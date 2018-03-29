@@ -1,0 +1,5 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/pogs?useSSL=false
+    username: root
+    password:
