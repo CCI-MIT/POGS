@@ -1,0 +1,6 @@
+database:
+  host: localhost:3306
+  schema: pogs
+  url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
+  username: root
+  password:

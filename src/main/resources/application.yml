@@ -1,5 +1,65 @@
+server:
+  port: 18082
+  error:
+    whitelabel:
+      enabled: false
+    include-stacktrace: always
+  servlet:
+    session:
+      timeout: 7d
+  compression:
+    enabled: true
+
 spring:
+  profiles:
+    include: database-config
   datasource:
-    url: jdbc:mysql://localhost:3306/pogs?useSSL=false
-    username: root
-    password:
+    url: ${database.url}
+    username: ${database.username}
+    password: ${database.password}
+  security:
+    filter:
+      dispatcher-types: ASYNC,REQUEST,ERROR
+  mvc:
+    favicon:
+      enabled: false
+  resources:
+    chain:
+      strategy:
+        content:
+          enabled: true
+          paths:
+            - "/js/**"      # /static/js - our JavaScript files
+            - "/css/**"     # /(static|dist)/css - our CSS files
+            - "/vendor/**"  # /dist/vendor - external dependencies (from yarn)
+      cache: false
+    cache:
+      period: 1d
+    # use comma-separated list to override default value
+    static-locations: >
+      classpath:/dist/,
+      classpath:/static/
+
+logging:
+  level:
+    ROOT: WARN
+    org.springframework: INFO
+    org.springframework.jmx: WARN
+    org.springframework.web: WARN
+    org.springframework.boot.web: WARN
+    org.springframework.boot.actuate: WARN
+    org.springframework.context.annotation: WARN
+    org.springframework.beans.factory.annotation: WARN
+
+
+---
+
+spring:
+  profiles: development
+  resources:
+    # use comma-separated list to override default value
+    static-locations: >
+      file:view/src/main/resources/static/,
+      file:view/src/main/resources/dist/,
+      classpath:/dist/,
+      classpath:/static/

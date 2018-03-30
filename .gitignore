@@ -1,25 +1,59 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
+### Intellij ###
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+#module and compilation related files (optional)
 *.iml
-*.ipr
+.idea/compiler.xml
+.idea/modules.xml
+.idea/encodings.xml
+.idea/misc.xml
 
-### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+# User-specific stuff:
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/vcs.xml
+.idea/jsLibraryMappings.xml
+
+# Sensitive or high-churn files:
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Plugins
+.idea/sonarlint
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+# IntelliJ
+/out/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+### Maven ###
+target/
+
+### Other ###
+*.jar
+*.zip
+rebel.xml
+.idea/artifacts
+.DS_Store
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+
+### Custom ###
+
+# Unignore maven wrapper
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Maven frontend plugin
+node_modules/
+node/

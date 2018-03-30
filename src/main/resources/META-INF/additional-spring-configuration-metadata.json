@@ -1,0 +1,31 @@
+{
+  "groups": [
+  ],
+  "properties": [
+    {
+      "name": "database.host",
+      "type": "java.lang.String",
+      "description": "The hostname of the database, defaults to 'localhost:3306'."
+    },
+    {
+      "name": "database.schema",
+      "type": "java.lang.String",
+      "description": "The name of the schema containing the database, defaults to 'pogs'."
+    },
+    {
+      "name": "database.url",
+      "type": "java.lang.String",
+      "description": "The url for the database, defaults to a jdbc:mysql URL containing the configured host and schema."
+    },
+    {
+      "name": "database.username",
+      "type": "java.lang.String",
+      "description": "The username to access the database."
+    },
+    {
+      "name": "database.password",
+      "type": "java.lang.String",
+      "description": "The password to access the database."
+    }
+  ]
+}
