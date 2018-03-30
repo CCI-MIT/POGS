@@ -57,3 +57,5 @@ hs_err_pid*
 # Maven frontend plugin
 node_modules/
 node/
+/src/main/resources/dist/vendor/
+yarn.lock
