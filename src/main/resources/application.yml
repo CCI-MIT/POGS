@@ -1,5 +1,5 @@
 server:
-  port: 18082
+  port: 8080
   error:
     whitelabel:
       enabled: false
@@ -40,16 +40,16 @@ spring:
       classpath:/dist/,
       classpath:/static/
 
-logging:
-  level:
-    ROOT: WARN
-    org.springframework: INFO
-    org.springframework.jmx: WARN
-    org.springframework.web: WARN
-    org.springframework.boot.web: WARN
-    org.springframework.boot.actuate: WARN
-    org.springframework.context.annotation: WARN
-    org.springframework.beans.factory.annotation: WARN
+#logging:
+#  level:
+#    ROOT: WARN
+#    org.springframework: INFO
+#    org.springframework.jmx: WARN
+#    org.springframework.web: WARN
+#    org.springframework.boot.web: WARN
+#    org.springframework.boot.actuate: WARN
+#    org.springframework.context.annotation: WARN
+#    org.springframework.beans.factory.annotation: WARN
 
 
 ---

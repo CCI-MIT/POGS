@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.config;
 
+import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,5 +25,10 @@ public class WebConfig implements WebMvcConfigurer {
                 new FilterRegistrationBean<>();
         registrationBean.setFilter(new ShallowEtagHeaderFilter());
         return registrationBean;
+    }
+
+    @Bean
+    public LayoutDialect layoutDialect() {
+        return new LayoutDialect();
     }
 }

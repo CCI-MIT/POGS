@@ -2,8 +2,8 @@ var gulp = require('gulp');
 var noop = require('gulp-noop');
 
 var npmDist = require('gulp-npm-dist');
-var postcss      = require('gulp-postcss');
-var sourcemaps   = require('gulp-sourcemaps');
+var postcss = require('gulp-postcss');
+var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('autoprefixer');
 var mqpacker = require('css-mqpacker');
 var cssnano = require('cssnano')({
@@ -28,7 +28,7 @@ var CONFIG = {
                 modules: [
                     {
                         name: "bootstrap",
-                        main: function() {
+                        main: function () {
                             return {
                                 sassDir: NODE_MODULES_PATH + '/bootstrap/scss'
                             }
@@ -51,19 +51,18 @@ var CONFIG = {
 gulp.task('default', ['copy-libs', 'sass']);
 gulp.task('build', ['copy-libs', 'sass-minified']);
 
-gulp.task('watch', function() {
+gulp.task('watch', function () {
     var watcher = gulp.watch(CONFIG.sass.sourcePath, ['sass']);
-    watcher.on('change', function(event) {
+    watcher.on('change', function (event) {
         console.log('File ' + event.path + ' was ' + event.type + ', running sass compilation...');
     });
 });
 
-
 //=  Internal tasks
-gulp.task('copy-libs', function() {
+gulp.task('copy-libs', function () {
     gulp.src(npmDist({copyUnminified: true, excludes: CONFIG.libs.excludes}),
-                {base: NODE_MODULES_PATH})
-            .pipe(gulp.dest(CONFIG.libs.destPath));
+        {base: NODE_MODULES_PATH})
+        .pipe(gulp.dest(CONFIG.libs.destPath));
 });
 
 gulp.task("sass", function () {
@@ -76,13 +75,13 @@ gulp.task("sass-minified", function () {
 
 function compileSass(shouldPostProcess) {
     gulp.src(CONFIG.sass.sourcePath)
-            .pipe(sourcemaps.init())
-            .pipe(sass(eyeglass(CONFIG.sass.options)).on("error", sass.logError))
-            .pipe(shouldPostProcess ? postcss([
-                autoprefixer(), // add vendor prefixes
-                mqpacker(), // combine media queries
-                cssnano // minify CSS
-            ]) : noop())
-            .pipe(sourcemaps.write('.'))
-            .pipe(gulp.dest(CONFIG.sass.destPath));
+        .pipe(sourcemaps.init())
+        .pipe(sass(eyeglass(CONFIG.sass.options)).on("error", sass.logError))
+        .pipe(shouldPostProcess ? postcss([
+            autoprefixer(), // add vendor prefixes
+            mqpacker(), // combine media queries
+            cssnano // minify CSS
+        ]) : noop())
+        .pipe(sourcemaps.write('.'))
+        .pipe(gulp.dest(CONFIG.sass.destPath));
 }

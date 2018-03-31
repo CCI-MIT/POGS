@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+    <link rel="stylesheet" href="../../dist/vendor/bootstrap/dist/css/bootstrap.min.css"
+          th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}"/>
+</head>
+<body>
+<header>
+    <img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/>
+</header>
+
+<div layout:fragment="content">
+    This is the page content.
+</div>
+
+<footer id="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</footer>
+
+<script src="../../dist/vendor/jquery/dist/jquery.min.js"
+        th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+<script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"
+        th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
+<script src="../../dist/vendor/bootstrap/dist/js/bootstrap.min.js"
+        th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+</body>
+</html>

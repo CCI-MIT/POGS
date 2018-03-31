@@ -59,3 +59,4 @@ node_modules/
 node/
 /src/main/resources/dist/vendor/
 yarn.lock
+.eyeglass_cache

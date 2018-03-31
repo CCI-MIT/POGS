@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.model.dao;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
+import edu.mit.cci.pogs.model.jooq.tables.records.AuthUserRecord;
 import org.jooq.DSLContext;
 import org.springframework.stereotype.Repository;
 
@@ -25,5 +26,17 @@ public class UserDao {
         return dslContext.selectFrom(AUTH_USER)
                          .where(AUTH_USER.EMAIL_ADDRESS.eq(emailAddress))
                          .fetchOne().into(AuthUser.class);
+    }
+
+    public void update(AuthUser authUser) {
+        final AuthUserRecord authUserRecord = new AuthUserRecord();
+        authUserRecord.from(authUser);
+        authUserRecord.update();
+    }
+
+    public void create(AuthUser authUser) {
+        final AuthUserRecord authUserRecord = new AuthUserRecord();
+        authUserRecord.from(authUser);
+        authUserRecord.store();
     }
 }
