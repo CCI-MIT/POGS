@@ -40,17 +40,15 @@ spring:
       classpath:/dist/,
       classpath:/static/
 
-#logging:
-#  level:
-#    ROOT: WARN
-#    org.springframework: INFO
-#    org.springframework.jmx: WARN
-#    org.springframework.web: WARN
-#    org.springframework.boot.web: WARN
-#    org.springframework.boot.actuate: WARN
-#    org.springframework.context.annotation: WARN
-#    org.springframework.beans.factory.annotation: WARN
-
+logging:
+  level:
+    ROOT: WARN
+    org.springframework: INFO
+    org.springframework.jmx: WARN
+    org.springframework.boot.actuate: WARN
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: WARN
+    org.springframework.boot.web.servlet.FilterRegistrationBean: WARN
+    org.springframework.web.servlet.handler.SimpleUrlHandlerMapping: WARN
 
 ---
 
@@ -59,7 +57,7 @@ spring:
   resources:
     # use comma-separated list to override default value
     static-locations: >
-      file:view/src/main/resources/static/,
-      file:view/src/main/resources/dist/,
+      file:src/main/resources/static/,
+      file:src/main/resources/dist/,
       classpath:/dist/,
       classpath:/static/
