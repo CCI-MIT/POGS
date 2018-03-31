@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base-layout.html}">
+
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>Login - POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <form action="#" th:action="@{/login}">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="username">Email:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="email" id="username" name="username"
+                       autocomplete="username"/>
+            </div>
+            <label class="col-sm-2 col-form-label" for="password">Password:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="password" id="password" name="password"
+                       autocomplete="current-password"/>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>
