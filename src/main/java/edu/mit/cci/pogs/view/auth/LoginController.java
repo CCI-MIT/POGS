@@ -1,4 +1,4 @@
-package edu.mit.cci.pogs.view;
+package edu.mit.cci.pogs.view.auth;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,6 +8,6 @@ public class LoginController {
 
     @GetMapping("/login")
     public String showLoginForm() {
-        return "login";
+        return "auth/login";
     }
 }

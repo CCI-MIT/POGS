@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders
         .AuthenticationManagerBuilder;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration
         .WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 @Configuration
@@ -31,6 +33,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .and()
                 .formLogin()
                     .loginPage("/login")
+                    .usernameParameter("emailAddress")
                     .permitAll()
                     .and()
                 .logout()
@@ -50,9 +53,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .sameOrigin();
     }
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(authUserDetailsService)
-            .passwordEncoder(new BCryptPasswordEncoder());
+            .passwordEncoder(passwordEncoder());
     }
 }

@@ -1,4 +1,4 @@
-package edu.mit.cci.pogs.view;
+package edu.mit.cci.pogs.view.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @GetMapping("/")
+    @GetMapping
     public String showIndex() {
         return "admin/index";
     }
