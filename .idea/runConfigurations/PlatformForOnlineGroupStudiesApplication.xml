@@ -1,0 +1,15 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="PlatformForOnlineGroupStudiesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="pogs" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="edu.mit.cci.pogs.PlatformForOnlineGroupStudiesApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <additionalParameters>
+      <param>
+        <option name="enabled" value="true" />
+        <option name="name" value="spring.profiles.active" />
+        <option name="value" value="development" />
+      </param>
+    </additionalParameters>
+    <method />
+  </configuration>
+</component>
