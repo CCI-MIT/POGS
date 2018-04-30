@@ -130,11 +130,8 @@
 	</dependencies>
 
 	<build>
+
 		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
 
 			<plugin>
                 <groupId>it.ozimov</groupId>
@@ -154,7 +151,31 @@
 					</execution>
 				</executions>
 			</plugin>
-
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>5.0.7</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>migrate</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<!--suppress MavenModelInspection (read from database-config) -->
+					<url>${database.url}</url>
+					<!--suppress MavenModelInspection (read from database-config) -->
+					<user>${database.username}</user>
+					<!--suppress MavenModelInspection (read from database-config) -->
+					<password>${database.password}</password>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
 			<plugin>
 				<groupId>org.jooq</groupId>
 				<artifactId>jooq-codegen-maven</artifactId>
@@ -190,6 +211,12 @@
 							<inputSchema>${database.schema}</inputSchema>
 							<includes>.*</includes>
 							<excludes>flyway_schema_history</excludes>
+							<forcedTypes>
+								<forcedType>
+									<name>BOOLEAN</name>
+									<types>(?i:TINYINT(\s*\(\d+\))?(\s*UNSIGNED)?)</types>
+								</forcedType>
+							</forcedTypes>
 						</database>
 						<generate>
 							<pojos>true</pojos>

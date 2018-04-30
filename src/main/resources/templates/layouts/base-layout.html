@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<!--/*@thymesVar id="message" type="java.lang.String"*/-->
+<!--/*@thymesVar id="messageType" type="java.lang.String"*/-->
 <head>
     <meta charset="UTF-8">
     <title>POGS</title>
@@ -11,9 +13,14 @@
 </head>
 <body>
 <div class="container">
+
     <header>
         <img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/>
     </header>
+
+    <div th:if="${message}" th:text="${message}"
+         th:class="${'alert alert-dismissible fade show ' + messageType}">
+    </div>
 
     <div layout:fragment="content">
         This is the page content.

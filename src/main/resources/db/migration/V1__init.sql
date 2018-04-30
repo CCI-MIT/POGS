@@ -5,4 +5,4 @@ CREATE TABLE auth_user (
 	`first_name` varchar(127) not null,
 	`last_name` varchar(127) not null,
 	primary key(`id`)
-);
+)ENGINE = InnoDB;

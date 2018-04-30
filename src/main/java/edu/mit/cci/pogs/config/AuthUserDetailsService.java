@@ -1,6 +1,6 @@
 package edu.mit.cci.pogs.config;
 
-import edu.mit.cci.pogs.model.dao.UserDao;
+import edu.mit.cci.pogs.model.dao.user.UserDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,6 +55,9 @@ public class AuthUserDetailsService implements UserDetailsService {
             // Ensure array iteration order is predictable (as per
             // UserDetails.getAuthorities() contract and SEC-717)
             SortedSet<GrantedAuthority> sortedAuthorities = new TreeSet<>(new AuthorityComparator());
+            if(authUser.getIsAdmin()){
+                sortedAuthorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            }
             sortedAuthorities.add(new SimpleGrantedAuthority("ROLE_MEMBER"));
             return sortedAuthorities;
         }
