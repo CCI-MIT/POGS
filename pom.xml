@@ -32,8 +32,8 @@
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
 
         <!-- JavaScript tool versions -->
-        <node.version>v8.9.3</node.version>
-        <yarn.version>v1.3.2</yarn.version>
+        <node.version>v9.11.1</node.version>
+        <yarn.version>v1.5.1</yarn.version>
     </properties>
 
 	<dependencies>
