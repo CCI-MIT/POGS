@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+>
+<!--/*@thymesVar id="message" type="java.lang.String"*/-->
+<!--/*@thymesVar id="messageType" type="java.lang.String"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+    <link rel="stylesheet" href="../../dist/vendor/bootstrap/dist/css/bootstrap.min.css"
+          th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}"/>
+    <link rel="stylesheet" href="../../dist/css/style.css"
+          th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" type="text/css" href="../../dist/vendor/bootstrap-duallistbox/dist/bootstrap-duallistbox.css"
+          th:href="@{/vendor/bootstrap-duallistbox/dist/bootstrap-duallistbox.css}">
+    <script src="../../dist/vendor/jquery/dist/jquery.min.js"
+            th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+</head>
+<body>
+<div class="container">
+
+    <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #f4f4f1;">
+        <a class="navbar-brand" href="#"><img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/></a>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="/admin/studies">Studies</a>
+                <a class="nav-item nav-link" href="/admin/studies">Task groups</a>
+                <a class="nav-item nav-link" href="/admin/studies">Tasks</a>
+            </div>
+        </div>
+        <ul class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+            <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_ADMIN')">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Admin
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <a class="dropdown-item" href="/admin/users">Users</a>
+                    <a class="dropdown-item" href="/admin/researchgroups">Research groups</a>
+                    <a class="dropdown-item" href="/admin/taskplugins">Task plugins</a>
+                </div>
+            </li>
+            <li>
+                <a class="nav-item nav-link" href="/login">Sign out</a>
+            </li>
+        </ul>
+    </nav>
+
+    <header>
+
+    </header>
+
+    <div th:if="${message}" th:text="${message}"
+         th:class="${'alert alert-dismissible fade show ' + messageType}">
+    </div>
+
+    <div layout:fragment="content">
+        This is the page content.
+    </div>
+
+
+    <footer id="footer">
+        &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+    </footer>
+</div>
+
+
+<script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"
+        th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
+<script src="../../dist/vendor/bootstrap/dist/js/bootstrap.min.js"
+        th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+
+<script src="../../dist/vendor/bootstrap-duallistbox/dist/jquery.bootstrap-duallistbox.min.js"
+        th:src="@{/vendor/bootstrap-duallistbox/dist/jquery.bootstrap-duallistbox.min.js}"></script>
+
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+    <!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
+        <li class="breadcrumb-item active"><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
+    </ol>
+    <h2 th:text="${study.studyName }"></h2>
+    <p th:text="${study.studyDescription}"></p>
+    <h3>Study sessions: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/sessions/create" class="btn btn-outline-primary float-right">
+                    Create new session</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Session ID</th>
+            <th>Session name</th>
+            <th># Sessions teams </th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="study : ${studiesList}">
+            <tr>
+                <td th:text="${study.id}"></td>
+                <td><a th:text="${study.studyName}" th:href="${'/admin/studies/'+ study.id}"></a></td>
+                <td th:text="${study.studySessionPrefix}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

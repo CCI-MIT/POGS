@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Users</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/authusers">Auth users</a></li>
+        <li class="breadcrumb-item active" th:if="${authUser.id != null}">
+            <a th:href="${'/admin/authusers/' + authUser.id}" th:text="${authUser.firstName}"></a>
+        </li>
+    </ol>
+    <h2>Edit user</h2>
+    <form action="#" th:action="@{/admin/users}" th:object="${authUser}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="id" th:value="*{id}"/>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="firstName">First Name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="firstName" th:field="*{firstName}"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="lastName">Last Name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="lastName" th:field="*{lastName}"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="emailAddress">Email Address:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="emailAddress" th:field="*{emailAddress}"/>
+            </div>
+        </div>
+        <div th:if="${authUser.id == null}"  class="form-group row">
+            <label class="col-sm-2 col-form-label" for="password">Password:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="password" id="password" th:field="*{password}"
+                       autocomplete="new-password"/>
+            </div>
+        </div>
+
+        <!-- Begin research group field -->
+        <fieldset class="form-group">
+            <legend>Research groups</legend>
+
+            <select multiple="multiple" size="10" th:field="*{researchGroupRelationshipBean.selectedValues}" id="researchGroups">
+                <option
+                        th:each="rg: ${researchGroups}"
+                        th:value="${rg.id}"
+                        th:text="${rg.groupName}" ></option>
+            </select>
+
+            <!--<select multiple="multiple" size="10" name="researchgroups">-->
+                <!--<th:block th:each="rg : ${researchGroups}">-->
+                    <!--<option th:value="${rg.id}" th:text="${rg.groupName}"></option>-->
+                <!--</th:block>-->
+
+            <!--</select>-->
+
+        </fieldset>
+        <script>
+
+            $(function() {
+                 //$('select[name="researchgroups"]')
+
+                $('#researchGroups')
+                    .bootstrapDualListbox({
+                        selectedListLabel:"Chosen groups",
+                        nonSelectedListLabel: "Available groups",
+                        moveAllLabel:"Move all",
+                        removeAllLabel: "Remove all"
+                });
+                /* hack for bootstrap 4 */
+                var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+            });
+        </script>
+        <!-- End research group field -->
+
+        <button th:if="${authUser.id == null}" type="submit" class="btn btn-primary">Create user
+        </button>
+        <button th:if="${authUser.id != null}" type="submit" class="btn btn-primary">Save user
+        </button>
+        <br/>
+    </form>
+</div>
+ 
+</div>
+</body>
+</html>

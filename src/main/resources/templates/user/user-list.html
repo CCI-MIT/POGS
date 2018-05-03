@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="AuthUsersList" type="java.util.List<edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - AuthUsers</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/users">Users</a></li>
+    </ol>
+    <h2>All users:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/users/create" class="btn btn-outline-primary float-right">
+                    Create new user</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email Address</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="authUser : ${usersList}">
+            <tr>
+                <td th:text="${authUser.id}"></td>
+                <td><a th:text="${authUser.firstName}" th:href="${'/admin/users/'+ authUser.id} + '/edit'"></a></td>
+                <td><a th:text="${authUser.lastName}" th:href="${'/admin/users/'+ authUser.id} + '/edit'"></a></td>
+                <td><a th:text="${authUser.emailAddress}" th:href="${'/admin/users/'+ authUser.id} + '/edit'"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

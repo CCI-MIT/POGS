@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS `research_group` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `group_name` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
