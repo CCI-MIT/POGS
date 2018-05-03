@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="PlatformForOnlineGroupStudiesApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <module name="pogs" />
+    <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="edu.mit.cci.pogs.PlatformForOnlineGroupStudiesApplication" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <additionalParameters>
@@ -10,6 +10,8 @@
         <option name="value" value="development" />
       </param>
     </additionalParameters>
+    <module name="pogs" />
+    <envs />
     <method />
   </configuration>
 </component>

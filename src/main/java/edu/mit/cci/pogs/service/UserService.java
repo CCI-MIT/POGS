@@ -40,7 +40,6 @@ public class UserService {
     }
 
 
-
     public AuthUser adminCreateOrUpdateUser(AuthUserBean authUserBean) {
         AuthUser authUser = new AuthUser();
         authUser.setEmailAddress(authUserBean.getEmailAddress());
@@ -50,38 +49,70 @@ public class UserService {
         authUser.setIsAdmin(authUserBean.getAdmin());
         authUser.setId(authUserBean.getId());
 
-        if(authUser.getId()==null) {
+        if (authUser.getId() == null) {
 
             authUser.setPassword(passwordEncoder.encode(authUserBean.getPassword()));
             authUser = userDao.create(authUser);
             authUserBean.setId(authUser.getId());
-            createUserGroups(authUserBean);
-            return  authUser;
+            createOrUpdateUserGroups(authUserBean);
+            return authUser;
 
-        }else{
+        } else {
             userDao.update(authUser);
-            uddateUserGroups(authUserBean);
+            createOrUpdateUserGroups(authUserBean);
             return authUser;
         }
 
     }
-    private void createUserGroups(AuthUserBean authUserBean){
 
-    }
-    private void uddateUserGroups(AuthUserBean authUserBean){
-        if(authUserBean.getResearchGroupRelationshipBean()==null && authUserBean.getResearchGroupRelationshipBean().getSelectedValues()==null){
+
+    private void createOrUpdateUserGroups(AuthUserBean authUserBean) {
+        if (authUserBean.getResearchGroupRelationshipBean() == null && authUserBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<ResearchGroupHasAuthUser> toCreate =  new ArrayList<>();
-        List<ResearchGroupHasAuthUser> toDelete =  new ArrayList<>();
-        List<ResearchGroupHasAuthUser> currentlySelected =  listResearchGroupHasAuthUserByAuthUser(authUserBean.getId());
+        List<ResearchGroupHasAuthUser> toCreate = new ArrayList<>();
+        List<ResearchGroupHasAuthUser> toDelete = new ArrayList<>();
+        List<ResearchGroupHasAuthUser> currentlySelected = listResearchGroupHasAuthUserByAuthUser(authUserBean.getId());
 
-        for(String researchGroupId : authUserBean.getResearchGroupRelationshipBean().getSelectedValues()){
-            
+        for (ResearchGroupHasAuthUser rghau : currentlySelected) {
+            boolean foundRGH = false;
+            for (String researchGroupId : authUserBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
+                    foundRGH = true;
+                }
+            }
+            if(!foundRGH){
+                toDelete.add(rghau);
+            }
+
+        }
+
+        for (String researchGroupId : authUserBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+
+            boolean selectedAlreadyIn = false;
+            for (ResearchGroupHasAuthUser rghau : currentlySelected) {
+                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
+                    selectedAlreadyIn = true;
+                }
+            }
+            if(!selectedAlreadyIn){
+                ResearchGroupHasAuthUser rghau = new ResearchGroupHasAuthUser();
+                rghau.setAuthUserId(authUserBean.getId());
+                rghau.setResearchGroupId(new Long(researchGroupId));
+                toCreate.add(rghau);
+            }
+
+        }
+        for(ResearchGroupHasAuthUser toCre: toCreate){
+            researchGroupHasAuthUserDao.create(toCre);
+        }
+        for(ResearchGroupHasAuthUser toDel: toDelete){
+            researchGroupHasAuthUserDao.delete(toDel);
         }
 
     }
-    public List<ResearchGroupHasAuthUser> listResearchGroupHasAuthUserByAuthUser(Long authUserId){
+
+    public List<ResearchGroupHasAuthUser> listResearchGroupHasAuthUserByAuthUser(Long authUserId) {
         return researchGroupHasAuthUserDao.listByAuthUser(authUserId);
     }
 
