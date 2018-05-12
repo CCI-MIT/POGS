@@ -10,6 +10,7 @@ public interface StudyHasResearchGroupDao extends Dao<StudyHasResearchGroup, Lon
     List<StudyHasResearchGroup> list();
     List<StudyHasResearchGroup> listByStudyId(Long studyId);
     List<StudyHasResearchGroup> listByResearchGroup(Long researchGroupId);
+    void delete(StudyHasResearchGroup rghau);
 }
 
  

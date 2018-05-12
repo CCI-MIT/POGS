@@ -16,13 +16,19 @@
         <li class="breadcrumb-item active"><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
     </ol>
     <h2 th:text="${study.studyName }"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/studies/' + study.id + '/edit'}" class="btn btn-outline-primary float-right">
+                Edit study</a>
+        </div>
+    </div>
     <p th:text="${study.studyDescription}"></p>
     <h3>Study sessions: </h3>
     <div class="row">
         <div class="col"></div>
         <div class="col">
             <div class="col-12">
-                <a href="/admin/sessions/create" class="btn btn-outline-primary float-right">
+                <a th:href="${'/admin/studies/' + study.id + '/sessions/create'}"  class="btn btn-outline-primary float-right">
                     Create new session</a>
             </div>
         </div>

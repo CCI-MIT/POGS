@@ -1,6 +1,8 @@
 package edu.mit.cci.pogs.view.study;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,9 +12,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.utils.MessageUtils;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
+import edu.mit.cci.pogs.view.study.beans.StudyBean;
 
 @Controller
 @RequestMapping(value = "/admin/studies")
@@ -21,11 +31,17 @@ public class StudyController {
     @Autowired
     private StudyDao studyDao;
 
+    @Autowired
+    private ResearchGroupDao researchGroupDao;
+
+    @Autowired
+    private StudyService studyService;
 
     @GetMapping
+
     public String getStudy(Model model) {
 
-        model.addAttribute("studiesList", studyDao.listStudiesWithUserGroup());
+        model.addAttribute("studiesList", studyDao.listStudiesWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "study/study-list";
     }
 
@@ -39,28 +55,45 @@ public class StudyController {
     @GetMapping("/create")
     public String createStudy(Model model) {
 
-        model.addAttribute("study", new Study());
+        StudyBean sb = new StudyBean();
+        sb.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+
+        model.addAttribute("study",sb );
         return "study/study-edit";
     }
 
     @GetMapping("{studyId}/edit")
     public String createStudy(@PathVariable("studyId") Long studyId, Model model) {
-        model.addAttribute("study", studyDao.get(studyId));
+
+        StudyBean sb = new StudyBean(studyDao.get(studyId));
+        sb.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+        sb.getResearchGroupRelationshipBean()
+                .setStudyHasResearchSelectedValues(
+                        studyService.listResearchGroupHasAuthUserByAuthUser(studyId));
+
+        model.addAttribute("study", sb);
         return "study/study-edit";
     }
 
     @PostMapping
-    public String saveStudy(@ModelAttribute Study study, RedirectAttributes redirectAttributes) {
+    public String saveStudy(@ModelAttribute StudyBean study, RedirectAttributes redirectAttributes) {
 
+        studyService.createOrUpdate(study);
         if (study.getId() == null) {
-            studyDao.create(study);
             MessageUtils.addSuccessMessage("Study created successfully!",redirectAttributes);
         }else{
-            studyDao.update(study);
             MessageUtils.addSuccessMessage("Study updated successfully!",redirectAttributes);
         }
 
         return "redirect:/admin/studies";
+    }
+
+    @ModelAttribute("researchGroups")
+    public List<ResearchGroup> getAllResearchGroups() {
+
+        return researchGroupDao.list();
     }
 
 }

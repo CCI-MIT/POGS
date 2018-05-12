@@ -1,17 +1,18 @@
 package edu.mit.cci.pogs.model.dao.studyhasresearchgroup.impl;
- 
-import edu.mit.cci.pogs.model.dao.api.AbstractDao;
-import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
-import edu.mit.cci.pogs.model.jooq.tables.records.StudyHasResearchGroupRecord;
+
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
- 
+
 import java.util.List;
- 
+
+import edu.mit.cci.pogs.model.dao.api.AbstractDao;
+import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.records.StudyHasResearchGroupRecord;
+
 import static edu.mit.cci.pogs.model.jooq.Tables.STUDY_HAS_RESEARCH_GROUP;
  
 @Repository
@@ -47,6 +48,13 @@ public class StudyHasResearchGroupDaoImpl extends AbstractDao<StudyHasResearchGr
                 .from(STUDY_HAS_RESEARCH_GROUP).getQuery();
                 query.addConditions(STUDY_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID.eq(researchGroupId));
         return query.fetchInto(StudyHasResearchGroup.class);
+    }
+
+    public void delete(StudyHasResearchGroup rghau) {
+        dslContext.delete(STUDY_HAS_RESEARCH_GROUP)
+                .where(STUDY_HAS_RESEARCH_GROUP.ID.eq(rghau.getId()))
+                .execute();
+
     }
  
 }

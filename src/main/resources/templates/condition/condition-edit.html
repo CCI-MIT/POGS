@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/base-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Conditions</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/conditions">Conditions</a></li>
+        <li class="breadcrumb-item active" th:if="${condition.id != null}">
+            <a th:href="${'/admin/conditions/' + condition.id}" th:text="${condition.studyName}"></a>
+        </li>
+    </ol>
+    <h2>Edit condition</h2>
+    <form action="#" th:action="@{/admin/conditions}" th:object="${condition}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+ 
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="conditionName">Condition Name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="conditionName" th:field="*{conditionName}"/>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="studyId">Study Id:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="studyId" th:field="*{studyId}"/>
+            </div>
+        </div>
+        </div>
+        <button th:if="${condition.id == null}" type="submit" class="btn btn-primary">Create condition
+        </button>
+        <button th:if="${condition.id != null}" type="submit" class="btn btn-primary">Save condition
+        </button>
+        <br/>
+    </form>
+</div>
+ 
+</div>
+</body>
+</html>

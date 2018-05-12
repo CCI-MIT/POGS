@@ -36,6 +36,7 @@ public class UserService {
         authUser.setPassword(passwordEncoder.encode(registerBean.getPassword()));
         authUser.setFirstName(registerBean.getFirstName());
         authUser.setLastName(registerBean.getLastName());
+        authUser.setIsAdmin(false);
         return userDao.create(authUser);
     }
 

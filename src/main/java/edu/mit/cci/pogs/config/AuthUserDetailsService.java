@@ -3,9 +3,11 @@ package edu.mit.cci.pogs.config;
 import edu.mit.cci.pogs.model.dao.user.UserDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.SpringSecurityCoreVersion;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -32,6 +34,16 @@ public class AuthUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return new AuthUserDetails(userDao.get(username));
+    }
+
+    public static Long getLoggedInUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = auth.getPrincipal();
+        Long userId = null;
+        if (principal instanceof AuthUserDetails) {
+            userId = ((AuthUserDetails) principal).getId();
+        }
+        return userId;
     }
 
     public static class AuthUserDetails implements UserDetails {
@@ -62,6 +74,10 @@ public class AuthUserDetailsService implements UserDetailsService {
             return sortedAuthorities;
         }
 
+
+        public Long getId(){
+            return  authUser.getId();
+        }
         @Override
         public String getPassword() {
             return authUser.getPassword();
