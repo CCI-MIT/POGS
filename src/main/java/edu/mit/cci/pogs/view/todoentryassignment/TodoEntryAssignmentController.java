@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.view.todoentryassignment;
 import edu.mit.cci.pogs.model.dao.todoentryassignment.TodoEntryAssignmentDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TodoEntryAssignment;
 import edu.mit.cci.pogs.utils.MessageUtils;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -29,13 +30,13 @@ public class TodoEntryAssignmentController {
     @PostMapping
     public String saveTodoEntryAssignment(@ModelAttribute TodoEntryAssignment todoEntryAssignment, RedirectAttributes redirectAttributes) {
 
-        if(todoEntryAssignment.getId() == null){
+        if (todoEntryAssignment.getId() == null) {
             todoEntryAssignmentDao.create(todoEntryAssignment);
-            MessageUtils.addSuccessMessage("Todo entry Assignment created successfully!",redirectAttributes);
-            } else {
+            MessageUtils.addSuccessMessage("Todo entry Assignment created successfully!", redirectAttributes);
+        } else {
             todoEntryAssignmentDao.update(todoEntryAssignment);
-            MessageUtils.addSuccessMessage("Todo entry Assignment updated successfully!",redirectAttributes);
-            }
+            MessageUtils.addSuccessMessage("Todo entry Assignment updated successfully!", redirectAttributes);
+        }
         return "redirect:/admin/todoentry";
     }
 }

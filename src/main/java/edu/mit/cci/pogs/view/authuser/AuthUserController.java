@@ -1,5 +1,5 @@
 package edu.mit.cci.pogs.view.authuser;
- 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,7 +16,6 @@ import javax.validation.Valid;
 
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.user.UserDao;
-
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
 import edu.mit.cci.pogs.service.UserService;
@@ -26,7 +25,7 @@ import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 @Controller
 @RequestMapping(value = "/admin/users")
 public class AuthUserController {
- 
+
     @Autowired
     private UserDao authUserDao;
 
@@ -44,25 +43,25 @@ public class AuthUserController {
 
     @GetMapping
     public String getAuthUser(Model model) {
- 
+
         model.addAttribute("usersList", authUserDao.list());
         return "user/user-list";
     }
- 
+
     @GetMapping("{id}")
     public String getAuthUsers(@PathVariable("id") Long id, Model model) {
- 
+
         model.addAttribute("authUser", authUserDao.get(id));
         return "user/user-display";
     }
- 
+
     @GetMapping("/create")
     public String createAuthUser(Model model) {
 
         model.addAttribute("authUser", new AuthUserBean(new AuthUser()));
         return "user/user-edit";
     }
- 
+
     @GetMapping("{id}/edit")
     public String createAuthUser(@PathVariable("id") Long id, Model model) {
         AuthUserBean aub = new AuthUserBean(authUserDao.get(id));
@@ -72,22 +71,22 @@ public class AuthUserController {
                 .setResearchGroupHasAuthUsersSelectedValues(
                         userService.listResearchGroupHasAuthUserByAuthUser(id));
 
-        model.addAttribute("authUser",aub );
+        model.addAttribute("authUser", aub);
         return "user/user-edit";
     }
- 
+
     @PostMapping
     public String saveAuthUser(@Valid @ModelAttribute AuthUserBean authUserBean, RedirectAttributes redirectAttributes) {
 
         userService.adminCreateOrUpdateUser(authUserBean);
 
         if (authUserBean.getId() == null) {
-            MessageUtils.addSuccessMessage("AuthUser created successfully!",redirectAttributes);
-        }else{
-            MessageUtils.addSuccessMessage("AuthUser updated successfully!",redirectAttributes);
+            MessageUtils.addSuccessMessage("AuthUser created successfully!", redirectAttributes);
+        } else {
+            MessageUtils.addSuccessMessage("AuthUser updated successfully!", redirectAttributes);
         }
- 
+
         return "redirect:/admin/users";
     }
- 
+
 }

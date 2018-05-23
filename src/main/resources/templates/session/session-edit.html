@@ -23,7 +23,8 @@
     <h2>Edit session</h2>
     <form action="#" th:action="@{/admin/sessions}" th:object="${session}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{studyId}"/>
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Basic</legend>
             <div class="container">
@@ -43,8 +44,8 @@
 
                                     <div class="col-sm-6">
                                         <div class="form-group">
-                                            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-                                                <input type="text" class="form-control datetimepicker-input" data-target="#sessionStartDate1" id="sessionStartDate"/>
+                                            <div class="input-group date" id="x" data-target-input="nearest">
+                                                <input type="text" class="form-control" data-target="#sessionStartDate1" id="sessionStartDate" th:field="*{sessionStartDate}"/>
                                                 <div class="input-group-append" data-target="#sessionStartDate1" data-toggle="sessionStartDate">
                                                     <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
                                                 </div>
@@ -53,7 +54,8 @@
                                     </div>
                                     <script type="text/javascript">
                                         $(function () {
-                                            $('#sessionStartDate1').datetimepicker();
+                                            jQuery.datetimepicker.setLocale('en');
+                                            jQuery('#sessionStartDate').datetimepicker({step:5});
                                         });
                                     </script>
 
@@ -372,6 +374,43 @@
             </div>
 
         </fieldset>
+
+        <!-- Begin research group field -->
+        <fieldset class="form-group">
+            <legend>Task groups</legend>
+
+            <select multiple="multiple" size="10" th:field="*{sessionHasTaskGroupRelationshipBean.selectedValues}" id="taskGroups">
+                <option
+                        th:each="rg: ${taskGroups}"
+                        th:value="${rg.id}"
+                        th:text="${rg.taskGroupName}" ></option>
+            </select>
+        </fieldset>
+        <script>
+
+            $(function() {
+                //$('select[name="researchgroups"]')
+
+                $('#taskGroups')
+                    .bootstrapDualListbox({
+                                              selectedListLabel:"Chosen groups",
+                                              nonSelectedListLabel: "Available groups",
+                                              moveAllLabel:"Move all",
+                                              removeAllLabel: "Remove all"
+                                          });
+                /* hack for bootstrap 4 */
+                var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+            });
+        </script>
+        <!-- End research group field -->
+
+
+
+
 
         <!--<div class="form-group row">-->
             <!--<label class="col-sm-2 col-form-label" for="subjectCommunicationId">Subject Communication Id:</label>-->

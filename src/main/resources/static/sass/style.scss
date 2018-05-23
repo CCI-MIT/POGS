@@ -4,3 +4,12 @@ body {
 header{
   margin-bottom: 15px;
 }
+
+.taskOrderNumber{
+  margin-left: 10px;
+  margin-right: 10px;
+  font-weight: 600;
+}
+.deleteTask {
+  cursor: pointer;
+}

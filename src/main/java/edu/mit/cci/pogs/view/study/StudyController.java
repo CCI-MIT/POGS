@@ -1,8 +1,6 @@
 package edu.mit.cci.pogs.view.study;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +15,6 @@ import java.util.List;
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
 import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.utils.MessageUtils;
@@ -38,7 +35,6 @@ public class StudyController {
     private StudyService studyService;
 
     @GetMapping
-
     public String getStudy(Model model) {
 
         model.addAttribute("studiesList", studyDao.listStudiesWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
@@ -49,6 +45,8 @@ public class StudyController {
     public String getStudies(@PathVariable("studyId") Long studyId, Model model) {
 
         model.addAttribute("study", studyDao.get(studyId));
+        model.addAttribute("studiesList", studyDao.listStudiesWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
+
         return "study/study-display";
     }
 
@@ -59,7 +57,7 @@ public class StudyController {
         sb.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
 
-        model.addAttribute("study",sb );
+        model.addAttribute("study", sb);
         return "study/study-edit";
     }
 
@@ -71,7 +69,7 @@ public class StudyController {
                 new ResearchGroupRelationshipBean());
         sb.getResearchGroupRelationshipBean()
                 .setStudyHasResearchSelectedValues(
-                        studyService.listResearchGroupHasAuthUserByAuthUser(studyId));
+                        studyService.listStudyHasResearchGroupByStudyId(studyId));
 
         model.addAttribute("study", sb);
         return "study/study-edit";
@@ -82,9 +80,9 @@ public class StudyController {
 
         studyService.createOrUpdate(study);
         if (study.getId() == null) {
-            MessageUtils.addSuccessMessage("Study created successfully!",redirectAttributes);
-        }else{
-            MessageUtils.addSuccessMessage("Study updated successfully!",redirectAttributes);
+            MessageUtils.addSuccessMessage("Study created successfully!", redirectAttributes);
+        } else {
+            MessageUtils.addSuccessMessage("Study updated successfully!", redirectAttributes);
         }
 
         return "redirect:/admin/studies";

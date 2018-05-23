@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="taskGroupsList" type="java.util.List<edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - TaskGroups</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/taskgroups">Task groups</a></li>
+    </ol>
+    <h2>All task groups:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/taskgroups/create" class="btn btn-outline-primary float-right">
+                    Create new Task Group</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Task Group Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="taskGroup : ${taskGroupsList}">
+            <tr>
+                <td th:text="${taskGroup.id}"></td>
+                <td><a th:text="${taskGroup.taskGroupName}" th:href="${'/admin/taskgroups/'+ taskGroup.id + '/edit'}"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

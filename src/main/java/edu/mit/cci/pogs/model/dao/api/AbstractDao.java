@@ -47,7 +47,7 @@ public abstract class AbstractDao<PojoT, IdT, RecordT extends UpdatableRecord> i
         final RecordT record = newRecord();
         record.from(pojo);
         record.store();
-        return pojo;
+        return record.into(pojoClass);
     }
 
     public void delete(PojoT pojo) {

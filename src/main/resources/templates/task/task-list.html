@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="tasksList" type="java.util.List<edu.mit.cci.pogs.model.jooq.tables.pojos.Task>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Tasks</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/tasks">Tasks</a></li>
+    </ol>
+    <h2>All tasks:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/tasks/create" class="btn btn-outline-primary float-right">
+                    Create new Task</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+
+            <th>Task Name</th>
+            <th>Task Plugin Type</th>
+            <th>Scoring Type</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="task : ${tasksList}">
+            <tr>
+                <td th:text="${task.id}"></td>
+                <td><a th:text="${task.taskName}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
+                <td><a th:text="${task.taskPluginType}" th:href="${'/admin/tasks/'+ task.id+ '/edit'}"></a></td>
+                <td><a th:text="${task.scoringType}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
+
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

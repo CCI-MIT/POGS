@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - TaskGroups</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/taskgroups">Task groups</a></li>
+        <li class="breadcrumb-item active" th:if="${taskGroup.id != null}">
+            <a th:href="${'/admin/taskgroups/' + taskGroup.id + '/edit'}" th:text="${taskGroup.taskGroupName}"></a>
+        </li>
+    </ol>
+    <h2>Edit task group</h2>
+    <form action="#" th:action="@{/admin/taskgroups}" th:object="${taskGroup}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" th:field="*{id}"/>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="taskGroupName">Task Group Name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="taskGroupName" th:field="*{taskGroupName}"/>
+            </div>
+        </div>
+        <div class="container">
+
+            <div class="form-group row">
+                <div class="input-group">
+                    <select  class="custom-select" size="1" id="tasks">
+                        <option value="-1" disabled selected>Select the task</option>
+                        <option
+                                th:each="rg: ${tasks}"
+                                th:value="${rg.id}"
+                                th:text="${rg.taskName}" ></option>
+                    </select>
+                    <div class="input-group-append">
+                        <button type="button" id="addTaskGroup" class="btn btn-outline-secondary">Add task to task group</button>
+                    </div>
+                </div>
+            </div>
+
+            <br/>
+            <br/>
+            <ul class="list-group o-sortable list-group-sortable" id="listTaskGroup">
+
+                <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><span th:text="${rg.taskName}"></span><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
+            </ul>
+
+            <script>
+                $(function() {
+
+                    $("#addTaskGroup").click(function(){
+                        var id = $("#tasks").find(":selected").val();
+                        if (id == -1 ) return;
+                        var txt = $("#tasks").find(":selected").text();
+                        var index = $("#listTaskGroup li").length + 1;
+                        var toAdd = "<li class=\"list-group-item\" draggable=\"true\" data-task-id = \""+id+"\"><span class='taskOrderNumber'>#"+index+"</span><span>"+txt+"</span><input type='hidden' name='selectedTasks' value='"+id+"'/><button type='button' class=\"pull-right fa fa-trash btn-danger deleteTask\" data='"+id+"'></button></li>";
+                        $("#listTaskGroup").append(toAdd);
+                    });
+                    sortable('.o-sortable', {
+                        forcePlaceholderSize: true
+                        //placeholderClass: 'ph-class',
+                        //hoverClass: 'bg-maroon yellow'
+                    });
+
+                    sortable('.o-sortable')[0].addEventListener('sortupdate', function(e) {
+
+
+                       resetOrder();
+
+                    });
+                    
+                    $(".deleteTask").click(function () {
+                        var r = confirm("Are you sure you want to delete this task from this task group?");
+                        if (r == true) {
+                            $(this).parent().remove();
+                            resetOrder();
+                        }
+                    })
+
+                    function resetOrder(){
+                        $(".list-group-sortable li span.taskOrderNumber").each(function( index ) {
+                            console.log( index + ": " + $( this ).text() );
+                            $( this ).text("#" + (index + 1))
+                        });
+                    }
+                });
+
+
+            </script>
+        </div>
+        <br/>
+
+        <button th:if="${taskGroup.id == null}" type="submit" class="btn btn-primary">Create task group
+        </button>
+        <button th:if="${taskGroup.id != null}" type="submit" class="btn btn-primary">Save task group
+        </button>
+        <br/>
+        <br/>
+    </form>
+</div>
+ 
+</div>
+</body>
+</html>

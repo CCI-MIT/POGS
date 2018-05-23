@@ -6,45 +6,51 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 
 public class SessionBean {
 
-    private Long      id;
-    private String    sessionSuffix;
+    private Long id;
+    private String sessionSuffix;
     private Timestamp sessionStartDate;
-    private Long      conditionId;
-    private String    status;
-    private Integer   waitingRoomTime;
-    private Boolean   introPageEnabled;
-    private String    introText;
-    private Integer   introTime;
-    private Boolean    displayNameChangePageEnabled;
-    private Integer   displayNameChangeTime;
-    private Boolean   rosterPageEnabled;
-    private Integer   rosterTime;
-    private Boolean   donePageEnabled;
-    private String    donePageText;
-    private Integer   donePageTime;
-    private String    doneRedirectUrl;
-    private String    couldNotAssignToTeamMessage;
-    private String    taskExecutionType;
-    private Boolean   roundsEnabled;
-    private Boolean   numberOfRounds;
-    private String    communicationType;
-    private String    chatBotName;
-    private Boolean   scoreboardEnabled;
-    private String    scoreboardDisplayType;
-    private Boolean   scoreboardUseDisplayNames;
-    private Boolean   collaborationTodoListEnabled;
-    private Boolean   collaborationFeedbackWidgetEnabled;
-    private Boolean   collaborationVotingWidgetEnabled;
-    private String    teamCreationMoment;
-    private String    teamCreationType;
-    private Integer   teamMinSize;
-    private Integer   teamMaxSize;
-    private String    teamCreationMethod;
-    private String    teamCreationMatrix;
+    private Long conditionId;
+    private String status;
+    private Integer waitingRoomTime;
+    private Boolean introPageEnabled;
+    private String introText;
+    private Integer introTime;
+    private Boolean displayNameChangePageEnabled;
+    private Integer displayNameChangeTime;
+    private Boolean rosterPageEnabled;
+    private Integer rosterTime;
+    private Boolean donePageEnabled;
+    private String donePageText;
+    private Integer donePageTime;
+    private String doneRedirectUrl;
+    private String couldNotAssignToTeamMessage;
+    private String taskExecutionType;
+    private Boolean roundsEnabled;
+    private Boolean numberOfRounds;
+    private String communicationType;
+    private String chatBotName;
+    private Boolean scoreboardEnabled;
+    private String scoreboardDisplayType;
+    private Boolean scoreboardUseDisplayNames;
+    private Boolean collaborationTodoListEnabled;
+    private Boolean collaborationFeedbackWidgetEnabled;
+    private Boolean collaborationVotingWidgetEnabled;
+    private String teamCreationMoment;
+    private String teamCreationType;
+    private Integer teamMinSize;
+    private Integer teamMaxSize;
+    private String teamCreationMethod;
+    private String teamCreationMatrix;
+
+    private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
+
+    private Long studyId;
+
 
     public SessionBean() {
 
     }
+
     public SessionBean(Session value) {
         this.id = value.getId();
         this.sessionSuffix = value.getSessionSuffix();
@@ -361,5 +367,21 @@ public class SessionBean {
 
     public void setTeamCreationMatrix(String teamCreationMatrix) {
         this.teamCreationMatrix = teamCreationMatrix;
+    }
+
+    public SessionHasTaskGroupRelationshipBean getSessionHasTaskGroupRelationshipBean() {
+        return sessionHasTaskGroupRelationshipBean;
+    }
+
+    public void setSessionHasTaskGroupRelationshipBean(SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean) {
+        this.sessionHasTaskGroupRelationshipBean = sessionHasTaskGroupRelationshipBean;
+    }
+
+    public Long getStudyId() {
+        return studyId;
+    }
+
+    public void setStudyId(Long studyId) {
+        this.studyId = studyId;
     }
 }

@@ -13,13 +13,13 @@ public class AuthUserBean {
     private Boolean isAdmin;
 
 
-
     private ResearchGroupRelationshipBean researchGroupRelationshipBean;
 
-    public AuthUserBean(){
+    public AuthUserBean() {
 
     }
-    public AuthUserBean(AuthUser pojo){
+
+    public AuthUserBean(AuthUser pojo) {
         this.id = pojo.getId();
         this.emailAddress = pojo.getEmailAddress();
         this.firstName = pojo.getFirstName();
@@ -28,7 +28,7 @@ public class AuthUserBean {
         this.isAdmin = pojo.getIsAdmin();
     }
 
-    public AuthUser getAuthUser(){
+    public AuthUser getAuthUser() {
         AuthUser ret = new AuthUser();
         ret.setId(id);
         ret.setEmailAddress(emailAddress);
@@ -38,6 +38,7 @@ public class AuthUserBean {
         ret.setIsAdmin(getAdmin());
         return ret;
     }
+
     public Long getId() {
         return id;
     }
@@ -85,6 +86,7 @@ public class AuthUserBean {
     public void setAdmin(Boolean admin) {
         isAdmin = admin;
     }
+
     public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {
         return researchGroupRelationshipBean;
     }

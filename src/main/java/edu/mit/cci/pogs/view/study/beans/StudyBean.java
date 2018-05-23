@@ -1,28 +1,26 @@
 package edu.mit.cci.pogs.view.study.beans;
 
 
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 
 public class StudyBean {
 
-    public StudyBean(){
+    public StudyBean() {
 
     }
 
-    public StudyBean(Study study){
+    public StudyBean(Study study) {
 
         this.id = study.getId();
         this.studyName = study.getStudyName();
-        this.studyDescription =  study.getStudyDescription();
+        this.studyDescription = study.getStudyDescription();
         this.studySessionPrefix = study.getStudySessionPrefix();
 
     }
 
 
-
-    private Long   id;
+    private Long id;
 
     private String studyName;
 

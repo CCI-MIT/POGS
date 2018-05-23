@@ -1,33 +1,36 @@
 package edu.mit.cci.pogs.service;
 
-import edu.mit.cci.pogs.model.dao.study.StudyDao;
-import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
-import edu.mit.cci.pogs.view.authuser.AuthUserBean;
-import edu.mit.cci.pogs.view.study.beans.StudyBean;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.cci.pogs.model.dao.condition.ConditionDao;
+import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.view.study.beans.StudyBean;
+
 @Service
 public class StudyService {
 
-    private StudyDao studyDao;
+    private final StudyDao studyDao;
 
-    private StudyHasResearchGroupDao studyHasResearchGroupDao;
+    private final StudyHasResearchGroupDao studyHasResearchGroupDao;
+
+    private final ConditionDao conditionDao;
 
     @Autowired
-    public StudyService(StudyDao studyDao, StudyHasResearchGroupDao studyHasResearchGroupDao) {
+    public StudyService(StudyDao studyDao, StudyHasResearchGroupDao studyHasResearchGroupDao, ConditionDao conditionDao) {
         this.studyDao = studyDao;
         this.studyHasResearchGroupDao = studyHasResearchGroupDao;
+        this.conditionDao = conditionDao;
     }
 
-    public List<StudyHasResearchGroup> listResearchGroupHasAuthUserByAuthUser(Long studyId){
+    public List<StudyHasResearchGroup> listStudyHasResearchGroupByStudyId(Long studyId) {
         return this.studyHasResearchGroupDao.listByStudyId(studyId);
     }
 
@@ -39,7 +42,7 @@ public class StudyService {
         study.setStudyName(studyBean.getStudyName());
         study.setStudySessionPrefix(studyBean.getStudySessionPrefix());
 
-        if(study.getId() == null){
+        if (study.getId() == null) {
             study = studyDao.create(study);
             studyBean.setId(study.getId());
             createOrUpdateUserGroups(studyBean);
@@ -50,6 +53,7 @@ public class StudyService {
         return study;
 
     }
+
     private void createOrUpdateUserGroups(StudyBean studyBean) {
         if (studyBean.getResearchGroupRelationshipBean() == null && studyBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
@@ -65,7 +69,7 @@ public class StudyService {
                     foundRGH = true;
                 }
             }
-            if(!foundRGH){
+            if (!foundRGH) {
                 toDelete.add(rghau);
             }
 
@@ -79,7 +83,7 @@ public class StudyService {
                     selectedAlreadyIn = true;
                 }
             }
-            if(!selectedAlreadyIn){
+            if (!selectedAlreadyIn) {
                 StudyHasResearchGroup rghau = new StudyHasResearchGroup();
                 rghau.setStudyId(studyBean.getId());
                 rghau.setResearchGroupId(new Long(researchGroupId));
@@ -87,10 +91,10 @@ public class StudyService {
             }
 
         }
-        for(StudyHasResearchGroup toCre: toCreate){
+        for (StudyHasResearchGroup toCre : toCreate) {
             studyHasResearchGroupDao.create(toCre);
         }
-        for(StudyHasResearchGroup toDel: toDelete){
+        for (StudyHasResearchGroup toDel : toDelete) {
             studyHasResearchGroupDao.delete(toDel);
         }
 
@@ -100,5 +104,9 @@ public class StudyService {
         return studyHasResearchGroupDao.listByStudyId(studyId);
     }
 
+    public List<Condition> listConditions(Study study) {
+        return conditionDao.list();
+
+    }
 
 }

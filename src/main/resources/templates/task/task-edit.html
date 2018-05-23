@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+ 
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Tasks</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/tasks">Tasks</a></li>
+        <li class="breadcrumb-item active" th:if="${task.id != null}">
+            <a th:href="${'/admin/tasks/' + task.id}" th:text="${task.taskName}"></a>
+        </li>
+    </ol>
+    <h2>Edit task</h2>
+    <form action="#" th:action="@{/admin/tasks}" th:object="${task}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden"  th:field="*{id}"/>
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Basic</legend>
+            <div class="container">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="taskName">Task Name:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="taskName" th:field="*{taskName}"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="taskPluginType">Task Plugin Type:</label>
+                    <div class="col-sm-10">
+                        <select class="custom-select" th:field="*{taskPluginType}" id="taskPluginType">
+                            <option
+                                    th:each="rg: ${taskPluginTypes}"
+                                    th:value="${rg.taskPluginName}"
+                                    th:text="${rg.taskPluginName}" ></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="scoringType">Scoring Type:</label>
+                    <div class="col-sm-10">
+                        <select class="custom-select" th:field="*{scoringType}" id="scoringType">
+                            <option
+                                    th:each="rg: ${scoringTypes}"
+                                    th:value="${rg.id}"
+                                    th:text="${rg.scoringType}" ></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="soloTask">Solo Task:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{soloTask}" type="checkbox" id="soloTask" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Intro</legend>
+            <div class="container">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="introPageEnabled">Intro Page Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{introPageEnabled}" type="checkbox" id="introPageEnabled" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="introText">Intro Text:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="introText" th:field="*{introText}" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="introTime">Intro Time:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="number" id="introTime" th:field="*{introTime}"/>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Primer</legend>
+            <div class="container">
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="primerPageEnabled">Primer Page Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{primerPageEnabled}" type="checkbox" id="primerPageEnabled" />
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="primerText">Primer Text:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="primerText" th:field="*{primerText}" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="primerTime">Primer Time:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="number" id="primerTime" th:field="*{primerTime}"/>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Interaction</legend>
+            <div class="container">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="interactionTime">Interaction Time:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="number" id="interactionTime" th:field="*{interactionTime}"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="interactionText">Interaction Text:</label>
+                    <div class="col-sm-10">
+                        <textarea class="form-control" id="interactionText" th:field="*{interactionText}" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="interactionWidgetEnabled">Interaction Widget Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{interactionWidgetEnabled}" type="checkbox" id="interactionWidgetEnabled" />
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Communication</legend>
+            <div class="container">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="communicationType">Communication Type (*) :</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="communicationType" th:field="*{communicationType}"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="subjectCommunicationId">Subject Communication Id (*) :</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="subjectCommunicationId" th:field="*{subjectCommunicationId}"/>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="chatScriptId">Chat Script Id:</label>
+                    <div class="col-sm-10">
+                        <input class="form-control" type="text" id="chatScriptId" th:field="*{chatScriptId}"/>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <fieldset class="form-group row">
+            <legend class="col-form-legend col-sm-2">Collaboration (*)</legend>
+            <div class="container">
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="collaborationTodoListEnabled">Collaboration Todo List Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{collaborationTodoListEnabled}" type="checkbox" id="collaborationTodoListEnabled" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="collaborationVotingWidgetEnabled">Collaboration Voting Widget Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{collaborationVotingWidgetEnabled}" type="checkbox" id="collaborationVotingWidgetEnabled" />
+                    </div>
+                </div>
+
+
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration Feedback Widget Enabled:</label>
+                    <div class="col-sm-10">
+                        <input class="form-check-input" th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox" id="collaborationFeedbackWidgetEnabled" />
+                    </div>
+                </div>
+
+            </div>
+        </fieldset>
+        <!-- Begin research group field -->
+        <fieldset class="form-group">
+            <legend>Research groups</legend>
+
+            <select multiple="multiple" size="10" th:field="*{researchGroupRelationshipBean.selectedValues}" id="researchGroups">
+                <option
+                        th:each="rg: ${researchGroups}"
+                        th:value="${rg.id}"
+                        th:text="${rg.groupName}" ></option>
+            </select>
+        </fieldset>
+        <script>
+
+            $(function() {
+                //$('select[name="researchgroups"]')
+
+                $('#researchGroups')
+                    .bootstrapDualListbox({
+                                              selectedListLabel:"Chosen groups",
+                                              nonSelectedListLabel: "Available groups",
+                                              moveAllLabel:"Move all",
+                                              removeAllLabel: "Remove all"
+                                          });
+                /* hack for bootstrap 4 */
+                var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+            });
+        </script>
+        <!-- End research group field -->
+        <div class="container">
+            Items marked with * (Override) <small>If set this will override the session defined configuration</small>
+        </div>
+
+        <button th:if="${task.id == null}" type="submit" class="btn btn-primary">Create task
+        </button>
+        <button th:if="${task.id != null}" type="submit" class="btn btn-primary">Save task
+        </button>
+        <br/>
+    </form>
+</div>
+ 
+</div>
+</body>
+</html>

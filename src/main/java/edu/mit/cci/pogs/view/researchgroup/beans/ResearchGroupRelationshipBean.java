@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
 
 
 public class ResearchGroupRelationshipBean {
@@ -30,6 +31,17 @@ public class ResearchGroupRelationshipBean {
             this.selectedValues = selectedValues.toArray( new String[0]);
         }
     }
+
+    public void setTaskyHasResearchSelectedValues(List<TaskHasResearchGroup> studyHasResearchGroup){
+        if(studyHasResearchGroup!=null && !studyHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(TaskHasResearchGroup rghau: studyHasResearchGroup){
+                selectedValues.add(rghau.getResearchGroupId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
+
     private String[] selectedValues;
 
     public String[] getSelectedValues() {

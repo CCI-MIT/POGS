@@ -32,6 +32,13 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
  
         return query.fetchInto(Session.class);
     }
- 
+    public List<Session> listByConditionId(Long conditionId){
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SESSION).getQuery();
+
+        query.addConditions(SESSION.CONDITION_ID.eq(conditionId));
+        return query.fetchInto(Session.class);
+    }
+
 }
  
