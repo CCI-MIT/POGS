@@ -1,14 +1,26 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/base-layout.html}">
+      layout:decorate="~{layouts/workspace-layout.html}">
 <head>
     <meta charset="UTF-8">
     <title>POGS</title>
 </head>
 <body>
 <div layout:fragment="content">
-    Please enter your user id : <input /> <button>Start</button>
+    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+
+
+        <div class="form-group row">
+            <label class="col-sm-6 col-form-label" for="checkin-form">Please enter your user id:</label>
+            <div class="col-sm-4">
+                <input class="form-check-input"  type="text" id="checkin-form" />
+            </div>
+            <button class="btn btn-info">Start</button>
+        </div>
+
+
+    </div>
 </div>
 </body>
 </html>

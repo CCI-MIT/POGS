@@ -1,0 +1,3 @@
+ALTER TABLE subject
+ADD COLUMN `session_id` BIGINT(20) NOT NULL;
+ALTER TABLE subject add FOREIGN KEY (session_id) REFERENCES session(id) ON DELETE CASCADE;

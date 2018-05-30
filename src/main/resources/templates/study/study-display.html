@@ -39,15 +39,16 @@
         <tr>
             <th>Session ID</th>
             <th>Session name</th>
-            <th># Sessions teams </th>
+            <th>Session start date </th>
         </tr>
         </thead>
         <tbody>
-        <th:block th:each="study : ${studiesList}">
+        <th:block th:each="sessionz : ${sessionsList}">
             <tr>
-                <td th:text="${study.id}"></td>
-                <td><a th:text="${study.studyName}" th:href="${'/admin/studies/'+ study.id}"></a></td>
-                <td th:text="${study.studySessionPrefix}"></td>
+                <td th:text="${sessionz.id}"></td>
+                <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
+                <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+
             </tr>
         </th:block>
         </tbody>

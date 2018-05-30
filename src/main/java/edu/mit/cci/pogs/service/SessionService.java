@@ -8,9 +8,12 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
+import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Service
 public class SessionService {
@@ -18,11 +21,14 @@ public class SessionService {
 
     private final SessionHasTaskGroupDao sessionHasTaskGroupDao;
     private final SessionDao sessionDao;
+    private final SubjectDao subjectDao;
 
     @Autowired
-    public SessionService(SessionHasTaskGroupDao sessionHasTaskGroupDao, SessionDao sessionDao){
+    public SessionService(SessionHasTaskGroupDao sessionHasTaskGroupDao, SessionDao sessionDao,
+                          SubjectDao subjectdao) {
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
         this.sessionDao = sessionDao;
+        this.subjectDao = subjectdao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -127,5 +133,22 @@ public class SessionService {
 
     public List<Session> listSessionByConditionId(Long conditionId) {
         return sessionDao.listByConditionId(conditionId);
+    }
+
+    public List<Subject> listSubjectsBySessionId(Long sessionId) {
+        return subjectDao.listBySessionId(sessionId);
+    }
+
+
+    public void updateSubjectList(SubjectsBean subjectsBean) {
+        List<Subject> subjectList = subjectsBean.getSubjectList();
+        for (Subject subject : subjectList) {
+            subject.setSessionId(subjectsBean.getSessionId());
+            if(subject.getId()!=null){
+                subjectDao.update(subject);
+            }else{
+                subjectDao.create(subject);
+            }
+        }
     }
 }

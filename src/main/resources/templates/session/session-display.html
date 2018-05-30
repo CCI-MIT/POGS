@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+    </ol>
+    <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/studies/' + study.id + '/studies/' + sessionBean.id}" class="btn btn-outline-primary float-right">
+                Edit session</a>
+        </div>
+    </div>
+    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
+    <h3>Session subjects: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/edit'}"  class="btn btn-outline-primary float-right">
+                    Edit subjects</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Internal ID</th>
+            <th>Subject external ID</th>
+            <th>Subject display name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="subject : ${subjectsBean.subjectList}">
+            <tr>
+                <td th:text="${subject.id}"></td>
+                <td th:text="${subject.subjectExternalId}"></td>
+                <td th:text="${subject.subjectDisplayName}"></td>
+
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

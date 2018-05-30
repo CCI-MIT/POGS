@@ -33,6 +33,7 @@ import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SessionHasTaskGroupRelationshipBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Controller
 public class SessionController {
@@ -104,10 +105,16 @@ public class SessionController {
         return "session/session-list";
     }
 
-    @GetMapping("{id}")
-    public String getSessions(@PathVariable("id") Long id, Model model) {
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}")
+    public String getSessions(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
+        Study study = studyDao.get(studyId);
 
-        model.addAttribute("session", sessionDao.get(id));
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", sessionDao.get(id));
+        SubjectsBean subjectsBean = new SubjectsBean();
+        subjectsBean.setSubjectList(sessionService.listSubjectsBySessionId(id));
+        model.addAttribute("subjectsBean", subjectsBean);
+
         return "session/session-display";
     }
 
@@ -123,11 +130,11 @@ public class SessionController {
         condition.setConditionName(DEFAULT_CONDITION_NAME);
         condition.setStudyId(studyId);
         model.addAttribute("study", study);
-        model.addAttribute("session", session);
+        model.addAttribute("sessionBean", session);
         return "session/session-edit";
     }
 
-    @GetMapping("/admin/study/{studyId}/sessions/{id}/edit")
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
         SessionBean session = new SessionBean(sessionDao.get(id));
         Study study = studyDao.get(studyId);
@@ -137,21 +144,39 @@ public class SessionController {
         session.getSessionHasTaskGroupRelationshipBean().setSessionHasTaskGroupSelectedValues(
                 sessionService.listSessionHasTaskGroupBySessionId(session.getId()));
         model.addAttribute("study", study);
-        model.addAttribute("session", session);
+        model.addAttribute("sessionBean", session);
         return "session/session-edit";
     }
 
-    @PostMapping("/admin/sessions")
-    public String saveSession(@ModelAttribute SessionBean session, RedirectAttributes redirectAttributes) {
+    @PostMapping("/admin/sessions/subjects/edit")
+    public String saveSubject(@ModelAttribute SubjectsBean subjectsBean, RedirectAttributes redirectAttributes) {
 
-        sessionService.createOrUpdate(session);
-        if (session.getId() == null) {
+            sessionService.updateSubjectList(subjectsBean);
+        return "redirect:/admin/studies/"+subjectsBean.getStudyId()+"/sessions/" + subjectsBean.getSessionId();
+    }
+    @PostMapping("/admin/sessions")
+    public String saveSession(@ModelAttribute SessionBean sessionBean, RedirectAttributes redirectAttributes) {
+
+        sessionService.createOrUpdate(sessionBean);
+        if (sessionBean.getId() == null) {
             MessageUtils.addSuccessMessage("Session created successfully!", redirectAttributes);
         } else {
             MessageUtils.addSuccessMessage("Session updated successfully!", redirectAttributes);
         }
 
-        return "redirect:/admin/studies/" + session.getStudyId();
+        return "redirect:/admin/studies/" + sessionBean.getStudyId();
     }
 
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/subjects/edit")
+    public String editSubjects(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
+        SessionBean session = new SessionBean(sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        session.setStudyId(study.getId());
+        SubjectsBean subjectsBean = new SubjectsBean();
+        subjectsBean.setSubjectList(sessionService.listSubjectsBySessionId(session.getId()));
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", session);
+        model.addAttribute("subjectsBean", subjectsBean);
+        return "session/subject-edit";
+    }
 }

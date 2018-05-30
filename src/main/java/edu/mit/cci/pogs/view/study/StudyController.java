@@ -10,12 +10,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
@@ -43,9 +47,14 @@ public class StudyController {
 
     @GetMapping("{studyId}")
     public String getStudies(@PathVariable("studyId") Long studyId, Model model) {
+        Study study = studyDao.get(studyId);
+        model.addAttribute("study", study);
+        List<Condition> conditionList = studyService.listConditions(study);
+        model.addAttribute("conditionsList", conditionList);
+        List<Session> sessions = new ArrayList<>();
+        conditionList.forEach(condition -> sessions.addAll(studyService.listSessionsByCondition(condition)));
 
-        model.addAttribute("study", studyDao.get(studyId));
-        model.addAttribute("studiesList", studyDao.listStudiesWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
+        model.addAttribute("sessionsList", sessions);
 
         return "study/study-display";
     }

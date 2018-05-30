@@ -16,12 +16,12 @@
         <li class="breadcrumb-item active" th:if="${study.id != null}">
             <a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a>
         </li>
-        <li class="breadcrumb-item active" th:if="${session.id != null}">
-            <a th:href="${'/admin/sessions/' + session.id}" th:text="${session.sessionSuffix}"></a>
+        <li class="breadcrumb-item active" th:if="${sessionBean.id != null}">
+            <a th:href="${'/admin/sessions/' + sessionBean.id}" th:text="${sessionBean.sessionSuffix}"></a>
         </li>
     </ol>
     <h2>Edit session</h2>
-    <form action="#" th:action="@{/admin/sessions}" th:object="${session}" method="post">
+    <form action="#" th:action="@{/admin/sessions}" th:object="${sessionBean}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{studyId}"/>
@@ -55,7 +55,10 @@
                                     <script type="text/javascript">
                                         $(function () {
                                             jQuery.datetimepicker.setLocale('en');
-                                            jQuery('#sessionStartDate').datetimepicker({step:5});
+                                            jQuery('#sessionStartDate').datetimepicker(
+                                                {
+                                                    step:5,
+                                                    format:'m/d/Y H:i'});
                                         });
                                     </script>
 
@@ -419,9 +422,9 @@
             <!--</div>-->
         <!--</div>-->
 
-        <button th:if="${session.id == null}" type="submit" class="btn btn-primary">Create session
+        <button th:if="${sessionBean.id == null}" type="submit" class="btn btn-primary">Create session
         </button>
-        <button th:if="${session.id != null}" type="submit" class="btn btn-primary">Save session
+        <button th:if="${sessionBean.id != null}" type="submit" class="btn btn-primary">Save session
         </button>
         <br/>
     </form>

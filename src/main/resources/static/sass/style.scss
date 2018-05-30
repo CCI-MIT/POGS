@@ -13,3 +13,47 @@ header{
 .deleteTask {
   cursor: pointer;
 }
+
+/* Workspace classes */
+html,
+body {
+  height: 100%;
+  margin: 0
+}
+.flexbox {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  height: 100%;
+  width: 100%;
+}
+.flexbox .main {
+  flex: 1;
+  background: red
+}
+.flexbox .header,
+.flexbox .footer {
+  background: #F4F4F1;
+  padding:1em
+}
+.flexbox-row {
+  display: flex;
+  height: 100%;
+}
+.flexbox-row .information,
+.flexbox-row .mainContent,
+.flexbox-row .communication {
+  background: white;
+  padding: 1em;
+}
+.flexbox-row .mainContent {
+  flex: 1;
+  background: white
+}
+
+.centerContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+/* Workspace classes */

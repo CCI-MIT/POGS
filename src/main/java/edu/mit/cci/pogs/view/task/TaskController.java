@@ -3,13 +3,16 @@ package edu.mit.cci.pogs.view.task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +25,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.utils.MessageUtils;
+import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import edu.mit.cci.pogs.view.task.bean.TaskBean;
 
@@ -38,6 +42,11 @@ public class TaskController {
 
     @Autowired
     private TaskService taskService;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(Timestamp.class, new SqlTimestampPropertyEditor());
+    }
 
     @ModelAttribute("scoringTypes")
     public List<ScoringType> getTeamCreationMethods() {
@@ -70,8 +79,11 @@ public class TaskController {
 
     @GetMapping("/create")
     public String createTask(Model model) {
+        TaskBean tb = new TaskBean();
 
-        model.addAttribute("task", new Task());
+        tb.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+        model.addAttribute("task", tb);
         return "task/task-edit";
     }
 

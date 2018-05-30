@@ -7,7 +7,7 @@ import java.text.SimpleDateFormat;
 
 public class SqlTimestampPropertyEditor extends PropertyEditorSupport {
 
-    public static final String DEFAULT_BATCH_PATTERN = "dd/MM/yyyy HH:mm";
+    public static final String DEFAULT_BATCH_PATTERN = "MM/dd/yyyy HH:mm";
 
     private final SimpleDateFormat sdf;
 

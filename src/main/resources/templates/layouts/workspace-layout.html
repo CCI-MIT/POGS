@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<!--/*@thymesVar id="message" type="java.lang.String"*/-->
+<!--/*@thymesVar id="messageType" type="java.lang.String"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+
+    <link rel="stylesheet" href="../../dist/css/style.css"
+          th:href="@{/css/style.css}"/>
+    <link rel="stylesheet" href="../../dist/vendor/bootstrap/dist/css/bootstrap.min.css"
+          th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}"/>
+</head>
+<body>
+<div class="flexbox">
+    <div class="header"><img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/></div>
+    <div class="main">
+        <div class="flexbox-row">
+            <div layout:replace="this::information"  class="information"></div>
+            <div class="mainContent">
+                <div layout:fragment="content" class="centerContent  h-100">
+                    This is the page content.
+                </div>
+            </div>
+            <div class="communication" layout:replace="this::communication"></div>
+        </div>
+    </div>
+    <div class="footer" layout:replace="this::footer"  ></div>
+</div>
+<script src="../../dist/vendor/jquery/dist/jquery.min.js"
+        th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+<script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"
+        th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
+<script src="../../dist/vendor/bootstrap/dist/js/bootstrap.min.js"
+        th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+</body>
+</html>

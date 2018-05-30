@@ -26,7 +26,7 @@ public class SessionBean {
     private String couldNotAssignToTeamMessage;
     private String taskExecutionType;
     private Boolean roundsEnabled;
-    private Boolean numberOfRounds;
+    private Integer numberOfRounds;
     private String communicationType;
     private String chatBotName;
     private Boolean scoreboardEnabled;
@@ -249,11 +249,11 @@ public class SessionBean {
         this.roundsEnabled = roundsEnabled;
     }
 
-    public Boolean getNumberOfRounds() {
+    public Integer getNumberOfRounds() {
         return numberOfRounds;
     }
 
-    public void setNumberOfRounds(Boolean numberOfRounds) {
+    public void setNumberOfRounds(Integer numberOfRounds) {
         this.numberOfRounds = numberOfRounds;
     }
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="researchGroupsList" type="java.util.List<edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Research Groups</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/researchgroups">ResearchGroups</a></li>
+    </ol>
+    <h2>All Research Groups:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/researchgroups/create" class="btn btn-outline-primary float-right">
+                    Create new Research Group</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Group Name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="researchGroup : ${researchGroupsList}">
+            <tr>
+                <td th:text="${researchGroup.id}"></td>
+                <td><a th:text="${researchGroup.groupName}" th:href="${'/admin/researchgroups/'+ researchGroup.id + '/edit'}"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

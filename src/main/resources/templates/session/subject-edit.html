@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/studies/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+    </ol>
+    <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/studies/' + study.id + '/studies/' + sessionBean.id}" class="btn btn-outline-primary float-right">
+                Edit session</a>
+        </div>
+    </div>
+    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
+    <h3>Session subjects: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <button id="addSubject" class="btn">Add subject</button>
+            </div>
+        </div>
+        <script>
+            $(function() {
+                $("#addSubject").click(function(){
+
+                    var index = $("#subjectList tr").length ;
+                    var sessionId = $("#sessionId").val();
+                    var toAdd = "<tr><td><input type='hidden' value='' id='subjectList"+index+".id' name='subjectList["+index+"].id' /><input type='hidden' value='' value='"+sessionId+"' name='subjectList["+index+"].sessionId' /><input type='text' name='subjectList["+index+"].subjectExternalId'/></td><td><input type='text' name='subjectList["+index+"].subjectDisplayName' /></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteSubject' ></button></td></tr>";
+                    $("#subjectList").append(toAdd);
+                });
+                $(".deleteSubject").click(function () {
+                    var r = confirm("Are you sure you want to delete this subject from this session ?");
+                    if (r == true) {
+                        $(this).parent().parent().remove();
+                    }
+                })
+            });
+        </script>
+    </div>
+    <br/>
+    <form action="#" th:action="@{/admin/sessions/subjects/edit}" th:object="${subjectsBean}" method="post">
+        <input type="hidden" name="sessionId" id="sessionId" th:value="${sessionBean.id}">
+        <input type="hidden" name="studyId" th:value="${study.id}">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Subject external ID</th>
+                <th>Subject display name</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="subjectList">
+
+                    <tr th:each="person, rowStat : *{subjectList}">
+                        <td><input type="hidden" th:field="*{subjectList[__${rowStat.index}__].id}"  /><input type="hidden" th:field="*{subjectList[__${rowStat.index}__].sessionId}"  /><input type="text" th:field="*{subjectList[__${rowStat.index}__].subjectExternalId}" /></td>
+                        <td><input type="text" th:field="*{subjectList[__${rowStat.index}__].subjectDisplayName}" /></td>
+                        <td><button type="button" class="pull-right fa fa-trash btn-danger deleteSubject" ></button></td>
+                    </tr>
+
+            </tbody>
+        </table>
+        <br/>
+        <button type="submit" class="btn btn-primary">Save subject list</button>
+        <br/>
+    </form>
+</div>
+</body>
+</html>
