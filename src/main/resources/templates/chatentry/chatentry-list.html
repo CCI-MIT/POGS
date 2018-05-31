@@ -13,7 +13,7 @@
         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
         <li class="breadcrumb-item"><a href="/admin/chatscripts">ChatScript</a></li>
         <li class="breadcrumb-item active" th:if="${chatscript.id != null}">
-            <a th:href="${'/admin/chatscript' + chatscript.id +'/details'}" th:text="${chatscript.chatscriptName}"></a>
+            <a th:href="${'/admin/chatscript' + chatscript.id +'/details'}" th:text="${chatscript.chatScriptName}"></a>
         </li>
         <!--<li class="breadcrumb-item active" th:if="${chatentry.id != null}">-->
             <!--<a th:href="${'/admin/chatentries/' + chatentry.id}" th:text="Test"></a>-->
