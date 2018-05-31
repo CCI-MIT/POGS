@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface TodoEntryDao extends Dao<TodoEntry, Long> {
     //TodoEntry get();
-    List<TodoEntry> get();
+    List<TodoEntry> list();
     //Update & create
 }

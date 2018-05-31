@@ -25,7 +25,7 @@ public class TodoEntryDaoImpl extends AbstractDao<TodoEntry, Long, TodoEntryReco
         this.dslContext = dslContext;
     }
 
-    public List<TodoEntry> get(){
+    public List<TodoEntry> list(){
         final SelectQuery<Record> query = dslContext.select()
                 .from(TODO_ENTRY).getQuery();
 

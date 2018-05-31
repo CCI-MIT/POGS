@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface VotingPoolVoteDao extends Dao<VotingPoolVote, Long> {
 
-    List<VotingPoolVote> get();
+    List<VotingPoolVote> list();
 }

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chatentry</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/chatscripts">Chatscript</a></li>
+        <li class="breadcrumb-item active" th:if="${chatscript.id != null}">
+            <a th:href="${'/admin/chatscripts/' + chatscript.id}" th:text="${chatscript.chatScriptName}"></a>
+        </li>
+        <li class="breadcrumb-item active" th:if="${chatentry.id != null}">
+            <a th:href="${'/admin/chatentries/' + chatentry.id}" th:text="${chatentry.id}"></a>
+        </li>
+    </ol>
+    <h2>Edit Chatentry</h2>
+    <form action="#" th:action="@{/admin/chatentries}" th:object="${chatentry}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="id" th:value="*{id}"/>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="chatentryValue">ChatEntry Value:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="chatentryValue" th:field="*{chatEntryValue}"/>
+
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="chatentryelaspsedtime">Chatentry name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="chatentryelaspsedtime" th:field="*{chatElapsedTime}"/>
+
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="chatentryscriptId">Chatentry ScriptId:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="chatentryscriptId" th:field="*{chatScriptId}"/>
+            </div>
+        </div>
+
+        <button th:if="${chatentry.id == null}" type="submit" class="btn btn-primary">Create chatentry
+        </button>
+        <button th:if="${chatentry.id != null}" type="submit" class="btn btn-primary">Save chatentry
+        </button>
+        <br/>
+    </form>
+</div>
+
+</div>
+</body>
+</html>

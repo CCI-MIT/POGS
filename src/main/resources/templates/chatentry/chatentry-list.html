@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chat Entries</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/chatscripts">ChatScript</a></li>
+        <li class="breadcrumb-item active" th:if="${chatscript.id != null}">
+            <a th:href="${'/admin/chatscript' + chatscript.id +'/details'}" th:text="${chatscript.chatscriptName}"></a>
+        </li>
+        <!--<li class="breadcrumb-item active" th:if="${chatentry.id != null}">-->
+            <!--<a th:href="${'/admin/chatentries/' + chatentry.id}" th:text="Test"></a>-->
+        <!--</li>-->
+    </ol>
+    <h2>All Chat Entries:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="'/admin/chatscripts/' + chatscript.id + '/chatentries/create'" class="btn btn-outline-primary float-right">
+                    Create new chatentry</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Chatentry ID</th>
+            <th>Chatentry value</th>
+            <th>Chatentry elapsed time</th>
+            <th>Chatscript Id</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <th:block th:each="chatentry : ${chatentryList}">
+            <tr>
+                <td th:text="${chatentry.id}"></td>
+                <td><a th:text="${chatentry.chatEntryValue}" ></a></td>
+                <td><a th:text="${chatentry.chatElapsedTime}" ></a></td>
+                <td><a th:text="${chatentry.chatScriptId}" ></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

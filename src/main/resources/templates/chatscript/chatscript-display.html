@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - ChatScript </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/chatscripts">ChatScript</a></li>
+        <li class="breadcrumb-item active"><a th:href="${'/admin/chatscripts/' + chatscript.id}" th:text="${chatscript.id}"></a></li>
+    </ol>
+    <!--<h2 th:text="Test111"></h2>-->
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/chatscripts/' + chatscript.id + '/edit'}" class="btn btn-outline-primary float-right">
+                Edit chatscript</a>
+        </div>
+    </div>
+    <!--<p th:text="${chatscript.id}"></p>-->
+    <h3>Chatentries: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a th:href="${'/admin/chatscripts/' + chatscript.id + '/chatentries/create'}"  class="btn btn-outline-primary float-right">
+                    Create new chatentry</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Chatentry ID</th>
+            <th>Chatentry Value</th>
+            <th>Chatentry Elapsed Time </th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="chatentry : ${chatentryList}">
+            <tr>
+                <td th:text="${chatentry.id}"></td>
+                <td><a th:text="${chatentry.chatEntryValue}" th:href="${'/admin/chatscripts/'+ chatscript.id +'/chatentries/'+ chatentry.id}"></a></td>
+                <td th:text="${chatentry.chatElapsedTime}"></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
