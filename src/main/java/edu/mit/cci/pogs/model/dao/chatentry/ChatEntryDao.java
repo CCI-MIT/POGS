@@ -9,4 +9,6 @@ public interface ChatEntryDao extends Dao<ChatEntry, Long> {
     List<ChatEntry> list();
 
     List<ChatEntry> listChatEntryByChatScript(Long id);
+
+    void deleteChatEntry(ChatEntry chatEntry);
 }

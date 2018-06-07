@@ -43,4 +43,11 @@ public class ChatEntryDaoImpl extends AbstractDao<ChatEntry, Long, ChatEntryReco
         query.addConditions(CHAT_ENTRY.CHAT_SCRIPT_ID.eq(id));
         return query.fetchInto(ChatEntry.class);
     }
+
+    @Override
+    public void deleteChatEntry(ChatEntry chatEntry){
+        delete(chatEntry);
+        return;
+    }
+
 }
