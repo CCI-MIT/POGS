@@ -56,4 +56,15 @@ body {
   flex-direction: column;
   justify-content: center;
 }
+.waiting_message {
+  color: black;
+  font-size: 18px;
+  text-align:center;
+}
+.waiting_message #countdown {
+  color: black;
+  font-size: 21px;
+  font-weight: 700;
+  text-align:center;
+}
 /* Workspace classes */

@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
  
 import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT;
- 
+import static edu.mit.cci.pogs.model.jooq.Tables.TEAM;
+import static edu.mit.cci.pogs.model.jooq.Tables.TEAM_HAS_SUBJECT;
+
 @Repository
 public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> implements SubjectDao {
  
@@ -36,6 +38,40 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         final SelectQuery<Record> query = dslContext.select()
                 .from(SUBJECT).getQuery();
         query.addConditions(SUBJECT.SESSION_ID.eq(sessionId));
+        return query.fetchInto(Subject.class);
+    }
+
+    public Subject getByExternalId(String externalId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SUBJECT).getQuery();
+        query.addConditions(SUBJECT.SUBJECT_EXTERNAL_ID.eq(externalId));
+        Record record =  query.fetchOne();
+        if(record == null) {
+            return null;
+        }else{
+            return record.into(Subject.class);
+        }
+    }
+
+    public List<Subject> getTeammates(Long sessionId, Long roundId, Long taskId) {
+        final SelectQuery<Record> query = dslContext.select(SUBJECT.fields())
+                .from(SUBJECT)
+                .join(TEAM_HAS_SUBJECT)
+                .on(TEAM_HAS_SUBJECT.SUBJECT_ID.eq(SUBJECT.ID))
+                .join(TEAM)
+                .on(TEAM.ID.eq(TEAM_HAS_SUBJECT.SUBJECT_ID))
+                .getQuery();
+
+        if(sessionId != null) {
+            query.addConditions(TEAM.SESSION_ID.eq(sessionId));
+        }
+
+        if(roundId != null) {
+            query.addConditions(TEAM.ROUND_ID.eq(roundId));
+        }
+        if(taskId != null) {
+            query.addConditions(TEAM.TASK_ID.eq(taskId));
+        }
         return query.fetchInto(Subject.class);
     }
  

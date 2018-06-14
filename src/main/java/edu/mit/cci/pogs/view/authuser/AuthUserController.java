@@ -65,6 +65,7 @@ public class AuthUserController {
     @GetMapping("{id}/edit")
     public String createAuthUser(@PathVariable("id") Long id, Model model) {
         AuthUserBean aub = new AuthUserBean(authUserDao.get(id));
+        aub.setAdmin(false);
         aub.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
         aub.getResearchGroupRelationshipBean()

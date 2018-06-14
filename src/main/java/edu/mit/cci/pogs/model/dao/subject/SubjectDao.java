@@ -9,5 +9,7 @@ public interface SubjectDao extends Dao<Subject, Long> {
  
     List<Subject> list();
     List<Subject> listBySessionId( Long sessionId);
+    Subject getByExternalId(String externalId);
+    List<Subject> getTeammates(Long sessionId, Long roundId, Long taskId);
 }
  

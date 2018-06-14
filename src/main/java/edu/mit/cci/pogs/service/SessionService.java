@@ -1,17 +1,22 @@
 package edu.mit.cci.pogs.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.cci.pogs.cron.SessionCron;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
@@ -22,6 +27,13 @@ public class SessionService {
     private final SessionHasTaskGroupDao sessionHasTaskGroupDao;
     private final SessionDao sessionDao;
     private final SubjectDao subjectDao;
+
+    private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
+
+    public static final long WAITING_ROOM_OPEN_INIT_WINDOW = 15*60_000;//15 mins
+
+    @Autowired
+    private ApplicationContext context;
 
     @Autowired
     public SessionService(SessionHasTaskGroupDao sessionHasTaskGroupDao, SessionDao sessionDao,
@@ -34,6 +46,24 @@ public class SessionService {
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
         return sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(sessionid);
     }
+
+    public void initializeSessionRunners(){
+        List<Session> sessions = getSessionsToBeInitialized();
+        for(Session s: sessions){
+            //place to create the new session runner thread
+            _log.debug(" Session runner starting: " + s.getSessionSuffix());
+            SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
+            sessionRunner.setSession(s);
+            SessionRunner.addSessionRunner(s.getId(),sessionRunner);
+            sessionRunner.run();
+
+
+        }
+    }
+    public List<Session> getSessionsToBeInitialized(){
+        return sessionDao.listStartsIn(WAITING_ROOM_OPEN_INIT_WINDOW);
+    }
+
 
     public Session createOrUpdate(SessionBean sessionBean) {
         Session session = new Session();
@@ -151,4 +181,6 @@ public class SessionService {
             }
         }
     }
+
+
 }

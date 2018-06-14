@@ -11,7 +11,15 @@
           th:href="@{/css/style.css}"/>
     <link rel="stylesheet" href="../../dist/vendor/bootstrap/dist/css/bootstrap.min.css"
           th:href="@{/vendor/bootstrap/dist/css/bootstrap.min.css}"/>
+
+    <script src="../../dist/vendor/jquery/dist/jquery.min.js"
+            th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+    <script src="../../js/pogs.js" th:src="@{/js/pogs.js}"></script>
+
+    <script src="../../js/pogsPlugin.js" th:src="@{/js/pogs.js}"></script>
+
 </head>
+
 <body>
 <div class="flexbox">
     <div class="header"><img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/></div>
@@ -28,11 +36,15 @@
     </div>
     <div class="footer" layout:replace="this::footer"  ></div>
 </div>
-<script src="../../dist/vendor/jquery/dist/jquery.min.js"
-        th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+
 <script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"
         th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
 <script src="../../dist/vendor/bootstrap/dist/js/bootstrap.min.js"
         th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+
+
 </body>
 </html>
