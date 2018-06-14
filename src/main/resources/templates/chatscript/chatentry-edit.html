@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chatscripts </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <!--<li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>-->
+        <li class="breadcrumb-item "><a th:href="${'/admin/chatscripts/' + chatscript.id}" th:text="${chatscript.chatScriptName}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/chatscripts/'+ chatscript.id}" th:text="${chatscript.chatScriptName}"></a></li>
+    </ol>
+    <h2 th:text="${chatscript.chatScriptName}"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/chatscripts/' + chatscript.id}" class="btn btn-outline-primary float-right">
+                Edit chatscripts</a>
+        </div>
+    </div>
+    <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
+
+    <h3>Chatscript entries: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <button id="addChatentry" class="btn">Add Chatentry</button>
+            </div>
+        </div>
+        <script>
+            $(function() {
+                $("#addChatentry").click(function(){
+
+                    var index = $("#chatEntryList tr").length ;
+                    var chatscriptId = $("#chatScriptId").val();
+                    var toAdd = "<tr><td><input type='hidden' value='' id='chatEntryList"+index+".id' name='chatEntryList["+index+"].id' /><input type='hidden' value='' value='"+chatscriptId+"' name='chatEntryList["+index+"].chatscriptId' /><input type='text' name='chatEntryList["+index+"].chatEntryValue'/></td><td><input type='text' name='chatEntryList["+index+"].chatElapsedTime' /></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteChatentry' ></button></td></tr>";
+                    $("#chatEntryList").append(toAdd);
+                });
+                $(".deleteChatentry").click(function () {
+                    var r = confirm("Are you sure you want to delete this chatentry from this chatscript ?");
+                    if (r == true) {
+                        $(this).parent().parent().remove();
+                    }
+                })
+            });
+        </script>
+    </div>
+    <br/>
+    <form action="#" th:action="@{/admin/chatscripts/chatentries/edit}" th:object="${chatEntriesBean}" method="post">
+        <input type="hidden" name="chatscriptId" id="chatscriptId" th:value="${chatscript.id}">
+        <!--<input type="hidden" name="studyId" th:value="${study.id}">-->
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Chatentry value</th>
+                <th>Chatentry elapsed time</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="chatEntryList">
+
+            <tr th:each="person, rowStat : *{chatEntryList}">
+                <td><input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].id}"  /><input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].chatScriptId}"  /><input type="text" th:field="*{chatEntryList[__${rowStat.index}__].chatEntryValue}" /></td>
+                <td><input type="text" th:field="*{chatEntryList[__${rowStat.index}__].chatElapsedTime}" /></td>
+                <td><button type="button" class="pull-right fa fa-trash btn-danger deleteChatentry" ></button></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <br/>
+        <button type="submit" class="btn btn-primary">Save chatentry list</button>
+        <br/>
+    </form>
+</div>
+</body>
+</html>

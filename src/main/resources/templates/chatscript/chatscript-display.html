@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chatscript </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/chatscripts">ChatScripts</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/chatscripts/' + chatEntriesBean.chatscriptId}" th:text="${chatscript.chatScriptName}"></a></li>
+        <!--<li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>-->
+    </ol>
+    <h2 th:text="${chatscript.chatScriptName}"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/chatscripts/' + chatscript.id}" class="btn btn-outline-primary float-right">
+                Edit chatscript</a>
+        </div>
+    </div>
+    <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
+
+    <h3>Chatscript entries: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a th:href="${'/admin/chatscripts/'+chatscript.id+'/chatentries/edit'}"  class="btn btn-outline-primary float-right">
+                    Edit chatentries</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ChatEntry Id</th>
+            <th>ChatEntry Value</th>
+            <th>ChatEntry Elapsed Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="chatentry : ${chatEntriesBean.chatEntryList}">
+            <tr>
+                <td th:text="${chatentry.id}"></td>
+                <td th:text="${chatentry.chatEntryValue}"></td>
+                <td th:text="${chatentry.chatElapsedTime}"></td>
+
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

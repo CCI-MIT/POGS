@@ -26,7 +26,7 @@ public class VotingPoolVoteDaoImpl extends AbstractDao<VotingPoolVote, Long, Vot
     }
 
     @Override
-    public List<VotingPoolVote> get() {
+    public List<VotingPoolVote> list() {
         final SelectQuery<Record> query = dslContext.select(VOTING_POOL_VOTE.fields())
                 .from(VOTING_POOL_VOTE)
                 .getQuery();
