@@ -8,11 +8,13 @@
 </head>
 <body>
 <div layout:fragment="content">
-    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white"
+         style="height: 100%">
 
 
-        <div class="form-group waiting_message"  th:remove="tag" th:utext="${session.introText}" >
-            <div>Your team: </div>
+        <div class="form-group waiting_message">
+            <div id="countdown"></div>
+            <div>Your team:</div>
             <th:block th:each="subject : ${teammates}">
                 <div th:text="${subject.subjectDisplayName}"></div>
             </th:block>
@@ -23,28 +25,22 @@
 
             $(function () {
 
-
-
                 pogs.setup({
                                currentUrl: window.location,
-                               sessionId: $("#sessionId").val(),
-                               subjectId: $("#externalUserId").val(),
-                               secondsRemainingCurrentUrl: $("#secondsRemainingCurrentUrl").val(),
+                               sessionId: '[(${pogsSession.id})]',
+                               subjectId: '[(${subject.subjectExternalId})]',
+                               secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                               nextUrl : '[(${nextUrl})]',
                                completedTaskId: null,
                                hasCollaboration:false,
                                hasChat: false
                            });
 
-
             });
 
 
         </script>
-        <form>
-            <input type="hidden" th:value="${subject.subjectExternalId}" id="externalUserId"/>
-            <input type="hidden" th:value="${session.id}" id="sessionId"/>
-            <input type="hidden" th:value="${secondsRemainingCurrentUrl}" id="secondsRemainingCurrentUrl">
-        </form>
+
     </div>
 </div>
 <div layout:fragment="footer">

@@ -1,13 +1,8 @@
 package edu.mit.cci.pogs.messages;
 
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
-
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
-import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 
-public class FlowBroadcastMessage extends PogsMessage {
+public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageContent> {
 
     private SessionWrapper sessionWrapper;
 
@@ -16,21 +11,58 @@ public class FlowBroadcastMessage extends PogsMessage {
         this.setType(MessageType.FLOW_BROADCAST);
 
         this.setSender("server");
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put("nextUrl", sessionWrapper.getNextUrl());
-            jo.put("secondsRemainingCurrentUrl", sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
-            jo.put("secondsRemainingForSession", sessionWrapper.getSecondsRemainingForSession().toString());
-            jo.put("secondsRemainingForCurrentRound", sessionWrapper.getSecondsRemainingForCurrentRound().toString());
-            this.setContent(jo.toString());
-        }catch (JSONException je){
+        this.content = new FlowBroadcastMessageContent();
 
-        }
+        this.content.setNextUrl(sessionWrapper.getNextUrl());
+        this.content.setSecondsRemainingCurrentUrl(sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
+        this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());
+        this.content.setSecondsRemainingForCurrentRound(sessionWrapper.getSecondsRemainingForCurrentRound().toString());
+
     }
 
-    public String getSpecificPublicTopic(){
+    public String getSpecificPublicTopic() {
         return "/topic/public/flow/" + sessionWrapper.getId();
     }
 
 
+}
+
+class FlowBroadcastMessageContent {
+
+    private String nextUrl;
+    private String secondsRemainingCurrentUrl;
+    private String secondsRemainingForSession;
+    private String secondsRemainingForCurrentRound;
+
+    public String getNextUrl() {
+        return nextUrl;
+    }
+
+    public void setNextUrl(String nextUrl) {
+        this.nextUrl = nextUrl;
+    }
+
+    public String getSecondsRemainingCurrentUrl() {
+        return secondsRemainingCurrentUrl;
+    }
+
+    public void setSecondsRemainingCurrentUrl(String secondsRemainingCurrentUrl) {
+        this.secondsRemainingCurrentUrl = secondsRemainingCurrentUrl;
+    }
+
+    public String getSecondsRemainingForSession() {
+        return secondsRemainingForSession;
+    }
+
+    public void setSecondsRemainingForSession(String secondsRemainingForSession) {
+        this.secondsRemainingForSession = secondsRemainingForSession;
+    }
+
+    public String getSecondsRemainingForCurrentRound() {
+        return secondsRemainingForCurrentRound;
+    }
+
+    public void setSecondsRemainingForCurrentRound(String secondsRemainingForCurrentRound) {
+        this.secondsRemainingForCurrentRound = secondsRemainingForCurrentRound;
+    }
 }

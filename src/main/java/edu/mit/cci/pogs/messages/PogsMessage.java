@@ -1,28 +1,27 @@
 package edu.mit.cci.pogs.messages;
 
-public class PogsMessage {
+public class PogsMessage <ContentType>{
 
-    private MessageType type;
-    private String content;
-    private String sender;
-    private String receiver;
-    private String completedTaskId;
-    private String sessionId;
+    protected MessageType type;
+    protected ContentType content;
+    protected String sender;
+    protected String receiver;
+    protected String completedTaskId;
+    protected String sessionId;
 
 
     public enum MessageType {
         COMMUNICATION_MESSAGE,
-        COMMUNICATION_JOIN,
-        COMMUNICATION_LEAVE,
 
         FLOW_CHECK_IN,
         FLOW_BROADCAST,
 
-        FLOW_ACK,
-
         TASK_ATTRIBUTE,
 
         COLLABORATION_MESSAGE
+    }
+
+    public PogsMessage() {
     }
 
 
@@ -34,11 +33,11 @@ public class PogsMessage {
         this.type = type;
     }
 
-    public String getContent() {
+    public ContentType getContent() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(ContentType content) {
         this.content = content;
     }
 
@@ -56,5 +55,22 @@ public class PogsMessage {
 
     public void setReceiver(String receiver) {
         this.receiver = receiver;
+    }
+
+    public String getCompletedTaskId() {
+        return completedTaskId;
+    }
+
+
+    public void setCompletedTaskId(String completedTaskId) {
+        this.completedTaskId = completedTaskId;
+    }
+
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
     }
 }

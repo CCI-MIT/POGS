@@ -12,14 +12,14 @@ import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.service.WorkspaceService;
 
 @Controller
-public class WorkspaceFlowWebSocketController {
+public class WorkspaceFlowWSController {
 
     @Autowired
     private WorkspaceService workspaceService;
 
     @MessageMapping("/flow.checkIn")
     public void getCheckin(@Payload PogsMessage pogsMessage) {
-        if(pogsMessage.getType().equals(PogsMessage.MessageType.FLOW_ACK)) {
+        if(pogsMessage.getType().equals(PogsMessage.MessageType.FLOW_CHECK_IN)) {
             String externalId = pogsMessage.getSender();
             Subject subject = workspaceService.getSubject(externalId);
 

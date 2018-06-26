@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <style  th:inline="text">
+
+        /*<![CDATA[*/
+        [(${taskCss})]
+
+        /*]]>*/
+    </style>
+    <script th:inline="text">
+
+        /*<![CDATA[*/
+
+        [(${taskWorkJs})]
+
+        /*]]>*/
+    </script>
+    <div class="form-group waiting_message">
+        <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+
+        <div th:remove="tag" th:utext="${taskWorkHtml}" ></div>
+
+
+            <script>
+
+                $(function () {
+
+
+
+                    pogs.setup({
+                                   currentUrl: window.location,
+                                   sessionId: '[(${pogsSession.id})]',
+                                   subjectId: '[(${subject.subjectExternalId})]',
+                                   secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                                   nextUrl : '[(${nextUrl})]',
+                                   teammates: [(${teammates})],
+                                   taskConfigurationAttributes: [(${taskConfigurationAttributes})],
+                                   completedTaskId:'[(${completedTask.id})]',
+                                   hasCollaboration:false,
+                                   hasChat: [(${hasChat})],
+                                   communicationType: '[(${communicationType})]'
+                               });
+
+
+                });
+
+
+            </script>
+
+        </div>
+    </div>
+</div>
+<div layout:fragment="communication" th:if="${hasChat}">
+    <div class="container-fluid h-100" style="width:350px;">
+        <div class="row h-100">
+            <div class="col-3 border-chat-lightgray px-0" style="display:none" id="subjectContainer">
+                <div class="h-100 w-100">
+                    <div class=" p-0 d-xs-none">
+                        <div class="col-1 p-1">
+                            <button class="btn text-white bg-darkblue p-0 hover-color-lightgray" id="toggleBackTrigger">
+                               <i class="fa fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="sidebar-scroll" id="list-group">
+                        <ul class="list-group w-100" id="friend-list">
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body bg-lightgrey d-flex flex-column p-0" style="" stryle = "flex: 9 1" id="chatContainer"><!--  -->
+                <div class="d-flex flex-row justify-content-start">
+                    <div class="col-1 p-1">
+                        <button class="btn text-white bg-darkblue p-0 hover-color-lightgray" id="toggleTrigger">
+                            <i class="fa fa-address-book" style="color: #6c757d;font-size: 30px;"></i>
+                        </button>
+                    </div>
+                    <div class="col">
+                        <div class="my-0">
+                            <b id="channelDisplayName">Group Chat</b>
+                        </div>
+                        <div class="my-0">
+                            <small id="statusMessages"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid message-scroll" style="flex: 1 1" id="channelMessageBody">
+                    <div id="channel_group" style="display: none">
+                        <div class="row" id="ownMessage">
+                            <div class="card message-card m-1">
+                                <div class="card-body p-2">
+                                    <span class="float-left mx-1"><b>carlos</b></span>
+                                    <span class="mx-2">Hi, Johannes</span>
+                                    <span class="float-right mx-1"><small>14:13</small></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row justify-content-end">
+                            <div class="card message-card bg-lightblue m-1">
+                                <div class="card-body p-2">
+                                    <span class="float-left mx-1"><b>johannes</b></span>
+                                    <span class="mx-2">Hello, Carlos</span>
+                                    <span class="float-right mx-1"><small>14:14</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <input type="text" class="form-control border-0" placeholder="Input message..." id="messageInput">
+                    <span class="input-group-addon">
+                        <button class="btn border-0 bg-white text-primary hover-color-darkblue" type="button" id="messageSubmitButton">Send</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div layout:fragment="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</div>
+</body>
+</html>

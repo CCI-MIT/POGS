@@ -68,3 +68,29 @@ body {
   text-align:center;
 }
 /* Workspace classes */
+
+.message-card {
+  max-width: 60%;
+}
+.message-scroll {
+  overflow-y: auto;
+}
+
+.bg-lightgrey {
+  background-color: #f1f1f1;
+}
+
+.bg-lightblue{
+  background-color: lightblue;
+}
+#sidebar-content {
+  display: flex;
+  flex-direction: column;
+}
+#list-group {
+  flex: 1 1;
+}
+
+.sidebar-scroll {
+  overflow-y: auto;
+}

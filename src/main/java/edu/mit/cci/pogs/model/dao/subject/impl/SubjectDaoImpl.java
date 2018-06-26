@@ -59,7 +59,7 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
                 .join(TEAM_HAS_SUBJECT)
                 .on(TEAM_HAS_SUBJECT.SUBJECT_ID.eq(SUBJECT.ID))
                 .join(TEAM)
-                .on(TEAM.ID.eq(TEAM_HAS_SUBJECT.SUBJECT_ID))
+                .on(TEAM.ID.eq(TEAM_HAS_SUBJECT.TEAM_ID))
                 .getQuery();
 
         if(sessionId != null) {

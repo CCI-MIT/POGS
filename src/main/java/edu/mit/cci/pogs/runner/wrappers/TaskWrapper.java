@@ -1,7 +1,6 @@
 package edu.mit.cci.pogs.runner.wrappers;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
@@ -60,12 +59,12 @@ public class TaskWrapper extends Task {
         return total;
     }
 
-    public Long getTaskFinishTimestamp() {
+    public Long getTaskEndTimestamp() {
         return getTaskStartTimestamp() + getTotalTaskTime();
     }
 
     public boolean isHappeningNow(Long currentTimestamp) {
-        return currentTimestamp >= taskStartTimestamp && currentTimestamp <= getTaskFinishTimestamp();
+        return currentTimestamp >= taskStartTimestamp && currentTimestamp <= getTaskEndTimestamp();
     }
 
     private Long getSecondsToStartTask() {
@@ -126,6 +125,24 @@ public class TaskWrapper extends Task {
         return getPrimerEndTime() + DateUtils.toMilliseconds(getInteractionTime());
     }
 
+    public ArrayList<SessionSchedule> getSessionSchedules(String roundUrl) {
+        ArrayList<SessionSchedule> schedules = new ArrayList<>();
 
+        if (getIntroPageEnabled()) {
+            schedules.add(new SessionSchedule(getTaskStartTimestamp(),
+                    getIntroEndTime(),this,null,null,
+                    roundUrl+"/task/" + getId() + "/i"));
+        }
+        if (getPrimerPageEnabled()) {
+            schedules.add(new SessionSchedule(getIntroEndTime(),
+                    getPrimerEndTime(),this,null,null,
+                    roundUrl+"/task/" + getId() + "/p"));
 
+        }
+        schedules.add(new SessionSchedule(getPrimerEndTime(),
+                getTaskEndTimestamp(),this,null,null,
+                roundUrl+"/task/" + getId() + "/w"));
+
+        return schedules;
+    }
 }

@@ -9,7 +9,7 @@ configurationAtrributes:
   -
     name: gridRows
     type: integer
-    
+
 scoring:
     completedTaskAttributeSubjectAnswerPrefix : answer
     completedTaskAttributeCorrectAnswerPrefix : rightAnswer

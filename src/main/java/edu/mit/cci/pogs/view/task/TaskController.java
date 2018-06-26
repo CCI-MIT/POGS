@@ -57,8 +57,9 @@ public class TaskController {
     private List<TaskPlugin> getTaskPlugins() {
         List<TaskPlugin> rt = new ArrayList<>();
 
-        rt.add(new TaskPlugin("Sudoku", false));
-        rt.add(new TaskPlugin("Multiple choice questions", false));
+        //read from plugin folder all available plugins
+        //rt.add(new TaskPlugin("Sudoku"));
+        //rt.add(new TaskPlugin("Multiple choice questions"));
 
         return rt;
     }

@@ -12,13 +12,17 @@
 
 
         <div class="form-group waiting_message" >
+            <div id="countdown"></div>
+
             <div>We have your name as <span class="current-display-name" th:text="${subject.subjectDisplayName}"></span>.  You can change it below.</div>
-            <form class="form-inline"  method="post" >
+            <div>What name do you want the other participants to know you by? </div>
+            <form class="form-inline"  method="POST" >
                 <div class="form-group mb-2">
-                    <label style="color:black">What name do you want the other participants to know you by:</label>
+                    <label style="color:black">Name:</label>
                 </div>
                 <div class="form-group mx-sm-3 mb-2">
-                    <input type="text" class="form-control" id="inputPassword2" placeholder="user id" name="externalId">
+                    <input type="text" class="form-control" id="inputPassword2" placeholder="user id" name="displayName">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
                 </div>
                 <button type="submit" class="btn btn-primary mb-2">Change name</button>
             </form>
@@ -33,9 +37,10 @@
 
                 pogs.setup({
                                currentUrl: window.location,
-                               sessionId: $("#sessionId").val(),
-                               subjectId: $("#externalUserId").val(),
-                               secondsRemainingCurrentUrl: $("#secondsRemainingCurrentUrl").val(),
+                               sessionId: '[(${pogsSession.id})]',
+                               subjectId: '[(${subject.subjectExternalId})]',
+                               secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                               nextUrl : '[(${nextUrl})]',
                                completedTaskId: null,
                                hasCollaboration:false,
                                hasChat: false
@@ -48,7 +53,7 @@
         </script>
         <form>
             <input type="hidden" th:value="${subject.subjectExternalId}" id="externalUserId"/>
-            <input type="hidden" th:value="${session.id}" id="sessionId"/>
+            <input type="hidden" th:value="${pogsSession.id}" id="sessionId"/>
             <input type="hidden" th:value="${secondsRemainingCurrentUrl}" id="secondsRemainingCurrentUrl">
         </form>
     </div>

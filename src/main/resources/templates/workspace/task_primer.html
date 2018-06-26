@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+
+
+
+        <div class="form-group waiting_message" >
+            <div id="countdown"></div>
+            <div th:remove="tag" th:utext="${task.primerText}"></div>
+        </div>
+
+        <script>
+
+            $(function () {
+
+
+
+                pogs.setup({
+                               currentUrl: window.location,
+                               sessionId: '[(${pogsSession.id})]',
+                               subjectId: '[(${subject.subjectExternalId})]',
+                               secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                               nextUrl : '[(${nextUrl})]',
+                               completedTaskId: null,
+                               hasCollaboration:false,
+                               hasChat: false
+                           });
+
+
+            });
+
+
+        </script>
+    </div>
+</div>
+<div layout:fragment="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</div>
+</body>
+</html>

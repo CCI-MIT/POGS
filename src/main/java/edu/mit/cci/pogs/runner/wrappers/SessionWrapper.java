@@ -1,7 +1,6 @@
 package edu.mit.cci.pogs.runner.wrappers;
 
-import org.springframework.security.core.parameters.P;
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,12 +8,13 @@ import java.util.List;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.utils.DateUtils;
 
 public class SessionWrapper extends Session {
 
+
+    private ArrayList<SessionSchedule> sessionSchedule;
 
     public SessionWrapper(Session session) {
         super(session);
@@ -50,9 +50,10 @@ public class SessionWrapper extends Session {
     }
 
     public Long getSecondsRemainingForSession() {
+
         Integer roundSize = this.sessionRounds.size();
-        if(roundSize!= 0 ){
-            return sessionRounds.get(roundSize -1 ).getTotalRoundTime() * roundSize;
+        if (roundSize != 0) {
+            return sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize;
         }
         return 0l;
     }
@@ -61,59 +62,29 @@ public class SessionWrapper extends Session {
         if (!this.isTaskExecutionModeSequential()) {
             return 0l;
         }
-        //if session intro has already gone
-        if (getTimeToStart() > 0) {
+        if(this.sessionSchedule== null){
             return getTimeToStart();
         }
-        //if session intro has already gone
-        if (getIntroPageEnabled() && introSecondsRemaining() > 0) {
-            return introSecondsRemaining();
-        }
-        //if session change name has already gone
-        if (getDisplayNameChangePageEnabled() && getDisplayNameChangeEndTime() > 0) {
-            return getDisplayNameChangeEndTime();
-        }
-        //if session roster has already gone
-        if (getRosterPageEnabled() && getRosterPageEndTime() > 0) {
-            return getRosterPageEndTime();
-        }
-        //check rounds
-        RoundWrapper r = getCurrentRound();
-        if (r != null) {
-            TaskWrapper tw = r.getNextTask();
-            if (tw != null) {
-                return tw.getSecondsRemainingForCurrentUrl();
-            } else {
-                RoundWrapper rw = getNextRound();
-                if (rw != null) {
-                    TaskWrapper tw2 = rw.getNextTask();
-                    return tw2.getSecondsRemainingForCurrentUrl();
-                } else {
-                    if (getDonePageEnabled()) {
-                        return getSecondsRemainingForSession();
-                    } else {
-                        return getSecondsRemainingForSession();
-                    }
-                }
-            }
-        } else {
-            return 0l;
-        }
+        Integer sessionScheduleIndex = getSessionScheduleIndex();
+
+
+        return this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now();
+
     }
 
 
     public Long getSecondsRemainingForCurrentRound() {
-        if(this.getTimeToStart() >0) {
+        if (this.getTimeToStart() > 0) {
             return 0l;
         }
         if (!this.isTaskExecutionModeSequential()) {
             return 0l;
         }
         RoundWrapper rw = getCurrentRound();
-        if(rw==null) {
+        if (rw == null) {
             return 0l;
-        }else{
-            return rw.getTotalRoundTime() - DateUtils.now();
+        } else {
+            return (rw.getRoundStartTimestamp() + rw.getTotalRoundTime()) - DateUtils.now();
         }
     }
 
@@ -121,40 +92,17 @@ public class SessionWrapper extends Session {
         if (!this.isTaskExecutionModeSequential()) {
             return "";
         }
-        //if session intro has already gone
-        if (getIntroPageEnabled() && introSecondsRemaining() > 0) {
+
+        if (this.sessionSchedule == null || this.sessionSchedule.size() == 0) {
             return "/intro";
         }
-        //if session change name has already gone
-        if (getDisplayNameChangePageEnabled() && getDisplayNameChangeEndTime() > 0) {
-            return "/display_name";
+        Integer sessionScheduleIndex = getSessionScheduleIndex();
+
+        if (sessionScheduleIndex + 1 < this.sessionSchedule.size() ) {
+            return this.sessionSchedule.get(sessionScheduleIndex + 1).getUrl();
         }
-        //if session roster has already gone
-        if (getRosterPageEnabled() && getRosterPageEndTime() > 0) {
-            return "/roster";
-        }
-        //check rounds
-        RoundWrapper r = getCurrentRound();
-        if (r != null) {
-            TaskWrapper tw = r.getNextTask();
-            if (tw != null) {
-                return r.getUrl() + tw.getNextUrl();
-            } else {
-                RoundWrapper rw = getNextRound();
-                if (rw != null) {
-                    TaskWrapper tw2 = rw.getNextTask();
-                    return r.getUrl() +tw2.getNextUrl();
-                } else {
-                    if (getDonePageEnabled()) {
-                        return "";
-                    } else {
-                        return getDoneRedirectUrl();
-                    }
-                }
-            }
-        } else {
-            return getDoneRedirectUrl();
-        }
+        return getDoneRedirectUrl();
+
     }
 
 
@@ -180,7 +128,7 @@ public class SessionWrapper extends Session {
     }
 
     public boolean isReadyToInitiateStart() {
-        return DateUtils.now()  + 2*1000 > this.getSessionStartDate().getTime() ;
+        return DateUtils.now() + 2 * 1000 > this.getSessionStartDate().getTime();
     }
 
 
@@ -192,7 +140,6 @@ public class SessionWrapper extends Session {
     private long getTimeToStart() {
         return this.getSessionStartDate().getTime() - DateUtils.now();
     }
-
 
 
     //waiting room
@@ -225,6 +172,10 @@ public class SessionWrapper extends Session {
         return getDisplayNameChangeEndTime() + DateUtils.toMilliseconds(this.getRosterTime());
     }
 
+    private long getDonePageEndTime(Long lastRoundEndTime) {
+        return lastRoundEndTime + DateUtils.toMilliseconds(this.getDonePageTime());
+    }
+
     public boolean isTaskExecutionModeSequential() {
         return this.getTaskExecutionType().equals(
                 TaskExecutionType.SEQUENTIAL_FIXED_ORDER.getId().toString()) ||
@@ -252,4 +203,53 @@ public class SessionWrapper extends Session {
         return total;
     }
 
+    public void createSessionSchedule() {
+        this.sessionSchedule = new ArrayList<>();
+        if (getIntroPageEnabled()) {
+            this.sessionSchedule.add(new SessionSchedule(
+                    getSessionStartDate().getTime(), getIntroEndTime(), null,
+                    null, this, "/intro"));
+        }
+        if (getDisplayNameChangePageEnabled()) {
+            this.sessionSchedule.add(new SessionSchedule(
+                    getIntroEndTime(), getDisplayNameChangeEndTime(), null,
+                    null, this, "/display_name"));
+        }
+        if (getRosterPageEnabled()) {
+            this.sessionSchedule.add(new SessionSchedule(
+                    getDisplayNameChangeEndTime(), getRosterPageEndTime(), null,
+                    null, this, "/roster"));
+        }
+        Long lastRoundEndTimestamp = -1l;
+        for (RoundWrapper rw : sessionRounds) {
+            ArrayList<SessionSchedule> rounds = rw.getSessionSchedules();
+            rounds.stream().forEach(t -> t.setSessionReference(this));
+            this.sessionSchedule.addAll(rounds);
+            lastRoundEndTimestamp = rw.getRoundFinishTimestamp();
+        }
+        if (this.getDonePageEnabled()) {
+            this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp
+                    , getDonePageEndTime(lastRoundEndTimestamp), null,
+                    null, this, "/done"));
+        }
+
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        for (SessionSchedule ss : this.sessionSchedule) {
+
+            System.out.println(simpleDateFormat.format(new Date(ss.getStartTimestamp())) + " - " + simpleDateFormat.format(new Date(ss.getEndTimestamp())) + " - " + ss.getUrl());
+        }
+    }
+
+    public Integer getSessionScheduleIndex() {
+        Long now = DateUtils.now();
+        for (int i = 0; i < this.sessionSchedule.size(); i++) {
+            SessionSchedule ss = this.sessionSchedule.get(i);
+            if (ss.isHappeningNow(now)) {
+                return i;
+            }
+        }
+        return 0;
+    }
 }

@@ -36,6 +36,7 @@ import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.TaskGroupService;
+import edu.mit.cci.pogs.utils.DateUtils;
 
 @Component
 public class SessionRunner implements Runnable {
@@ -132,7 +133,9 @@ public class SessionRunner implements Runnable {
                     session.getTeamCreationMoment().equals(TeamCreationTime.BEGINING_ROUND)) {
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
-                setupStartingTimes(session, round);
+                setupStartingTimes(session, round, null);
+                session.createSessionSchedule();
+
             } else {
                 //TODO:Handle before task , team and completed task creation
             }
@@ -143,10 +146,15 @@ public class SessionRunner implements Runnable {
 
     }
 
-    private void setupStartingTimes(SessionWrapper session, RoundWrapper round) {
-        Long now = new Date().getTime();
+
+    private void setupStartingTimes(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
+
         //if firstRound
-        round.setRoundStartTimestamp(now + session.getIntroAndSetupTime());
+        if(prevRound == null) {
+            round.setRoundStartTimestamp(session.getSessionStartDate().getTime() + session.getIntroAndSetupTime());
+        }else{
+            round.setRoundStartTimestamp(round.getRoundFinishTimestamp());
+        }
 
         Long elapsedTime = round.getRoundStartTimestamp();
 

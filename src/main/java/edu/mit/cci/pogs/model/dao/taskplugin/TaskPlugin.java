@@ -1,14 +1,56 @@
 package edu.mit.cci.pogs.model.dao.taskplugin;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class TaskPlugin {
+
+
+    private static Map<String, TaskPlugin> registeredPlugins = new HashMap<>();
+
 
     private String taskPluginName;
 
-    private boolean isExternal;
+    private String pluginRootFolder;
 
-    public TaskPlugin(String taskPluginName, boolean isExternal){
+
+    public TaskPlugin(String taskPluginName, String pluginRootFolder) {
+
         this.taskPluginName = taskPluginName;
-        this.isExternal = isExternal;
+        this.pluginRootFolder = pluginRootFolder;
+    }
+
+    public static TaskPlugin getTaskPlugin(String sessionId) {
+        return registeredPlugins.get(sessionId);
+    }
+    public static List<TaskPlugin> getAllTaskPlugins(){
+        return new ArrayList<>(registeredPlugins.values());
+    }
+
+    public static void addTaskPlugin(String sessionId, TaskPlugin sessionRunner) {
+        if (registeredPlugins.get(sessionId) == null) {
+            registeredPlugins.put(sessionId, sessionRunner);
+        }
+    }
+
+    private static void removeTaskPlugin(Long sessionId) {
+        if (registeredPlugins.get(sessionId) != null) {
+            registeredPlugins.remove(sessionId);
+        }
+    }
+
+    public String getPluginRootFolder() {
+        return pluginRootFolder;
+    }
+
+    public void setPluginRootFolder(String pluginRootFolder) {
+        this.pluginRootFolder = pluginRootFolder;
     }
 
 
@@ -20,11 +62,41 @@ public class TaskPlugin {
         this.taskPluginName = taskPluginName;
     }
 
-    public boolean isExternal() {
-        return isExternal;
+
+    private String readFile(String filePath) {
+        String ret = new String();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+
+            String sCurrentLine;
+
+            while ((sCurrentLine = br.readLine()) != null) {
+                ret += sCurrentLine + "\n";
+            }
+
+        } catch (IOException e) {
+            return null;
+        }
+        return ret;
     }
 
-    public void setExternal(boolean external) {
-        isExternal = external;
+
+    public String getTaskInitJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskInit.html");
+    }
+
+    public String getTaskEditHtmlContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskEdit.html");
+    }
+
+    public String getTaskWorkHtmlContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.html");
+    }
+
+    public String getTaskWorkJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.js");
+    }
+
+    public String getTaskCSSContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "task.css");
     }
 }

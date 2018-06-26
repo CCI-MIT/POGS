@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.runner.wrappers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -107,5 +108,15 @@ public class RoundWrapper extends Round {
 
     public String getUrl() {
         return "/round/"+this.getId();
+    }
+
+    public ArrayList<SessionSchedule> getSessionSchedules() {
+        ArrayList<SessionSchedule> schedules = new ArrayList<>();
+        for(TaskWrapper tw: this.tasks){
+            ArrayList<SessionSchedule> tasks =tw.getSessionSchedules(this.getUrl());
+            tasks.stream().forEach(t -> t.setRoundReference(this));
+            schedules.addAll(tasks);
+        }
+        return schedules;
     }
 }

@@ -27,25 +27,22 @@
 
 
         pogs.setup({
-                    currentUrl: window.location,
-                    sessionId: $("#sessionId").val(),
-                    subjectId: $("#externalUserId").val(),
-                    secondsRemainingCurrentUrl: $("#secondsRemainingCurrentUrl").val(),
-                    completedTaskId: null,
-                    hasCollaboration:false,
-                    hasChat: false
-                        });
+                       currentUrl: window.location,
+                       sessionId: '[(${pogsSession.id})]',
+                       subjectId: '[(${subject.subjectExternalId})]',
+                       secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                       nextUrl : '[(${nextUrl})]',
+                       completedTaskId: null,
+                       hasCollaboration:false,
+                       hasChat: false
+                   });
 
 
     });
 
 
 </script>
-<form>
-    <input type="hidden" th:value="${subject.subjectExternalId}" id="externalUserId"/>
-    <input type="hidden" th:value="${session.id}" id="sessionId"/>
-    <input type="hidden" th:value="${secondsRemainingCurrentUrl}" id="secondsRemainingCurrentUrl">
-</form>
+
     </div>
 </div>
 <div layout:fragment="footer">
