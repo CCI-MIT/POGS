@@ -75,7 +75,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `task` WRITE;
 /*!40000 ALTER TABLE `task` DISABLE KEYS */;
-INSERT INTO `task` VALUES (1,'sudoku task ','sudokuPlugin',0,1000,1,'task intro ',10,1,'primer for task',10,0,'Here we gooo','G',0,0,0,'S',NULL,NULL),(2,'surveyTask','surveyPlugin',0,100,1,'Please answer all survey questions.',10,0,'',0,0,'','',0,0,0,'S',NULL,NULL);
+INSERT INTO `task` VALUES (1,'sudoku task ','sudokuPlugin',0,1000,1,'task intro ',10,1,'primer for task',10,0,'Here we gooo','G',0,0,0,'S',NULL,NULL),(2,'surveyTask','surveyPlugin',0,1000,1,'Please answer all survey questions.',10,0,'',0,0,'','G',0,0,0,'S',NULL,NULL);
 /*!40000 ALTER TABLE `task` ENABLE KEYS */;
 UNLOCK TABLES;
 

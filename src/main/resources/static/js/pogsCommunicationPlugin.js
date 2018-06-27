@@ -48,6 +48,7 @@ class GroupChatManager {
             subscribeCommunicationBroadcast(this.onCommunicationBroadcastReceived.bind(this));
 
         this.channelBodyRef.show();
+        console.log("Group chat manager show")
     }
     onCommunicationBroadcastReceived(message) {
 
@@ -84,6 +85,7 @@ class GroupChatManager {
         return $("#channelBody_" + channelName);
     }
     setupHTML() {
+        console.log("Setup HTML for chat");
         //register toggle button to subject list
         $("#toggleTrigger").click(function (event) {
             $("#chatContainer").hide();
@@ -120,10 +122,11 @@ class GroupChatManager {
         this.channelBodyRef.append(
             this.createOwnMessageHTML(message,
                                       this.communicationPluginReference.getSubjectByExternalId(
-                                          this.communicationPluginReference.getSubjectId().displayName),
+                                          this.communicationPluginReference.getSubjectId()).displayName,
                                       new Date()));
         // send the message using ws
         this.sendRegularMessage(message);
+        console.log("triggerSendMessage ");
     }
     sendRegularMessage(message) {
         this.communicationPluginReference.sendMessage(message, this.channel, "MESSAGE", null);

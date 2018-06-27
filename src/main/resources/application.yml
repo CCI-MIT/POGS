@@ -49,7 +49,7 @@ logging:
     org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: WARN
     org.springframework.boot.web.servlet.FilterRegistrationBean: WARN
     org.springframework.web.servlet.handler.SimpleUrlHandlerMapping: WARN
-    edu.mit.cci.pogs.runner.SessionService: DEBUG
+    edu.mit.cci: DEBUG
 
 ---
 
