@@ -50,5 +50,13 @@ public class CompletedTaskAttributeDaoImpl extends AbstractDao<CompletedTaskAttr
         }
     }
 
+    public void deleteByCompletedTaskId(Long completedTaskId) {
+        dslContext.delete(COMPLETED_TASK_ATTRIBUTE)
+                .where(COMPLETED_TASK_ATTRIBUTE.COMPLETED_TASK_ID.eq(completedTaskId))
+                .execute();
+
+    }
+
+
 }
  

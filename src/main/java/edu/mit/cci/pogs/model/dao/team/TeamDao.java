@@ -12,5 +12,7 @@ public interface TeamDao extends Dao<Team, Long> {
     List<Team> listByRoundId(Long roundId);
 
     Team getByRoundIdTaskId(Long roundId, Long taskId);
+
+    void deleteByRoundId(Long roundId);
 }
  

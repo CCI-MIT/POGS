@@ -189,6 +189,8 @@ public class SessionWrapper extends Session {
                 .equals(SessionStatus.DONE.getId().toString());
     }
 
+
+
     public Long getIntroAndSetupTime() {
         Long total = 0l;
         if (this.getIntroPageEnabled()) {

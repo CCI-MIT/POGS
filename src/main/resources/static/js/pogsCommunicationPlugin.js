@@ -120,7 +120,7 @@ class GroupChatManager {
         this.channelBodyRef.append(
             this.createOwnMessageHTML(message,
                                       this.communicationPluginReference.getSubjectByExternalId(
-                                          this.communicationPluginReference.getSubjectId()),
+                                          this.communicationPluginReference.getSubjectId().displayName),
                                       new Date()));
         // send the message using ws
         this.sendRegularMessage(message);

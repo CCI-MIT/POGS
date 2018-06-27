@@ -41,6 +41,11 @@ public class TeamHasSubjectDaoImpl extends AbstractDao<TeamHasSubject, Long, Tea
         return query.fetchInto(TeamHasSubject.class);
     }
 
+    public void deleteByTeamId(Long teamId){
+        dslContext.delete(TEAM_HAS_SUBJECT)
+                .where(TEAM_HAS_SUBJECT.TEAM_ID.eq(teamId))
+                .execute();
+    }
 
  
 }

@@ -10,13 +10,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.cci.pogs.cron.SessionCron;
+import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.completedtaskattribute.CompletedTaskAttributeDao;
+import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
+import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
+import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.dao.team.TeamDao;
+import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
@@ -27,6 +39,12 @@ public class SessionService {
     private final SessionHasTaskGroupDao sessionHasTaskGroupDao;
     private final SessionDao sessionDao;
     private final SubjectDao subjectDao;
+    private final CompletedTaskAttributeDao completedTaskAttributeDao;
+    private final CompletedTaskDao completedTaskDao;
+    private final TeamHasSubjectDao teamHasSubjectDao;
+    private final TeamDao teamDao;
+    private final RoundDao roundDao;
+    private final EventLogDao eventLogDao;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
 
@@ -37,10 +55,23 @@ public class SessionService {
 
     @Autowired
     public SessionService(SessionHasTaskGroupDao sessionHasTaskGroupDao, SessionDao sessionDao,
-                          SubjectDao subjectdao) {
+                          SubjectDao subjectdao,
+                          CompletedTaskDao completedTaskDao,
+                          CompletedTaskAttributeDao completedTaskAttributeDao,
+                          TeamHasSubjectDao teamHasSubjectDao,
+                          TeamDao teamDao,
+                          RoundDao roundDao,
+                          EventLogDao eventLogDao
+                          ) {
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
         this.sessionDao = sessionDao;
         this.subjectDao = subjectdao;
+        this.completedTaskAttributeDao = completedTaskAttributeDao;
+        this.completedTaskDao = completedTaskDao;
+        this.teamHasSubjectDao = teamHasSubjectDao;
+        this.teamDao = teamDao;
+        this.roundDao = roundDao;
+        this.eventLogDao =  eventLogDao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -183,4 +214,34 @@ public class SessionService {
     }
 
 
+    public void resetSession(Session session) {
+
+        List<Round> roundList = roundDao.listBySessionId(session.getId());
+        for(Round r: roundList) {
+            List<Team> teamList = teamDao.listByRoundId(r.getId());
+
+            List<CompletedTask> completedTasks = completedTaskDao.listByRoundId(r.getId());
+            for(CompletedTask ct: completedTasks) {
+                completedTaskAttributeDao.deleteByCompletedTaskId(ct.getId());
+                eventLogDao.deleteByCompletedTaskId(ct.getId());
+            }
+            completedTaskDao.deleteByRoundId(r.getId());
+
+            for(Team team: teamList) {
+                teamHasSubjectDao.deleteByTeamId(team.getId());
+            }
+            teamDao.deleteByRoundId(r.getId());
+
+        }
+        roundDao.deleteBySessionId(session.getId());
+
+        SessionRunner sr = SessionRunner.getSessionRunner(session.getId());
+        if(sr!=null){
+            SessionRunner.removeSessionRunner(session.getId());
+        }
+
+        session.setStatus(SessionStatus.NOTSTARTED.getId().toString());
+        sessionDao.update(session);
+
+    }
 }

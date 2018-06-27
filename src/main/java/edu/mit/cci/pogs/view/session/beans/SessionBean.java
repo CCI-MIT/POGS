@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.view.session.beans;
 
 import java.sql.Timestamp;
 
+import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 
 public class SessionBean {
@@ -383,5 +384,10 @@ public class SessionBean {
 
     public void setStudyId(Long studyId) {
         this.studyId = studyId;
+    }
+
+    public boolean getHasSessionStarted() {
+        return !getStatus()
+                .equals(SessionStatus.NOTSTARTED.getId().toString());
     }
 }

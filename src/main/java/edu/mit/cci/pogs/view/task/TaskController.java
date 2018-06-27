@@ -55,13 +55,7 @@ public class TaskController {
 
     @ModelAttribute("taskPluginTypes")
     private List<TaskPlugin> getTaskPlugins() {
-        List<TaskPlugin> rt = new ArrayList<>();
-
-        //read from plugin folder all available plugins
-        //rt.add(new TaskPlugin("Sudoku"));
-        //rt.add(new TaskPlugin("Multiple choice questions"));
-
-        return rt;
+        return TaskPlugin.getAllTaskPlugins();
     }
 
     @GetMapping

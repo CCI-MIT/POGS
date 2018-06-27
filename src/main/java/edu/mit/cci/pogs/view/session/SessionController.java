@@ -26,6 +26,7 @@ import edu.mit.cci.pogs.model.dao.session.TeamCreationType;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
 import edu.mit.cci.pogs.service.SessionService;
@@ -110,7 +111,7 @@ public class SessionController {
         Study study = studyDao.get(studyId);
 
         model.addAttribute("study", study);
-        model.addAttribute("sessionBean", sessionDao.get(id));
+        model.addAttribute("sessionBean", new SessionBean(sessionDao.get(id)));
         SubjectsBean subjectsBean = new SubjectsBean();
         subjectsBean.setSubjectList(sessionService.listSubjectsBySessionId(id));
         model.addAttribute("subjectsBean", subjectsBean);
@@ -134,6 +135,15 @@ public class SessionController {
         return "session/session-edit";
     }
 
+
+    @PostMapping("/admin/studies/{studyId}/sessions/{id}/reset")
+    public String resetSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id) {
+        Session session = (sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        sessionService.resetSession(session);
+
+        return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
+    }
     @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
         SessionBean session = new SessionBean(sessionDao.get(id));

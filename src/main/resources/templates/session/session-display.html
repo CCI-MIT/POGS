@@ -19,10 +19,28 @@
     <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
     <div class="col">
         <div class="col-12">
-            <a th:href="${'/admin/studies/' + study.id + '/studies/' + sessionBean.id}" class="btn btn-outline-primary float-right">
+            <a th:unless="${sessionBean.hasSessionStarted}" th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}" class="btn btn-outline-primary float-right">
                 Edit session</a>
+
+            <a th:if="${sessionBean.hasSessionStarted}" class="btn btn-danger float-right" id="resetSession">
+                Reset session</a>
+
         </div>
     </div>
+    <script>
+        $(function() {
+            $("#resetSession").click(function () {
+                var r = confirm("Are you sure you want to reset this session, all saved data like completed tasks and logs will be deleted?");
+                if (r == true) {
+                    $("#resetSessionForm").submit();
+                }
+            })
+        });
+    </script>
+    <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/reset'}" method="post" id="resetSessionForm">
+    </form>
+
+    </form>
     <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
 
     <h3>Session subjects: </h3>

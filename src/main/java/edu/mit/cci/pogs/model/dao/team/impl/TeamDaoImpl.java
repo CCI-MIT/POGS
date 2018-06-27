@@ -60,5 +60,12 @@ public class TeamDaoImpl extends AbstractDao<Team, Long, TeamRecord> implements 
             return record.into(Team.class);
         }
     }
+
+    public void deleteByRoundId(Long roundId){
+        dslContext.delete(TEAM)
+                .where(TEAM.ROUND_ID.eq(roundId))
+                .execute();
+    }
+
 }
  

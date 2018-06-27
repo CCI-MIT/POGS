@@ -60,7 +60,7 @@ public class SessionRunner implements Runnable {
         }
     }
 
-    private static void removeSessionRunner(Long sessionId) {
+    public static void removeSessionRunner(Long sessionId) {
         if (liveRunners.get(sessionId) != null) {
             liveRunners.remove(sessionId);
         }

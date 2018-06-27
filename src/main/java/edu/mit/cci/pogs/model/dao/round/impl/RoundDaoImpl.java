@@ -41,6 +41,11 @@ public class RoundDaoImpl extends AbstractDao<Round, Long, RoundRecord> implemen
 
         return query.fetchInto(Round.class);
     }
+    public void deleteBySessionId(Long sessionId){
+        dslContext.delete(ROUND)
+                .where(ROUND.SESSION_ID.eq(sessionId))
+                .execute();
+    }
 
 }
  

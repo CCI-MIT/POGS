@@ -9,5 +9,7 @@ public interface RoundDao extends Dao<Round, Long> {
  
     List<Round> list();
     List<Round> listBySessionId(Long sessionId);
+
+    void deleteBySessionId(Long sessionId);
 }
  

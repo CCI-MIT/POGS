@@ -60,5 +60,11 @@ public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, Compl
 
     }
 
+    public void deleteByRoundId(Long roundId){
+        dslContext.delete(COMPLETED_TASK)
+                .where(COMPLETED_TASK.ROUND_ID.eq(roundId))
+                .execute();
+    }
+
 }
  

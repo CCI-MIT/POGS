@@ -38,7 +38,7 @@ public class SessionCron {
 
     @Scheduled(fixedRate = RATE, initialDelay = DELAY)
     public void checkForSessionInitialization() {
-        _log.debug("Checking for sessions to be configured...");
+        //_log.debug("Checking for sessions to be configured...");
         sessionService.initializeSessionRunners();
 
     }

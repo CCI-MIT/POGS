@@ -12,5 +12,6 @@ public interface TeamHasSubjectDao extends Dao<TeamHasSubject, Long> {
 
     List<TeamHasSubject> listByTeamId(Long teamId);
 
+    void deleteByTeamId(Long teamId);
 }
  

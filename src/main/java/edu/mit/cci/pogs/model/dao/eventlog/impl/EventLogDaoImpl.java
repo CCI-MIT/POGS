@@ -32,6 +32,11 @@ public class EventLogDaoImpl extends AbstractDao<EventLog, Long, EventLogRecord>
  
         return query.fetchInto(EventLog.class);
     }
+    public void deleteByCompletedTaskId(Long completedTaskId){
+        dslContext.delete(EVENT_LOG)
+                .where(EVENT_LOG.COMPLETED_TASK_ID.eq(completedTaskId))
+                .execute();
+    }
  
 }
  
