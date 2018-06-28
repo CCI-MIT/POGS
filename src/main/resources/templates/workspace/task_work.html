@@ -62,7 +62,7 @@
     <div class="container-fluid h-100" style="width:350px;">
         <div class="row h-100">
             <div class="col-3 border-chat-lightgray px-0" style="display:none" id="subjectContainer">
-                <div class="h-100 w-100">
+                <div id="sidebar-content" class="h-100 w-100">
                     <div class=" p-0 d-xs-none">
                         <div class="col-1 p-1">
                             <button class="btn text-white bg-darkblue p-0 hover-color-lightgray" id="toggleBackTrigger">
@@ -77,7 +77,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card-body bg-lightgrey d-flex flex-column p-0" style="" stryle = "flex: 9 1" id="chatContainer"><!--  -->
+            <div class="card-body bg-lightgrey d-flex flex-column p-0" style="flex: 9 1" id="chatContainer"><!--  -->
                 <div class="d-flex flex-row justify-content-start">
                     <div class="col-1 p-1">
                         <button class="btn text-white bg-darkblue p-0 hover-color-lightgray" id="toggleTrigger">
@@ -93,27 +93,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="container-fluid message-scroll" style="flex: 1 1" id="channelMessageBody">
-                    <div id="channel_group" style="display: none">
-                        <div class="row" id="ownMessage">
-                            <div class="card message-card m-1">
-                                <div class="card-body p-2">
-                                    <span class="float-left mx-1"><b>carlos</b></span>
-                                    <span class="mx-2">Hi, Johannes</span>
-                                    <span class="float-right mx-1"><small>14:13</small></span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row justify-content-end">
-                            <div class="card message-card bg-lightblue m-1">
-                                <div class="card-body p-2">
-                                    <span class="float-left mx-1"><b>johannes</b></span>
-                                    <span class="mx-2">Hello, Carlos</span>
-                                    <span class="float-right mx-1"><small>14:14</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="container-fluid message-scroll" style="flex: 1 1;padding-bottom: 10px;" id="channelMessageBody">
+
                 </div>
                 <div class="input-group">
                     <input type="text" class="form-control border-0" placeholder="Input message..." id="messageInput">

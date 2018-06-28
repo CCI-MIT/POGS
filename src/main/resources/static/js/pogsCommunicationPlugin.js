@@ -48,7 +48,8 @@ class GroupChatManager {
             subscribeCommunicationBroadcast(this.onCommunicationBroadcastReceived.bind(this));
 
         this.channelBodyRef.show();
-        console.log("Group chat manager show")
+        console.log("Group chat manager show");
+        this.firstTime = true;
     }
     onCommunicationBroadcastReceived(message) {
 
@@ -58,6 +59,7 @@ class GroupChatManager {
                 if (message.content.message != "") {
                     this.channelBodyRef.append(this.createReceivedMessageHTML(
                         message.content.message, this.communicationPluginReference.getSubjectByExternalId(message.sender).displayName, new Date()));
+                    this.adjustScroll();
                 }
 
             }
@@ -88,14 +90,25 @@ class GroupChatManager {
         console.log("Setup HTML for chat");
         //register toggle button to subject list
         $("#toggleTrigger").click(function (event) {
-            $("#chatContainer").hide();
-            $("#subjectContainer").show();
+
+            $("#sidebar-content")
+                .removeClass("w-100")
+                .width($("#sidebar").width());
+            $("#subjectContainer").css({"flex" : "none"});
+            $("#subjectContainer").animate({
+                                      width: "toggle"
+                                  }, 600, function() {
+                $("#subjectContainer").css({"flex" : '', "width" : ''});
+                $("#sidebar-content")
+                    .css("width", "")
+                    .addClass("w-100");
+            });
         });
-        //register back to chat window
-        $("#toggleBackTrigger").click(function () {
-            $("#subjectContainer").hide();
-            $("#chatContainer").show();
-        });
+        // //register back to chat window
+        // $("#toggleBackTrigger").click(function () {
+        //     $("#subjectContainer").hide();
+        //     $("#chatContainer").show();
+        // });
         //register form enter and button click
         $("#messageInput").keypress(function (e) {
             if (e.which == 13) {
@@ -108,6 +121,13 @@ class GroupChatManager {
         $("#messageSubmitButton").click(function () {
             this.triggerSendMessage();
         }.bind(this));
+
+        var height = $("#channelMessageBody").height();
+        $("#channelMessageBody").css({height: height, overflowY: 'scroll'});
+        this.adjustScroll();
+    }
+    adjustScroll(){
+        document.getElementById("channelMessageBody").scrollTop = document.getElementById("channelMessageBody").scrollHeight;
     }
     sendJoinedMessage() {
         this.communicationPluginReference.sendMessage("", this.channel, "JOINED", null)
@@ -127,6 +147,7 @@ class GroupChatManager {
         // send the message using ws
         this.sendRegularMessage(message);
         console.log("triggerSendMessage ");
+        this.adjustScroll();
     }
     sendRegularMessage(message) {
         this.communicationPluginReference.sendMessage(message, this.channel, "MESSAGE", null);
