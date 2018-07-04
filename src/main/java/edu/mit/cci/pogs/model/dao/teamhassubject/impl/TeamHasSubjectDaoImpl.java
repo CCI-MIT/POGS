@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
  
 import java.util.List;
- 
+
+import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT;
+import static edu.mit.cci.pogs.model.jooq.Tables.TEAM;
 import static edu.mit.cci.pogs.model.jooq.Tables.TEAM_HAS_SUBJECT;
  
 @Repository

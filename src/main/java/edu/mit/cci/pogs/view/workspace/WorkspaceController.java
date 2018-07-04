@@ -35,6 +35,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
+import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
 
 @Controller
@@ -60,6 +61,9 @@ public class WorkspaceController {
 
     @Autowired
     private SubjectAttributeDao subjectAttributeDao;
+
+    @Autowired
+    private TeamService teamService;
 
     @Autowired
     private TeamDao teamDao;
@@ -148,7 +152,8 @@ public class WorkspaceController {
 
         if (su != null) {
             //discover subject team
-            List<Subject> teammates = subjectDao.getTeammates(su.getSessionId(), null, null);
+
+            List<Subject> teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(), null, null);
             model.addAttribute("teammates", teammates);
         }
 
@@ -283,23 +288,27 @@ public class WorkspaceController {
                         sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
 
-                Team team = teamDao.getByRoundIdTaskId(round.getId(),task.getId());
+                Team team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),round.getId(),task.getId());
                 if (team == null) {
-                    team = teamDao.getByRoundIdTaskId(round.getId(), null);
+                    team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),round.getId(), null);
+                    if(team == null){
+                        team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),null, null);
+                    }
                 }
                 CompletedTask completedTask = completedTaskDao.getByRoundIdTaskIdTeamId(
                         round.getId(),
                         team.getId(),
                         task.getId());
                 //get team
-                List<Subject> teammates = subjectDao.getTeammates(su.getSessionId(),
+                List<Subject> teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
                         round.getId(), task.getId());
+
                 if(teammates == null || teammates.size() == 0 ){
-                    teammates = subjectDao.getTeammates(su.getSessionId(),
+                    teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
                             round.getId(), null);
                 }
                 if(teammates == null || teammates.size() == 0  ){
-                    teammates = subjectDao.getTeammates(su.getSessionId(),
+                    teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
                             null, null);
                 }
 

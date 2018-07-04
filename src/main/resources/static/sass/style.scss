@@ -97,5 +97,67 @@ body {
 .border-chat-lightgray {
   border-style: solid;
   border-width: 1px 0 1px 1px;
-  border-color: #dfdfdf!important;
+  border-color: #e2e0e0!important;
+}
+.hover-bg-lightgray:hover {
+  background-color: #dcdcdc!important;
+  cursor: pointer;
+}
+
+.border-chat-window {
+  border: 1px solid #e2e0e0;
+}
+
+.subject-icon{
+  background-color:#0E5EA9;color: white;font-size: 30px;cursor:pointer;
+}
+.chatRequestAvailable {
+  color: #00dd1c;font-size: 28px;cursor: pointer
+}
+.chatRequestBusy {
+  color: red;font-size: 28px;
+}
+.chatRequestNotAvailable {
+  color: grey;font-size: 28px;
+}
+.status-text-desc {
+  font-size:8px;
+}
+
+.statusAvailable {
+  background-color: #00dd1c;
+}
+
+.statusBusy {
+  background-color: red;
+}
+
+.statusNotAvailable {
+  background-color: gray;
+}
+
+.chatRequestIconRing {
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  animation-iteration-count: infinite;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }

@@ -128,7 +128,7 @@ public class SessionWrapper extends Session {
     }
 
     public boolean isReadyToInitiateStart() {
-        return DateUtils.now() + 2 * 1000 > this.getSessionStartDate().getTime();
+        return DateUtils.now() + 10 * 1000 > this.getSessionStartDate().getTime();
     }
 
 

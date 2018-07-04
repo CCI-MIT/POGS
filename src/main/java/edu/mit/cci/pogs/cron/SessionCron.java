@@ -30,7 +30,7 @@ public class SessionCron {
         _log.info("Initializing session cron with rate = {}s", RATE / 1000);
     }
 
-    @Scheduled(fixedRate = RATE, initialDelay = DELAY)
+    @Scheduled(fixedRate = RATE)
     public void checkForSessionInitialization() {
         _log.debug("Checking for sessions to be configured...");
         sessionService.initializeSessionRunners();

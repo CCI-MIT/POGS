@@ -142,7 +142,7 @@ class Pogs {
 //        );
     }
     onError(error) {
-        this.fire(null, 'onReady', this);
+        this.fire(null, 'onError', this);
     }
     onFlowBroadcastReceived(message) {
 

@@ -10,6 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import edu.mit.cci.pogs.messages.CommunicationMessage;
+import edu.mit.cci.pogs.messages.CommunicationMessageContent;
+import edu.mit.cci.pogs.messages.PogsMessage;
+
 @Component
 public class WebSocketEventListener {
 
@@ -27,15 +31,22 @@ public class WebSocketEventListener {
     public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
-        String username = (String) headerAccessor.getSessionAttributes().get("username");
-        if(username != null) {
-            logger.info("User Disconnected : " + username);
+        String externalUserId = (String) headerAccessor.getSessionAttributes().get("externalUserId");
+        String latestCompletedTaskId = (String) headerAccessor.getSessionAttributes()
+                .get("latestCompletedTaskId");
 
-            //ChatMessage chatMessage = new ChatMessage();
-            //chatMessage.setType(ChatMessage.MessageType.LEAVE);
-            //chatMessage.setSender(username);
+        if(externalUserId != null) {
+            logger.info("User Disconnected : " + externalUserId);
 
-            //messagingTemplate.convertAndSend("/topic/public", chatMessage);
+            CommunicationMessage cm = new CommunicationMessage();
+            cm.setSender(externalUserId);
+            cm.setType(PogsMessage.MessageType.COMMUNICATION_MESSAGE);
+            CommunicationMessageContent cmc = new CommunicationMessageContent();
+            cmc.setType(CommunicationMessage.CommunicationType.STATUS);
+            cmc.setMessage("UNAVAILABLE");
+
+            cm.setContent(cmc);
+            messagingTemplate.convertAndSend("/topic/public/task/"+latestCompletedTaskId + "/communication", cm);
         }
     }
 
