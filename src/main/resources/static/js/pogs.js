@@ -23,7 +23,13 @@ class Pogs {
         this.teammates = config.teammates;
 
         this.hasCollaboration = config.hasCollaboration;
+        this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
+        this.hasCollaborationFeedbackWidget = config.hasCollaborationFeedbackWidget;
+        this.hasCollaborationTodoListEnabled = config.hasCollaborationTodoListEnabled;
 
+        this.hasCollaboration = this.hasCollaborationVotingWidget ||
+                                this.hasCollaborationFeedbackWidget||
+                                this.hasCollaborationTodoListEnabled;
         this.hasChat = config.hasChat;
         this.communicationType = config.communicationType;
 
@@ -107,7 +113,7 @@ class Pogs {
                                    }.bind(this));
     }
     onConnected() {
-        this.fire(null, 'onReady', this);
+
         this.subscribeTopicAndFireEvent(('/topic/public/flow/' + this.sessionId),
                                         'FLOW_BROADCAST', 'flowBroadcast');
 
@@ -140,6 +146,7 @@ class Pogs {
 //                         {},
 //                         JSON.stringify({sender: username, type: 'JOIN'})
 //        );
+        this.fire(null, 'onReady', this);
     }
     onError(error) {
         this.fire(null, 'onError', this);

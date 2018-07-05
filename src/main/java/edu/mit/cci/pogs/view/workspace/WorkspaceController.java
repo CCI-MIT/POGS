@@ -153,7 +153,7 @@ public class WorkspaceController {
         if (su != null) {
             //discover subject team
 
-            List<Subject> teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(), null, null);
+            List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(), null, null);
             model.addAttribute("teammates", teammates);
         }
 
@@ -251,7 +251,6 @@ public class WorkspaceController {
                         .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
 
-
                 //get task html & js from plugin file system
                 model.addAttribute("taskCss", pl.getTaskCSSContent());
                 model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
@@ -259,7 +258,6 @@ public class WorkspaceController {
 
                 model.addAttribute("subject", su);
                 model.addAttribute("task", new TaskWrapper(task));
-
 
 
                 model.addAttribute("taskConfigurationAttributes",
@@ -276,23 +274,34 @@ public class WorkspaceController {
 
 
                 String cc = sessionWrapper.getCommunicationType();
-                if(task.getCommunicationType() != null || !task.getCommunicationType().equals(cc)){
+                if (task.getCommunicationType() != null || !task.getCommunicationType().equals(cc)) {
                     cc = task.getCommunicationType();
                 }
 
                 model.addAttribute("communicationType", cc);
-                model.addAttribute("hasChat", (cc!=null && !cc.equals(CommunicationConstraint.NO_CHAT)?(true):(false)));
+                model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint.NO_CHAT) ? (true) : (false)));
+
+                boolean hasCollaborationTodoListEnabled = sessionWrapper
+                        .getCollaborationTodoListEnabled();
+                model.addAttribute("hasCollaborationTodoListEnabled",hasCollaborationTodoListEnabled);
+                boolean hasCollaborationFeedbackWidget = sessionWrapper
+                        .getCollaborationFeedbackWidgetEnabled();
+                model.addAttribute("hasCollaborationFeedbackWidget",hasCollaborationFeedbackWidget);
+                boolean hasCollaborationVotingWidget = sessionWrapper
+                        .getCollaborationVotingWidgetEnabled();
+
+                model.addAttribute("hasCollaborationVotingWidget",hasCollaborationVotingWidget);
 
 
                 model.addAttribute("secondsRemainingCurrentUrl",
                         sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
 
-                Team team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),round.getId(),task.getId());
+                Team team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), round.getId(), task.getId());
                 if (team == null) {
-                    team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),round.getId(), null);
-                    if(team == null){
-                        team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(),null, null);
+                    team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), round.getId(), null);
+                    if (team == null) {
+                        team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), null, null);
                     }
                 }
                 CompletedTask completedTask = completedTaskDao.getByRoundIdTaskIdTeamId(
@@ -300,15 +309,15 @@ public class WorkspaceController {
                         team.getId(),
                         task.getId());
                 //get team
-                List<Subject> teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
+                List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
                         round.getId(), task.getId());
 
-                if(teammates == null || teammates.size() == 0 ){
-                    teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
+                if (teammates == null || teammates.size() == 0) {
+                    teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
                             round.getId(), null);
                 }
-                if(teammates == null || teammates.size() == 0  ){
-                    teammates = teamService.getTeamSubjects(su.getId(),su.getSessionId(),
+                if (teammates == null || teammates.size() == 0) {
+                    teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
                             null, null);
                 }
 
@@ -327,18 +336,18 @@ public class WorkspaceController {
 
     private JSONArray getTeamatesJSONObject(List<Subject> teammates) {
         JSONArray ja = new JSONArray();
-        for(Subject s: teammates) {
+        for (Subject s : teammates) {
             JSONObject subject = new JSONObject();
             subject.put("externalId", s.getSubjectExternalId());
             subject.put("displayName", s.getSubjectDisplayName());
             JSONArray subjectAttributes = new JSONArray();
             List<SubjectAttribute> attributes = subjectAttributeDao.listBySubjectId(s.getId());
-            for(SubjectAttribute sa: attributes){
+            for (SubjectAttribute sa : attributes) {
                 JSONObject att = new JSONObject();
-                att.put("attributeName",sa.getAttributeName());
-                att.put("stringValue",sa.getStringValue());
-                att.put("integerValue",sa.getIntegerValue());
-                att.put("realValue",sa.getRealValue());
+                att.put("attributeName", sa.getAttributeName());
+                att.put("stringValue", sa.getStringValue());
+                att.put("integerValue", sa.getIntegerValue());
+                att.put("realValue", sa.getRealValue());
                 subjectAttributes.add(att);
             }
             subject.put("attributes", subjectAttributes);

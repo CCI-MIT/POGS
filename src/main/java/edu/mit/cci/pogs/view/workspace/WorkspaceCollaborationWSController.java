@@ -7,7 +7,9 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 import edu.mit.cci.pogs.messages.CollaborationMessage;
-import edu.mit.cci.pogs.messages.CommunicationMessage;
+
+import edu.mit.cci.pogs.messages.TodoListMessageContent;
+
 
 @Controller
 public class WorkspaceCollaborationWSController {
@@ -18,10 +20,22 @@ public class WorkspaceCollaborationWSController {
     @MessageMapping("/collaboration.sendMessage")
     public void getCheckin(@Payload CollaborationMessage pogsMessage) {
 
-        Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
-        //if group message send to task level topic
-        //else send to channel whatever it is
 
-        messagingTemplate.convertAndSend("/topic/public/task/"+completedTaskId + "/collaboration", pogsMessage);
+        TodoListMessageContent todoListMessageContent = pogsMessage.getContent();
+
+
+
+        Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
+
+        if(todoListMessageContent.getType().equals(CollaborationMessage.TodoType.CREATE_TODO)){
+                //call service or dao for creating todoentries.
+
+        }
+
+        // compose the todo list broadcast message .
+        CollaborationMessage allTodoEntries = new CollaborationMessage();
+
+
+        messagingTemplate.convertAndSend("/topic/public/task/"+completedTaskId + "/collaboration", allTodoEntries);
     }
 }

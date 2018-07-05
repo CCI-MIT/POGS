@@ -1,53 +1,51 @@
 'use strict';
 
+const TODO_TYPE = {
+
+    CREATE_TODO: "CREATE_TODO",
+    ASSIGN_ME: "ASSIGN_ME",
+    UNASSIGN_ME: "UNASSIGN_ME",
+    DELETE_TODO: "DELETE_TODO",
+    MARK_DONE: "MARK_DONE",
+    MARK_UNDONE: "MARK_UNDONE"
+
+};
+
 class CollaborationPlugin extends PogsPlugin {
-    constructor(pogsRef){
+    constructor(pogsRef) {
         super('collaborationPlugin', null, pogsRef);
         this.initFunc = this.init;
     }
-    init(){
+
+    init() {
         console.log("Init");
-        //check for the enabled widgets and instantiate their managers
+
+        if (this.pogsRef.hasCollaborationTodoListEnabled) {
+            new TodoListManager(this);
+        }
+        if (this.pogsRef.hasCollaborationVotingWidget) {
+            console.log("HasCollaboratonVoting");
+        }
+        if (this.pogsRef.hasCollaborationFeedbackWidget) {
+            console.log("HasCollaboratonVoting");
+        }
+
     }
+
     subscribeCollaborationBroadcast(funct) {
         this.pogsRef.subscribe('collaborationMessage', funct);
     }
-    sendMessage(message, channel, type, receiver) {
+
+    sendMessage(message, type) {
 
         var messageContent = {
             message: message,
-            type: type,
-            channel: channel
+            type: type
         };
 
         this.pogsRef.sendMessage("/pogsapp/collaboration.sendMessage", "COLLABORATION_MESSAGE",
                                  messageContent,
-                                 this.getSubjectId(), receiver, this.getCompletedTaskId(),
+                                 this.getSubjectId(), null, this.getCompletedTaskId(),
                                  this.getSessionId());
     }
 }
-
-
-//Create the TodoListManager
-/* Responsabilities
-  - Create the HTML for the todo items
-  - handle onclick on buttons for assignment/unnasignment
-  - handle marked as done
-  - handle broadcast messages for events
-  - handle broadcast messages for todo item sync
-
-  Events:
-    - todo created
-    - todo assigned
-    - todo marked as done
-
-
- */
-//Create the VotingPoolManager
-/*
- - create the html for the voting pool
- - handle onclick for adding new pool and new options
- - handle vote
- - show pool statistics.
- - handle broadcast messages for all events
-*/
