@@ -29,4 +29,4 @@ Adjust the username and password to the ones you configured during the mysql dat
 mvn clean compile package install 
 ```
 
-5 Go to Intellij and use RUN the app named PlatformForOnlineGroupStudiesApplication
+5 Go to Intellij and use RUN the configuration called "POGS (development)". If you don't see that configuration, you can also run the application directly from the `PlatformForOnlineGroupStudiesApplication` class. Make sure you set the active profile to development, which enables hot reloading of static files.
