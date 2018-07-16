@@ -29,7 +29,7 @@ class Survey {
         */
         var surveyValues = $.parseJSON(surveyBluePrint);
         var self = this;
-        $("#surveyForm").find(".form-group").each(function(index) { // grab form-group
+        /*$("#surveyForm").find(".form-group").each(function(index) { // grab form-group
             var surveyValue = surveyValues[index];
             $("#question"+index).text(surveyValue["question"]);
             if(surveyValue["type"] == "text") {
@@ -38,8 +38,40 @@ class Survey {
                 $answer.on('focusin', self.handleOnClick.bind(self));
                 $answer.on('focusout', self.handleOnBlur.bind(self));
             }
+        });*/
+
+        var str = '';
+
+        $.each(surveyValues,function(i,e){
+            console.log(e.type);
+            if(e.type == "text"){
+                str += '<div class="form-group">'
+                str += '<label for="answer'+i+'" id="question'+i+'" class="question-label pull-left">'+e.question+'</label>'
+                str += '<input type="text" class="form-control" id="answer'+i+'" data-cell-reference-index="'+i+'" placeholder="'+e.placeholder+'"></div>'
+            }
+            else if(e.type == "radio"){
+                str += '<label for="answer'+i+'" id="question'+i+'" class="question-label pull-left">'+e.question+'</label> <br>'
+
+                $.each(e.value,function(j, choice){
+                    str += '<div class="form-check">'
+                    str += '  <label class="form-check-label" for="radio'+j+'">'
+                    str += '    <input type="radio" class="form-check-input" name="answer'+i+'" id="radio'+j+'" value="'+choice+'">' + choice
+                    str += '  </label> </div>'
+                });
+            }
+
+            console.log(i + '----'+ JSON.stringify(e));
         });
 
+        $('#surveyForm').append(str);
+
+        $("#surveyForm").find(".form-group").each(function(index) { // grab form-group
+            var $answer = $("#answer"+index);
+            if($answer.attr('type') == "text") {
+                $answer.on('focusin', self.handleOnClick.bind(self));
+                $answer.on('focusout', self.handleOnBlur.bind(self));
+            }
+        });
     }
 
 

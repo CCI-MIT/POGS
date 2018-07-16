@@ -1,4 +1,61 @@
+
+.centerContent {
+    -ms-flex-direction: column;
+    -ms-flex-pack: center;
+    display: -ms-flexbox;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+}
+
+.container {
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    padding: .25rem;
+    margin-top: 40px;
+    vertical-align: top;
+}
+
+h3 {
+    color: black;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    text-align: left;
+    vertical-align: top;
+    margin-top: 0px;
+}
+
+form {
+    margin-top: 2.5rem;
+}
+
 .question-label {
+    display: block;
     color: black;
     text-align: left;
+    width: 85%;
+    margin-bottom: 0.325rem;
 }
+
+.form-control{
+    flex: 1 1 auto;
+    padding: 0.350rem;
+    margin-bottom: 0.625rem;
+    display: block;
+    text-align: left;
+    width: 85%;
+}
+
+.form-control:focus{
+    background:#ffd;
+}
+
+.form-check-label{
+    color: black;
+    padding: 0.350rem;
+    margin-bottom: 0.625rem;
+    display: block;
+    text-align: left;
+    width: 85%;
+}
+
