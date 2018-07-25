@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="taskPlugin" type="edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Task Plugin </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/taskplugins">Task Plugins</a></li>
+        <li class="breadcrumb-item active"><a th:href="${'/admin/taskplugins/' + taskPlugin.taskPluginName}" th:text="${taskPlugin.taskPluginName}"></a></li>
+    </ol>
+    <h2 th:text="${taskPlugin.taskPluginName }"></h2>
+
+    <p> Plugin description</p>
+
+    <h3>Plugin configurations: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+
+                <a th:href="${'/admin/taskplugins/' + taskPlugin.taskPluginName + '/createConfiguration'}"  class="btn btn-outline-primary float-right">
+                    Create new configuration</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Configuration name</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="config : ${taskConfigurationList}">
+            <tr>
+                <td><a th:text="${config.configurationName}" th:href="${'/admin/taskplugins/' + taskPlugin.taskPluginName + '/' + config.id} "></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

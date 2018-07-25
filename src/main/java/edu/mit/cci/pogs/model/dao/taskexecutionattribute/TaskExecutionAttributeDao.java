@@ -9,5 +9,6 @@ public interface TaskExecutionAttributeDao extends Dao<TaskExecutionAttribute, L
  
     List<TaskExecutionAttribute> list();
     List<TaskExecutionAttribute> listByTaskConfigurationId(Long taskConfigurationId);
+    void delete(TaskExecutionAttribute tea);
 }
  

@@ -29,7 +29,8 @@ public class TaskPlugin {
     public static TaskPlugin getTaskPlugin(String sessionId) {
         return registeredPlugins.get(sessionId);
     }
-    public static List<TaskPlugin> getAllTaskPlugins(){
+
+    public static List<TaskPlugin> getAllTaskPlugins() {
         return new ArrayList<>(registeredPlugins.values());
     }
 
@@ -79,9 +80,26 @@ public class TaskPlugin {
         return ret;
     }
 
+    public boolean hasLibsDir() {
+        File f = new File(this.pluginRootFolder + File.separatorChar + "libs");
+        if (f == null) return false;
+        return f.isDirectory();
+    }
 
-    public String getTaskInitJsContent() {
-        return readFile(this.pluginRootFolder + File.separatorChar + "taskInit.html");
+    public String getLibsDirContent() {
+        File f = new File(this.pluginRootFolder + File.separatorChar + "libs");
+        File[] files = f.listFiles();
+        String ret = "";
+        for (File jsFile : files) {
+            ret += readFile(this.pluginRootFolder + File.separatorChar + "libs" + File.separatorChar + jsFile.getName());
+        }
+
+        return ret;
+    }
+
+
+    public String getTaskEditJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskEdit.js");
     }
 
     public String getTaskEditHtmlContent() {

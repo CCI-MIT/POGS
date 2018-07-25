@@ -321,8 +321,16 @@ class DyadicChatManager extends GroupChatManager {
 
     }
     handleSendRequestCommunication(event){
+        var subjStatus = $(event.target).data("status");
+
         if(this.status == STATUS.AVAILABLE) {
+
+            if(subjStatus != STATUS.AVAILABLE){
+                alert("You can't request a call with a busy subject!")
+                return;
+            }
             this.requestSent = $(event.target).data("externalid");
+
             this.setBusyStatus();
             console.log("Request sent from: " + this.communicationPluginReference.getSubjectId() +
                         " to :" + $(event.target).data("externalid"));
@@ -340,6 +348,7 @@ class DyadicChatManager extends GroupChatManager {
             $(iconRef).removeClass("chatRequestBusy");
             $(iconRef).removeClass("chatRequestNotAvailable");
             $(iconRef).addClass("chatRequestAvailable");
+            $(iconRef).data("status", status);
             $(textDescRef).text("available");
 
             $(textDescRef).removeClass("statusBusy");
@@ -352,6 +361,8 @@ class DyadicChatManager extends GroupChatManager {
             $(iconRef).removeClass("chatRequestAvailable");
             $(iconRef).removeClass("chatRequestNotAvailable");
             $(iconRef).addClass("chatRequestBusy");
+            $(iconRef).data("status", status);
+
             $(textDescRef).text("busy");
             $(textDescRef).removeClass("statusAvailable");
             $(textDescRef).removeClass("statusNotAvailable");
@@ -362,6 +373,8 @@ class DyadicChatManager extends GroupChatManager {
             $(iconRef).removeClass("chatRequestBusy");
             $(iconRef).removeClass("chatRequestAvailable");
             $(iconRef).addClass("chatRequestNotAvailable");
+            $(iconRef).data("status", status);
+
             $(textDescRef).text("unavailable");
             $(textDescRef).removeClass("statusBusy");
             $(textDescRef).removeClass("statusAvailable");
@@ -428,7 +441,7 @@ class DyadicChatManager extends GroupChatManager {
                     '                           <li class="list-group-item p-1 hover-bg-lightgray" id="'+this.subjectsInChannel[i].externalId+'_subject_ref">\n'
                     + '                            <span class="d-xs-none username">'
                     + this.subjectsInChannel[i].displayName + '</span>\n'
-                    + '                             <i class="fa fa-phone-square chatRequest chatRequestAvailable" data-externalId="'
+                    + '                             <i class="fa fa-phone-square chatRequest chatRequestAvailable" data-status="AVAILABLE" data-externalId="'
                     + this.subjectsInChannel[i].externalId + '"style=""></i> <span class="badge badge-primary status-text-desc statusAvailable">available</span>  \n'
                     + '                        </li>\n');
             }

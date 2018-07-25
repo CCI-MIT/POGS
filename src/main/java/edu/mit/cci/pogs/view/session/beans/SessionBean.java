@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.view.session.beans;
 
 import java.sql.Timestamp;
 
+import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 
@@ -260,6 +261,10 @@ public class SessionBean {
 
     public String getCommunicationType() {
         return communicationType;
+    }
+
+    public boolean canHaveCommunicationMatrix() {
+        return (communicationType.equals(CommunicationConstraint.DYADIC_CHAT.getId().toString())||communicationType.equals(CommunicationConstraint.MATRIX_CHAT.getId().toString()));
     }
 
     public void setCommunicationType(String communicationType) {

@@ -13,31 +13,39 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
         <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
-        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
-        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}"
+                                        th:text="${study.studyName}"></a></li>
+        <li class="breadcrumb-item "><a
+                th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}"
+                th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
     </ol>
     <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
     <div class="col">
         <div class="col-12">
-            <a th:unless="${sessionBean.hasSessionStarted}" th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}" class="btn btn-outline-primary float-right">
+            <a th:unless="${sessionBean.hasSessionStarted}"
+               th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}"
+               class="btn btn-outline-primary float-right">
                 Edit session</a>
 
-            <a th:if="${sessionBean.hasSessionStarted}" class="btn btn-danger float-right" id="resetSession">
+            <a th:if="${sessionBean.hasSessionStarted}" class="btn btn-danger float-right"
+               id="resetSession">
                 Reset session</a>
 
         </div>
     </div>
     <script>
-        $(function() {
+        $(function () {
             $("#resetSession").click(function () {
-                var r = confirm("Are you sure you want to reset this session, all saved data like completed tasks and logs will be deleted?");
+                var r = confirm(
+                    "Are you sure you want to reset this session, all saved data like completed tasks and logs will be deleted?");
                 if (r == true) {
                     $("#resetSessionForm").submit();
                 }
             })
         });
     </script>
-    <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/reset'}" method="post" id="resetSessionForm">
+    <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/reset'}"
+          method="post" id="resetSessionForm">
     </form>
 
     </form>
@@ -48,7 +56,8 @@
         <div class="col"></div>
         <div class="col">
             <div class="col-12">
-                <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/edit'}"  class="btn btn-outline-primary float-right">
+                <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/edit'}"
+                   class="btn btn-outline-primary float-right">
                     Edit subjects</a>
             </div>
         </div>
@@ -73,6 +82,42 @@
         </th:block>
         </tbody>
     </table>
+
+
+    <div th:if="sessionBean.canHaveCommunicationMatrix">
+
+        <h3>Communication matrix constraint: </h3>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <div class="col-12">
+                    <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/edit'}"
+                       class="btn btn-outline-primary float-right">
+                        Edit communication constraint</a>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>Internal ID</th>
+                <th>Subject external ID</th>
+                <th>Subject display name</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="subject : ${subjectsBean.subjectList}">
+                <tr>
+                    <td th:text="${subject.id}"></td>
+                    <td th:text="${subject.subjectExternalId}"></td>
+                    <td th:text="${subject.subjectDisplayName}"></td>
+
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
 </div>
 </body>
 </html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="studiesList" type="java.util.List<edu.mit.cci.pogs.model.jooq.tables.pojos.Study>"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Task Plugins</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/taskplugins">Task Plugins</a></li>
+    </ol>
+    <h2>All task plugins:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/studies/create" class="btn btn-outline-primary float-right disabled">
+                    Upload new task plugin</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Plugin name</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <th:block th:each="tp : ${taskPluginsList}">
+            <tr>
+                <td><a th:text="${tp.taskPluginName}" th:href="${'/admin/taskplugins/'+ tp.taskPluginName}"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
