@@ -24,6 +24,15 @@ public class WorkspaceCollaborationWSController {
         TodoListMessageContent todoListMessageContent = pogsMessage.getContent();
 
 
+        //PoolWidgetContet
+        //create
+          //- create the pool
+        //
+        //vote
+          // vote
+
+
+        CollaborationMessage allPoolsForTask = new CollaborationMessage();
 
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
 
