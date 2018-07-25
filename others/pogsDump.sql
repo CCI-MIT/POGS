@@ -1,3 +1,4 @@
+SET FOREIGN_KEY_CHECKS=0;
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
@@ -93,7 +94,7 @@ LOCK TABLES `task_execution_attribute` WRITE;
 /*!40000 ALTER TABLE `task_execution_attribute` DISABLE KEYS */;
 INSERT INTO `task_execution_attribute` VALUES (1,'inputCell_0_0','2',NULL,NULL,1),(2,'filledCell_0_1','7',NULL,NULL,1),(3,'inputCell_0_2','2',NULL,NULL,1),(4,'inputCell_0_3','8',NULL,NULL,1),(5,'inputCell_0_4','5',NULL,NULL,1),(6,'filledCell_0_5','2',NULL,NULL,1),(7,'filledCell_0_6','5',NULL,NULL,1),(8,'inputCell_0_7','2',NULL,NULL,1),(9,'filledCell_0_8','8',NULL,NULL,1),(10,'inputCell_1_0','5',NULL,NULL,1),(11,'filledCell_1_1','9',NULL,NULL,1),(12,'filledCell_1_2','6',NULL,NULL,1),(13,'inputCell_1_3','4',NULL,NULL,1),(14,'inputCell_1_4','1',NULL,NULL,1),(15,'filledCell_1_5','1',NULL,NULL,1),(16,'inputCell_1_6','3',NULL,NULL,1),(17,'inputCell_1_7','7',NULL,NULL,1),(18,'filledCell_1_8','7',NULL,NULL,1),(19,'inputCell_2_0','3',NULL,NULL,1),(20,'filledCell_2_1','5',NULL,NULL,1),(21,'inputCell_2_2','1',NULL,NULL,1),(22,'filledCell_2_3','9',NULL,NULL,1),(23,'inputCell_2_4','2',NULL,NULL,1),(24,'inputCell_2_5','2',NULL,NULL,1),(25,'inputCell_2_6','2',NULL,NULL,1),(26,'inputCell_2_7','2',NULL,NULL,1),(27,'inputCell_2_8','2',NULL,NULL,1),(28,'gridBluePrint','0,7,0,0,0,2,5,0,8,0,9,6,0,0,1,0,0,7,0,5,0,9,0,0,0,0,0,0,0,0,7,2,0,4,8,3,6,0,0,0,9,0,0,0,5,2,8,3,0,1,5,0,0,0,0,0,0,0,0,8,0,4,0,7,0,0,4,0,0,3,5,0,9,0,5,1,0,0,0,6,2',NULL,NULL,1);
 /* for survey plugin */
-INSERT INTO `task_execution_attribute` VALUES (29, 'surveyBluePrint','[{"question":"Lorem ipsum dolor sit amet, laudem habemus contentiones his no. Suas volumus ne sit, ferri graecis ne ius, an vix aliquip commune?","type":"text","placeholder":"sample question1 placeholder"},{"question":"Natum ridens dissentiunt eos ne, partem diceret eloquentiam ea ius?","type":"text","placeholder":"sample question2 placeholder"},{"question":"Eu menandri dissentias sea, et noster epicurei tacimates eum, ut malis denique disputando sit?","type":"text","placeholder":"sample question3 placeholder"}]', NULL, NULL, 2);
+INSERT INTO `task_execution_attribute` VALUES (29, 'surveyBluePrint','[{"question":"Lorem ipsum dolor sit amet, laudem habemus contentiones his no. Suas volumus ne sit, ferri graecis ne ius, an vix aliquip commune?","type":"text","placeholder":"sample question1 placeholder"},{"question":"Natum ridens dissentiunt eos ne, partem diceret eloquentiam ea ius?","type":"text","placeholder":"sample question2 placeholder","video_url":"https://www.youtube.com/embed/zVXnoIoWu88"},{"question":"Eu menandri dissentias sea, et noster epicurei tacimates eum, ut malis denique disputando sit?","type":"text","placeholder":"sample question3 placeholder"},{"question":"radio question #1","type":"radio","value":["choice 1", "choice 2", "choice 3"], "video_url":"https://www.youtube.com/embed/aJaZc4E8Y4U"},{"question":"radio question #2","type":"radio","value":["option 1", "option 2", "option 3"]}]', NULL, NULL, 2);
 /*!40000 ALTER TABLE `task_execution_attribute` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -129,3 +130,4 @@ INSERT INTO `task_has_task_configuration` VALUES (1,1,1),(2,2,2);
 /*!40000 ALTER TABLE `task_has_task_configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
+SET FOREIGN_KEY_CHECKS=1;

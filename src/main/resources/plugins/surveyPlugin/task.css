@@ -15,14 +15,13 @@
     padding: .25rem;
     margin-top: 40px;
     vertical-align: top;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: black;
 }
 
 h3 {
-    color: black;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
     text-align: left;
     vertical-align: top;
-    margin-top: 0px;
 }
 
 form {
@@ -33,7 +32,6 @@ form {
     display: block;
     color: black;
     text-align: left;
-    width: 85%;
     margin-bottom: 0.325rem;
 }
 
@@ -43,19 +41,91 @@ form {
     margin-bottom: 0.625rem;
     display: block;
     text-align: left;
-    width: 85%;
 }
 
 .form-control:focus{
     background:#ffd;
 }
 
-.form-check-label{
-    color: black;
-    padding: 0.350rem;
-    margin-bottom: 0.625rem;
-    display: block;
-    text-align: left;
-    width: 85%;
+.form-control--error {
+    color: red;
+    background: #fdd;
 }
+
+.form-check{
+    text-align: left;
+    display: block;
+}
+
+.form-check-label{
+     color: black;
+     padding: 0.15rem;
+     margin-bottom: 0.425rem;
+     display: block;
+     text-align: left;
+ }
+
+
+#video_frame{
+    display: block;
+    margin-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+@media (max-width: 260px) {
+    #video_frame{
+        width: 200px;
+        height: 112px;
+    }
+    .question-label{
+        width: 200px;
+    }
+    .form-control{
+        width: 200px;
+    }
+}
+@media (min-width: 261px) and (max-width: 420px) {
+    #video_frame{
+        width: 220px;
+        height: 123px;
+    }
+    .question-label{
+        width: 220px;
+    }
+    .form-control{
+        width: 220px;
+    }
+
+}
+@media (min-width: 421px) and (max-width: 615px) {
+    #video_frame{
+        width: 357px;
+        height: 200px;
+    }
+    .question-label{
+        width: 357px;
+    }
+    .form-control{
+        width: 357px;
+    }
+
+}
+@media (min-width: 615px) {
+    #video_frame{
+        width: 522px;
+        height: 293px;
+    }
+    .question-label{
+        width: 522px;
+    }
+    .form-control{
+        width: 522px;
+    }
+
+}
+
+
+
 
