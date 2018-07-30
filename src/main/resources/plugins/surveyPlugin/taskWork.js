@@ -58,6 +58,26 @@ class Survey {
 
                 str += ' </div>'
             }
+            else if(e.type == "select") {
+                str += '<div class="form-group">'
+                str += '<label for="answer'+i+'" id="question'+i+'" class="question-label pull-left">'+e.question+'</label> <br>'
+                str += '<select class="form-control" id="answer'+i+'" data-cell-reference-index="'+i+'">'
+                $.each(e.options, function(j, option) {
+                    str += '<option value="'+option+'">'+option+'</option>'
+                });
+                str += '</select></div>'
+            }
+            else if(e.type == "checkbox") {
+                str += '<div class="form-group">'
+                str += '<label id="question'+i+'" class="question-label">'+ e.question +'</label><div id="answer'+i+'">'
+                $.each(e.value, function(j, choice){
+                    str += '<div class="form-check">'
+                    str += '<label class="form-check-label">'
+                    str += '<input type="checkbox" class="form-check-input" name="answer'+i+'" value="'+choice+'" data-cell-reference-index="'+i+'">' + choice
+                    str += '</label> </div>'
+                });
+                str += '</div></div>'
+            }
 
             console.log(i + '----'+ JSON.stringify(e));
         });
@@ -72,6 +92,13 @@ class Survey {
             } else if($(this).attr('type') == "radio"){
                 $(this).on('change',self.handleRadioOnClick.bind(self));
             }
+            else if($(this).attr('type') == "checkbox"){
+                $(this).on('change',self.handleCheckboxOnClick.bind(self));
+            }
+        });
+
+        $("#surveyForm select").each(function() {
+            $(this).on('change', self.handleSelectOnChange.bind(self));
         });
     }
 
@@ -110,6 +137,25 @@ class Survey {
 
                 }
                 //change to  (#answer + cell).checked = message.content attributeIntVal
+                else if (attrName.indexOf("changeSelect_") != -1) {
+                    var cell = attrName.replace("changeSelect_", "");
+                    $("#answer" + cell).val(message.content.attributeStringValue)
+                        .addClass("form-control--error")
+                        .delay(1000).queue(function (next) {
+                            $(this).removeClass("form-control--error");
+                            next();
+                        });
+                }
+                else if(attrName.indexOf("checkboxSelect_") != -1) {
+                    var question_number = attrName.replace("checkboxSelect_", "");
+                    $("#answer" + question_number).find("input[value='"+message.content.attributeStringValue+"']")
+                        .prop("checked", true);
+                }
+                else if(attrName.indexOf("checkboxUnselect_") != -1) {
+                    var question_number = attrName.replace("checkboxUnselect_", "");
+                    $("#answer" + question_number).find("input[value='"+message.content.attributeStringValue+"']")
+                        .prop("checked", false);
+                }
             }
         }
     }
@@ -153,6 +199,36 @@ class Survey {
         }
     }
 
+    handleSelectOnChange(event) {
+        console.log("here");
+        var target = $(event.target);
+        var cellIndex = parseInt(target.data( "cell-reference-index"));
+        var option = target.val();
+        if(!isNaN(cellIndex) && option != null) {
+            this.pogsPlugin.saveCompletedTaskAttribute('changeSelect_' + cellIndex,
+                option, 0.0,
+                0, true);
+        }
+    }
+
+    handleCheckboxOnClick(event) {
+        console.log("checkbox clicked");
+        var target = $(event.target);
+        var questionIndex = parseInt(target.data( "cell-reference-index"));
+        var option = target.val();
+        if(!isNaN(questionIndex) && option != null) {
+            if(target.is(":checked")) {
+                this.pogsPlugin.saveCompletedTaskAttribute('checkboxSelect_' + questionIndex,
+                    option, 0.0,
+                    0, true);
+            }
+            else {
+                this.pogsPlugin.saveCompletedTaskAttribute('checkboxUnselect_' + questionIndex,
+                    option, 0.0,
+                    0, false);
+            }
+        }
+    }
 }
 
 var surveyPlugin = pogs.createPlugin('surveyTaskPlugin',function(){
