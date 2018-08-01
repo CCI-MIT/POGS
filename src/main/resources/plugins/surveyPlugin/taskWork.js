@@ -34,49 +34,61 @@ class Survey {
         $.each(surveyValues,function(i,e){
             console.log(e.type);
             if(e.type == "text"){ // setup text question
-                str += '<div class="form-group">'
-                str += '<label for="answer'+i+'" id="question'+i+'" class="question-label pull-left">'+ 'Question ' + i + ': ' + e.question +'</label>'
+                str += '<div class="form-group" style="min-width: 300px;">'
+                str += '<label for="answer'+i+'" id="question'+i+'" class="text-left text-dark row">'+ e.question +'</label>'
                 if(e.video_url){
-                    str += ' <iframe id="video_frame" class="question-video" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>'
+                    str += ' <div class="embed-responsive embed-responsive-16by9 row"><iframe class="embed-responsive-item" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
                 }
-                str += '<input type="text" class="form-control" id="answer'+i+'" data-cell-reference-index="'+i+'" placeholder="'+e.placeholder+'"></div>'
+                str += '<input type="text" class="form-control row" id="answer'+i+'" data-cell-reference-index="'+i+'" placeholder="'+e.placeholder+'"></div> <br>'
             }
-            else if(e.type == "radio"){
-                str += '<div class="form-group">'
-                str += '<label id="question'+i+'" class="question-label">'+ 'Question ' + i + ': ' + e.question +'</label>'
+            else if(e.type == "radio"){ // setup radio question
+                str += '<div class="form-group" style="min-width: 300px;">'
+                str += '<label id="question'+i+'" class="text-left text-dark row">'+ e.question +'</label>'
+
                 if(e.video_url){
-                    str += '<iframe id="video_frame" class="question-video" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>'
+                    str += ' <div class="embed-responsive embed-responsive-16by9 row"><iframe class="embed-responsive-item" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
                 }
 
-
+                str += '<div id="answer'+i+'">'
                 $.each(e.value,function(j, choice){ // setup radio question
-                    str += '<div class="form-check" id="answer'+i+'">'
-                    str += '  <label class="form-check-label" for="radio'+j+'">'
-                    str += '    <input type="radio" class="form-check-input" name="answer'+i+'" id="radio'+j+'" value="'+choice+'" data-cell-reference-index="'+i+'">' + choice
+                    str += '<div class="form-check form-inline row">'
+                    str += '  <label class="form-check-label text-left text-dark">'
+                    str += '    <input type="radio" class="form-check-input" name="answer'+i+'" value="'+choice+'" data-cell-reference-index="'+i+'">' + choice
                     str += '  </label> </div>'
                 });
 
-                str += ' </div>'
+                str += ' </div> </div> <br>'
             }
             else if(e.type == "select") {
-                str += '<div class="form-group">'
-                str += '<label for="answer'+i+'" id="question'+i+'" class="question-label pull-left">'+e.question+'</label> <br>'
-                str += '<select class="form-control" id="answer'+i+'" data-cell-reference-index="'+i+'">'
-                $.each(e.options, function(j, option) {
+                str += '<div class="form-group" style="min-width: 300px;">'
+                str += '<label for="answer'+i+'" id="question'+i+'" class="text-left text-dark row">'+e.question+'</label>'
+
+                if(e.video_url){
+                    str += ' <div class="embed-responsive embed-responsive-16by9 row"><iframe class="embed-responsive-item" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
+                }
+
+                str += '<select class="form-control row" id="answer'+i+'" data-cell-reference-index="'+i+'">'
+                $.each(e.value, function(j, option) {
                     str += '<option value="'+option+'">'+option+'</option>'
                 });
-                str += '</select></div>'
+                str += '</select></div> <br>'
             }
             else if(e.type == "checkbox") {
-                str += '<div class="form-group">'
-                str += '<label id="question'+i+'" class="question-label">'+ e.question +'</label><div id="answer'+i+'">'
+                str += '<div class="form-group" style="min-width: 300px;">'
+                str += '<label id="question'+i+'" class="text-left text-dark row">'+ e.question +'</label>'
+
+                if(e.video_url){
+                    str += ' <div class="embed-responsive embed-responsive-16by9 row"><iframe class="embed-responsive-item" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
+                }
+
+                str += '<div id="answer'+i+'">'
                 $.each(e.value, function(j, choice){
-                    str += '<div class="form-check">'
-                    str += '<label class="form-check-label">'
+                    str += '<div class="form-check form-inline row">'
+                    str += '<label class="form-check-label text-dark">'
                     str += '<input type="checkbox" class="form-check-input" name="answer'+i+'" value="'+choice+'" data-cell-reference-index="'+i+'">' + choice
                     str += '</label> </div>'
                 });
-                str += '</div></div>'
+                str += '</div></div> <br>'
             }
 
             console.log(i + '----'+ JSON.stringify(e));
@@ -110,7 +122,7 @@ class Survey {
             if (attrName == "focusInCell") {
                    // handle on focus - add class for bg change
                 var cell = message.content.attributeIntegerValue;
-                if($("#answer" + cell).attr('type') == "text" && !($("#answer" + cell).is( ":focus" ))){ // sync text field
+                if($("#answer" + cell).attr('type') == "text" && !($("#answer" + cell).is( ":focus" ))){ // sync text field when selected
                              $("#answer" + cell)
                                  .addClass("form-control--error") //get subject backgroud COLOR
                 }
@@ -124,17 +136,12 @@ class Survey {
                                 $(this).removeClass("form-control--error");
                                 next();
                             });
-                    } else if($("#answer" + cell).attr('class') == "form-check"){ //sync radio button
-                        var radioButtons = $("#answer"+cell+" label input[type=radio]")
-                        $(radioButtons).each(function(i){
-                            var radioButton = $("#answer"+cell+" label input[type=radio]")[i]
-                            if($(radioButton).attr('value') == message.content.attributeStringValue){
-                                $(radioButton).prop("checked",true)
-                            }
-                        });
-                   }
+                    }
 
-
+                }
+                else if(attrName.indexOf("radioAnswer_") != -1){ //sync radio button
+                    var question_number = attrName.replace("radioAnswer_", "");
+                    var radioButtons = $("#answer"+question_number).find("input[value='"+message.content.attributeStringValue+"']").prop("checked",true);
                 }
                 //change to  (#answer + cell).checked = message.content attributeIntVal
                 else if (attrName.indexOf("changeSelect_") != -1) {
@@ -192,7 +199,7 @@ class Survey {
             var valueTyped = $(event.target).attr('value'); // value of radio button
             // console.log("Typed Value: " + valueTyped);
             if(valueTyped != null) {
-                this.pogsPlugin.saveCompletedTaskAttribute('surveyAnswer_' + cellIndex,
+                this.pogsPlugin.saveCompletedTaskAttribute('radioAnswer_' + cellIndex,
                     valueTyped, 0.0,
                     0, true);
             }
