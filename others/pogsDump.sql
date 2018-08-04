@@ -16,7 +16,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `condition` WRITE;
 /*!40000 ALTER TABLE `condition` DISABLE KEYS */;
-INSERT INTO `condition` VALUES (1,'condition 1',1),(2,'condition2',3);
+INSERT INTO `condition` VALUES (1,'condition 1',1),(2,'condition2',3),(3,'condition3',4);
 /*!40000 ALTER TABLE `condition` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -30,7 +30,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `research_group_has_auth_user` WRITE;
 /*!40000 ALTER TABLE `research_group_has_auth_user` DISABLE KEYS */;
-INSERT INTO `research_group_has_auth_user` VALUES (1,1,1),(2,1,2);
+INSERT INTO `research_group_has_auth_user` VALUES (1,1,1),(2,1,2),(3,1,2);
 /*!40000 ALTER TABLE `research_group_has_auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -39,6 +39,8 @@ UNLOCK TABLES;
 LOCK TABLES `session` WRITE;
 /*!40000 ALTER TABLE `session` DISABLE KEYS */;
 INSERT INTO `session` VALUES (1,'s01','2018-06-26 23:00:00',1,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','carlos_bot',0,'T',0,1,0,1,'S','C',2,NULL,'C',''),(2,'s02','2018-06-27 01:04:00',2,'S',300,1,'This is the intro',10,1,10,1,10,1,'Thanks',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,0,0,0,'S','C',2,NULL,'C','');
+/* for wack-a-mole plugin */
+INSERT INTO `session` VALUES (3,'s03','2018-08-03 23:00:00',3,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,1,0,1,'S','C',2,NULL,'C','');
 /*!40000 ALTER TABLE `session` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -46,7 +48,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `session_has_task_group` WRITE;
 /*!40000 ALTER TABLE `session_has_task_group` DISABLE KEYS */;
-INSERT INTO `session_has_task_group` VALUES (1,1,1),(3,2,2);
+INSERT INTO `session_has_task_group` VALUES (1,1,1),(3,2,2),(4,3,3);
 /*!40000 ALTER TABLE `session_has_task_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -54,6 +56,8 @@ UNLOCK TABLES;
 LOCK TABLES `study` WRITE;
 /*!40000 ALTER TABLE `study` DISABLE KEYS */;
 INSERT INTO `study` VALUES (1,'Ashwini Shandana test study','This study has the collaboration widgets on','ash01'),(2,'youngjistudy','Desc','yji'),(3,'Min Santha test study','This study has task survey plugin','minsa01');
+/* for wack-a-mole-plugin */
+INSERT INTO `study` VALUES (4,'Wack-a-mole test study','This study has the wack-a-mole plugin','minsa');
 /*!40000 ALTER TABLE `study` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -61,7 +65,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `study_has_research_group` WRITE;
 /*!40000 ALTER TABLE `study_has_research_group` DISABLE KEYS */;
-INSERT INTO `study_has_research_group` VALUES (1,1,1),(3,3,1);
+INSERT INTO `study_has_research_group` VALUES (1,1,1),(3,3,1),(4,4,1);
 /*!40000 ALTER TABLE `study_has_research_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -69,6 +73,8 @@ UNLOCK TABLES;
 LOCK TABLES `subject` WRITE;
 /*!40000 ALTER TABLE `subject` DISABLE KEYS */;
 INSERT INTO `subject` VALUES (1,'stc01','carlos',1),(2,'stc02','johannes',1),(3,'minsa01','min',2),(4,'minsa02','santha',2);
+/* for wack-a-mole plugin */
+INSERT INTO `subject` VALUES (5,'wack1','min',3),(6,'wack2','santha',3);
 /*!40000 ALTER TABLE `subject` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -77,6 +83,8 @@ UNLOCK TABLES;
 LOCK TABLES `task` WRITE;
 /*!40000 ALTER TABLE `task` DISABLE KEYS */;
 INSERT INTO `task` VALUES (1,'sudoku task ','sudokuPlugin',0,1000,1,'task intro ',10,1,'primer for task',10,0,'Here we gooo','G',0,0,0,'S',NULL,NULL),(2,'surveyTask','surveyPlugin',0,1000,1,'Please answer all survey questions.',10,0,'',0,0,'','G',0,0,0,'S',NULL,NULL);
+/* for wack-a-mole plugin */
+INSERT INTO `task` VALUES (3,'wack-a-mole task','wackamolePlugin',0,1000,1,'Please answer all survey questions.',10,0,'',0,0,'','G',0,0,0,'S',NULL,NULL);
 /*!40000 ALTER TABLE `task` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -85,6 +93,8 @@ UNLOCK TABLES;
 LOCK TABLES `task_configuration` WRITE;
 /*!40000 ALTER TABLE `task_configuration` DISABLE KEYS */;
 INSERT INTO `task_configuration` VALUES (1,'sudokuPlugin9x9','sudokuPlugin'),(2,'surveySimpleQuestions','surveyPlugin');
+/* for wack-a-mole plugin */
+INSERT INTO `task_configuration` VALUES (3,'simpleWackamole','wackamolePlugin');
 /*!40000 ALTER TABLE `task_configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +112,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `task_group` WRITE;
 /*!40000 ALTER TABLE `task_group` DISABLE KEYS */;
-INSERT INTO `task_group` VALUES (1,'sudokutaskgroup'),(2,'surveytaskgroup');
+INSERT INTO `task_group` VALUES (1,'sudokutaskgroup'),(2,'surveytaskgroup'), (3, 'wackamoletaskgroup');
 /*!40000 ALTER TABLE `task_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,7 +120,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `task_group_has_task` WRITE;
 /*!40000 ALTER TABLE `task_group_has_task` DISABLE KEYS */;
-INSERT INTO `task_group_has_task` VALUES (1,0,1,1),(2,0,2,2);
+INSERT INTO `task_group_has_task` VALUES (1,0,1,1),(2,0,2,2), (3,0,3,3);
 /*!40000 ALTER TABLE `task_group_has_task` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,7 +128,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `task_has_research_group` WRITE;
 /*!40000 ALTER TABLE `task_has_research_group` DISABLE KEYS */;
-INSERT INTO `task_has_research_group` VALUES (1,1,1),(2,1,2);
+INSERT INTO `task_has_research_group` VALUES (1,1,1),(2,1,2),(3,1,3);
 /*!40000 ALTER TABLE `task_has_research_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -126,7 +136,7 @@ UNLOCK TABLES;
 
 LOCK TABLES `task_has_task_configuration` WRITE;
 /*!40000 ALTER TABLE `task_has_task_configuration` DISABLE KEYS */;
-INSERT INTO `task_has_task_configuration` VALUES (1,1,1),(2,2,2);
+INSERT INTO `task_has_task_configuration` VALUES (1,1,1),(2,2,2),(3,3,3);
 /*!40000 ALTER TABLE `task_has_task_configuration` ENABLE KEYS */;
 UNLOCK TABLES;
 
