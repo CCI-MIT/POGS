@@ -45,6 +45,8 @@ class SurveyTaskEdit {
             } else if(($("#questionType")).val() == "select"){
                 this.addSelectQuestion(question_number, "", withVideo, "", [""]);
 
+            } else if(($("#questionType")).val() == "introduction") {
+                this.addIntroduction(question_number, "", withVideo, "", [""]);
             }
 
             question_number = question_number + 1;
@@ -272,6 +274,28 @@ class SurveyTaskEdit {
         });
     }
 
+    addIntroduction(question_number, question, withVideo, video_url) {
+        var str = "";
+        str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "introduction">';
+        // add text area
+        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Introduction:</label><textarea class="form-control col-sm-8" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea><button type="button" class="btn btn-danger btn-sm remove-intro" id="removeQuestion' + question_number + '">remove</button> </div>';
+        // str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class="form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'">  <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>';
+
+        if(withVideo){ // add video url
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+        }
+
+        str += '</div>';
+
+        $("#survey").append(str);
+
+        $("#removeQuestion"+question_number).click(function () { //setup removeQuestion Button
+            var question_set = "#question_set" + $(this).attr('id').match(/\d+/);
+
+            $(question_set).remove();
+        });
+    }
+
 
 
     setupHtmlFromAttributeString(bluePrint, answerSheet){
@@ -318,9 +342,14 @@ class SurveyTaskEdit {
                 //select answer for checkbox question
                 $('#question_set'+question_number+' div select option[value="'+answerSheet[i]+'"]').prop("selected",true);
 
-
-
+            } else if(bluePrint[i].type == "introduction") {
+                var withVideo = false;
+                if(bluePrint[i].video_url != undefined){
+                    withVideo = true;
+                }
+                this.addIntroduction(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url);
             }
+
 
             question_number++;
         }

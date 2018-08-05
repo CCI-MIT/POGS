@@ -40,3 +40,13 @@ label{
     border-bottom-color: lightgrey;
     margin-bottom: 20px;
 }
+
+.question-intro {
+    font-weight: lighter;
+    font-size: 80%;
+}
+
+.remove-intro {
+    margin: 1%;
+    height: 50%;
+}
