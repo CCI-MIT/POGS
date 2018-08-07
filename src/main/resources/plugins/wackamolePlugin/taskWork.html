@@ -1,4 +1,169 @@
 <div id="wackamoleContainer" class="container">
-    <h2 id="wackamoleTitle" class="text-dark"></h2>
+    <h2 id="wackamoleTitle" class="text-dark">Wack-a-Mole TESTING</h2>
+    <div>
+        <div class="row">
+            <div class="column" id="gameColumn">
+
+                <!--Intro Page-->
+                <div class="text-center" id="readyView">
+                    <small>Please click the button below when you are ready</small>
+                    <br>
+                    <button type="button" class="btn btn-light" id="readyBtn">ready</button>
+                </div>
+
+                <!--Count Down-->
+                <!-- The Modal -->
+                <div class="modal">
+                    <!-- Modal content -->
+                    <div class="modal-content">
+                        <p>The game will start when it counts to 0.</p>
+                        <small id="loadingCountDown"> </small>
+                    </div>
+
+                </div>
+
+                <!--game table-->
+                <table class="whack_grid">
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell0" data-cell-reference-index="0"></td>
+                        <td class="whack_gametable-cell" id="whack_cell1" data-cell-reference-index="1"></td>
+                        <td class="whack_gametable-cell" id="whack_cell2" data-cell-reference-index="2"></td>
+                        <td class="whack_gametable-cell" id="whack_cell3" data-cell-reference-index="3"></td>
+                        <td class="whack_gametable-cell" id="whack_cell4" data-cell-reference-index="4"></td>
+                        <td class="whack_gametable-cell" id="whack_cell5" data-cell-reference-index="5"></td>
+                        <td class="whack_gametable-cell" id="whack_cell6" data-cell-reference-index="6"></td>
+                        <td class="whack_gametable-cell" id="whack_cell7" data-cell-reference-index="7"></td>
+                        <td class="whack_gametable-cell" id="whack_cell8" data-cell-reference-index="8"></td>
+                        <td class="whack_gametable-cell" id="whack_cell9" data-cell-reference-index="9"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell10" data-cell-reference-index="10"></td>
+                        <td class="whack_gametable-cell" id="whack_cell11" data-cell-reference-index="11"></td>
+                        <td class="whack_gametable-cell" id="whack_cell12" data-cell-reference-index="12"></td>
+                        <td class="whack_gametable-cell" id="whack_cell13" data-cell-reference-index="13"></td>
+                        <td class="whack_gametable-cell" id="whack_cell14" data-cell-reference-index="14"></td>
+                        <td class="whack_gametable-cell" id="whack_cell15" data-cell-reference-index="15"></td>
+                        <td class="whack_gametable-cell" id="whack_cell16" data-cell-reference-index="16"></td>
+                        <td class="whack_gametable-cell" id="whack_cell17" data-cell-reference-index="17"></td>
+                        <td class="whack_gametable-cell" id="whack_cell18" data-cell-reference-index="18"></td>
+                        <td class="whack_gametable-cell" id="whack_cell19" data-cell-reference-index="19"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell20" data-cell-reference-index="20"></td>
+                        <td class="whack_gametable-cell" id="whack_cell21" data-cell-reference-index="21"></td>
+                        <td class="whack_gametable-cell" id="whack_cell22" data-cell-reference-index="22"></td>
+                        <td class="whack_gametable-cell" id="whack_cell23" data-cell-reference-index="23"></td>
+                        <td class="whack_gametable-cell" id="whack_cell24" data-cell-reference-index="24"></td>
+                        <td class="whack_gametable-cell" id="whack_cell25" data-cell-reference-index="25"></td>
+                        <td class="whack_gametable-cell" id="whack_cell26" data-cell-reference-index="26"></td>
+                        <td class="whack_gametable-cell" id="whack_cell27" data-cell-reference-index="27"></td>
+                        <td class="whack_gametable-cell" id="whack_cell28" data-cell-reference-index="28"></td>
+                        <td class="whack_gametable-cell" id="whack_cell29" data-cell-reference-index="29"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell30" data-cell-reference-index="30"></td>
+                        <td class="whack_gametable-cell" id="whack_cell31" data-cell-reference-index="31"></td>
+                        <td class="whack_gametable-cell" id="whack_cell32" data-cell-reference-index="32"></td>
+                        <td class="whack_gametable-cell" id="whack_cell33" data-cell-reference-index="33"></td>
+                        <td class="whack_gametable-cell" id="whack_cell34" data-cell-reference-index="34"></td>
+                        <td class="whack_gametable-cell" id="whack_cell35" data-cell-reference-index="35"></td>
+                        <td class="whack_gametable-cell" id="whack_cell36" data-cell-reference-index="36"></td>
+                        <td class="whack_gametable-cell" id="whack_cell37" data-cell-reference-index="37"></td>
+                        <td class="whack_gametable-cell" id="whack_cell38" data-cell-reference-index="38"></td>
+                        <td class="whack_gametable-cell" id="whack_cell39" data-cell-reference-index="39"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell40" data-cell-reference-index="40"></td>
+                        <td class="whack_gametable-cell" id="whack_cell41" data-cell-reference-index="41"></td>
+                        <td class="whack_gametable-cell" id="whack_cell42" data-cell-reference-index="42"></td>
+                        <td class="whack_gametable-cell" id="whack_cell43" data-cell-reference-index="43"></td>
+                        <td class="whack_gametable-cell" id="whack_cell44" data-cell-reference-index="44"></td>
+                        <td class="whack_gametable-cell" id="whack_cell45" data-cell-reference-index="45"></td>
+                        <td class="whack_gametable-cell" id="whack_cell46" data-cell-reference-index="46"></td>
+                        <td class="whack_gametable-cell" id="whack_cell47" data-cell-reference-index="47"></td>
+                        <td class="whack_gametable-cell" id="whack_cell48" data-cell-reference-index="48"></td>
+                        <td class="whack_gametable-cell" id="whack_cell49" data-cell-reference-index="49"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell50" data-cell-reference-index="50"></td>
+                        <td class="whack_gametable-cell" id="whack_cell51" data-cell-reference-index="51"></td>
+                        <td class="whack_gametable-cell" id="whack_cell52" data-cell-reference-index="52"></td>
+                        <td class="whack_gametable-cell" id="whack_cell53" data-cell-reference-index="53"></td>
+                        <td class="whack_gametable-cell" id="whack_cell54" data-cell-reference-index="54"></td>
+                        <td class="whack_gametable-cell" id="whack_cell55" data-cell-reference-index="55"></td>
+                        <td class="whack_gametable-cell" id="whack_cell56" data-cell-reference-index="56"></td>
+                        <td class="whack_gametable-cell" id="whack_cell57" data-cell-reference-index="57"></td>
+                        <td class="whack_gametable-cell" id="whack_cell58" data-cell-reference-index="58"></td>
+                        <td class="whack_gametable-cell" id="whack_cell59" data-cell-reference-index="59"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell60" data-cell-reference-index="60"></td>
+                        <td class="whack_gametable-cell" id="whack_cell61" data-cell-reference-index="61"></td>
+                        <td class="whack_gametable-cell" id="whack_cell62" data-cell-reference-index="62"></td>
+                        <td class="whack_gametable-cell" id="whack_cell63" data-cell-reference-index="63"></td>
+                        <td class="whack_gametable-cell" id="whack_cell64" data-cell-reference-index="64"></td>
+                        <td class="whack_gametable-cell" id="whack_cell65" data-cell-reference-index="65"></td>
+                        <td class="whack_gametable-cell" id="whack_cell66" data-cell-reference-index="66"></td>
+                        <td class="whack_gametable-cell" id="whack_cell67" data-cell-reference-index="67"></td>
+                        <td class="whack_gametable-cell" id="whack_cell68" data-cell-reference-index="68"></td>
+                        <td class="whack_gametable-cell" id="whack_cell69" data-cell-reference-index="69"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell70" data-cell-reference-index="70"></td>
+                        <td class="whack_gametable-cell" id="whack_cell71" data-cell-reference-index="71"></td>
+                        <td class="whack_gametable-cell" id="whack_cell72" data-cell-reference-index="72"></td>
+                        <td class="whack_gametable-cell" id="whack_cell73" data-cell-reference-index="73"></td>
+                        <td class="whack_gametable-cell" id="whack_cell74" data-cell-reference-index="74"></td>
+                        <td class="whack_gametable-cell" id="whack_cell75" data-cell-reference-index="75"></td>
+                        <td class="whack_gametable-cell" id="whack_cell76" data-cell-reference-index="76"></td>
+                        <td class="whack_gametable-cell" id="whack_cell77" data-cell-reference-index="77"></td>
+                        <td class="whack_gametable-cell" id="whack_cell78" data-cell-reference-index="78"></td>
+                        <td class="whack_gametable-cell" id="whack_cell79" data-cell-reference-index="79"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell80" data-cell-reference-index="80"></td>
+                        <td class="whack_gametable-cell" id="whack_cell81" data-cell-reference-index="81"></td>
+                        <td class="whack_gametable-cell" id="whack_cell82" data-cell-reference-index="82"></td>
+                        <td class="whack_gametable-cell" id="whack_cell83" data-cell-reference-index="83"></td>
+                        <td class="whack_gametable-cell" id="whack_cell84" data-cell-reference-index="84"></td>
+                        <td class="whack_gametable-cell" id="whack_cell85" data-cell-reference-index="85"></td>
+                        <td class="whack_gametable-cell" id="whack_cell86" data-cell-reference-index="86"></td>
+                        <td class="whack_gametable-cell" id="whack_cell87" data-cell-reference-index="87"></td>
+                        <td class="whack_gametable-cell" id="whack_cell88" data-cell-reference-index="88"></td>
+                        <td class="whack_gametable-cell" id="whack_cell89" data-cell-reference-index="89"></td>
+                    </tr>
+                    <tr class="whack_gametable-row">
+                        <td class="whack_gametable-cell" id="whack_cell90" data-cell-reference-index="90"></td>
+                        <td class="whack_gametable-cell" id="whack_cell91" data-cell-reference-index="91"></td>
+                        <td class="whack_gametable-cell" id="whack_cell92" data-cell-reference-index="92"></td>
+                        <td class="whack_gametable-cell" id="whack_cell93" data-cell-reference-index="93"></td>
+                        <td class="whack_gametable-cell" id="whack_cell94" data-cell-reference-index="94"></td>
+                        <td class="whack_gametable-cell" id="whack_cell95" data-cell-reference-index="95"></td>
+                        <td class="whack_gametable-cell" id="whack_cell96" data-cell-reference-index="96"></td>
+                        <td class="whack_gametable-cell" id="whack_cell97" data-cell-reference-index="97"></td>
+                        <td class="whack_gametable-cell" id="whack_cell98" data-cell-reference-index="98"></td>
+                        <td class="whack_gametable-cell" id="whack_cell99" data-cell-reference-index="99"></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="column" id="informationColumn">
+                <div class="h-25 text-center">
+                    Rounds
+                </div>
+                <div class="h-25 text-center">
+                    Time Left <br>
+                    30 s
+                </div>
+                <div class="h-25 text-center">
+                    Your Cursor <br>
+                    <i class="fa fa-mouse-pointer" style="color:cyan;"></i>
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
 </div>
 

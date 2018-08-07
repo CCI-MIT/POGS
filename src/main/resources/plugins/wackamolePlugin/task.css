@@ -1,0 +1,42 @@
+.whack_grid { margin:1em auto; border-collapse:collapse }
+.whack_grid td {
+    cursor:pointer;
+    width:30px; height:30px;
+    border:1px solid #ccc;
+    text-align:center;
+    font-family:sans-serif; font-size:13px
+}
+.whack_grid td.clicked {
+    background-color:yellow;
+    font-weight:bold; color:red;
+}
+
+/* Create two equal columns that floats next to each other */
+#gameColumn {
+    color: black;
+    float: left;
+    width: 80%;
+    padding: 10px;
+    align-items: center;
+    border: solid;
+}
+
+#informationColumn {
+    color: black;
+    float: left;
+    width: 20%;
+    padding: 10px;
+    border: solid;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/*Monster color*/
+.fa{
+    color: black;
+}
