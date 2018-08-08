@@ -6,10 +6,6 @@
     text-align:center;
     font-family:sans-serif; font-size:13px
 }
-.whack_grid td.clicked {
-    background-color:yellow;
-    font-weight:bold; color:red;
-}
 
 /* Create two equal columns that floats next to each other */
 #gameColumn {
@@ -39,4 +35,24 @@
 /*Monster color*/
 .fa{
     color: black;
+}
+
+/* The Modal*/
+.after_modal_appended
+{
+    position:relative;
+
+}
+
+.modal-backdrop {
+    position: absolute;
+}
+
+.modal{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
 }

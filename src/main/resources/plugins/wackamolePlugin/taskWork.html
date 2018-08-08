@@ -13,7 +13,7 @@
 
                 <!--Count Down-->
                 <!-- The Modal -->
-                <div class="modal">
+                <div class="modal" id="countDownModal">
                     <!-- Modal content -->
                     <div class="modal-content">
                         <p>The game will start when it counts to 0.</p>
@@ -149,16 +149,26 @@
 
             <div class="column" id="informationColumn">
                 <div class="h-25 text-center">
-                    Rounds
+                    Rounds <br>
+                    <small id="rounds"> 0 </small>
                 </div>
+
                 <div class="h-25 text-center">
                     Time Left <br>
-                    30 s
+                    <small id="roundTimeRemain"> </small>
                 </div>
+
                 <div class="h-25 text-center">
                     Your Cursor <br>
                     <i class="fa fa-mouse-pointer" style="color:cyan;"></i>
                 </div>
+
+                <div class="h-25 text-center">
+                    Your score is <br>
+                    <small id="score"> 0 </small>
+                </div>
+
+
 
 
             </div>
