@@ -31,7 +31,7 @@ class TodoListManager {
     }
 
     createTodoEntry(todoText) {
-        this.pogsColaborationPlugin.sendMessage(todoText, TODO_TYPE.CREATE_TODO);
+        this.pogsColaborationPlugin.sendMessage(todoText, TODO_TYPE.CREATE_TODO, COLLABORATION_TYPE.TODO_LIST);
     }
 
     selfAssignTodoItem(todoTaskId) {
@@ -41,12 +41,12 @@ class TodoListManager {
         }
         var r = confirm("Do you want to assign yourself to this task?");
         if (r == true) {
-            selfAssignTodoEntry(todoTaskId)
+            this.selfAssignTodoEntry(todoTaskId)
         }
     }
 
     selfAssignTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.ASSIGN_ME);
+        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.ASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
     }
 
     unassignTodoItem(todoTaskId) {
@@ -61,7 +61,7 @@ class TodoListManager {
     }
 
     unssignTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.UNASSIGN_ME);
+        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.UNASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
     }
 
     deleteTodoItem(todoTaskId) {
@@ -76,7 +76,7 @@ class TodoListManager {
     }
 
     deleteTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.DELETE_TODO);
+        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.DELETE_TODO, COLLABORATION_TYPE.TODO_LIST);
     }
 
     markDoneTodoItem(todoTaskId) {
@@ -91,7 +91,7 @@ class TodoListManager {
     }
 
     markDoneTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_DONE);
+        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_DONE, COLLABORATION_TYPE.TODO_LIST);
     }
 
     markUndoneTodoItem(todoTaskId) {
@@ -106,7 +106,7 @@ class TodoListManager {
     }
 
     markUndoneTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_UNDONE);
+        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_UNDONE, COLLABORATION_TYPE.TODO_LIST);
     }
 
     onTodoBroadcastReceived(message) {

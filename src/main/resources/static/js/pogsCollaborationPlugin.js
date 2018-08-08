@@ -1,5 +1,9 @@
 'use strict';
 
+const COLLABORATION_TYPE = {
+    TODO_LIST: "TODO_LIST",
+    VOTING_LIST: "VOTING_LIST"
+}
 const TODO_TYPE = {
 
     CREATE_TODO: "CREATE_TODO",

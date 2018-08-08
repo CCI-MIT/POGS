@@ -60,5 +60,7 @@ spring:
     static-locations: >
       file:src/main/resources/static/,
       file:src/main/resources/dist/,
+      file:src/main/resources/plugins/,
       classpath:/dist/,
-      classpath:/static/
+      classpath:/static/,
+      classpath:/plugins/

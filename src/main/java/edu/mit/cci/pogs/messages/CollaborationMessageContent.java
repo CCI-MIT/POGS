@@ -3,7 +3,9 @@ package edu.mit.cci.pogs.messages;
 public class CollaborationMessageContent {
 
     private String message;
-    private CollaborationMessage.CollaborationType type;
+    private CollaborationMessage.CollaborationType collaborationType;
+
+    private String messageType;
 
     public String getMessage() {
         return message;
@@ -13,11 +15,19 @@ public class CollaborationMessageContent {
         this.message = message;
     }
 
-    public CollaborationMessage.CollaborationType getType() {
-        return type;
+    public CollaborationMessage.CollaborationType getCollaborationType() {
+        return collaborationType;
     }
 
-    public void setType(CollaborationMessage.CollaborationType type) {
-        this.type = type;
+    public void setCollaborationType(CollaborationMessage.CollaborationType collaborationType) {
+        this.collaborationType = collaborationType;
+    }
+
+    public String getMessageType() {
+        return messageType;
+    }
+
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }

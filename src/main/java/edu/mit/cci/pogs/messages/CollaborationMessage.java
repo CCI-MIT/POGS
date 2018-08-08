@@ -12,7 +12,17 @@ public class CollaborationMessage extends PogsMessage<CollaborationMessageConten
         UNASSIGN_ME,
         DELETE_TODO,
         MARK_DONE,
-        MARK_UNDONE
+        MARK_UNDONE,
+        BROADCAST_TODO_ITEMS;
+
+        public static TodoType getType(String messageType) {
+            for(TodoType tt : TodoType.values()){
+                if(tt.name().equals(messageType)){
+                    return tt;
+                }
+            }
+            return null;
+        }
     }
 }
 
