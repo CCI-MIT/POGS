@@ -90,6 +90,15 @@ class Survey {
                 });
                 str += '</div></div> <br>'
             }
+            if(e.type == "introduction") {
+                str += '<div class="form-group" style="min-width: 300px;">';
+                str += '<label class="control-label text-dark text-left row question-intro">'+e.question+'</label>';
+
+                if(e.video_url){
+                    str += ' <div class="embed-responsive embed-responsive-16by9 row"><iframe class="embed-responsive-item" src="'+e.video_url+'" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>'
+                }
+                str += '</div>';
+            }
 
             console.log(i + '----'+ JSON.stringify(e));
         });
