@@ -90,6 +90,9 @@ body {
 #list-group {
   flex: 1 1;
 }
+#list-group2{
+  flex: 1 1;
+}
 
 .sidebar-scroll {
   overflow-y: auto;
@@ -107,7 +110,12 @@ body {
 .border-chat-window {
   border: 1px solid #e2e0e0;
 }
-
+.sidebarSubDivisionTitle{
+  color: #325e8c;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px;
+}
 .subject-icon{
   background-color:#0E5EA9;color: white;font-size: 30px;cursor:pointer;
 }

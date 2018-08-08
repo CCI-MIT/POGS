@@ -72,15 +72,10 @@ public class SessionRunner implements Runnable {
     private Map<String, Subject> checkedInWaitingSubjectList;
 
 
-    private List<TeamWrapper> teams;
-
     @Autowired
     private SessionDao sessionDao;
     @Autowired
     private SessionService sessionService;
-
-    @Autowired
-    private TaskGroupDao taskGroupDao;
 
     @Autowired
     private TaskGroupService taskGroupService;
@@ -222,10 +217,8 @@ public class SessionRunner implements Runnable {
             //TODO: Handle the other kinds of team creation, Matrix, research defined
         }
 
-        //update teams
         List<Team> teams = teamDao.listByRoundId(round.getId());
         List<TeamWrapper> teamWrappers = new ArrayList<>();
-        this.teams = new ArrayList<>();
         for (Team t : teams) {
 
             TeamWrapper teamWrapper = new TeamWrapper(t);

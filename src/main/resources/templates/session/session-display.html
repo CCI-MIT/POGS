@@ -91,7 +91,7 @@
             <div class="col"></div>
             <div class="col">
                 <div class="col-12">
-                    <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/edit'}"
+                    <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/subjects/editCommunication'}"
                        class="btn btn-outline-primary float-right">
                         Edit communication constraint</a>
                 </div>
@@ -100,23 +100,82 @@
         <br/>
         <table class="table table-striped">
             <thead>
+
             <tr>
-                <th>Internal ID</th>
-                <th>Subject external ID</th>
-                <th>Subject display name</th>
+                <th> - </th>
+                <th:block th:each="subject : ${subjectsBean.subjectList}">
+                    <th th:text="${subject.subjectExternalId}"></th>
+                </th:block>
             </tr>
             </thead>
             <tbody>
-            <th:block th:each="subject : ${subjectsBean.subjectList}">
+            <th:block th:each="subject,iteratorStatusSubject : ${subjectsBean.subjectList}">
                 <tr>
-                    <td th:text="${subject.id}"></td>
                     <td th:text="${subject.subjectExternalId}"></td>
-                    <td th:text="${subject.subjectDisplayName}"></td>
-
+                    <th:block th:if="subject" th:each="subjectCommunication, iteratorStatusSubject2 : ${subject.subjectCommunications}">
+                        <td th:if="${iteratorStatusSubject.count > iteratorStatusSubject2.count}">
+                            <span th:if="${subjectCommunication.allowed}"><i class="fa fa-check-square" style="color:darkgreen"></i></span>
+                            <span th:if="${not subjectCommunication.allowed}"><i class="fa fa-times-circle"  style="color:darkred"></i></span>
+                        </td>
+                        <td th:if="${iteratorStatusSubject.count <= iteratorStatusSubject2.count}">-</td>
+                    </th:block>
                 </tr>
             </th:block>
             </tbody>
         </table>
+        <h3>Communication channels: </h3>
+        <div class="col">
+                <div class="col-12">
+                    <a th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/chatchannels/create'}" class="btn btn-outline-primary float-right">
+                        Create channel</a>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th> Chat channel </th>
+                    <th>Subjects in channel</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:each="chatChannel,iteratorStatusSubject : ${chatChannelBeans}">
+                    <tr>
+                        <td th:text="${chatChannel.channelName}"></td>
+                        <td>
+                            <th:block th:each="subject, iter : ${chatChannel.subjectList}">
+                                 <span th:text="${subject.subjectExternalId}"></span>
+                                 <span th:if="not ${iter.last}" >,</span>
+                            </th:block>
+                        </td>
+                        <td>
+                        <button th:data-url="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/chatchannels/'+chatChannel.id+'/delete'}"
+                                                                       class="btn btn-danger float-right deleteChat" style="margin-left: 10px">
+                                                                        <i class="fa fa-trash"></i></button>
+                            <a th:href="${'/admin/studies/' + study.id + '/sessions/'+sessionBean.id+'/chatchannels/'+chatChannel.id+'/edit'}"
+                                               class="btn btn-outline-primary float-right">
+                                                Edit channel</a>
+
+                        </td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+        <script>
+        $(function(){
+            $(".deleteChat").click(function(e) {
+               var res = confirm("Are you sure you want to delete ?");
+               if (res == true) {
+                   window.location = $(this).data("url");
+                   return true;
+               }else{
+                   e.stopPropagation();
+                   return false;
+               }
+            })
+        })
+</script>
     </div>
 </div>
 </body>

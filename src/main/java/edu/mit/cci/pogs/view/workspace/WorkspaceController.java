@@ -10,24 +10,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
+import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
+import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
+import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
@@ -70,6 +77,15 @@ public class WorkspaceController {
 
     @Autowired
     private RoundDao roundDao;
+
+    @Autowired
+    private SubjectHasChannelDao subjectHasChannelDao;
+
+    @Autowired
+    private ChatChannelDao chatChannelDao;
+
+    @Autowired
+    private SubjectCommunicationDao subjectCommunicationDao;
 
     @PostMapping("/check_in")
     public String register(@RequestParam("externalId") String externalId, Model model) {
@@ -240,13 +256,38 @@ public class WorkspaceController {
         Subject su = workspaceService.getSubject(subjectExternalId);
         Round round = roundDao.get(roundId);
 
+
+        List<SubjectCommunication> subjectCommunications =
+                subjectCommunicationDao.listByFromSubjectId(su.getId()) ;
+
+        JSONArray allowedToTalkTo = new JSONArray();
+        if(subjectCommunications!=null) {
+            for (SubjectCommunication sc : subjectCommunications) {
+                Subject subject = subjectDao.get(sc.getToSubjectId());
+                if(sc.getAllowed()) {
+                    allowedToTalkTo.add(subject.getSubjectExternalId());
+                }
+            }
+        }
+        //get Channels user is allowed to talk to
+
+        List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listBySubjectId(su.getId());
+        JSONArray channelSubjectIsIn = new JSONArray();
+        if(subjectHasChannels!=null) {
+            for(SubjectHasChannel shc: subjectHasChannels){
+                ChatChannel chatChannel = chatChannelDao.get(shc.getChatChannelId());
+                channelSubjectIsIn.add(chatChannel.getChannelName());
+            }
+        }
+
+
         if (task != null && round != null) {
             //get task plugin type task.getTaskPluginType()
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
             if (pl != null) {
                 //get task configurations
                 TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
-                        .getByTaskIdRoundId(task.getId(), round.getId());
+                        .getByTaskId(task.getId());
                 List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
                         .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
@@ -257,6 +298,10 @@ public class WorkspaceController {
                 model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
                 model.addAttribute("subject", su);
+                model.addAttribute("subjectCanTalkTo", allowedToTalkTo);
+                model.addAttribute("channelSubjectIsIn",channelSubjectIsIn);
+
+
                 model.addAttribute("task", new TaskWrapper(task));
 
 

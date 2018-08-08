@@ -1,7 +1,11 @@
 package edu.mit.cci.pogs.messages;
 
-public class CollaborationMessage extends PogsMessage<TodoListMessageContent>  {
+public class CollaborationMessage extends PogsMessage<CollaborationMessageContent>  {
 
+    public enum CollaborationType{
+        TODO_LIST,
+        VOTING_LIST
+    }
     public enum TodoType {
         CREATE_TODO,
         ASSIGN_ME,

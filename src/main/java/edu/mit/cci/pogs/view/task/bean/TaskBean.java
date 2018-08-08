@@ -26,6 +26,10 @@ public class TaskBean {
     private Long subjectCommunicationId;
     private Long chatScriptId;
 
+    private Long taskConfigurationId;
+
+
+
     private ResearchGroupRelationshipBean researchGroupRelationshipBean;
 
     public TaskBean() {
@@ -214,6 +218,14 @@ public class TaskBean {
         this.subjectCommunicationId = subjectCommunicationId;
     }
 
+    public Long getTaskConfigurationId() {
+        return taskConfigurationId;
+    }
+
+    public void setTaskConfigurationId(Long taskConfigurationId) {
+        this.taskConfigurationId = taskConfigurationId;
+    }
+
     public Long getChatScriptId() {
         return chatScriptId;
     }
@@ -221,4 +233,6 @@ public class TaskBean {
     public void setChatScriptId(Long chatScriptId) {
         this.chatScriptId = chatScriptId;
     }
+
+
 }

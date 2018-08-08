@@ -27,6 +27,10 @@ class Pogs {
         this.hasCollaborationFeedbackWidget = config.hasCollaborationFeedbackWidget;
         this.hasCollaborationTodoListEnabled = config.hasCollaborationTodoListEnabled;
 
+        this.subjectCanTalkTo = config.subjectCanTalkTo;
+
+        this.channelSubjectIsIn = config.channelSubjectIsIn;
+
         this.hasCollaboration = this.hasCollaborationVotingWidget ||
                                 this.hasCollaborationFeedbackWidget||
                                 this.hasCollaborationTodoListEnabled;
@@ -80,6 +84,7 @@ class Pogs {
 
         var socket = new SockJS('/ws');
         this.stompClient = Stomp.over(socket);
+        this.stompClient.debug = () => {};
 
         this.stompClient.connect({}, this.onConnected.bind(this), this.onError.bind(this));
     }

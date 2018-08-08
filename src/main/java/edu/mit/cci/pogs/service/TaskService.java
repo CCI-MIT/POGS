@@ -8,8 +8,10 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskhasresearchgroup.TaskHasResearchGroupDao;
+import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.view.task.bean.TaskBean;
 
 @Service
@@ -17,12 +19,14 @@ public class TaskService {
 
     private final TaskDao taskDao;
     private final TaskHasResearchGroupDao taskHasResearchGroupDao;
+    private final TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
 
 
     @Autowired
-    public TaskService(TaskDao taskDao, TaskHasResearchGroupDao taskHasResearchGroupDao) {
+    public TaskService(TaskDao taskDao, TaskHasResearchGroupDao taskHasResearchGroupDao, TaskHasTaskConfigurationDao taskHasTaskConfigurationDao) {
         this.taskHasResearchGroupDao = taskHasResearchGroupDao;
         this.taskDao = taskDao;
+        this.taskHasTaskConfigurationDao = taskHasTaskConfigurationDao;
     }
 
     public List<TaskHasResearchGroup> listTaskHasResearchGroupByTaskId(Long taskId) {
@@ -56,12 +60,31 @@ public class TaskService {
         if (tk.getId() == null) {
             tk = taskDao.create(tk);
             value.setId(tk.getId());
+            createOrUpdateTaskHasTaskConfiguration(value);
+
             createOrUpdateUserGroups(value);
         } else {
             taskDao.update(tk);
             createOrUpdateUserGroups(value);
+            createOrUpdateTaskHasTaskConfiguration(value);
         }
         return value;
+    }
+
+    private void createOrUpdateTaskHasTaskConfiguration(TaskBean value) {
+        TaskHasTaskConfiguration currentConfig = taskHasTaskConfigurationDao.getByTaskId(value.getId());
+        if(currentConfig!=null) {
+            if (currentConfig.getTaskConfigurationId().longValue() == value.getTaskConfigurationId().longValue()) {
+                return;
+            } else {
+                taskHasTaskConfigurationDao.delete(currentConfig);
+            }
+        }
+        TaskHasTaskConfiguration taskHasTaskConfiguration = new TaskHasTaskConfiguration();
+        taskHasTaskConfiguration.setTaskId(value.getId());
+        taskHasTaskConfiguration.setTaskConfigurationId(value.getTaskConfigurationId());
+        taskHasTaskConfigurationDao.create(taskHasTaskConfiguration);
+
     }
 
     private void createOrUpdateUserGroups(TaskBean taskBean) {

@@ -6,7 +6,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 
 public class SubjectsBean {
 
-    private List<Subject> subjectList;
+    private List<SubjectBean> subjectList;
 
     private Long sessionId;
 
@@ -28,11 +28,11 @@ public class SubjectsBean {
         this.sessionId = sessionId;
     }
 
-    public List<Subject> getSubjectList() {
+    public List<SubjectBean> getSubjectList() {
         return subjectList;
     }
 
-    public void setSubjectList(List<Subject> subjectList) {
+    public void setSubjectList(List<SubjectBean> subjectList) {
         this.subjectList = subjectList;
     }
 }

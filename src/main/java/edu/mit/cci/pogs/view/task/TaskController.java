@@ -20,9 +20,12 @@ import java.util.List;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.task.ScoringType;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
+import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
+import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
@@ -43,6 +46,12 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private TaskConfigurationDao taskConfigurationDao;
+
+    @Autowired
+    private TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Timestamp.class, new SqlTimestampPropertyEditor());
@@ -51,6 +60,15 @@ public class TaskController {
     @ModelAttribute("scoringTypes")
     public List<ScoringType> getTeamCreationMethods() {
         return Arrays.asList(ScoringType.values());
+    }
+
+    @ModelAttribute("taskPluginConfigurationOptions")
+    public List<TaskConfiguration> getPluginConfiguration(){
+        List<TaskConfiguration> taskConfigurationList = new ArrayList<>();
+        for(TaskPlugin tp : TaskPlugin.getAllTaskPlugins()) {
+            taskConfigurationList.addAll(taskConfigurationDao.listByTaskPluginName(tp.getTaskPluginName()));
+        }
+        return taskConfigurationList;
     }
 
     @ModelAttribute("taskPluginTypes")
@@ -78,6 +96,7 @@ public class TaskController {
 
         tb.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
+
         model.addAttribute("task", tb);
         return "task/task-edit";
     }
@@ -92,6 +111,9 @@ public class TaskController {
                 .setTaskyHasResearchSelectedValues(
                         taskService.listTaskHasResearchGroupByTaskId(id));
 
+        TaskHasTaskConfiguration thtc = taskHasTaskConfigurationDao.getByTaskId(tb.getId());
+        tb.setTaskConfigurationId(thtc.getTaskConfigurationId());
+
         model.addAttribute("task", tb);
         return "task/task-edit";
     }
@@ -100,6 +122,7 @@ public class TaskController {
     public String saveTask(@ModelAttribute TaskBean task, RedirectAttributes redirectAttributes) {
 
         taskService.createOrUpdate(task);
+
         if (task.getId() == null) {
             MessageUtils.addSuccessMessage("Task created successfully!", redirectAttributes);
         } else {

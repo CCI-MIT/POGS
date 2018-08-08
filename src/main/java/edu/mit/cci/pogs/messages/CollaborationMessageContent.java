@@ -1,9 +1,9 @@
 package edu.mit.cci.pogs.messages;
 
-public class TodoListMessageContent {
+public class CollaborationMessageContent {
 
     private String message;
-    private CommunicationMessage.CommunicationType type;
+    private CollaborationMessage.CollaborationType type;
 
     public String getMessage() {
         return message;
@@ -13,11 +13,11 @@ public class TodoListMessageContent {
         this.message = message;
     }
 
-    public CommunicationMessage.CommunicationType getType() {
+    public CollaborationMessage.CollaborationType getType() {
         return type;
     }
 
-    public void setType(CommunicationMessage.CommunicationType type) {
+    public void setType(CollaborationMessage.CollaborationType type) {
         this.type = type;
     }
 }

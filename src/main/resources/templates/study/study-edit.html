@@ -75,11 +75,13 @@
             });
         </script>
         <!-- End research group field -->
+        <a class="btn btn-danger btn-primary" href="/admin/studies">Cancel</a>
 
         <button th:if="${study.id == null}" type="submit" class="btn btn-primary">Create study
         </button>
         <button th:if="${study.id != null}" type="submit" class="btn btn-primary">Save study
         </button>
+
         <br/>
     </form>
 </div>

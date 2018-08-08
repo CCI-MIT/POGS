@@ -39,6 +39,8 @@
                                    currentUrl: window.location,
                                    sessionId: '[(${pogsSession.id})]',
                                    subjectId: '[(${subject.subjectExternalId})]',
+                                   subjectCanTalkTo: [(${subjectCanTalkTo})],
+                                   channelSubjectIsIn: [(${channelSubjectIsIn})],
                                    secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
                                    nextUrl : '[(${nextUrl})]',
                                    teammates: [(${teammates})],
@@ -65,9 +67,9 @@
         <div class="row h-100">
             <div class="col-3 border-chat-lightgray px-0" style="display:none" id="subjectContainer">
                 <div id="sidebar-content" class="h-100 w-100">
-                    <div class=" p-0 d-xs-none">
-                        <div class="col-1 p-1" style="background-color: white;color:#0E5EA9">
-                            Your team:
+                    <div class=" p-0 d-xs-none w-100">
+                        <div class="col-1 w-100 sidebarSubDivisionTitle">
+                            Teammates:
                         </div>
                     </div>
                     <div class="sidebar-scroll" id="list-group">
@@ -75,6 +77,18 @@
 
                         </ul>
                     </div>
+
+                    <div class=" p-0 d-xs-none w-100 d-none" id="channelDivision">
+                        <div class="col-1 w-100 sidebarSubDivisionTitle">
+                            #Channels:
+                        </div>
+                    </div>
+                    <div class="sidebar-scroll d-none" id="list-group2">
+                        <ul class="list-group w-100" id="channel-list">
+
+                        </ul>
+                    </div>
+
                 </div>
             </div>
             <div class="card-body border-chat-window  d-flex flex-column p-0" style="flex: 9 1" id="chatContainer"><!--  -->
@@ -103,9 +117,6 @@
             </div>
         </div>
     </div>
-</div>
-<div layout:fragment="footer">
-    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
 </div>
 </body>
 </html>

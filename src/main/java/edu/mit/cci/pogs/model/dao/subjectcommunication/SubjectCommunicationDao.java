@@ -8,5 +8,6 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 public interface SubjectCommunicationDao extends Dao<SubjectCommunication, Long> {
  
     List<SubjectCommunication> list();
+    List<SubjectCommunication> listByFromSubjectId(Long fromSubjectId);
 }
  

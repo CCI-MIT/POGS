@@ -1,6 +1,7 @@
 
 const COMMUNICATION_TYPE ={
     GROUP_CHAT: 'G',
+    MATRIX_CHAT: 'M',
     DYADIC : 'D'
 }
 
@@ -23,6 +24,7 @@ const STATUS = {
 const CHAT_BODY = {
     GROUP: {htmlRef: "group", displayString: "Group chat"},
     INSTRUCTIONS: {htmlRef: "instructions", displayString: "Instructions"},
+
     REQUEST_SENT: {htmlRef: "requestsent", displayString: "Waiting ..."},
     REQUEST_RECEIVED: {htmlRef: "requestreceived", displayString: "Incoming request"},
 
@@ -46,11 +48,23 @@ class CommunicationPlugin extends PogsPlugin {
                 dcm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
 
             }
-            //TODO: handle other kinds of chats
-            // - Communication matrix
+            if(this.pogsRef.communicationType == COMMUNICATION_TYPE.MATRIX_CHAT) {
+                var mtm = new MatrixChatManager(this);
+                mtm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
+                // get the constraint matrix
+                // get the subchannel configs
+
+            }
+
 
     }
 
+    getChannelsSubjectIsIn(){
+        return this.pogsRef.channelSubjectIsIn;
+    }
+    getSubjectCanTalkToSubjects(){
+        return this.pogsRef.subjectCanTalkTo;
+    }
     subscribeCommunicationBroadcast(funct) {
             this.pogsRef.subscribe('communicationMessage', funct);
     }
@@ -232,7 +246,143 @@ class GroupChatManager {
     }
 }
 
+class MatrixChatManager extends GroupChatManager {
+    constructor(communicationPluginReference) {
+        super(communicationPluginReference);
 
+        this.showChannelsList();
+        this.subjectCanTalkTo = this.communicationPluginReference.getSubjectCanTalkToSubjects();
+        this.channelsSubjectIsIn = this.communicationPluginReference.getChannelsSubjectIsIn();
+
+        this.setupChannelsPanel();
+    }
+    showChannelsList(){
+        $("#channelDivision").removeClass("d-none");
+        $("#list-group2").removeClass("d-none")
+    }
+    onCommunicationBroadcastReceived(message) {
+
+        if (message.sender != this.communicationPluginReference.getSubjectId()) {
+            if (message.content.type == CHAT_TYPE.MESSAGE) {
+
+                //if is private chat message.content.channel.indexOf("chat_")
+                //if is channel
+                if (message.content.message != "") {
+                    var originChatName = "";
+
+                    if(message.content.channel.indexOf("chat_")>=0){
+                        originChatName = "chat_"+message.sender;
+                        $("#channelBody_"+originChatName)
+                            .append(this.createReceivedMessageHTML(
+                                message.content.message,
+                                this.resolveSubjectDisplayName(message.sender),
+                                new Date()));
+                    } else{
+                        originChatName = message.content.channel;
+                        $("#channelBody_"+message.content.channel)
+                            .append(this.createReceivedMessageHTML(
+                                message.content.message,
+                                this.resolveSubjectDisplayName(message.sender),
+                                new Date()));
+                    }
+                    if(this.channel == originChatName) {
+                        //message is for the current channel
+
+                        this.adjustScroll();
+                    }else{
+                       //add it to the body and trigger notification icon
+                        this.addNotification(originChatName);
+                    }
+                }
+
+            }
+        }
+
+    }
+    clearNotification(chatName) {
+        if($("#"+chatName  + " .notification").length >= 0 ){
+            $("#"+chatName  + " .notification").remove();
+        }
+    }
+    addNotification(chatName) {
+        //check if there is a notification badge already
+
+        if($("#"+chatName  + " .badge").length > 0 ){
+            var totalNot = parseInt($("#"+chatName  + " .badge").text());
+            totalNot ++;
+            $("#"+chatName  + " .badge").text(totalNot);
+        }else{
+            $("#"+chatName).append('<span class="notification badge badge-danger">1</span>\n');
+        }
+    }
+    changeChannelTo(channel, channelDisplayName,receiver) {
+        this.clearNotification(channel);
+        super.changeChannelTo(channel, channelDisplayName, receiver);
+
+
+        if (channel == CHAT_BODY.INSTRUCTIONS.htmlRef) {
+            $("#closeCommunication").addClass("d-none");
+            $("#sendForm").addClass("d-none");
+
+            $(this.channelBodyRef).html('<div class="text-center"><br><br><br>' +
+                                        'Click on the left menu to open the<br><br>' +
+                                        'chat window with the subject\'s name you would like to chat with!'+
+                                        '<br><br> You can also chat in the channels that you are associated with!</div>');
+            return;
+        }else{
+            $("#closeCommunication").removeClass("d-none");
+            $("#sendForm").removeClass("d-none");
+        }
+    }
+    setupSubjectPanel() {
+        //use matrix to either display or not the current user
+        this.subjectCanTalkTo = this.communicationPluginReference.getSubjectCanTalkToSubjects();
+        for(var i = 0; i < this.subjectsInChannel.length; i ++) {
+            for(var j=0 ; j < this.subjectCanTalkTo.length; j++) {
+                if (this.subjectCanTalkTo[j] == this.subjectsInChannel[i].externalId) {
+                    $("#friend-list").append(
+                        '                           <li class="list-group-item p-1 hover-bg-lightgray '
+                        + 'username" data-external-id="'+ this.subjectsInChannel[i].externalId + '"'
+                        + ' id="chat_'+ this.subjectsInChannel[i].externalId +'">\n'
+                        + '                            <span class="d-xs-none">'
+                        + this.subjectsInChannel[i].displayName + '</span>\n'
+                        + '                        </li>\n');
+                    this.getOrCreateChannelHTML('chat_'+ this.subjectsInChannel[i].externalId);
+                }
+            }
+        }
+        $(".username").click(function(event){
+            var externalId = $(event.target).data("external-id");
+            if(externalId == null) {
+                externalId = $($(event.target).parent()).data("external-id");
+            }
+            var subject = this.communicationPluginReference.getSubjectByExternalId(externalId);
+            this.changeChannelTo('chat_' + externalId, "Chat with: "+ subject.displayName, externalId);
+            $("#messageInput").focus();
+
+        }.bind(this));
+    }
+    setupChannelsPanel() {
+        for(var i = 0; i < this.channelsSubjectIsIn.length; i ++) {
+            $("#channel-list").append(
+                '                           <li class="list-group-item p-1 hover-bg-lightgray  channelName" \n'
+                + '                 data-channel-name="'+this.channelsSubjectIsIn[i]+'"'
+                + ' id="channel_'+this.channelsSubjectIsIn[i]+'">\n'
+                + '                            <span class="d-xs-none">'
+                +this.channelsSubjectIsIn[i]+'</span>\n'
+                + '                        </li>\n');
+            this.getOrCreateChannelHTML("channel_"+this.channelsSubjectIsIn[i]);
+        }
+        $(".channelName").click(function(event){
+            var chatName = $(event.target).data("channel-name");
+            if(chatName == null){
+                chatName = $($(event.target).parent()).data("channel-name");
+            };
+            this.changeChannelTo('channel_' + chatName, "#"+ chatName, null);
+            $("#messageInput").focus();
+        }.bind(this));
+    }
+}
 class DyadicChatManager extends GroupChatManager {
     constructor(communicationPluginReference) {
         super(communicationPluginReference);
