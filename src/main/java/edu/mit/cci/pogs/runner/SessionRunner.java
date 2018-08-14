@@ -30,6 +30,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
+import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
@@ -135,10 +136,42 @@ public class SessionRunner implements Runnable {
 
         } else {
             //TODO:Handle multi task and task team and completed task creation
+            if ((session.getTeamCreationMoment().equals(
+                    TeamCreationTime.BEGINING_SESSION.getId().toString())) ||
+                    session.getTeamCreationMoment().equals(TeamCreationTime.BEGINING_ROUND)) {
+                createTeams(session, null, round);
+                createCompletedTasks(session, round, true);
+                setupStartingTimesMultiTask(session, round, null);
+                session.createSessionSchedule();
+
+
+            }
         }
 
     }
 
+
+
+
+    private void setupStartingTimesMultiTask(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
+
+        Long taskStartTime = session.getSessionStartDate().getTime() + session.getIntroAndSetupTime();
+        round.setRoundStartTimestamp(taskStartTime);
+
+        for (TaskWrapper tw : session.getTaskList()) {
+
+            tw.setCompletedTasks(tw.getCompletedTasks());
+            tw.setTaskStartTimestamp(taskStartTime);
+            tw.setInteractionTime(session.getFixedInteractionTime());
+            tw.setIntroPageEnabled(false);
+            tw.setIntroTime(0);
+            tw.setPrimerPageEnabled(false);
+            tw.setPrimerTime(0);
+
+            round.getTasks().add(tw);
+        }
+
+    }
 
     private void setupStartingTimes(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
 

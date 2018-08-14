@@ -8,6 +8,13 @@
 </head>
 <body>
 <div layout:fragment="content">
+    <div th:if="${hasTabs}">
+        <ul class="nav nav-tabs">
+          <li class="nav-item" th:each="task:${taskList}">
+            <a class="nav-link" th:classappend="${task.id == taskId} ? active : nothing" th:href="${'/round/' +round.id + task.taskWorkUrl +'/' + subject.subjectExternalId}" th:text="${task.taskName}"></a>
+          </li>
+        </ul>
+    </div>
     <style  th:inline="text">
 
         /*<![CDATA[*/
@@ -23,7 +30,7 @@
 
         /*]]>*/
     </script>
-    <div class="form-group waiting_message">
+    <div class="form-group waiting_message tab-content">
         <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
 
         <div th:remove="tag" th:utext="${taskWorkHtml}" ></div>
@@ -50,6 +57,7 @@
                                    hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
                                    hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
                                    hasChat: [(${hasChat})],
+                                   eventsUntilNow: [(${eventsUntilNow})],
                                    communicationType: '[(${communicationType})]'
                                });
 
@@ -61,6 +69,7 @@
 
         </div>
     </div>
+
 </div>
 <div layout:fragment="communication" th:if="${hasChat}">
     <div class="container-fluid h-100" style="width:350px;">

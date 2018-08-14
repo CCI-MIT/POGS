@@ -204,12 +204,17 @@
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Communication</legend>
             <div class="container">
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="communicationType">Communication
-                        Type (*) :</label>
-                    <div class="col-sm-10">
-                        <input class="form-control" type="text" id="communicationType"
-                               th:field="*{communicationType}"/>
+
+                 <div class="form-group row">
+                    <label class="col-sm-6 col-form-label" for="communicationType">Communication Type:</label>
+                    <div class="col-sm-6">
+
+                        <select class="custom-select" th:field="*{communicationType}" id="communicationType">
+                            <option
+                                    th:each="rg: ${communicationConstraints}"
+                                    th:value="${rg.id}"
+                                    th:text="${rg.communicationType}" ></option>
+                        </select>
                     </div>
                 </div>
                 <div class="form-group row">

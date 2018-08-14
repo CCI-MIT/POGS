@@ -131,18 +131,27 @@ public class TaskWrapper extends Task {
         if (getIntroPageEnabled()) {
             schedules.add(new SessionSchedule(getTaskStartTimestamp(),
                     getIntroEndTime(),this,null,null,
-                    roundUrl+"/task/" + getId() + "/i"));
+                    roundUrl+getTaskIntroUrl()));
         }
         if (getPrimerPageEnabled()) {
             schedules.add(new SessionSchedule(getIntroEndTime(),
                     getPrimerEndTime(),this,null,null,
-                    roundUrl+"/task/" + getId() + "/p"));
+                    roundUrl+getTaskPrimerUrl()));
 
         }
         schedules.add(new SessionSchedule(getPrimerEndTime(),
                 getTaskEndTimestamp(),this,null,null,
-                roundUrl+"/task/" + getId() + "/w"));
+                roundUrl+getTaskWorkUrl()));
 
         return schedules;
+    }
+    public String getTaskIntroUrl(){
+        return "/task/" + getId() + "/i";
+    }
+    public String getTaskPrimerUrl(){
+        return "/task/" + getId() + "/";
+    }
+    public String getTaskWorkUrl(){
+        return "/task/" + getId() + "/w";
     }
 }

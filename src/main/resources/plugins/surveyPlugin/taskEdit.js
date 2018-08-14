@@ -70,7 +70,7 @@ class SurveyTaskEdit {
         }
 
         //add answer field
-        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Answer: </label><input type="text" class="form-control col-sm-8" id="answer'+question_number+'" placeholder = "Put answer here" value="'+answer+'"></div>';
+        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Right Answer: </label><input type="text" class="form-control col-sm-8" id="answer'+question_number+'" placeholder = "Put answer here" value="'+answer+'"></div>';
 
         //add placeholder field
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Placeholder: </label> <input class="form-control col-sm-8" type="text" id="placeholder'+question_number+'" placeholder = "Put placeholder here" value="'+placeholder+'"></div>';

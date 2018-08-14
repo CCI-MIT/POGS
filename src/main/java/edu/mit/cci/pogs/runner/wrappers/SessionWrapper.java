@@ -59,14 +59,13 @@ public class SessionWrapper extends Session {
     }
 
     public Long getSecondsRemainingForCurrentUrl() {
-        if (!this.isTaskExecutionModeSequential()) {
-            return 0l;
-        }
-        if(this.sessionSchedule== null){
+        //if (!this.isTaskExecutionModeSequential()) {
+        //    return 0l;
+        // }
+        if (this.sessionSchedule == null) {
             return getTimeToStart();
         }
         Integer sessionScheduleIndex = getSessionScheduleIndex();
-
 
         return this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now();
 
@@ -75,9 +74,6 @@ public class SessionWrapper extends Session {
 
     public Long getSecondsRemainingForCurrentRound() {
         if (this.getTimeToStart() > 0) {
-            return 0l;
-        }
-        if (!this.isTaskExecutionModeSequential()) {
             return 0l;
         }
         RoundWrapper rw = getCurrentRound();
@@ -89,16 +85,14 @@ public class SessionWrapper extends Session {
     }
 
     public String getNextUrl() {
-        if (!this.isTaskExecutionModeSequential()) {
-            return "";
-        }
 
         if (this.sessionSchedule == null || this.sessionSchedule.size() == 0) {
             return "/intro";
         }
         Integer sessionScheduleIndex = getSessionScheduleIndex();
 
-        if (sessionScheduleIndex + 1 < this.sessionSchedule.size() ) {
+
+        if (sessionScheduleIndex + 1 < this.sessionSchedule.size()) {
             return this.sessionSchedule.get(sessionScheduleIndex + 1).getUrl();
         }
         return getDoneRedirectUrl();
@@ -183,12 +177,18 @@ public class SessionWrapper extends Session {
                         TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString());
     }
 
+    public boolean isTaskExecutionModeParallel() {
+        return this.getTaskExecutionType().equals(
+                TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString()) ||
+                this.getTaskExecutionType().equals(
+                        TaskExecutionType.PARALLEL_RANDOM_ORDER.getId().toString());
+    }
+
 
     public boolean isSessionStatusDone() {
         return getStatus()
                 .equals(SessionStatus.DONE.getId().toString());
     }
-
 
 
     public Long getIntroAndSetupTime() {
@@ -205,8 +205,15 @@ public class SessionWrapper extends Session {
         return total;
     }
 
+
     public void createSessionSchedule() {
+
         this.sessionSchedule = new ArrayList<>();
+        if (this.getTimeToStart() > 0) {
+            this.sessionSchedule.add(new SessionSchedule(new Date().getTime()
+                    , getSessionStartDate().getTime(), null,
+                    null, this, "/waiting_room"));
+        }
         if (getIntroPageEnabled()) {
             this.sessionSchedule.add(new SessionSchedule(
                     getSessionStartDate().getTime(), getIntroEndTime(), null,
@@ -238,10 +245,45 @@ public class SessionWrapper extends Session {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
+        if (this.isTaskExecutionModeParallel()) {
+            removeIntrosAndPrimersFromSchedule();
+        }
+
+        System.out.println("Time of schedule creation : " + new Date());
+
         for (SessionSchedule ss : this.sessionSchedule) {
 
             System.out.println(simpleDateFormat.format(new Date(ss.getStartTimestamp())) + " - " + simpleDateFormat.format(new Date(ss.getEndTimestamp())) + " - " + ss.getUrl());
         }
+    }
+
+    private void removeIntrosAndPrimersFromSchedule() {
+        List<SessionSchedule> allSchedules = new ArrayList<>(this.sessionSchedule);
+        boolean foundOneTask = false;
+        for (SessionSchedule ss : allSchedules) {
+            if (ss.getTaskReference() != null) {
+                if (!ss.getUrl().endsWith("/w")) {
+                    this.sessionSchedule.remove(ss);
+                } else {
+                    if (!foundOneTask) {
+                        foundOneTask = true;
+                    } else {
+                        this.sessionSchedule.remove(ss);
+                    }
+                }
+            }
+        }
+    }
+
+    public boolean isCurrentScheduleTask() {
+        Long now = DateUtils.now();
+        for (int i = 0; i < this.sessionSchedule.size(); i++) {
+            SessionSchedule ss = this.sessionSchedule.get(i);
+            if (ss.isHappeningNow(now)) {
+                return ss.getTaskReference() != null;
+            }
+        }
+        return false;
     }
 
     public Integer getSessionScheduleIndex() {

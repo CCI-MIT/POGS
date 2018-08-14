@@ -2,6 +2,8 @@ package edu.mit.cci.pogs.messages;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import org.jooq.tools.json.JSONObject;
+
 
 public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageContent> {
 
@@ -32,6 +34,7 @@ public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageConten
     }
 
 
+    public JSONObject toJSON() {return content.toJSON();}
 
 }
 
@@ -94,4 +97,13 @@ class TaskAttributeMessageContent {
         this.loggableAttribute = loggableAttribute;
     }
 
+    public JSONObject toJSON(){
+        JSONObject jo = new JSONObject();
+        jo.put("attributeName",attributeName);
+        jo.put("attributeStringValue",attributeStringValue);
+        jo.put("attributeDoubleValue",attributeDoubleValue);
+        jo.put("attributeIntegerValue",attributeIntegerValue);
+        jo.put("loggableAttribute",loggableAttribute);
+        return jo;
+    }
 }

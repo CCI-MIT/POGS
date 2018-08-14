@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
+import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.task.ScoringType;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
@@ -55,6 +56,11 @@ public class TaskController {
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Timestamp.class, new SqlTimestampPropertyEditor());
+    }
+
+    @ModelAttribute("communicationConstraints")
+    public List<CommunicationConstraint> getCommunicationConstraints() {
+        return Arrays.asList(CommunicationConstraint.values());
     }
 
     @ModelAttribute("scoringTypes")

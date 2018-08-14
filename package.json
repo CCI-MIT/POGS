@@ -33,6 +33,7 @@
     "popper": "^1.0.1",
     "popper.js": "^1.12.9",
     "spin.js": "2.3.2",
+    "summernote": "^0.8.10",
     "tooltipster": "^4.2.5"
   },
   "devDependencies": {

@@ -121,6 +121,14 @@ class GroupChatManager {
                 }
 
             }
+        }else{
+            if (message.content.message != "") {
+                this.channelBodyRef.append(
+                    this.createOwnMessageHTML(message.content.message,
+                                              this.resolveSubjectDisplayName(
+                                                  this.communicationPluginReference.getSubjectId()),
+                                              new Date()));
+            }
         }
 
     }
@@ -208,11 +216,6 @@ class GroupChatManager {
         var message = $("#messageInput").val();
         $("#messageInput").val("");
 
-        this.channelBodyRef.append(
-            this.createOwnMessageHTML(message,
-                                      this.resolveSubjectDisplayName(
-                                          this.communicationPluginReference.getSubjectId()),
-                                      new Date()));
         this.sendRegularMessage(message);
 
         this.adjustScroll();
@@ -261,42 +264,78 @@ class MatrixChatManager extends GroupChatManager {
         $("#list-group2").removeClass("d-none")
     }
     onCommunicationBroadcastReceived(message) {
+        var isOwnMessage = false;
+        console.log("Message.sender" + message.sender);
 
-        if (message.sender != this.communicationPluginReference.getSubjectId()) {
-            if (message.content.type == CHAT_TYPE.MESSAGE) {
+        if (message.sender == this.communicationPluginReference.getSubjectId()) {
+            isOwnMessage = true;
+        }
+        var isToCurrentSubject = false;
+        if (message.receiver == this.communicationPluginReference.getSubjectId()) {
+            isToCurrentSubject = true;
+        }
+        if (message.content.type == CHAT_TYPE.MESSAGE) {
 
-                //if is private chat message.content.channel.indexOf("chat_")
-                //if is channel
-                if (message.content.message != "") {
-                    var originChatName = "";
+            //if is private chat message.content.channel.indexOf("chat_")
+            //if is channel
+            if (message.content.message != "") {
+                var originChatName = "";
 
-                    if(message.content.channel.indexOf("chat_")>=0){
-                        originChatName = "chat_"+message.sender;
-                        $("#channelBody_"+originChatName)
-                            .append(this.createReceivedMessageHTML(
-                                message.content.message,
-                                this.resolveSubjectDisplayName(message.sender),
-                                new Date()));
-                    } else{
-                        originChatName = message.content.channel;
-                        $("#channelBody_"+message.content.channel)
-                            .append(this.createReceivedMessageHTML(
-                                message.content.message,
-                                this.resolveSubjectDisplayName(message.sender),
-                                new Date()));
+                if(message.content.channel.indexOf("chat_")>=0){
+
+
+                    if(!isOwnMessage) {
+                        if(isToCurrentSubject) {
+                            originChatName = "chat_" + message.sender;
+
+                            $("#channelBody_" + originChatName)
+                                .append(this.createReceivedMessageHTML(
+                                    message.content.message,
+                                    this.resolveSubjectDisplayName(message.sender),
+                                    new Date()));
+                        }
+                    }else {
+
+                        originChatName = "chat_" + message.receiver;
+                        $("#channelBody_" + originChatName).append(
+                            this.createOwnMessageHTML(message.content.message,
+                                                      this.resolveSubjectDisplayName(
+                                                          this.communicationPluginReference.getSubjectId()),
+                                                      new Date()));
+
                     }
-                    if(this.channel == originChatName) {
-                        //message is for the current channel
 
-                        this.adjustScroll();
+                } else{
+                    originChatName = message.content.channel;
+                    if(!isOwnMessage) {
+                        $("#channelBody_" + message.content.channel)
+                            .append(this.createReceivedMessageHTML(
+                                message.content.message,
+                                this.resolveSubjectDisplayName(message.sender),
+                                new Date()));
                     }else{
-                       //add it to the body and trigger notification icon
-                        this.addNotification(originChatName);
+                        $("#channelBody_" + message.content.channel).append(
+                            this.createOwnMessageHTML(message.content.message,
+                                                      this.resolveSubjectDisplayName(
+                                                          this.communicationPluginReference.getSubjectId()),
+                                                      new Date()));
                     }
                 }
 
+                if(this.channel == originChatName) {
+                    //message is for the current channel
+
+                    this.adjustScroll();
+                }else{
+                   //add it to the body and trigger notification icon
+                    if(isToCurrentSubject) {
+                        this.addNotification(originChatName);
+                    }
+                }
             }
+
         }
+
 
     }
     clearNotification(chatName) {
@@ -439,6 +478,10 @@ class DyadicChatManager extends GroupChatManager {
             }
             if (message.content.type == CHAT_TYPE.STATUS) {
                 this.updateTeamSubjectStatus(message.sender, message.content.message);
+            }
+        } else {
+            if (message.content.type == CHAT_TYPE.MESSAGE) {
+                super.onCommunicationBroadcastReceived(message);
             }
         }
 
