@@ -56,3 +56,7 @@
     height: -webkit-fit-content;
     height: -moz-fit-content;
 }
+
+.container {
+    position: relative;
+}
