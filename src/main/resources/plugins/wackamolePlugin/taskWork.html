@@ -1,14 +1,36 @@
 <div id="wackamoleContainer" class="container">
-    <h2 id="wackamoleTitle" class="text-dark">Wack-a-Mole TESTING</h2>
+    <h2 id="wackamoleTitle" class="text-dark">Wack-a-Mole</h2>
     <div>
         <div class="row">
             <div class="column" id="gameColumn">
 
                 <!--Intro Page-->
                 <div class="text-center" id="readyView">
-                    <small>Please click the button below when you are ready</small>
+                    <p>Please click the button below when you are ready</p>
                     <br>
-                    <button type="button" class="btn btn-light" id="readyBtn">ready</button>
+                    <form data-toggle="validator" role="form" id="readyForm">
+                        <div class="form-group form-inline form-row justify-content-center">
+                            <label for="moleAppearTime" class="col-form-label">Mole Appear time: </label>
+                            <div class="col-xs-2">
+                                <input type="number" min="0.01" value="1" step="0.01" class="form-control" id="moleAppearTime" placeholder="Enter seconds">
+                            </div>
+                        </div>
+                        <div class="form-group form-inline form-row justify-content-center">
+                            <label for="maxMoleNumber" class="col-form-label">Max Number of Mole: </label>
+                            <div class="col-xs-2">
+                                <input type="number" min="1" max="100" value="1" step="1" class="form-control" id="maxMoleNumber" placeholder="Enter mole number">
+                            </div>
+                        </div>
+                        <div class="form-group form-inline form-row justify-content-center">
+                            <label for="clickDelay" class="col-form-label">Click Delay: </label>
+                            <div class="col-xs-2">
+                                <input type="number" min="0" value="0" step="0.0001" class="form-control" id="clickDelay" placeholder="Enter seconds">
+                            </div>
+                        </div>
+                        <div class="form-group form-inline form-row justify-content-center">
+                            <button type="submit" class="btn btn-light" id="readyBtn">ready</button>
+                        </div>
+                    </form>
                 </div>
 
                 <!--Count Down-->
@@ -160,19 +182,14 @@
 
                 <div class="h-25 text-center">
                     Your Cursor <br>
-                    <i class="fa fa-mouse-pointer" style="color:cyan;"></i>
+                    <i class="fa fa-mouse-pointer"></i>
                 </div>
 
                 <div class="h-25 text-center">
                     Your score is <br>
                     <small id="score"> 0 </small>
                 </div>
-
-
-
-
             </div>
-
         </div>
     </div>
 </div>
