@@ -97,7 +97,7 @@ public class WorkspaceCollaborationWSController {
         CollaborationMessageContent cmc = new CollaborationMessageContent();
         cmc.setCollaborationType(CollaborationMessage.CollaborationType.TODO_LIST);
         cmc.setMessageType(CollaborationMessage.TodoType.BROADCAST_TODO_ITEMS.name().toString());
-        allTodoEntriesMessage.setContent(cmc);
+//        allTodoEntriesMessage.setContent(cmc);
 
         JSONObject broadCastTodoMessage = new JSONObject();
         broadCastTodoMessage.put("triggeredBy", pogsMessage.getContent().getMessageType());
