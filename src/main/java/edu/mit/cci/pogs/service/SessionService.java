@@ -30,6 +30,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Service
@@ -45,6 +46,7 @@ public class SessionService {
     private final TeamDao teamDao;
     private final RoundDao roundDao;
     private final EventLogDao eventLogDao;
+    private final SubjectCommunicationService subjectCommunicationService;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
 
@@ -52,6 +54,8 @@ public class SessionService {
 
     @Autowired
     private ApplicationContext context;
+
+
 
     @Autowired
     public SessionService(SessionHasTaskGroupDao sessionHasTaskGroupDao, SessionDao sessionDao,
@@ -61,7 +65,8 @@ public class SessionService {
                           TeamHasSubjectDao teamHasSubjectDao,
                           TeamDao teamDao,
                           RoundDao roundDao,
-                          EventLogDao eventLogDao
+                          EventLogDao eventLogDao,
+                          SubjectCommunicationService subjectCommunicationService
                           ) {
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
         this.sessionDao = sessionDao;
@@ -72,6 +77,7 @@ public class SessionService {
         this.teamDao = teamDao;
         this.roundDao = roundDao;
         this.eventLogDao =  eventLogDao;
+        this.subjectCommunicationService = subjectCommunicationService;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -202,7 +208,7 @@ public class SessionService {
 
 
     public void updateSubjectList(SubjectsBean subjectsBean) {
-        List<Subject> subjectList = subjectsBean.getSubjectList();
+        List<SubjectBean> subjectList = subjectsBean.getSubjectList();
         for (Subject subject : subjectList) {
             subject.setSessionId(subjectsBean.getSessionId());
             if(subject.getId()!=null){
@@ -211,6 +217,7 @@ public class SessionService {
                 subjectDao.create(subject);
             }
         }
+        subjectCommunicationService.createSubjectCommunications(subjectsBean.getSessionId(), true);
     }
 
 

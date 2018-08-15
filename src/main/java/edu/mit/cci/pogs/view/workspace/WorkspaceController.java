@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.view.workspace;
 
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
+import org.jooq.tools.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,29 +11,40 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
+import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
+import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
+import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.TeamService;
@@ -54,6 +66,9 @@ public class WorkspaceController {
     private CompletedTaskDao completedTaskDao;
 
     @Autowired
+    private EventLogDao eventLogDao;
+
+    @Autowired
     private TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
 
     @Autowired
@@ -70,6 +85,15 @@ public class WorkspaceController {
 
     @Autowired
     private RoundDao roundDao;
+
+    @Autowired
+    private SubjectHasChannelDao subjectHasChannelDao;
+
+    @Autowired
+    private ChatChannelDao chatChannelDao;
+
+    @Autowired
+    private SubjectCommunicationDao subjectCommunicationDao;
 
     @PostMapping("/check_in")
     public String register(@RequestParam("externalId") String externalId, Model model) {
@@ -240,13 +264,38 @@ public class WorkspaceController {
         Subject su = workspaceService.getSubject(subjectExternalId);
         Round round = roundDao.get(roundId);
 
+
+        List<SubjectCommunication> subjectCommunications =
+                subjectCommunicationDao.listByFromSubjectId(su.getId());
+
+        JSONArray allowedToTalkTo = new JSONArray();
+        if (subjectCommunications != null) {
+            for (SubjectCommunication sc : subjectCommunications) {
+                Subject subject = subjectDao.get(sc.getToSubjectId());
+                if (sc.getAllowed()) {
+                    allowedToTalkTo.add(subject.getSubjectExternalId());
+                }
+            }
+        }
+        //get Channels user is allowed to talk to
+
+        List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listBySubjectId(su.getId());
+        JSONArray channelSubjectIsIn = new JSONArray();
+        if (subjectHasChannels != null) {
+            for (SubjectHasChannel shc : subjectHasChannels) {
+                ChatChannel chatChannel = chatChannelDao.get(shc.getChatChannelId());
+                channelSubjectIsIn.add(chatChannel.getChannelName());
+            }
+        }
+
+
         if (task != null && round != null) {
             //get task plugin type task.getTaskPluginType()
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
             if (pl != null) {
                 //get task configurations
                 TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
-                        .getByTaskIdRoundId(task.getId(), round.getId());
+                        .getByTaskId(task.getId());
                 List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
                         .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
@@ -257,8 +306,12 @@ public class WorkspaceController {
                 model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
                 model.addAttribute("subject", su);
-                model.addAttribute("task", new TaskWrapper(task));
+                model.addAttribute("subjectCanTalkTo", allowedToTalkTo);
+                model.addAttribute("channelSubjectIsIn", channelSubjectIsIn);
 
+
+                model.addAttribute("task", new TaskWrapper(task));
+                model.addAttribute("round", new RoundWrapper(round));
 
                 model.addAttribute("taskConfigurationAttributes",
                         attributesToJsonArray(taskExecutionAttributes));
@@ -272,6 +325,13 @@ public class WorkspaceController {
                 }
                 model.addAttribute("pogsSession", sessionWrapper);
 
+                if (sessionWrapper.isTaskExecutionModeParallel()) {
+                    model.addAttribute("hasTabs", true);
+                    model.addAttribute("taskList", sessionWrapper.getTaskList());
+                    //add all tasks
+                } else {
+                    model.addAttribute("hasTabs", false);
+                }
 
                 String cc = sessionWrapper.getCommunicationType();
                 if (task.getCommunicationType() != null || !task.getCommunicationType().equals(cc)) {
@@ -283,15 +343,28 @@ public class WorkspaceController {
 
                 boolean hasCollaborationTodoListEnabled = sessionWrapper
                         .getCollaborationTodoListEnabled();
-                model.addAttribute("hasCollaborationTodoListEnabled",hasCollaborationTodoListEnabled);
+                if (task.getCollaborationTodoListEnabled() != null) {
+                    hasCollaborationTodoListEnabled = task.getCollaborationTodoListEnabled();
+                }
+                model.addAttribute("hasCollaborationTodoListEnabled", hasCollaborationTodoListEnabled);
+
                 boolean hasCollaborationFeedbackWidget = sessionWrapper
                         .getCollaborationFeedbackWidgetEnabled();
-                model.addAttribute("hasCollaborationFeedbackWidget",hasCollaborationFeedbackWidget);
+
+
+                if (task.getCollaborationFeedbackWidgetEnabled() != null) {
+                    hasCollaborationFeedbackWidget = task.getCollaborationFeedbackWidgetEnabled();
+                }
+                model.addAttribute("hasCollaborationFeedbackWidget", hasCollaborationFeedbackWidget);
+
                 boolean hasCollaborationVotingWidget = sessionWrapper
                         .getCollaborationVotingWidgetEnabled();
 
-                model.addAttribute("hasCollaborationVotingWidget",hasCollaborationVotingWidget);
+                if (task.getCollaborationVotingWidgetEnabled() != null) {
+                    hasCollaborationVotingWidget = task.getCollaborationVotingWidgetEnabled();
+                }
 
+                model.addAttribute("hasCollaborationVotingWidget", hasCollaborationVotingWidget);
 
                 model.addAttribute("secondsRemainingCurrentUrl",
                         sr.getSession().getSecondsRemainingForCurrentUrl());
@@ -325,6 +398,14 @@ public class WorkspaceController {
                 model.addAttribute("completedTask", completedTask);
 
 
+                List<EventLog> allLogsUntilNow = eventLogDao.listLogsUntil(completedTask.getId(), new Date());
+                JSONArray allLogs = new JSONArray();
+                for (EventLog el : allLogsUntilNow) {
+                    allLogs.add(getLogJson(el));
+                }
+
+                model.addAttribute("eventsUntilNow", allLogs);
+
             } else {
                 return handleErrorMessage("There was an error and your session has ended!", model);
             }
@@ -332,6 +413,18 @@ public class WorkspaceController {
         }
 
         return "workspace/task_work";
+    }
+
+    private JSONObject getLogJson(EventLog el) {
+        JSONObject event = new JSONObject();
+        event.put("sender", el.getSender());
+        event.put("receiver", el.getReceiver());
+
+        event.put("content", el.getEventContent());
+        event.put("completedTaskId", el.getCompletedTaskId());
+        event.put("sessionId", el.getSessionId());
+        event.put("type", el.getEventType());
+        return event;
     }
 
     private JSONArray getTeamatesJSONObject(List<Subject> teammates) {

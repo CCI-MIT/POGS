@@ -16,6 +16,7 @@
     <link rel="stylesheet" type="text/css" href="../../dist/vendor/font-awesome/css/font-awesome.css"
           th:href="@{/vendor/font-awesome/css/font-awesome.css}">
 
+
     <script src="../../dist/vendor/jquery/dist/jquery.min.js"
             th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
     <script src="../../js/pogs.js" th:src="@{/js/pogs.js}"></script>
@@ -33,7 +34,7 @@
 <div class="flexbox">
     <div class="header">
         <!--<img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/>-->
-        POGS
+        <span>POGS</span>
     </div>
     <div class="main">
         <div class="flexbox-row">
@@ -46,7 +47,28 @@
             <div class="communication" layout:fragment="communication" ></div>
         </div>
     </div>
-    <div class="footer" layout:fragment="footer"  ></div>
+    <div class="footer" layout:fragment="footer" >
+        Copyright © 2018 MIT Center for Collective Intelligence
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="communicationModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"

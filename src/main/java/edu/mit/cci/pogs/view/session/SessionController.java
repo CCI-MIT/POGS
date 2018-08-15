@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.view.session;
 
+import org.jooq.tools.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,12 +10,16 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
+import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
@@ -24,16 +29,28 @@ import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationType;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
+import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
+import edu.mit.cci.pogs.service.ChatChannelService;
 import edu.mit.cci.pogs.service.SessionService;
+import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
+import edu.mit.cci.pogs.view.session.beans.ChatChannelBean;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SessionHasTaskGroupRelationshipBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectCommunicationBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Controller
@@ -50,6 +67,24 @@ public class SessionController {
 
     @Autowired
     private TaskGroupDao taskGroupDao;
+
+    @Autowired
+    private SubjectHasChannelDao subjectHasChannelDao;
+
+    @Autowired
+    private SubjectDao subjectDao;
+
+    @Autowired
+    private SubjectCommunicationDao subjectCommunicationDao;
+
+    @Autowired
+    private ChatChannelDao chatChannelDao;
+
+    @Autowired
+    private ChatChannelService chatChannelService;
+
+    @Autowired
+    private SubjectCommunicationService subjectCommunicationService;
 
     private static final String DEFAULT_CONDITION_NAME = "";
 
@@ -113,7 +148,36 @@ public class SessionController {
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", new SessionBean(sessionDao.get(id)));
         SubjectsBean subjectsBean = new SubjectsBean();
-        subjectsBean.setSubjectList(sessionService.listSubjectsBySessionId(id));
+
+        List<SubjectBean> sbList = new ArrayList<>();
+        for (Subject su : sessionService.listSubjectsBySessionId(id)) {
+            sbList.add(new SubjectBean(su));
+            //
+        }
+        for (SubjectBean sb : sbList) {
+            subjectsBean.setSubjectList(sbList);
+            sb.setSubjectCommunications(subjectCommunicationDao.listByFromSubjectId(sb.getId()));
+        }
+
+        List<ChatChannel> chatChannels = chatChannelDao.listBySessionId(id);
+        List<ChatChannelBean> chatChannelBeans = new ArrayList<>();
+
+        for (ChatChannel cc : chatChannels) {
+            ChatChannelBean ccb = new ChatChannelBean(cc);
+            List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listByChatId(ccb.getId());
+            List<Subject> subjectList = new ArrayList<>();
+            if (subjectHasChannels != null && subjectHasChannels.size() > 0) {
+                for (SubjectHasChannel shc : subjectHasChannels) {
+                    Subject subject = subjectDao.get(shc.getSubjectId());
+                    subjectList.add(subject);
+                }
+            }
+            ccb.setSubjectList(subjectList);
+            ccb.setSubjectHasChannelList(subjectHasChannels);
+            chatChannelBeans.add(ccb);
+        }
+        model.addAttribute("chatChannelBeans", chatChannelBeans);
+
         model.addAttribute("subjectsBean", subjectsBean);
 
         return "session/session-display";
@@ -144,6 +208,7 @@ public class SessionController {
 
         return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
     }
+
     @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
         SessionBean session = new SessionBean(sessionDao.get(id));
@@ -161,9 +226,10 @@ public class SessionController {
     @PostMapping("/admin/sessions/subjects/edit")
     public String saveSubject(@ModelAttribute SubjectsBean subjectsBean, RedirectAttributes redirectAttributes) {
 
-            sessionService.updateSubjectList(subjectsBean);
-        return "redirect:/admin/studies/"+subjectsBean.getStudyId()+"/sessions/" + subjectsBean.getSessionId();
+        sessionService.updateSubjectList(subjectsBean);
+        return "redirect:/admin/studies/" + subjectsBean.getStudyId() + "/sessions/" + subjectsBean.getSessionId();
     }
+
     @PostMapping("/admin/sessions")
     public String saveSession(@ModelAttribute SessionBean sessionBean, RedirectAttributes redirectAttributes) {
 
@@ -183,10 +249,133 @@ public class SessionController {
         Study study = studyDao.get(studyId);
         session.setStudyId(study.getId());
         SubjectsBean subjectsBean = new SubjectsBean();
-        subjectsBean.setSubjectList(sessionService.listSubjectsBySessionId(session.getId()));
+        List<SubjectBean> sbList = new ArrayList<>();
+        for (Subject su : sessionService.listSubjectsBySessionId(session.getId())) {
+            sbList.add(new SubjectBean(su));
+        }
+        subjectsBean.setSubjectList(sbList);
+
+
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", session);
         model.addAttribute("subjectsBean", subjectsBean);
         return "session/subject-edit";
     }
+
+    @PostMapping("/admin/sessions/chatchannels/edit")
+    public String saveChatChannel(@ModelAttribute ChatChannelBean chatChannelBean, RedirectAttributes redirectAttributes) {
+
+        if (chatChannelBean.getId() == null) {
+            ChatChannel cc = chatChannelDao.create(chatChannelBean);
+            chatChannelBean.setId(cc.getId());
+        } else {
+            chatChannelDao.update(chatChannelBean);
+        }
+        chatChannelService.updateOrCreateChat(chatChannelBean);
+
+        return "redirect:/admin/studies/" + chatChannelBean.getStudyId() + "/sessions/" + chatChannelBean.getSessionId();
+    }
+
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/chatchannels/create")
+    public String createChatChannel(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id,
+                                    Model model) {
+        SessionBean session = new SessionBean(sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        ChatChannelBean chatChannelBean = new ChatChannelBean();
+        chatChannelBean.setSubjectHasChannelList(new ArrayList<>());
+        chatChannelBean.setSubjectList(new ArrayList<>());
+        chatChannelBean.setSessionId(session.getId());
+
+        SubjectsBean subjectsBean = new SubjectsBean();
+        List<SubjectBean> sbList = new ArrayList<>();
+        for (Subject su : sessionService.listSubjectsBySessionId(session.getId())) {
+            sbList.add(new SubjectBean(su));
+        }
+        subjectsBean.setSubjectList(sbList);
+
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", session);
+        model.addAttribute("chatChannelBean", chatChannelBean);
+        model.addAttribute("subjectsBean", subjectsBean);
+
+        return "session/chatchannel-edit";
+
+    }
+
+
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/chatchannels/{channelId}/delete")
+    public String deleteChatChannel(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id,
+                                  @PathVariable("channelId") Long channelId, Model model) {
+
+        SessionBean session = new SessionBean(sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        ChatChannel cc = chatChannelDao.get(channelId);
+        chatChannelService.delete(cc);
+
+        return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
+    }
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/chatchannels/{channelId}/edit")
+    public String editChatChannel(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id,
+                                  @PathVariable("channelId") Long channelId, Model model) {
+
+        SessionBean session = new SessionBean(sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        ChatChannel cc = chatChannelDao.get(channelId);
+        ChatChannelBean chatChannelBean = new ChatChannelBean(cc);
+        List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listByChatId(chatChannelBean.getId());
+        List<Subject> subjectList = new ArrayList<>();
+        if (subjectHasChannels != null && subjectHasChannels.size() > 0) {
+            for (SubjectHasChannel shc : subjectHasChannels) {
+                Subject subject = subjectDao.get(shc.getSubjectId());
+                subjectList.add(subject);
+            }
+        }
+        chatChannelBean.setSubjectList(subjectList);
+        chatChannelBean.setSubjectHasChannelList(subjectHasChannels);
+
+        SubjectsBean subjectsBean = new SubjectsBean();
+        List<SubjectBean> sbList = new ArrayList<>();
+        for (Subject su : sessionService.listSubjectsBySessionId(session.getId())) {
+            sbList.add(new SubjectBean(su));
+        }
+        subjectsBean.setSubjectList(sbList);
+
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", session);
+        model.addAttribute("chatChannelBean", chatChannelBean);
+        model.addAttribute("subjectsBean", subjectsBean);
+
+        return "session/chatchannel-edit";
+    }
+
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/subjects/editCommunication")
+    public String editCommunicationSubjects(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
+        SessionBean session = new SessionBean(sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        session.setStudyId(study.getId());
+        SubjectsBean subjectsBean = new SubjectsBean();
+        List<SubjectBean> sbList = new ArrayList<>();
+        for (Subject su : sessionService.listSubjectsBySessionId(session.getId())) {
+            sbList.add(new SubjectBean(su));
+            //
+        }
+        for (SubjectBean sb : sbList) {
+            subjectsBean.setSubjectList(sbList);
+            sb.setSubjectCommunications(subjectCommunicationDao.listByFromSubjectId(sb.getId()));
+        }
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", session);
+        model.addAttribute("subjectsBean", subjectsBean);
+        return "session/subject-communication-edit";
+    }
+
+
+    @PostMapping("/admin/sessions/subjects/editCommunication")
+    public String saveCommunicationSubject(@ModelAttribute SubjectCommunicationBean subjectCommunicationBean, RedirectAttributes redirectAttributes) {
+        Session session = sessionDao.get(subjectCommunicationBean.getSessionId());
+        Study study = studyDao.get(subjectCommunicationBean.getStudyId());
+        subjectCommunicationService.updateSubjectCommunications(subjectCommunicationBean);
+        return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
+    }
+
 }

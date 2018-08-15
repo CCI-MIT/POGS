@@ -18,6 +18,11 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
         this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());
         this.content.setSecondsRemainingForCurrentRound(sessionWrapper.getSecondsRemainingForCurrentRound().toString());
 
+        //System.out.println("nextUrl:" + this.content.getNextUrl());
+        //System.out.println("secondsRemainingCurrentUrl:" + this.content.getSecondsRemainingCurrentUrl());
+        //System.out.println("secondsRemainingForSession:" + this.content.getSecondsRemainingForSession());
+        //System.out.println("secondsRemainingForCurrentRound:" + this.content.getSecondsRemainingForCurrentRound());
+
     }
 
     public String getSpecificPublicTopic() {

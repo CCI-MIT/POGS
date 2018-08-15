@@ -16,16 +16,27 @@ class Pogs {
     }
     setup (config) {
 
+
         this.stompClient = null;
         this.sessionId = config.sessionId;
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
 
-        this.hasCollaboration = config.hasCollaboration;
+
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
         this.hasCollaborationFeedbackWidget = config.hasCollaborationFeedbackWidget;
         this.hasCollaborationTodoListEnabled = config.hasCollaborationTodoListEnabled;
+
+        this.hasCollaboration = this.hasCollaborationVotingWidget||
+                                this.hasCollaborationFeedbackWidget||
+                                this.hasCollaborationTodoListEnabled;
+
+
+
+        this.subjectCanTalkTo = config.subjectCanTalkTo;
+
+        this.channelSubjectIsIn = config.channelSubjectIsIn;
 
         this.hasCollaboration = this.hasCollaborationVotingWidget ||
                                 this.hasCollaborationFeedbackWidget||
@@ -39,6 +50,7 @@ class Pogs {
                                            parseInt(config.secondsRemainingCurrentUrl));
         this.taskConfigurationAttributes = config.taskConfigurationAttributes;
 
+        this.eventsUntilNow = config.eventsUntilNow;
         this.taskConfigurationAttributesMap = new Map();
         if(typeof(this.taskConfigurationAttributes) != "undefined") {
             for (var i = 0; i < this.taskConfigurationAttributes.length; i++) {
@@ -51,6 +63,12 @@ class Pogs {
 
         this.initializeWebSockets();
 
+        if(window.location.href.indexOf("/w/")>=0){
+            $('<div/>', {
+                id: "countdown",
+                'class': "float-right",
+            }).appendTo(".header");
+        }
         this.countDown = new Countdown(this.secondsRemainingCurrentUrl, "countdown",
                                        function () {
                                            window.location = this.nextUrl
@@ -60,6 +78,38 @@ class Pogs {
 
         this.setupCommunication();
         this.setupCollaboration();
+
+        if(this.eventsUntilNow) {
+            if (this.eventsUntilNow.length > 0) {
+                this.subscribe('onReady', this.processOldEventsUntilNow.bind(this));
+            }
+        }
+
+    }
+    processOldEventsUntilNow(){
+        for(var i=0; i< this.eventsUntilNow.length ; i++) {
+
+            var event = this.eventsUntilNow[i];
+            if(event.type == "TASK_ATTRIBUTE"){
+                this.fireOldEvent(event,'taskAttributeBroadcast')
+            }
+
+            if(event.type == "COMMUNICATION_MESSAGE"){
+                this.fireOldEvent(event,'communicationMessage');
+            }
+
+            if(event.type == "COLLABORATION_MESSAGE"){
+                this.fireOldEvent(event,'collaborationMessage');
+            }
+        }
+    }
+    fireOldEvent(message, eventName){
+        if (!(typeof message.content === 'object')) {
+            var messageContent = JSON.parse(message.content);
+            message.content = messageContent;
+        }
+
+        this.fire(message, eventName, this);
 
     }
     setupCommunication() {
@@ -80,6 +130,7 @@ class Pogs {
 
         var socket = new SockJS('/ws');
         this.stompClient = Stomp.over(socket);
+        this.stompClient.debug = () => {};
 
         this.stompClient.connect({}, this.onConnected.bind(this), this.onError.bind(this));
     }
@@ -153,6 +204,7 @@ class Pogs {
     }
     onFlowBroadcastReceived(message) {
 
+
         this.nextUrl = message.content.nextUrl;
         if(message.content.nextUrl.indexOf("http") == -1) {
             this.nextUrl = this.nextUrl + '/' + this.subjectId;
@@ -177,7 +229,10 @@ class Pogs {
             };
             this.stompClient.send(url, {}, JSON.stringify(chatMessage));
         }
-        event.preventDefault();
+        if(event){
+            event.preventDefault()
+        }
+
     }
 }
 

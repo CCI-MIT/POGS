@@ -4,6 +4,7 @@ import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.todoentry.TodoEntryDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TodoEntry;
 import edu.mit.cci.pogs.model.jooq.tables.records.TodoEntryRecord;
+
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
@@ -25,10 +26,18 @@ public class TodoEntryDaoImpl extends AbstractDao<TodoEntry, Long, TodoEntryReco
         this.dslContext = dslContext;
     }
 
-    public List<TodoEntry> list(){
+    public List<TodoEntry> list() {
         final SelectQuery<Record> query = dslContext.select()
                 .from(TODO_ENTRY).getQuery();
 
+        return query.fetchInto(TodoEntry.class);
+    }
+
+    public List<TodoEntry> listByCompletedTaskId(Long completedTaskId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(TODO_ENTRY).getQuery();
+        query.addConditions(TODO_ENTRY.COMPLETED_TASK_ID.eq(completedTaskId));
+        query.addOrderBy(TODO_ENTRY.TODO_ENTRY_DATE);
         return query.fetchInto(TodoEntry.class);
     }
 }

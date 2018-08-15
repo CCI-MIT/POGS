@@ -70,13 +70,12 @@ class SurveyTaskEdit {
         }
 
         //add answer field
-        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Answer: </label><input type="text" class="form-control col-sm-8" id="answer'+question_number+'" placeholder = "Put answer here" value="'+answer+'"></div>';
+        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Right Answer: </label><input type="text" class="form-control col-sm-8" id="answer'+question_number+'" placeholder = "Put answer here" value="'+answer+'"></div>';
 
         //add placeholder field
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Placeholder: </label> <input class="form-control col-sm-8" type="text" id="placeholder'+question_number+'" placeholder = "Put placeholder here" value="'+placeholder+'"></div>';
-        str += '</div>'
-
-        str += '</div>  '
+        str += '<small id="" class="form-text text-muted">If it applies provide the right answer in the "Right Answer" field</small>';
+        str += '</div>';
 
         $("#survey").append(str);
 
@@ -112,6 +111,7 @@ class SurveyTaskEdit {
 
         str += '<div class="form-check form-inline row"> <div class="col-sm-2"> </div> <button type="button" class="btn btn-secondary btn-sm add-radio-choice" id="addRadioChoice' + question_number + '">+</button> </div>'
 
+        str += '<small id="" class="form-text text-muted">If it applies provide the right answer by clicking in the right radio button field</small>';
         str += '</div> '
 
         $("#survey").append(str);
@@ -164,6 +164,7 @@ class SurveyTaskEdit {
 
         str += '<div class="form-check form-inline row"> <div class="col-sm-2"> </div> <button type="button" class="btn btn-secondary btn-sm add-checkbox-choice" id="addCheckboxChoice' + question_number + '">+</button> </div>'
 
+        str += '<small id="" class="form-text text-muted">If it applies provide the right answer(s) by clicking in the right checkbox(es)</small>';
         str += '</div> '
 
         $("#survey").append(str);
@@ -198,11 +199,11 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
         }
 
         //add button and choices field
-        str += '<div class="form-group row"> <div class="col-sm-2"> </div> <select class="col-sm-8" id="answer'+question_number+'"> </select></div>'
+        str += '<div class="form-group row"> <div class="col-sm-2">Right Answer:</div> <select class="col-sm-8" id="answer'+question_number+'"> </select></div>'
 
         str += '<div id="answerChoices'+question_number+'">'
         $.each(choices,function(i){
@@ -216,6 +217,7 @@ class SurveyTaskEdit {
 
         str += '<div class="form-check form-inline row"> <div class="col-sm-2"> </div> <button type="button" class="btn btn-secondary btn-sm add-select-choice" id="addSelectChoice' + question_number + '">+</button> </div>'
 
+        str += '<small id="" class="form-text text-muted">If it applies provide the right answer in the "Right Answer" Field </small>';
         str += '</div> '
 
         $("#survey").append(str);

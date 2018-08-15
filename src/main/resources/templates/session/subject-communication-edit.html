@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+    </ol>
+    <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
+
+    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
+    <h3>Session subject communication: </h3>
+
+    <form action="#" th:action="@{/admin/sessions/subjects/editCommunication}" method="post">
+        <input type="hidden" name="sessionId" id="sessionId" th:value="${sessionBean.id}">
+        <input type="hidden" name="studyId" th:value="${study.id}">
+         <br/>
+                <table class="table table-striped">
+                    <thead>
+
+                    <tr>
+                        <th> - </th>
+                        <th:block th:each="subject : ${subjectsBean.subjectList}">
+                            <th th:text="${subject.subjectExternalId}"></th>
+                        </th:block>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <th:block th:each="subject,iteratorStatusSubject : ${subjectsBean.subjectList}">
+                        <tr>
+                            <td th:text="${subject.subjectExternalId}"></td>
+                            <th:block th:if="subject" th:each="subjectCommunication, iteratorStatusSubject2 : ${subject.subjectCommunications}">
+                                <td th:if="${iteratorStatusSubject.count > iteratorStatusSubject2.count}">
+                                    <span th:if="${subjectCommunication.allowed}">
+                                        <input type="checkbox" th:id="${subject.id + '_' + subjectCommunication.toSubjectId}" name="selectedCommunications" th:value="${subjectCommunication.id}" checked="checked" />
+                                    </span>
+                                    <span th:if="${not subjectCommunication.allowed}">
+                                        <input type="checkbox" th:id="${subject.id + '_' + subjectCommunication.toSubjectId}" name="selectedCommunications" th:value="${subjectCommunication.id}" />
+                                    </span>
+                                </td>
+                                <td th:if="${iteratorStatusSubject.count < iteratorStatusSubject2.count}">
+                                        <span th:if="${subjectCommunication.allowed}">
+                                            <input type="checkbox" th:id="${subject.id + '_' + subjectCommunication.toSubjectId}" name="selectedCommunications" th:value="${subjectCommunication.id}" checked="checked" disabled="disabled"/>
+                                        </span>
+                                        <span th:if="${not subjectCommunication.allowed}">
+                                            <input type="checkbox" th:id="${subject.id + '_' + subjectCommunication.toSubjectId}" name="selectedCommunications" th:value="${subjectCommunication.id}" disabled="disabled"/>
+                                        </span>
+                                </td>
+                                <td th:if="${iteratorStatusSubject.count == iteratorStatusSubject2.count}">-
+                                </td>
+                            </th:block>
+                        </tr>
+                    </th:block>
+                    </tbody>
+                </table>
+                <script>
+                $(function(){
+                   $("input[type=checkbox]").click(function(){
+                       var ids = $(this).attr("id").split("_");
+
+                       console.log($(this).attr("id") + " - "+ this.checked);
+                       $("#" + ids[1] + "_" + ids[0]).prop('checked', this.checked);
+                   })
+                });
+                </script>
+        <br/>
+        <a class="btn btn-danger btn-primary" th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Save subject list</button>
+        <br/>
+    </form>
+</div>
+</body>
+</html>

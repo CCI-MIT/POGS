@@ -32,6 +32,16 @@ public class SubjectCommunicationDaoImpl extends AbstractDao<SubjectCommunicatio
  
         return query.fetchInto(SubjectCommunication.class);
     }
- 
+
+    public List<SubjectCommunication> listByFromSubjectId(Long fromSubjectId){
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SUBJECT_COMMUNICATION).getQuery();
+                query.addConditions(SUBJECT_COMMUNICATION.FROM_SUBJECT_ID.eq(fromSubjectId));
+                query.addOrderBy(SUBJECT_COMMUNICATION.TO_SUBJECT_ID);
+
+        return query.fetchInto(SubjectCommunication.class);
+    }
+
 }
  

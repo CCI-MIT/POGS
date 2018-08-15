@@ -43,7 +43,7 @@ public class TaskHasTaskConfigurationDaoImpl extends AbstractDao<TaskHasTaskConf
         return query.fetchInto(TaskHasTaskConfiguration.class);
     }
 
-    public TaskHasTaskConfiguration getByTaskIdRoundId(Long taskId, Long roundId) {
+    public TaskHasTaskConfiguration getByTaskId(Long taskId) {
 
 
         //TODO add condition for roundId, after database change
@@ -59,6 +59,8 @@ public class TaskHasTaskConfigurationDaoImpl extends AbstractDao<TaskHasTaskConf
             return record.into(TaskHasTaskConfiguration.class);
         }
     }
+
+
 
 }
  

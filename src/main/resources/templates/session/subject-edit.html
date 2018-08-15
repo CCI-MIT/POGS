@@ -15,16 +15,10 @@
         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
         <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
         <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a></li>
-        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/studies/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
     </ol>
     <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
-    <div class="col">
-        <div class="col-12">
-            <a th:href="${'/admin/studies/' + study.id + '/studies/' + sessionBean.id}" class="btn btn-outline-primary float-right">
-                Edit session</a>
-        </div>
-    </div>
-    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
 
     <h3>Session subjects: </h3>
     <div class="row">
@@ -75,6 +69,7 @@
             </tbody>
         </table>
         <br/>
+        <a class="btn btn-danger btn-primary" th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}">Cancel</a>
         <button type="submit" class="btn btn-primary">Save subject list</button>
         <br/>
     </form>

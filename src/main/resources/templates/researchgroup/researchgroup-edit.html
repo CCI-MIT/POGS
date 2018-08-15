@@ -28,6 +28,8 @@
                 <input class="form-control" type="text" id="groupName" th:field="*{groupName}"/>
             </div>
         </div>
+        <a class="btn btn-danger btn-primary" href="/admin/researchgroups">Cancel</a>
+
         <button th:if="${researchGroup.id == null}" type="submit" class="btn btn-primary">Create Research Group
         </button>
         <button th:if="${researchGroup.id != null}" type="submit" class="btn btn-primary">Save Research Group

@@ -6,35 +6,28 @@ class Wackamole {
         this.maxMoleNumber = 3;
         this.moleAppearTime = 1000; // time in millisecond
         this.clickDelay = 0;
-        this.subjectColor = null;
+        this.subjectColors = ["red", "green", "blue", "purple", "aqua"]; // maximum no. of players = 5
+        this.numberOfClicks = 0; // TODO: keep track of the number of clicks
+        console.log(pogsPlugin);
     }
 
-    setupGrid(title) {
+    setupGrid(title, teammates) {
         var self = this;
         var score = 0;
 
         $("#wackamoleTitle").text(title);
 
-        // change cursor color
-        var subjectNumToColor = {
-            0: "#6495ED",
-            1: "#98FB98",
-            2: "#F08080",
-            3: "#707070"
-        };
-        var teammates = self.pogsPlugin.getTeammates();
-        for (var i = 0; i < teammates.length; i++) {
-            if (teammates[i].externalId == self.pogsPlugin.getSubjectId()) {
-                self.subjectColor = subjectNumToColor[i];
-            }
-        }
-        self.changeCursorColor(self.subjectColor);
+        // display teammates' id
+        $.each(teammates, function (teammate) {
+            console.log(teammate);
+        });
+
+
 
         // Only show readyView at start
         $("#gameColumn").children().hide();
         $("#informationColumn").children().hide();
         $("#readyView").show();
-        $("#readyBtn").valid
         $("#readyBtn").on('click', self.handleReadyOnClick.bind(self));
 
         // Game grid appearred
@@ -42,7 +35,43 @@ class Wackamole {
             $("#whack_cell" + i).on('click', self.handleCellOnClick.bind(self));
             $("#whack_cell" + i).on('removeMole', self.handleCellRemoveMole.bind(self));
             $("#whack_cell" + i).on('addMole', self.handleCellAddMole.bind(self));
+        });
 
+        // mouse move event
+        $("#wackamoleContainer").on('mousemove', self.handleMouseMove.bind(self));
+        // check debounce function with different values
+        // $("#wackamoleContainer").on('mousemove', self.debounce(self.handleMouseMove.bind(self), 100, true));
+
+    }
+
+    debounce(func, wait, immediate) {
+        var timeout;
+        return function() {
+            var context = this, args = arguments;
+            var later = function() {
+                timeout = null;
+                if (!immediate) func.apply(context, args);
+            };
+            var callNow = immediate && !timeout;
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+            if (callNow) func.apply(context, args);
+        };
+    }
+
+    initPlayers(teammates, myId) {
+        var self = this;
+        self.subjectId = myId; // this is my id
+        self.teammates = {};
+        $.each(teammates, function(key, player) {
+            var externalId = player.externalId;
+            var displayName = player.displayName;
+            var isCurrentPlayer = (externalId == myId);
+            if (isCurrentPlayer) {
+                self.changeCursorColor(self.subjectColors[key]);
+            }
+            var playerObj = new Player(externalId, displayName, self.subjectColors[key], isCurrentPlayer);
+            self.teammates[player.externalId] = playerObj;
         });
     }
 
@@ -50,21 +79,7 @@ class Wackamole {
         var self = this;
         var attrName = message.content.attributeName;
         if (message.sender != this.pogsPlugin.getSubjectId()) {
-            if (attrName == "clickedCell") {
-                var cell = message.content.attributeIntegerValue;
-                var color = message.content.attributeStringValue;
-
-                // change cell background color
-                $("#whack_cell" + cell).css('background-color', color);
-                $("#whack_cell" + cell).addClass('clicked');
-
-                // after 0.5 second the cell background change back to white
-                setTimeout(function () {
-                    $("#whack_cell" + cell).css('background-color', 'white');
-                    $("#whack_cell" + cell).removeClass('clicked');
-                }, 500); // background change back to white after __ ms
-            }
-            else if (attrName == "removeMole") {
+             if (attrName == "removeMole") {
                 var cell = message.content.attributeIntegerValue;
 
                 $("#whack_cell" + cell).removeClass("hasMole");
@@ -97,6 +112,31 @@ class Wackamole {
                     }, 5000);
                 }
             }
+
+            else if (attrName == 'mouseMove') {
+                console.log("received-> " + message.content.attributeStringValue )
+                var position = message.content.attributeStringValue.split(":");
+                this.teammates[message.sender].updatePosition(position[0], position[1]);
+            }
+            else if(attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
+                var cell = message.content.attributeIntegerValue;
+                if(!($("#whack_cell"+cell).hasClass("clicked"))) {
+
+                    if($("#whack_cell"+cell).hasClass("hasMole")){
+                        var newScore = parseInt($("#score").text()) + 1;
+                        $("#score").text(newScore);
+                    }
+
+                    $("#whack_cell" + cell).css('background-color', this.teammates[message.sender].color);
+                    $("#whack_cell" + cell).addClass('clicked');
+
+                    setTimeout(function () {
+                        $("#whack_cell" + cell).css('background-color', 'white');
+                        $("#whack_cell" + cell).removeClass('clicked');
+                    }, 1000); // TODO: change back to 500 after testing
+                }
+                console.log("click message recieved");
+            }
         }
     }
 
@@ -111,7 +151,6 @@ class Wackamole {
             self.maxMoleNumber = $("#maxMoleNumber").val();
             self.clickDelay = $("#clickDelay").val() * 1000;
 
-            // for single player
             $("#gameColumn").children().hide();
 
             // Show CountDown hovering over gameGrid and result table
@@ -120,7 +159,7 @@ class Wackamole {
             $("#gameColumn").addClass("after_modal_appended");
             $(".whack_grid").show();
             $("#informationColumn").children().show();
-            $(".fa-mouse-pointer").css("color", self.subjectColor);
+            $(".fa-mouse-pointer").css("color", self.teammates[self.subjectId].color);
             $("#loadingCountDown").html("Waiting for teammates...");
 
             self.memberReady++;
@@ -151,7 +190,13 @@ class Wackamole {
         var cell = parseInt($(event.target).data("cell-reference-index"));
 
         setTimeout(function () {
-            console.log("delay in click function" + self.clickDelay);
+
+            this.numberOfClicks++;
+            // broadcast mouse click
+            this.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
+                "", 0.0,
+                cell, false);
+
             if (!($("#whack_cell" + cell).hasClass("clicked"))) {
 
                 // increment score if a mole is present in cell
@@ -160,14 +205,9 @@ class Wackamole {
                     $("#score").text(newScore);
                 }
 
-                // change cell background color
-                $("#whack_cell" + cell).css('background-color', self.subjectColor);
-                $("#whack_cell" + cell).addClass('clicked');
+            $("#whack_cell" + cell).css('background-color', this.teammates[this.subjectId].color);
+            $("#whack_cell" + cell).addClass('clicked');
 
-                // Broadcast cell click
-                self.pogsPlugin.saveCompletedTaskAttribute('clickedCell',
-                    self.subjectColor, 0.0,
-                    cell, false);
 
                 // after 0.5 second the cell background change back to white
                 setTimeout(function () {
@@ -193,6 +233,17 @@ class Wackamole {
         this.pogsPlugin.saveCompletedTaskAttribute('addMole',
             "", 0.0,
             cell, false);
+    }
+
+    handleMouseMove(event) {
+        var offset = $('#wackamoleContainer').offset();
+        var x = event.pageX - offset.left;
+        var y = event.pageY - offset.top;
+        // broadcast mouse move
+        this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
+            x + ":" + y, 0.0,
+            0, false);
+        console.log("mouse move event" + x + ":" + y );
     }
 
     countDownTo(countDownDate, elementId) {
@@ -292,10 +343,36 @@ class Wackamole {
 
 }
 
+class Player {
+    constructor(id, name, color, isCurrentPlayer) {
+        this.externalId = id;
+        this.displayName = name;
+        this.color = color;
+        this.isCurrentPlayer = isCurrentPlayer;
+        this.setUpPointer();
+        // TODO: should score be tied to players?
+
+    }
+    setUpPointer() {
+        if(this.isCurrentPlayer) {
+            $("#myPointerColor").css("color", this.color);
+        }
+        else {
+            $("#pointerContainer").append('<i id="'+this.externalId+'Pointer" class="fa fa-mouse-pointer" style="color:'+this.color+';display:none"></i>')
+        }
+        console.log("init player "+this.externalId);
+        console.log("color: "+this.color);
+    }
+    updatePosition(x, y) {
+        $("#"+this.externalId+"Pointer").css({left: x+"px", top: y+"px", position:'absolute'}).show();
+    }
+}
 
 var wackamolePlugin = pogs.createPlugin('wackamoleTaskPlugin', function () {
     console.log("Wack-a-mole Plugin Loaded");
     var wackamole = new Wackamole(this);
-    wackamole.setupGrid("Wack-a-mole")
+    wackamole.setupGrid("Wack-a-mole", this.getTeammates())
     this.subscribeTaskAttributeBroadcast(wackamole.broadcastReceived.bind(wackamole))
+    console.log("teammates" + this.getTeammates());
+    wackamole.initPlayers(this.getTeammates(), this.getSubjectId());
 });
