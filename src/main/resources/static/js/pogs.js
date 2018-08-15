@@ -23,10 +23,16 @@ class Pogs {
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
 
-        this.hasCollaboration = config.hasCollaboration;
+
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
         this.hasCollaborationFeedbackWidget = config.hasCollaborationFeedbackWidget;
         this.hasCollaborationTodoListEnabled = config.hasCollaborationTodoListEnabled;
+
+        this.hasCollaboration = this.hasCollaborationVotingWidget||
+                                this.hasCollaborationFeedbackWidget||
+                                this.hasCollaborationTodoListEnabled;
+
+
 
         this.subjectCanTalkTo = config.subjectCanTalkTo;
 
@@ -84,7 +90,6 @@ class Pogs {
         for(var i=0; i< this.eventsUntilNow.length ; i++) {
 
             var event = this.eventsUntilNow[i];
-            console.log("Process " + event)
             if(event.type == "TASK_ATTRIBUTE"){
                 this.fireOldEvent(event,'taskAttributeBroadcast')
             }
@@ -103,8 +108,7 @@ class Pogs {
             var messageContent = JSON.parse(message.content);
             message.content = messageContent;
         }
-        console.log("Fire old Event" + message + " - event Name : " + eventName)
-        console.log(this.handlers[eventName])
+
         this.fire(message, eventName, this);
 
     }

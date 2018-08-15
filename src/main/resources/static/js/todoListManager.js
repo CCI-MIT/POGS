@@ -1,15 +1,16 @@
 'use strict';
 
 class TodoListManager {
-    constructor(pogsColaborationPlugin) {
-        this.pogsColaborationPlugin = pogsColaborationPlugin;
+    constructor(pogsCollaborationPlugin) {
+        this.pogsCollaborationPlugin = pogsCollaborationPlugin;
         this.setupHTML();
-        this.pogsColaborationPlugin.subscribeCollaborationBroadcast(this.onTodoBroadcastReceived.bind(this));
+        this.pogsCollaborationPlugin.subscribeCollaborationBroadcast(this.onTodoBroadcastReceived.bind(this));
     }
 
     setupHTML() {
-        this.createInitialHTML();
+
         $("#createTodoItem").click(this.createTodoItem.bind(this));
+
         $("#selfAssignTodoItem").click(this.selfAssignTodoItem.bind(this));
         $("#unassignTodoItem").click(this.unassignTodoItem.bind(this));
         $("#deleteTodoItem").click(this.deleteTodoItem.bind(this));
@@ -18,7 +19,10 @@ class TodoListManager {
     }
 
     createTodoItem(promptEntry) {
-        var todoText = prompt("Please describe the task (Max. 25 characters).", (promptEntry == '') ? ('') : (promptEntry));
+        if(typeof promptEntry != 'string'){
+            promptEntry = "";
+        }
+        var todoText = prompt("Please describe the task (Max. 25 characters).", promptEntry);
 
         if (todoText.length >= 26) {
             alert("Task description should be less than 25 characters.")
@@ -31,7 +35,8 @@ class TodoListManager {
     }
 
     createTodoEntry(todoText) {
-        this.pogsColaborationPlugin.sendMessage(todoText, TODO_TYPE.CREATE_TODO, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoText, TODO_TYPE.CREATE_TODO, COLLABORATION_TYPE.TODO_LIST);
+        console.log("Sending todo text message" + todoText)
     }
 
     selfAssignTodoItem(todoTaskId) {
@@ -46,7 +51,7 @@ class TodoListManager {
     }
 
     selfAssignTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.ASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.ASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
     }
 
     unassignTodoItem(todoTaskId) {
@@ -61,7 +66,7 @@ class TodoListManager {
     }
 
     unssignTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.UNASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.UNASSIGN_ME, COLLABORATION_TYPE.TODO_LIST);
     }
 
     deleteTodoItem(todoTaskId) {
@@ -76,7 +81,7 @@ class TodoListManager {
     }
 
     deleteTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.DELETE_TODO, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.DELETE_TODO, COLLABORATION_TYPE.TODO_LIST);
     }
 
     markDoneTodoItem(todoTaskId) {
@@ -91,7 +96,7 @@ class TodoListManager {
     }
 
     markDoneTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_DONE, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_DONE, COLLABORATION_TYPE.TODO_LIST);
     }
 
     markUndoneTodoItem(todoTaskId) {
@@ -106,10 +111,13 @@ class TodoListManager {
     }
 
     markUndoneTodoEntry(todoTaskId) {
-        this.pogsColaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_UNDONE, COLLABORATION_TYPE.TODO_LIST);
+        this.pogsCollaborationPlugin.sendMessage(todoTaskId, TODO_TYPE.MARK_UNDONE, COLLABORATION_TYPE.TODO_LIST);
     }
 
     onTodoBroadcastReceived(message) {
+        console.log("Should have list of todos here: ")
+        console.log(message);
+
         var todoEntries = message.content.todoEntries;
         for (var i = 0; i < todoEntries.length; i++) {
             if (!todoEntries[i].currentAssigned) {
@@ -128,7 +136,7 @@ class TodoListManager {
                         + '    </span>';
                     $("#todoListContainer").append(todoItem);
                 }
-            } else if (todoEntries[i].currentAssigned == this.pogsColaborationPlugin.getSubjectId()){
+            } else if (todoEntries[i].currentAssigned == this.pogsCollaborationPlugin.getSubjectId()){
                 if (!todoEntries[i].markDone) {
 
                     var todoItem = '<i class="badge badge-primary">\n'
@@ -154,7 +162,7 @@ class TodoListManager {
                     var todoItem = '<i class="badge badge-primary">\n'
                         + '        <i class="far fa-square" id="markDoneTodoItem" data-todoid="' + todoEntries[i].todo_entry_id + '"></i>\n'
                         + '        <span> ' + todoEntries[i].text + '</span>\n'
-                        + '        <span class="badge badge-success">'+ this.pogsColaborationPlugin.getSubjectByExternalId(todoEntries[i].externalId)+'</span>\n'
+                        + '        <span class="badge badge-success">'+ this.pogsCollaborationPlugin.getSubjectByExternalId(todoEntries[i].externalId)+'</span>\n'
                         + '        <i class="fa fa-trash-alt" id="deleteTodoItem" data-todoid="' + todoEntries[i].todo_entry_id + '"></i>\n'
                         + '    </span>';
                     $("#todoListContainer").append(todoItem);
@@ -162,7 +170,7 @@ class TodoListManager {
                     var todoItem = '<i class="badge badge-primary">\n'
                         + '        <i class="fas fa-check-square" id="markUndoneTodoItem" data-todoid="' + todoEntries[i].todo_entry_id + '"></i>\n'
                         + '        <span> ' + todoEntries[i].text + '</span>\n'
-                        + '        <span class="badge badge-success">'+ this.pogsColaborationPlugin.getSubjectByExternalId(todoEntries[i].externalId)+'</span>\n'
+                        + '        <span class="badge badge-success">'+ this.pogsCollaborationPlugin.getSubjectByExternalId(todoEntries[i].externalId)+'</span>\n'
                         + '        <i class="fa fa-trash-alt" id="deleteTodoItem" data-todoid="' + todoEntries[i].todo_entry_id + '"></i>\n'
                         + '    </span>';
                     $("#todoListContainer").append(todoItem);
@@ -172,10 +180,7 @@ class TodoListManager {
     }
 
 
-    createInitialHTML() {
-        return '<div id="todoListContainer">\n' +
-            '        <button id = "createTodoItem">Create Todo Entry</button></div>';
-    }
+
 
 }
 

@@ -266,13 +266,13 @@ public class WorkspaceController {
 
 
         List<SubjectCommunication> subjectCommunications =
-                subjectCommunicationDao.listByFromSubjectId(su.getId()) ;
+                subjectCommunicationDao.listByFromSubjectId(su.getId());
 
         JSONArray allowedToTalkTo = new JSONArray();
-        if(subjectCommunications!=null) {
+        if (subjectCommunications != null) {
             for (SubjectCommunication sc : subjectCommunications) {
                 Subject subject = subjectDao.get(sc.getToSubjectId());
-                if(sc.getAllowed()) {
+                if (sc.getAllowed()) {
                     allowedToTalkTo.add(subject.getSubjectExternalId());
                 }
             }
@@ -281,13 +281,12 @@ public class WorkspaceController {
 
         List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listBySubjectId(su.getId());
         JSONArray channelSubjectIsIn = new JSONArray();
-        if(subjectHasChannels!=null) {
-            for(SubjectHasChannel shc: subjectHasChannels){
+        if (subjectHasChannels != null) {
+            for (SubjectHasChannel shc : subjectHasChannels) {
                 ChatChannel chatChannel = chatChannelDao.get(shc.getChatChannelId());
                 channelSubjectIsIn.add(chatChannel.getChannelName());
             }
         }
-
 
 
         if (task != null && round != null) {
@@ -308,7 +307,7 @@ public class WorkspaceController {
 
                 model.addAttribute("subject", su);
                 model.addAttribute("subjectCanTalkTo", allowedToTalkTo);
-                model.addAttribute("channelSubjectIsIn",channelSubjectIsIn);
+                model.addAttribute("channelSubjectIsIn", channelSubjectIsIn);
 
 
                 model.addAttribute("task", new TaskWrapper(task));
@@ -326,12 +325,12 @@ public class WorkspaceController {
                 }
                 model.addAttribute("pogsSession", sessionWrapper);
 
-                if(sessionWrapper.isTaskExecutionModeParallel()) {
-                    model.addAttribute("hasTabs", true );
+                if (sessionWrapper.isTaskExecutionModeParallel()) {
+                    model.addAttribute("hasTabs", true);
                     model.addAttribute("taskList", sessionWrapper.getTaskList());
                     //add all tasks
-                }else{
-                    model.addAttribute("hasTabs", false );
+                } else {
+                    model.addAttribute("hasTabs", false);
                 }
 
                 String cc = sessionWrapper.getCommunicationType();
@@ -344,15 +343,28 @@ public class WorkspaceController {
 
                 boolean hasCollaborationTodoListEnabled = sessionWrapper
                         .getCollaborationTodoListEnabled();
-                model.addAttribute("hasCollaborationTodoListEnabled",hasCollaborationTodoListEnabled);
+                if (task.getCollaborationTodoListEnabled() != null) {
+                    hasCollaborationTodoListEnabled = task.getCollaborationTodoListEnabled();
+                }
+                model.addAttribute("hasCollaborationTodoListEnabled", hasCollaborationTodoListEnabled);
+
                 boolean hasCollaborationFeedbackWidget = sessionWrapper
                         .getCollaborationFeedbackWidgetEnabled();
-                model.addAttribute("hasCollaborationFeedbackWidget",hasCollaborationFeedbackWidget);
+
+
+                if (task.getCollaborationFeedbackWidgetEnabled() != null) {
+                    hasCollaborationFeedbackWidget = task.getCollaborationFeedbackWidgetEnabled();
+                }
+                model.addAttribute("hasCollaborationFeedbackWidget", hasCollaborationFeedbackWidget);
+
                 boolean hasCollaborationVotingWidget = sessionWrapper
                         .getCollaborationVotingWidgetEnabled();
 
-                model.addAttribute("hasCollaborationVotingWidget",hasCollaborationVotingWidget);
+                if (task.getCollaborationVotingWidgetEnabled() != null) {
+                    hasCollaborationVotingWidget = task.getCollaborationVotingWidgetEnabled();
+                }
 
+                model.addAttribute("hasCollaborationVotingWidget", hasCollaborationVotingWidget);
 
                 model.addAttribute("secondsRemainingCurrentUrl",
                         sr.getSession().getSecondsRemainingForCurrentUrl());
@@ -386,9 +398,9 @@ public class WorkspaceController {
                 model.addAttribute("completedTask", completedTask);
 
 
-                List<EventLog> allLogsUntilNow = eventLogDao.listLogsUntil(completedTask.getId(),new Date());
+                List<EventLog> allLogsUntilNow = eventLogDao.listLogsUntil(completedTask.getId(), new Date());
                 JSONArray allLogs = new JSONArray();
-                for(EventLog el : allLogsUntilNow){
+                for (EventLog el : allLogsUntilNow) {
                     allLogs.add(getLogJson(el));
                 }
 

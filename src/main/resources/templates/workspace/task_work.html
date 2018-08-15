@@ -15,6 +15,9 @@
           </li>
         </ul>
     </div>
+
+    <div id="todoListContainer" class="flex-column w-100" style="padding-top: 5px" th:if="${hasCollaborationTodoListEnabled}"><button id = "createTodoItem" class="btn btn-outline-primary btn-sm">Create Todo Entry</button></div>
+
     <style  th:inline="text">
 
         /*<![CDATA[*/
@@ -43,23 +46,23 @@
 
 
                     pogs.setup({
-                                   currentUrl: window.location,
-                                   sessionId: '[(${pogsSession.id})]',
-                                   subjectId: '[(${subject.subjectExternalId})]',
-                                   subjectCanTalkTo: [(${subjectCanTalkTo})],
-                                   channelSubjectIsIn: [(${channelSubjectIsIn})],
-                                   secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
-                                   nextUrl : '[(${nextUrl})]',
-                                   teammates: [(${teammates})],
-                                   taskConfigurationAttributes: [(${taskConfigurationAttributes})],
-                                   completedTaskId:'[(${completedTask.id})]',
-                                   hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
-                                   hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
-                                   hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
-                                   hasChat: [(${hasChat})],
-                                   eventsUntilNow: [(${eventsUntilNow})],
-                                   communicationType: '[(${communicationType})]'
-                               });
+                       currentUrl: window.location,
+                       sessionId: '[(${pogsSession.id})]',
+                       subjectId: '[(${subject.subjectExternalId})]',
+                       subjectCanTalkTo: [(${subjectCanTalkTo})],
+                       channelSubjectIsIn: [(${channelSubjectIsIn})],
+                       secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                       nextUrl : '[(${nextUrl})]',
+                       teammates: [(${teammates})],
+                       taskConfigurationAttributes: [(${taskConfigurationAttributes})],
+                       completedTaskId:'[(${completedTask.id})]',
+                       hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
+                       hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
+                       hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
+                       hasChat: [(${hasChat})],
+                       eventsUntilNow: [(${eventsUntilNow})],
+                       communicationType: '[(${communicationType})]'
+                   });
 
 
                 });

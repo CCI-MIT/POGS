@@ -38,7 +38,6 @@ class CommunicationPlugin extends PogsPlugin {
         this.initFunc = this.init;
     }
     init(){
-            console.log("Init config : " + this.pogsRef.communicationType);
             if (this.pogsRef.communicationType == COMMUNICATION_TYPE.GROUP_CHAT) {
                 var gcm = new GroupChatManager(this);
                 gcm.changeChannelTo(CHAT_BODY.GROUP.htmlRef, CHAT_BODY.GROUP.displayString, null);
@@ -51,9 +50,6 @@ class CommunicationPlugin extends PogsPlugin {
             if(this.pogsRef.communicationType == COMMUNICATION_TYPE.MATRIX_CHAT) {
                 var mtm = new MatrixChatManager(this);
                 mtm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
-                // get the constraint matrix
-                // get the subchannel configs
-
             }
 
 
@@ -265,7 +261,7 @@ class MatrixChatManager extends GroupChatManager {
     }
     onCommunicationBroadcastReceived(message) {
         var isOwnMessage = false;
-        console.log("Message.sender" + message.sender);
+
 
         if (message.sender == this.communicationPluginReference.getSubjectId()) {
             isOwnMessage = true;
@@ -276,8 +272,6 @@ class MatrixChatManager extends GroupChatManager {
         }
         if (message.content.type == CHAT_TYPE.MESSAGE) {
 
-            //if is private chat message.content.channel.indexOf("chat_")
-            //if is channel
             if (message.content.message != "") {
                 var originChatName = "";
 
@@ -314,6 +308,7 @@ class MatrixChatManager extends GroupChatManager {
                                 this.resolveSubjectDisplayName(message.sender),
                                 new Date()));
                     }else{
+
                         $("#channelBody_" + message.content.channel).append(
                             this.createOwnMessageHTML(message.content.message,
                                                       this.resolveSubjectDisplayName(
@@ -525,8 +520,7 @@ class DyadicChatManager extends GroupChatManager {
             this.requestSent = $(event.target).data("externalid");
 
             this.setBusyStatus();
-            console.log("Request sent from: " + this.communicationPluginReference.getSubjectId() +
-                        " to :" + $(event.target).data("externalid"));
+
             this.changeChannelTo("requestsent", "Waiting ...", this.requestSent);
             this.sendMessage("", this.channel, CHAT_TYPE.REQUEST_CHAT, this.requestSent);
         }else{

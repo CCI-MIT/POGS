@@ -33,10 +33,11 @@ class CollaborationPlugin extends PogsPlugin {
     }
 
     init() {
-        console.log("Init");
+        console.log("Init collab prlugin");
 
         if (this.pogsRef.hasCollaborationTodoListEnabled) {
             new TodoListManager(this);
+            console.log("hasTodoFeature");
         }
         if (this.pogsRef.hasCollaborationVotingWidget) {
             console.log("HasCollaboratonVoting");
@@ -51,13 +52,14 @@ class CollaborationPlugin extends PogsPlugin {
         this.pogsRef.subscribe('collaborationMessage', funct);
     }
 
-    sendMessage(message, type) {
+    sendMessage(message, messageType, collaborationType) {
 
         var messageContent = {
             message: message,
-            type: type
+            collaborationType: collaborationType,
+            messageType: messageType
         };
-
+        console.log()
         this.pogsRef.sendMessage("/pogsapp/collaboration.sendMessage", "COLLABORATION_MESSAGE",
                                  messageContent,
                                  this.getSubjectId(), null, this.getCompletedTaskId(),

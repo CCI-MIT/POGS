@@ -404,6 +404,9 @@ public class SessionRunner implements Runnable {
         runSession();
     }
 
+    public Map<String,Subject> getAllCheckedInSubjects(){
+        return checkedInWaitingSubjectList;
+    }
 
     public SessionWrapper getSession() {
         return session;
