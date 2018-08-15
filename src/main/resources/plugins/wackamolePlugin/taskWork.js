@@ -193,7 +193,7 @@ class Wackamole {
 
             this.numberOfClicks++;
             // broadcast mouse click
-            this.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
+            self.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
                 "", 0.0,
                 cell, false);
 
@@ -205,7 +205,7 @@ class Wackamole {
                     $("#score").text(newScore);
                 }
 
-            $("#whack_cell" + cell).css('background-color', this.teammates[this.subjectId].color);
+            $("#whack_cell" + cell).css('background-color', self.teammates[self.subjectId].color);
             $("#whack_cell" + cell).addClass('clicked');
 
 
