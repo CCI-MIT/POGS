@@ -114,7 +114,6 @@ class Wackamole {
             }
 
             else if (attrName == 'mouseMove') {
-                console.log("received-> " + message.content.attributeStringValue )
                 var position = message.content.attributeStringValue.split(":");
                 this.teammates[message.sender].updatePosition(position[0], position[1]);
             }
@@ -159,7 +158,7 @@ class Wackamole {
             $("#gameColumn").addClass("after_modal_appended");
             $(".whack_grid").show();
             $("#informationColumn").children().show();
-            $(".fa-mouse-pointer").css("color", self.teammates[self.subjectId].color);
+            // $(".fa-mouse-pointer").css("color", self.teammates[self.subjectId].color);
             $("#loadingCountDown").html("Waiting for teammates...");
 
             self.memberReady++;
@@ -243,7 +242,6 @@ class Wackamole {
         this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
             x + ":" + y, 0.0,
             0, false);
-        console.log("mouse move event" + x + ":" + y );
     }
 
     countDownTo(countDownDate, elementId) {
