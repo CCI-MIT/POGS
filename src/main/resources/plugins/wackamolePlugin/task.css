@@ -17,6 +17,15 @@
     border: solid;
 }
 
+.gameColumn {
+    color: black;
+    float: left;
+    width: 80%;
+    padding: 10px;
+    align-items: center;
+    border: solid;
+}
+
 #informationColumn {
     color: black;
     float: left;

@@ -8,6 +8,7 @@ class Wackamole {
         this.clickDelay = 0;
         this.subjectColors = ["red", "green", "blue", "purple", "aqua"]; // maximum no. of players = 5
         this.numberOfClicks = 0; // TODO: keep track of the number of clicks
+        this.totalScore = 0; // Change later
         console.log(pogsPlugin);
     }
 
@@ -319,6 +320,8 @@ class Wackamole {
                 document.getElementById("roundTimeRemain").innerHTML = "GameOver";
                 $(".whack_gametable-cell").find('.fa-optin-monster').remove();
                 $(".whack_gametable-cell").removeClass("hasMole");
+                self.displayEvaluationForm();
+
             }
         }, 100); // This is mole appear frequency when moleNum is less than maxMoleNum
     }
@@ -337,6 +340,20 @@ class Wackamole {
         var dataURL = canvas.toDataURL('image/png')
         $('#wackamoleContainer').css('cursor', 'url(' + dataURL + '), auto');
         $('.whack_gametable-cell').css('cursor', 'url(' + dataURL + '), auto');
+    }
+
+    displayEvaluationForm() {
+        var str='';
+        for( var id in this.teammates) {
+            var player = this.teammates[id];
+            if(player.externalId != this.subjectId) {
+                str += "<div class='row mar m-3'>" +
+                    "<div class='col-md-1 offset-md-6 rounded' style='background-color:red;'></div>" +
+                    "<div class='col-md-3'><input type='text' class='form-control' id='value1'></div></div>";
+            }
+        }
+        $("#gameColumn").hide();
+        $("#playerEvalList").append(str).show();
     }
 
 }
