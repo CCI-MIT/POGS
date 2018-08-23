@@ -170,3 +170,49 @@ body {
     transform: translate3d(4px, 0, 0);
   }
 }
+
+.todoEntry{
+  margin: 4px;
+}
+.deleteTodoItem{
+  cursor: pointer;
+}
+.assignTodoItem{
+  cursor: pointer;
+  margin-left: 3px;
+  margin-right: 3px;
+}
+.unassignTodoItem{
+  cursor: pointer;
+}
+.markDoneTodoItem{
+  cursor: pointer;
+}
+.deleteOption{
+  margin-top: 5px;
+  cursor: pointer;
+}
+.radioOption{
+  margin-right: 5px;
+}
+.votingBadge{
+  margin: 4px;
+  cursor: pointer;
+}
+.progressPosition{
+  margin-top: 7px;
+  width: 150px;
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.optionText{
+  margin: 4px;
+}
+.addVotingOption {
+  cursor: pointer;
+}
+.assigneePill{
+  margin-left: 2px;
+  margin-right: 2px;
+}

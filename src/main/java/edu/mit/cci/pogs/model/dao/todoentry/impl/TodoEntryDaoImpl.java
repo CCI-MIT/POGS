@@ -37,7 +37,9 @@ public class TodoEntryDaoImpl extends AbstractDao<TodoEntry, Long, TodoEntryReco
         final SelectQuery<Record> query = dslContext.select()
                 .from(TODO_ENTRY).getQuery();
         query.addConditions(TODO_ENTRY.COMPLETED_TASK_ID.eq(completedTaskId));
+        query.addConditions(TODO_ENTRY.DELETED_AT.isNull());
         query.addOrderBy(TODO_ENTRY.TODO_ENTRY_DATE);
+
         return query.fetchInto(TodoEntry.class);
     }
 }

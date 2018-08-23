@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface VotingPoolOptionDao extends Dao<VotingPoolOption, Long> {
     List<VotingPoolOption> list();
+    List<VotingPoolOption> listByVotingPoolId(Long votingPoolId);
+    void deleteByVotingPoolId(Long votingPoolId);
+    void delete(Long votingPoolId);
 }
