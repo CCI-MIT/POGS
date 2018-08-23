@@ -38,9 +38,9 @@ UNLOCK TABLES;
 
 LOCK TABLES `session` WRITE;
 /*!40000 ALTER TABLE `session` DISABLE KEYS */;
-INSERT INTO `session` VALUES (1,'s01','2018-06-26 23:00:00',1,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','carlos_bot',0,'T',0,1,0,1,'S','C',2,NULL,'C',''),(2,'s02','2018-06-27 01:04:00',2,'S',300,1,'This is the intro',10,1,10,1,10,1,'Thanks',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,0,0,0,'S','C',2,NULL,'C','');
+INSERT INTO `session` VALUES (1,'s01','2018-06-26 23:00:00',1,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','carlos_bot',0,'T',0,1,0,1,'S','C',2,NULL,'C','',0),(2,'s02','2018-06-27 01:04:00',2,'S',300,1,'This is the intro',10,1,10,1,10,1,'Thanks',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,0,0,0,'S','C',2,NULL,'C','',0);
 /* for wack-a-mole plugin */
-INSERT INTO `session` VALUES (3,'s03','2018-08-03 23:00:00',3,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,1,0,1,'S','C',2,NULL,'C','');
+INSERT INTO `session` VALUES (3,'s03','2018-08-03 23:00:00',3,'S',300,1,'Intro page',10,1,10,1,10,1,'Thanks for this session',100,'http://www.google.com.br','Could not assign all people to groups ','S',1,1,'G','',0,'T',0,1,0,1,'S','C',2,NULL,'C','',0);
 /*!40000 ALTER TABLE `session` ENABLE KEYS */;
 UNLOCK TABLES;
 
