@@ -96,4 +96,95 @@ public class Operation {
         }
         return outputText;
     }
+
+    /**
+     * Composes this operation with another operation, that is applied after this one.
+     *
+     * This produces one operation that, whose output is equal to that of this operation and the
+     * given operation being applied consecutively.
+     *
+     * The following must hold:
+     * b.apply(a.apply(S)) == a.compose(b).apply(S)
+     *
+     * @param operationB The operation to compose with this one.
+     * @return An operation that applies this operation and then the passed operation.
+     */
+    public Operation compose(Operation operationB) {
+
+        if (targetLength != operationB.baseLength) {
+            throw new IllegalArgumentException(String.format("The second operation's "
+                            + "baseLength (%d) must be the first operation's targetLength (%d).",
+                    operationB.baseLength, targetLength));
+        }
+
+        Operation composedOperation = Operation.begin();
+
+        Deque<OperationComponent> componentsA = new ArrayDeque<>(components);
+        Deque<OperationComponent> componentsB = new ArrayDeque<>(operationB.components);
+
+        while (!(componentsA.isEmpty() && componentsB.isEmpty())) {
+            OperationComponent componentA = componentsA.peek();
+            OperationComponent componentB = componentsB.peek();
+
+            if (isDelete(componentA)) {
+                composedOperation.add(componentsA.pop());
+                continue;
+            }
+
+            if (isInsert(componentB)) {
+                composedOperation.add(componentsB.pop());
+                continue;
+            }
+
+            if (componentA == null) {
+                throw new IllegalArgumentException("Operation a is too short.");
+            }
+
+            if (componentB == null) {
+                throw new IllegalArgumentException("Operation b is too short.");
+            }
+
+            if (componentA.size() > componentB.size()) {
+                advance(componentsA, componentB.size());
+                composedOperation.add(componentsB.pop());
+            } else if (componentA.size() < componentB.size()) {
+                composedOperation.add(componentsA.pop());
+                advance(componentsB, componentA.size());
+            } else {
+                //components have the same size
+                if (isRetain(componentA) && isRetain(componentB)) {
+                    composedOperation.add(componentsA.pop());
+                    componentsB.remove();
+                } else if (isRetain(componentA) && isDelete(componentB)) {
+                    composedOperation.add(componentsB.pop());
+                    componentsA.remove();
+                } else if (isInsert(componentA) && isDelete(componentB)) {
+                    componentsA.remove();
+                    componentsB.remove();
+                } else if (isInsert(componentA) && isRetain(componentB)) {
+                    composedOperation.add(componentsA.pop());
+                    componentsB.remove();
+                }
+            }
+        }
+
+        return composedOperation;
+    }
+
+    private static boolean isRetain(OperationComponent component) {
+        return component instanceof RetainComponent;
+    }
+
+    private static boolean isInsert(OperationComponent component) {
+        return component instanceof InsertComponent;
+    }
+
+    private static boolean isDelete(OperationComponent component) {
+        return component instanceof DeleteComponent;
+    }
+
+    private static void advance(Deque<OperationComponent> components, int advanceBy) {
+        final OperationComponent oldComponent = components.pop();
+        components.addFirst(oldComponent.advance(advanceBy));
+    }
 }
