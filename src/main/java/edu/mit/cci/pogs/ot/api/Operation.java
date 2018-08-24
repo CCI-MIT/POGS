@@ -3,6 +3,8 @@ package edu.mit.cci.pogs.ot.api;
 import edu.mit.cci.pogs.ot.api.components.DeleteComponent;
 import edu.mit.cci.pogs.ot.api.components.InsertComponent;
 import edu.mit.cci.pogs.ot.api.components.RetainComponent;
+import edu.mit.cci.pogs.ot.dto.OperationComponentDto;
+import edu.mit.cci.pogs.ot.dto.OperationDto;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -13,7 +15,8 @@ import java.util.List;
 
 public class Operation {
 
-    private int id;
+    private Long padId;
+    private Integer id;
     private int parentId;
 
     private int baseLength = 0;
@@ -22,15 +25,25 @@ public class Operation {
 
     private OperationMetaData metaData;
 
-    private Operation() {
 
+    private Operation(int parentId) {
+        this.parentId = parentId;
     }
 
-    public int getId() {
+
+    public Long getPadId() {
+        return padId;
+    }
+
+    public void setPadId(Long padId) {
+        this.padId = padId;
+    }
+
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -69,7 +82,23 @@ public class Operation {
     }
 
     public static Operation begin() {
-        return new Operation();
+        return new Operation(-1);
+    }
+
+    public static Operation begin(int parentId) {
+        return new Operation(parentId);
+    }
+
+    public static Operation fromDto(OperationDto dto) {
+        final Operation operation = new Operation(dto.getParentId());
+        operation.setPadId(dto.getPadId());
+        operation.setId(dto.getId());
+        operation.setMetaData(dto.getMetaData());
+
+        for (OperationComponentDto component : dto.getComponents()) {
+            operation.add(component.toComponent());
+        }
+        return operation;
     }
 
     public Operation retain(int retain) {
@@ -220,8 +249,9 @@ public class Operation {
         if (operationA.parentId != operationB.parentId) {
             throw new IllegalArgumentException("Both operations must have the same parent.");
         }
-
-
+        if (operationA.getId() != null) {
+            operationB.setParentId(operationA.getId());
+        }
 
         Operation operationAPrime = Operation.begin();
         Operation operationBPrime = Operation.begin();
