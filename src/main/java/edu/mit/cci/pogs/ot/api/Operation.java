@@ -12,12 +12,13 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
+import java.util.Objects;
 
 public class Operation {
 
     private Long padId;
     private Integer id;
-    private int parentId;
+    private Integer parentId;
 
     private int baseLength = 0;
     private int targetLength = 0;
@@ -47,7 +48,7 @@ public class Operation {
         this.id = id;
     }
 
-    public int getParentId() {
+    public Integer getParentId() {
         return parentId;
     }
 
@@ -101,6 +102,20 @@ public class Operation {
         return operation;
     }
 
+    public OperationDto toDto() {
+        final OperationDto dto = new OperationDto();
+        dto.setPadId(padId);
+        dto.setId(id);
+        dto.setMetaData(metaData);
+
+        final ArrayList<OperationComponentDto> componentDtos = new ArrayList<>();
+        for (OperationComponent component : components) {
+            componentDtos.add(OperationComponentDto.from(component));
+            dto.setComponents(componentDtos);
+        }
+        return dto;
+    }
+
     public Operation retain(int retain) {
         add(new RetainComponent(retain));
         return this;
@@ -113,6 +128,16 @@ public class Operation {
 
     public Operation delete(String payload) {
         add(new DeleteComponent(payload));
+        return this;
+    }
+
+    public Operation withPadId(long padId) {
+        this.padId = padId;
+        return this;
+    }
+
+    public Operation withMetaData(OperationMetaData metaData) {
+        this.setMetaData(metaData);
         return this;
     }
 
@@ -156,7 +181,13 @@ public class Operation {
                     operationB.baseLength, targetLength));
         }
 
-        Operation composedOperation = Operation.begin();
+        if (metaData.getAuthorId() != operationB.metaData.getAuthorId()) {
+            throw new IllegalArgumentException("Cannot compose operations from different authors");
+        }
+
+        Operation composedOperation = Operation.begin()
+                .withPadId(padId)
+                .withMetaData(metaData);
 
         Deque<OperationComponent> componentsA = new ArrayDeque<>(components);
         Deque<OperationComponent> componentsB = new ArrayDeque<>(operationB.components);
@@ -246,15 +277,16 @@ public class Operation {
                     operationA.baseLength, operationB.baseLength));
         }
 
-        if (operationA.parentId != operationB.parentId) {
+        if (!Objects.equals(operationA.parentId, operationB.parentId)) {
             throw new IllegalArgumentException("Both operations must have the same parent.");
         }
-        if (operationA.getId() != null) {
-            operationB.setParentId(operationA.getId());
-        }
 
-        Operation operationAPrime = Operation.begin();
-        Operation operationBPrime = Operation.begin();
+        Operation operationAPrime = Operation.begin(operationA.getId())
+                                             .withPadId(padId)
+                                             .withMetaData(operationA.getMetaData());
+        Operation operationBPrime = Operation.begin(operationA.getId())
+                                             .withPadId(padId)
+                                             .withMetaData(operationB.getMetaData());
 
         Deque<OperationComponent> componentsA = new ArrayDeque<>(components);
         Deque<OperationComponent> componentsB = new ArrayDeque<>(operationB.components);

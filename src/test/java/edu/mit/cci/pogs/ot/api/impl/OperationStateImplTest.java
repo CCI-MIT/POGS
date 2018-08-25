@@ -98,5 +98,4 @@ public class OperationStateImplTest {
         assertEquals("Multiple concurrent operation not transformed correctly",
                 "Lorem ipsum dolor sit amet. goat orange fox", operationState.getText());
     }
-
 }

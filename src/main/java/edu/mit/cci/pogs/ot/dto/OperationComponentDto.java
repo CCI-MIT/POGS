@@ -10,7 +10,6 @@ public class OperationComponentDto {
     private ComponentType type;
     private int retain;
     private String payload;
-    private int lengthChange;
 
     public static OperationComponentDto from(OperationComponent component) {
         if (component instanceof RetainComponent) {
@@ -22,13 +21,11 @@ public class OperationComponentDto {
             final OperationComponentDto dto = new OperationComponentDto();
             dto.type = ComponentType.INSERT;
             dto.payload = component.getPayload();
-            dto.lengthChange = component.getLengthChange();
             return dto;
         } else if (component instanceof DeleteComponent) {
             final OperationComponentDto dto = new OperationComponentDto();
             dto.type = ComponentType.DELETE;
             dto.payload = component.getPayload();
-            dto.lengthChange = component.getLengthChange();
             return dto;
         }
         throw new IllegalArgumentException("Unknown component type " + component.getClass());
@@ -69,14 +66,6 @@ public class OperationComponentDto {
 
     public void setPayload(String payload) {
         this.payload = payload;
-    }
-
-    public int getLengthChange() {
-        return lengthChange;
-    }
-
-    public void setLengthChange(int lengthChange) {
-        this.lengthChange = lengthChange;
     }
 
     public enum ComponentType {
