@@ -2,7 +2,7 @@ package edu.mit.cci.pogs.ot.api.components;
 
 import edu.mit.cci.pogs.ot.api.OperationComponent;
 
-public class InsertComponent extends OperationComponent {
+public final class InsertComponent extends OperationComponent {
 
     public InsertComponent(String payload) {
         super(0, payload, payload.length());

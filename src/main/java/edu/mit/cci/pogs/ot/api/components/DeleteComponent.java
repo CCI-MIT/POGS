@@ -2,7 +2,7 @@ package edu.mit.cci.pogs.ot.api.components;
 
 import edu.mit.cci.pogs.ot.api.OperationComponent;
 
-public class DeleteComponent extends OperationComponent {
+public final class DeleteComponent extends OperationComponent {
 
     public DeleteComponent(String payload) {
         super(0, payload, -payload.length());

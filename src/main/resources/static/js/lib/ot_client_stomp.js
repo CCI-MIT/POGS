@@ -25,7 +25,7 @@ ot.StompOtClient = (function() {
         /**
          * Programmatically update the content of the input.
          *
-         * Programmatic updates to not fire the input event, so the update needs to
+         * Programmatic updates do not fire the input event, so the update needs to
          * manually set the data attribute correctly.
          *
          * @param newContent

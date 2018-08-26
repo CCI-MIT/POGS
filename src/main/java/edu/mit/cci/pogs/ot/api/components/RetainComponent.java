@@ -2,7 +2,7 @@ package edu.mit.cci.pogs.ot.api.components;
 
 import edu.mit.cci.pogs.ot.api.OperationComponent;
 
-public class RetainComponent extends OperationComponent {
+public final class RetainComponent extends OperationComponent {
 
     public RetainComponent(int retain) {
         super(retain, "", 0);

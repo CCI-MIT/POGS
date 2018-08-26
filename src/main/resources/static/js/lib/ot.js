@@ -113,8 +113,8 @@ let ot = {};
             this.id = null;
             this.parentId = parentId;
             this.metaData = {
-                'authorId': authorId,
-                'timestamp': new Date().getTime() / 1000
+                authorId: authorId,
+                timestamp: new Date().getTime() / 1000
             };
 
             this._baseLength = 0;
