@@ -39,4 +39,6 @@ public interface OperationState {
      * @return the current text
      */
     String getText();
+
+    List<Operation> getAllOperations();
 }

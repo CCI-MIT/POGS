@@ -59,4 +59,9 @@ public class OperationStateImpl implements OperationState {
     public String getText() {
         return text;
     }
+
+    @Override
+    public List<Operation> getAllOperations() {
+        return new ArrayList<>(operations);
+    }
 }

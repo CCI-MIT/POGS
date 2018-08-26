@@ -6,6 +6,7 @@ import edu.mit.cci.pogs.ot.api.impl.OperationStateImpl;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -38,5 +39,10 @@ public class OperationService {
         }
 
         return operationState.apply(operation);
+    }
+
+    public List<Operation> getAllOperations(long padId) {
+        final OperationState operationState = serverStates.get(padId);
+        return operationState.getAllOperations();
     }
 }
