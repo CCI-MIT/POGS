@@ -14,6 +14,8 @@ public abstract class OperationComponent {
 
     public abstract String apply(String text, int cursorPosition);
 
+    public abstract OperationComponent merge(OperationComponent otherComponent);
+
     public int getRetain() {
         return retain;
     }

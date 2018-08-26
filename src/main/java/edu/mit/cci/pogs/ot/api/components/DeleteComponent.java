@@ -22,6 +22,15 @@ public class DeleteComponent extends OperationComponent {
     }
 
     @Override
+    public OperationComponent merge(OperationComponent otherComponent) {
+        if (!(otherComponent instanceof DeleteComponent)) {
+            throw new IllegalArgumentException("Cannot merge with component of type: "
+                    + otherComponent.getClass());
+        }
+        return new DeleteComponent(getPayload() + otherComponent.getPayload());
+    }
+
+    @Override
     public OperationComponent advance(int advanceBy) {
         return new DeleteComponent(getPayload().substring(advanceBy));
     }

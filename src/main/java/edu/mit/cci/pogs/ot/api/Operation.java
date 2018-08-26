@@ -57,6 +57,14 @@ public class Operation {
         if (targetLength < 0) {
             throw new IllegalArgumentException("Operation would reduce target length below zero.");
         }
+        if (!components.isEmpty()) {
+            final int lastComponentIndex = components.size() - 1;
+            final OperationComponent lastComponent = components.get(lastComponentIndex);
+            if (lastComponent.getClass() == component.getClass()) {
+                components.set(lastComponentIndex, lastComponent.merge(component));
+                return;
+            }
+        }
         components.add(component);
     }
 
