@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.ot.api;
 
+import edu.mit.cci.pogs.ot.api.Operation.TransformedOperationPair;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -162,5 +163,183 @@ public class OperationTest {
         final Operation composedOperation = opA.compose(opB);
         final String result = composedOperation.apply(inputString);
         assertEquals("Multiple operations not composed correctly", expected, result);
+    }
+
+    /*
+     * ================================
+     * ======== test transform() ========
+     * ================================
+     */
+
+    @Test
+    public void testTransform__givenTwoInserts__shouldMoveSecondForward() {
+        final TransformTestInput testInput = getTransformTestInputForTwoInserts();
+        assertTransformedOutputMatches("Two insert operations not transformed correctly",
+                testInput);
+    }
+
+    @Test
+    public void testTransform__givenTwoInserts__shouldInvariantHold() {
+        final TransformTestInput testInput = getTransformTestInputForTwoInserts();
+        assertTransformInvariantHolds(testInput);
+    }
+
+    private TransformTestInput getTransformTestInputForTwoInserts() {
+        final Operation opA = Operation.begin()
+                                       .insert("go");
+        final Operation opB = Operation.begin()
+                                       .insert("at");
+
+        final String inputString = "";
+        final String expected = "goat";
+
+        return new TransformTestInput(opA, opB, inputString, expected);
+    }
+
+
+    @Test
+    public void testTransform__givenTwoEquivalentDeletes__shouldChangeNothing() {
+        final TransformTestInput testInput = getTransformTestInputForTwoEquivalentDeletes();
+        assertTransformedOutputMatches("Two equivalent deletes not transformed correctly",
+                testInput);
+    }
+
+    @Test
+    public void testTransform__givenTwoEquivalentDeletes__shouldInvariantHold() {
+        final TransformTestInput testInput = getTransformTestInputForTwoEquivalentDeletes();
+        assertTransformInvariantHolds(testInput);
+    }
+
+    private TransformTestInput getTransformTestInputForTwoEquivalentDeletes() {
+        final Operation opA = Operation.begin()
+                                       .delete("go")
+                                       .retain(2);
+        final Operation opB = Operation.begin()
+                                       .delete("go")
+                                       .retain(2);
+
+        final String inputString = "goat";
+        final String expected = "at";
+
+        return new TransformTestInput(opA, opB, inputString, expected);
+    }
+
+
+    @Test
+    public void testTransform__givenMultipleOperations__shouldTransformCorrectly() {
+        final TransformTestInput testInput = getTransformTestInputForMultipleOperations();
+        assertTransformedOutputMatches("Multiple operations not transformed correctly",
+                testInput);
+    }
+
+    @Test
+    public void testTransform__givenMultipleOperations__shouldInvariantHold() {
+        final TransformTestInput testInput = getTransformTestInputForMultipleOperations();
+
+        assertTransformInvariantHolds(testInput);
+    }
+
+    private TransformTestInput getTransformTestInputForMultipleOperations() {
+        final Operation opA = Operation.begin()
+                                       .retain(10)
+                                       .delete("brown fox")
+                                       .insert("lazy dog")
+                                       .retain(16)
+                                       .delete("lazy dog")
+                                       .insert("brown fox");
+        final Operation opB = Operation.begin()
+                                       .retain(4)
+                                       .delete("quick brown")
+                                       .retain(5)
+                                       .delete("jumps over")
+                                       .insert("slides under")
+                                       .retain(13);
+
+        final String inputString = "the quick brown fox jumps over the lazy dog";
+        final String expected = "the lazy dog slides under the brown fox";
+
+        return new TransformTestInput(opA, opB, inputString, expected);
+    }
+
+    @Test
+    public void testTransform__givenMultipleOperations2__shouldTransformCorrectly() {
+        final TransformTestInput testInput = getTransformTestInputForMultipleOperations2();
+        assertTransformedOutputMatches("Multiple operations not transformed correctly",
+                testInput);
+    }
+
+    @Test
+    public void testTransform__givenMultipleOperations2__shouldInvariantHold() {
+        final TransformTestInput testInput = getTransformTestInputForMultipleOperations2();
+
+        assertTransformInvariantHolds(testInput);
+    }
+
+    private TransformTestInput getTransformTestInputForMultipleOperations2() {
+        final Operation opA = Operation.begin()
+                                       .delete("lorem ipsum")
+                                       .insert("dolor sit amet");
+        final Operation opB = Operation.begin()
+                                       .retain(6)
+                                       .insert("consectetur adipiscing elit ")
+                                       .retain(5);
+
+        final String inputString = "lorem ipsum";
+        final String expected = "consectetur adipiscing elit dolor sit amet";
+
+        return new TransformTestInput(opA, opB, inputString, expected);
+    }
+
+
+    // Helpers
+
+    private void assertTransformedOutputMatches(String message, TransformTestInput testInput) {
+        final Operation opA = testInput.opA;
+        final Operation opB = testInput.opB;
+
+        final TransformedOperationPair transformedPair = opA.transform(opB);
+
+        final Operation opAPrime = transformedPair.getAPrime();
+        final Operation opBPrime = transformedPair.getBPrime();
+
+        final String applyA = opA.apply(testInput.inputString);
+        assertEquals(message, testInput.expectedOutput, opBPrime.apply(applyA));
+        final String applyB = opB.apply(testInput.inputString);
+        assertEquals(message, testInput.expectedOutput, opAPrime.apply(applyB));
+    }
+
+    private void assertTransformInvariantHolds(TransformTestInput testInput) {
+        // Tests that the following invariant holds:
+        // a.transform(b) = [a’, b’], where a.compose(b’) == b.compose(a’)
+        final Operation opA = testInput.opA;
+        final Operation opB = testInput.opB;
+
+        final TransformedOperationPair transformedPair = opA.transform(opB);
+
+        final Operation opAPrime = transformedPair.getAPrime();
+        final Operation opBPrime = transformedPair.getBPrime();
+
+        final Operation composeABPrime = opA.compose(opBPrime);
+        final Operation composeBAPrime = opB.compose(opAPrime);
+        final String applyABPrime = composeABPrime.apply(testInput.inputString);
+        final String applyBAPrime = composeBAPrime.apply(testInput.inputString);
+        assertEquals("Composed operations are not equal after transform.", applyABPrime,
+                applyBAPrime);
+    }
+
+    static class TransformTestInput {
+
+        private Operation opA;
+        private Operation opB;
+        private String inputString;
+        private String expectedOutput;
+
+        TransformTestInput(Operation opA, Operation opB, String inputString,
+                String expectedOutput) {
+            this.opA = opA;
+            this.opB = opB;
+            this.inputString = inputString;
+            this.expectedOutput = expectedOutput;
+        }
     }
 }

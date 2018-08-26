@@ -3,6 +3,8 @@ package edu.mit.cci.pogs.ot.api;
 import edu.mit.cci.pogs.ot.api.components.DeleteComponent;
 import edu.mit.cci.pogs.ot.api.components.InsertComponent;
 import edu.mit.cci.pogs.ot.api.components.RetainComponent;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -85,8 +87,8 @@ public class Operation {
      */
     public String apply(String text) {
         if (text.length() != baseLength) {
-            throw new IllegalArgumentException("Operation cannot be applied to text of length "
-                    + text.length());
+            throw new IllegalArgumentException(String.format(
+                    "Operation cannot be applied to text of length %d: %s", text.length(), this));
         }
         String outputText = text;
         int position = 0;
@@ -186,5 +188,123 @@ public class Operation {
     private static void advance(Deque<OperationComponent> components, int advanceBy) {
         final OperationComponent oldComponent = components.pop();
         components.addFirst(oldComponent.advance(advanceBy));
+    }
+
+    /**
+     * Transforms an operation to be applied after this operation has been applied.
+     *
+     * The following must hold:
+     * a.transform(b) = [a’, b’], where a.compose(b’) == b.compose(a’)
+     *
+     * @param operationB The operation to be transformed.
+     * @return The original operation, transformed to be applied after this operation.
+     */
+    public TransformedOperationPair transform(Operation operationB) {
+        Operation operationA = this;
+
+        if (operationA.baseLength != operationB.baseLength) {
+            throw new IllegalArgumentException(String.format(
+                    "Both operations must have the same baseLength: operationA.baseLength = %d, "
+                            + "operationB.baseLength = %d",
+                    operationA.baseLength, operationB.baseLength));
+        }
+
+        if (operationA.parentId != operationB.parentId) {
+            throw new IllegalArgumentException("Both operations must have the same parent.");
+        }
+
+
+
+        Operation operationAPrime = Operation.begin();
+        Operation operationBPrime = Operation.begin();
+
+        Deque<OperationComponent> componentsA = new ArrayDeque<>(components);
+        Deque<OperationComponent> componentsB = new ArrayDeque<>(operationB.components);
+
+        while (!(componentsA.isEmpty() && componentsB.isEmpty())) {
+            OperationComponent componentA = componentsA.peek();
+            OperationComponent componentB = componentsB.peek();
+
+            if (isInsert(componentA)) {
+                operationAPrime.add(componentsA.pop());
+                operationBPrime.retain(componentA.getCharactersAdded());
+                continue;
+            }
+            if (isInsert(componentB)) {
+                operationBPrime.add(componentsB.pop());
+                operationAPrime.retain(componentB.getCharactersAdded());
+                continue;
+            }
+
+            if (componentA == null) {
+                throw new IllegalArgumentException("Operation a is too short.");
+            }
+
+            if (componentB == null) {
+                throw new IllegalArgumentException("Operation b is too short.");
+            }
+
+            OperationComponent shorterComponent;
+            if (componentA.size() == componentB.size()) {
+                shorterComponent = componentA;
+                componentsA.remove();
+                componentsB.remove();
+            } else if (componentA.size() > componentB.size()) {
+                shorterComponent = componentB;
+                advance(componentsA, shorterComponent.size());
+                componentsB.remove();
+            } else {
+                shorterComponent = componentA;
+                advance(componentsB, shorterComponent.size());
+                componentsA.remove();
+            }
+
+
+            if (isRetain(componentA) && isRetain(componentB)) {
+                operationAPrime.add(shorterComponent);
+                operationBPrime.add(shorterComponent);
+            } else if (isDelete(componentA) && isRetain(componentB)) {
+                final String deletePayload = componentA.getPayload();
+                final String minLengthPayload = deletePayload.substring(0, shorterComponent.size());
+                operationAPrime.delete(minLengthPayload);
+            } else if (isRetain(componentA) && isDelete(componentB)) {
+                final String deletePayload = componentB.getPayload();
+                final String minLengthPayload = deletePayload.substring(0, shorterComponent.size());
+                operationBPrime.delete(minLengthPayload);
+            }
+            //unhandled case: both are delete components --> we don't need to do anything
+        }
+
+        return new TransformedOperationPair(operationAPrime, operationBPrime);
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("id", id).append("parentId", parentId)
+                .append("baseLength", baseLength)
+                .append("targetLength", targetLength)
+                .append("components", components)
+                .append("metaData", metaData)
+                .toString();
+    }
+
+    public static class TransformedOperationPair {
+
+        private Operation aPrime;
+        private Operation bPrime;
+
+        private TransformedOperationPair(Operation aPrime, Operation bPrime) {
+            this.aPrime = aPrime;
+            this.bPrime = bPrime;
+        }
+
+        public Operation getAPrime() {
+            return aPrime;
+        }
+
+        public Operation getBPrime() {
+            return bPrime;
+        }
     }
 }
