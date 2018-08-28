@@ -62,12 +62,12 @@ class WhackTaskEdit {
 
     setupAttributesFromHtml(){
         var bluePrint = [];
-        for(var i = 1; i < this.numOfPlayer + 1; i++){
+        for(var i = 0; i < this.numOfPlayer; i++){
             var playerConfig = {};
             playerConfig["player"] = i.toString();
-            playerConfig["moleAppearTime"] = $("#moleAppearTime"+i).val();
-            playerConfig["maxMoleNum"] = $("#maxMoleNum"+i).val();
-            playerConfig["clickDelay"] = $("#clickDelay"+i).val();
+            playerConfig["moleAppearTime"] = $("#moleAppearTime"+(i+1)).val();
+            playerConfig["maxMoleNum"] = $("#maxMoleNum"+(i+1)).val();
+            playerConfig["clickDelay"] = $("#clickDelay"+(i+1)).val();
             bluePrint.push(playerConfig);
         }
         return  {bluePrint: JSON.stringify(bluePrint)};
