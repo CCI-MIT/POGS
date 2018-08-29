@@ -29,11 +29,15 @@ class WhackTaskEdit {
     }
 
     addPlayer(moleAppearTime, maxMoleNum, clickDelay){
+        var self = this;
         this.numOfPlayer++;
         var str =
-            '<div class="container" id="player'+ this.numOfPlayer +'">\n' +
+            '<div class="container player" id="player'+ this.numOfPlayer +'">\n' +
             '            <div class="form-group row">\n' +
             '                <bold class="col-sm-2 col-form-label">Player '+ this.numOfPlayer +'</bold>\n' +
+            '                <div class="col-sm-8">' +
+            '                   <button type="button" class="btn btn-danger btn-sm pull-right" id="removePlayer' + this.numOfPlayer + '">remove</button>' +
+            '                </div>' +
             '            </div>\n' +
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="moleAppearTime'+ this.numOfPlayer +'">Mole appear time: </label>\n' +
@@ -46,9 +50,15 @@ class WhackTaskEdit {
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="clickDelay'+ this.numOfPlayer +'">Click delay: </label>\n' +
             '                <input type="number" min="0" step="0.0001" class="form-control col-sm-8" id="clickDelay'+ this.numOfPlayer +'" placeholder="Enter seconds" value="'+ clickDelay +'">\n' +
-            '            </div>\n' +
-            '        </div> <hr>';
+            '            </div> <hr>\n' +
+            '        </div>';
         $("#whack").append(str);
+
+        $('#removePlayer' + this.numOfPlayer).click(function(){
+            var playerNum = $(this).attr("id").match(/\d+/);
+            console.log("clicked: " + playerNum);
+            $("#player" + playerNum).remove();
+        });
     }
 
 
@@ -62,14 +72,15 @@ class WhackTaskEdit {
 
     setupAttributesFromHtml(){
         var bluePrint = [];
-        for(var i = 0; i < this.numOfPlayer; i++){
+        $.each($('.player'), function(i,e){
             var playerConfig = {};
+            var playerId = e.id.match(/\d+/);
             playerConfig["player"] = i.toString();
-            playerConfig["moleAppearTime"] = $("#moleAppearTime"+(i+1)).val();
-            playerConfig["maxMoleNum"] = $("#maxMoleNum"+(i+1)).val();
-            playerConfig["clickDelay"] = $("#clickDelay"+(i+1)).val();
+            playerConfig["moleAppearTime"] = $("#moleAppearTime"+playerId).val();
+            playerConfig["maxMoleNum"] = $("#maxMoleNum"+playerId).val();
+            playerConfig["clickDelay"] = $("#clickDelay"+playerId).val();
             bluePrint.push(playerConfig);
-        }
+        });
         return  {bluePrint: JSON.stringify(bluePrint)};
     }
     beforeSubmit(){
