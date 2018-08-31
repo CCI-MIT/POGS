@@ -7,7 +7,7 @@ import java.util.List;
 
 public class OperationDto {
 
-    private Long padId;
+    private String padId;
     private Integer id;
     private int parentId;
 
@@ -15,11 +15,11 @@ public class OperationDto {
 
     private OperationMetaData metaData;
 
-    public Long getPadId() {
+    public String getPadId() {
         return padId;
     }
 
-    public void setPadId(Long padId) {
+    public void setPadId(String padId) {
         this.padId = padId;
     }
 

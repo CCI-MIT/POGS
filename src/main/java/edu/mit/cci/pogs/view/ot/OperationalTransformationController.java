@@ -36,19 +36,24 @@ public class OperationalTransformationController {
         int padId;
         do {
             padId = padCount.getAndIncrement();
-        } while(operationService.getState(padId) != null);
+        } while(operationService.getState(getTestPadId(padId)) != null);
 
-        operationService.initializeState(padId, "");
+        operationService.initializeState(getTestPadId(padId), "");
         return "redirect:/ot/test-pad/" + padId;
     }
 
+    private String getTestPadId(int padId) {
+        return "test-pad-" + padId;
+    }
+
     @GetMapping("/ot/test-pad/{padId}")
-    public String showPad(HttpServletRequest request, Model model, @PathVariable long padId) {
-        if (operationService.getState(padId) == null) {
+    public String showPad(HttpServletRequest request, Model model, @PathVariable int padId) {
+        final String testPadId = getTestPadId(padId);
+        if (operationService.getState(testPadId) == null) {
             return "redirect:/ot/test-pad";
         }
 
-        model.addAttribute("padId", padId);
+        model.addAttribute("padId", testPadId);
         model.addAttribute("clientId", clientCount.getAndIncrement());
         return "ot/test-pad";
     }

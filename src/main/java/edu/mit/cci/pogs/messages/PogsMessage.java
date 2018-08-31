@@ -18,12 +18,22 @@ public class PogsMessage <ContentType>{
 
         TASK_ATTRIBUTE,
 
-        COLLABORATION_MESSAGE
+        COLLABORATION_MESSAGE,
+        OPERATION
     }
 
     public PogsMessage() {
     }
 
+    public PogsMessage(MessageType type, ContentType content, String sender, String receiver, String completedTaskId,
+            String sessionId) {
+        this.type = type;
+        this.content = content;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.completedTaskId = completedTaskId;
+        this.sessionId = sessionId;
+    }
 
     public MessageType getType() {
         return type;

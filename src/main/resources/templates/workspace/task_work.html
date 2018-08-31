@@ -25,14 +25,6 @@
 
         /*]]>*/
     </style>
-    <script th:inline="text">
-
-        /*<![CDATA[*/
-
-        [(${taskWorkJs})]
-
-        /*]]>*/
-    </script>
     <div class="form-group waiting_message tab-content">
         <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
 
@@ -72,6 +64,14 @@
 
         </div>
     </div>
+
+    <script th:inline="text">
+        /*<![CDATA[*/
+
+        [(${taskWorkJs})]
+
+        /*]]>*/
+    </script>
 
 </div>
 <div layout:fragment="communication" th:if="${hasChat}">

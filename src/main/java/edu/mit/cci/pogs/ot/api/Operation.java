@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public class Operation {
 
-    private Long padId;
+    private String padId;
     private Integer id;
     private Integer parentId;
 
@@ -32,11 +32,11 @@ public class Operation {
     }
 
 
-    public Long getPadId() {
+    public String getPadId() {
         return padId;
     }
 
-    public void setPadId(Long padId) {
+    public void setPadId(String padId) {
         this.padId = padId;
     }
 
@@ -131,7 +131,7 @@ public class Operation {
         return this;
     }
 
-    public Operation withPadId(long padId) {
+    public Operation withPadId(String padId) {
         this.padId = padId;
         return this;
     }

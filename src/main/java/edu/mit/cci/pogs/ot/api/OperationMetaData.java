@@ -5,16 +5,16 @@ import java.util.Map;
 
 public class OperationMetaData {
 
-    private long authorId;
+    private String authorId;
     private Instant timestamp;
 
     private Map<String, String> additionalMetaData;
 
-    public long getAuthorId() {
+    public String getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorId(long authorId) {
+    public void setAuthorId(String authorId) {
         this.authorId = authorId;
     }
 

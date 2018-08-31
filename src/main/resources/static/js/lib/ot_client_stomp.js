@@ -1,6 +1,6 @@
 // Requires loglevel, fast-diff, ot.js and ot_client.js
 
-ot.StompOtClient = (function() {
+[ot.AbstractOrClient, ot.StompOtClient] = (function() {
     // Imports
     let Client = ot.Client;
     let Component = ot.Component;
@@ -44,10 +44,9 @@ ot.StompOtClient = (function() {
         $input.data(LAST_VALUE_ATTRIBUTE, $input.val());
     }
 
-    class StompOtClient extends Client {
+    class AbstractOtClient extends Client {
         constructor (padId, clientId, padSelector) {
             super(padId, clientId);
-            log.info(`Initializing StompOtClient for pad ${padId} as client ${clientId}`);
 
             this._inputWatcher = new InputWatcher(padSelector, function(event, difference) {
                 let components = [];
@@ -57,22 +56,39 @@ ot.StompOtClient = (function() {
                 let operation = this.createOperation(components);
                 this.processClientOperation(operation);
             }.bind(this));
+        }
+
+        /**
+         * Processes an incoming message.
+         *
+         * The message must be an object that can be converted to an Operation object.
+         * The implementing class must ensure that this method is called every time a message
+         * is received.
+         *
+         * @param operationJson An object that can be parsed as Operation
+         */
+        receiveOperation(operationJson) {
+            let operation = Operation.fromJSON(operationJson);
+            this.processServerOperation(operation);
+        }
+
+        applyOperation(operation) {
+            if (log.getLevel() >= log.levels.DEBUG) {
+                log.debug("Applying operation: " + JSON.stringify(operation));
+            }
+            let currentContent = this._inputWatcher.value;
+            this._inputWatcher.value = operation.apply(currentContent);
+        }
+    }
+
+    class StompOtClient extends AbstractOtClient {
+        constructor (padId, clientId, padSelector) {
+            super(padId, clientId, padSelector);
+            log.info(`Initializing StompOtClient for pad ${padId} as client ${clientId}`);
 
             stomp.subscribe(`/topic/ot/pad/${this.padId}/operations`, function(payload) {
-                let json = JSON.parse(payload.body);
-                if (Array.isArray(json)) {
-                    if (json.length > 0) {
-                        log.info(`Catching up to ${json.length} previous operations`);
-                        let previousOperations = json;
-                        for (let i = 0; i < previousOperations.length; i++) {
-                            let operation = previousOperations[i];
-                            this.processServerOperation(operation);
-                        }
-                    }
-                } else {
-                    let operation = Operation.fromJSON(json);
-                    this.processServerOperation(operation);
-                }
+                let operationJson = JSON.parse(payload.body);
+                this.receiveOperation(operationJson);
             }.bind(this));
         }
 
@@ -105,5 +121,5 @@ ot.StompOtClient = (function() {
                 throw "Shouldn't happen";
         }
     }
-    return StompOtClient;
+    return [AbstractOtClient, StompOtClient];
 })();

@@ -23,6 +23,10 @@ class PogsPlugin {
         this.pogsRef.sendMessage(url, type, messageContent, sender, receiver, completedTaskId,
                                  sessionId);
     }
+    sendOperation(operation) {
+        this.sendMessage('/pogsapp/ot.operations.submit', 'OPERATION', JSON.stringify(operation),
+            this.pogsRef.subjectId, null, this.pogsRef.completedTaskId, this.pogsRef.sessionId);
+    }
 
     getSubjectByExternalId(externalId){
         var teammates = this.getTeammates();

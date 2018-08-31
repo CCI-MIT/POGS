@@ -8,28 +8,29 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class OperationService {
 
-    private Map<Long, OperationState> serverStates = new HashMap<>();
+    private Map<String, OperationState> serverStates = new HashMap<>();
 
-    public void initializeState(long padId, String initialText) {
+    public void initializeState(String padId, String initialText) {
         serverStates.put(padId, new OperationStateImpl(initialText));
     }
 
-    public OperationState getState(long padId) {
+    public OperationState getState(String padId) {
         return serverStates.get(padId);
     }
 
-    public void removeState(long padId) {
+    public void removeState(String padId) {
         serverStates.remove(padId);
     }
 
-    public Operation processOperation(long padId, Operation operation) {
-        if (operation.getPadId() != null && operation.getPadId() != padId) {
+    public Operation processOperation(String padId, Operation operation) {
+        if (operation.getPadId() != null && !Objects.equals(operation.getPadId(), padId)) {
             throw new IllegalArgumentException(String.format(
-                    "This operation's padId %d does not match the given padId %d.",
+                    "This operation's padId %s does not match the given padId %s.",
                     operation.getPadId(), padId));
         }
 
@@ -41,7 +42,7 @@ public class OperationService {
         return operationState.apply(operation);
     }
 
-    public List<Operation> getAllOperations(long padId) {
+    public List<Operation> getAllOperations(String padId) {
         final OperationState operationState = serverStates.get(padId);
         return operationState.getAllOperations();
     }
