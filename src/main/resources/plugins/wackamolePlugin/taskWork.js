@@ -43,7 +43,7 @@ class Wackamole {
 
         // Only show readyView at start
         $("#gameColumn").children().hide();
-        $("#informationColumn").children().hide();
+        $("#informationColumn").hide();
         $("#readyView").show();
         $("#readyBtn").on('click', self.handleReadyOnClick.bind(self));
 
@@ -165,6 +165,7 @@ class Wackamole {
         $('.modal-backdrop').appendTo('#gameColumn');
         $("#gameColumn").addClass("after_modal_appended");
         $(".whack_grid").show();
+        $("#informationColumn").show();
         $("#informationColumn").children().show();
         // $(".fa-mouse-pointer").css("color", self.teammates[self.subjectId].color);
         $("#loadingCountDown").html("Waiting for teammates...");

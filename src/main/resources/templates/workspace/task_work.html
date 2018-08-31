@@ -16,7 +16,17 @@
         </ul>
     </div>
 
-    <div id="todoListContainer" class="flex-column w-100" style="padding-top: 5px" th:if="${hasCollaborationTodoListEnabled}"><button id = "createTodoItem" class="btn btn-outline-primary btn-sm">Create Todo Entry</button></div>
+    <div id="todoListContainer" class="flex-column w-100" style="padding-top: 5px"
+        th:if="${hasCollaborationTodoListEnabled}">
+        <button id = "createTodoItem" class="btn btn-outline-primary btn-sm">Create Todo Entry</button>
+    </div>
+
+    <div id="votingPoolContainer"  class="flex-column w-100" style="padding-top: 5px"
+        th:if="${hasCollaborationVotingWidget}">
+        <div id="votingModal" class=""></div>
+         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Pool</button>
+
+    </div>
 
     <style  th:inline="text">
 

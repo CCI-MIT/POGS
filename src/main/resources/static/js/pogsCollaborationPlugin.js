@@ -9,9 +9,7 @@ const VOTING_TYPE = {
     CREATE_VOTING_POOL: "CREATE_VOTING_POOL",
     CAST_VOTE: "CAST_VOTE",
     DELETE_VOTING_POOL: "DELETE_VOTING_POOL",
-    CREATE_QUESTION: "CREATE_QUESTION",
     CREATE_OPTION: "CREATE_OPTION",
-    DELETE_QUESTION: "DELETE_QUESTION",
     DELETE_OPTION: "DELETE_OPTION"
 };
 
@@ -41,6 +39,7 @@ class CollaborationPlugin extends PogsPlugin {
         }
         if (this.pogsRef.hasCollaborationVotingWidget) {
             console.log("HasCollaboratonVoting");
+            new VotingPoolManager(this);
         }
         if (this.pogsRef.hasCollaborationFeedbackWidget) {
             console.log("HasCollaboratonVoting");

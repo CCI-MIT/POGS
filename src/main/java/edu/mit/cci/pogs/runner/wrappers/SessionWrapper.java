@@ -209,6 +209,7 @@ public class SessionWrapper extends Session {
     public void createSessionSchedule() {
 
         this.sessionSchedule = new ArrayList<>();
+
         if (this.getTimeToStart() > 0) {
             this.sessionSchedule.add(new SessionSchedule(new Date().getTime()
                     , getSessionStartDate().getTime(), null,

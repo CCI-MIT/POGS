@@ -1,11 +1,15 @@
 package edu.mit.cci.pogs.messages;
 
-public class CollaborationMessage extends PogsMessage<CollaborationMessageContent>  {
+import org.jooq.tools.json.JSONObject;
 
-    public enum CollaborationType{
+public class CollaborationMessage extends PogsMessage<CollaborationMessageContent> {
+
+
+    public enum CollaborationType {
         TODO_LIST,
         VOTING_LIST
     }
+
     public enum TodoType {
         CREATE_TODO,
         ASSIGN_ME,
@@ -16,8 +20,26 @@ public class CollaborationMessage extends PogsMessage<CollaborationMessageConten
         BROADCAST_TODO_ITEMS;
 
         public static TodoType getType(String messageType) {
-            for(TodoType tt : TodoType.values()){
-                if(tt.name().equals(messageType)){
+            for (TodoType tt : TodoType.values()) {
+                if (tt.name().equals(messageType)) {
+                    return tt;
+                }
+            }
+            return null;
+        }
+    }
+
+    public enum VotingPoolType {
+        BROADCAST_VOTING_POOLS,
+        CREATE_VOTING_POOL,
+        CAST_VOTE,
+        DELETE_VOTING_POOL,
+        CREATE_OPTION,
+        DELETE_OPTION;
+
+        public static VotingPoolType getType(String messageType) {
+            for (VotingPoolType tt : VotingPoolType.values()) {
+                if (tt.name().equals(messageType)) {
                     return tt;
                 }
             }

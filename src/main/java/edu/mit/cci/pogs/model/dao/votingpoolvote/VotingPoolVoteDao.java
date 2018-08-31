@@ -8,4 +8,8 @@ import java.util.List;
 public interface VotingPoolVoteDao extends Dao<VotingPoolVote, Long> {
 
     List<VotingPoolVote> list();
+    Integer countVote(Long votingPoolId);
+    VotingPoolVote getBySubjectId(Long subjectId);
+    List<VotingPoolVote> listByPoolOptionId(Long optionId);
+    void delete(Long votingPoolId);
 }

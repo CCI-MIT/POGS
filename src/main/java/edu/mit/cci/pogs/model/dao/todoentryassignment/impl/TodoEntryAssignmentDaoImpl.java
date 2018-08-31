@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.todoentryassignment.impl;
 
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.todoentryassignment.TodoEntryAssignmentDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TodoEntry;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TodoEntryAssignment;
 import edu.mit.cci.pogs.model.jooq.tables.records.TodoEntryAssignmentRecord;
@@ -33,6 +34,22 @@ public class TodoEntryAssignmentDaoImpl extends AbstractDao<TodoEntryAssignment,
 
         return query.fetchInto(TodoEntryAssignment.class);
     }
+
+    public TodoEntryAssignment getByTodoEntryIdSubjectId(Long todoEntryId, Long subjectId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(TODO_ENTRY_ASSIGNMENT).getQuery();
+        query.addConditions(TODO_ENTRY_ASSIGNMENT.TODO_ENTRY_ID.eq(todoEntryId));
+        query.addConditions(TODO_ENTRY_ASSIGNMENT.SUBJECT_ID.eq(subjectId));
+
+        Record record =  query.fetchOne();
+        if(record == null) {
+            return null;
+        }else{
+            return record.into(TodoEntryAssignment.class);
+        }
+
+    }
+
 
     public List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, boolean currentlyAssigned) {
         final SelectQuery<Record> query = dslContext.select()

@@ -262,7 +262,6 @@ class MatrixChatManager extends GroupChatManager {
     onCommunicationBroadcastReceived(message) {
         var isOwnMessage = false;
 
-
         if (message.sender == this.communicationPluginReference.getSubjectId()) {
             isOwnMessage = true;
         }
@@ -301,7 +300,9 @@ class MatrixChatManager extends GroupChatManager {
 
                 } else{
                     originChatName = message.content.channel;
+
                     if(!isOwnMessage) {
+                        isToCurrentSubject = true;
                         $("#channelBody_" + message.content.channel)
                             .append(this.createReceivedMessageHTML(
                                 message.content.message,
