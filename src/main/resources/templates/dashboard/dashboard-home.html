@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+    </ol>
+    <h2>Live sessions Dashboard</h2>
+
+    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
+    <h3>Session subjects: </h3>
+
+    <br/>
+    <table class="table table-striped">
+           <thead>
+           <tr>
+               <th>Session ID</th>
+               <th>Session name</th>
+               <th>Session start date </th>
+           </tr>
+           </thead>
+           <tbody>
+           <th:block th:each="sessionz : ${sessionsList}">
+               <tr>
+                   <td th:text="${sessionz.id}"></td>
+                   <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
+                   <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+
+               </tr>
+           </th:block>
+           </tbody>
+       </table>
+</div>
+</body>
+</html>

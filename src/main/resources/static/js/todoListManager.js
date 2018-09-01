@@ -153,7 +153,7 @@ class TodoListManager {
         if (assigneeName == extId) {
 
             todoItem +=
-                '        <span class="badge badge-success assigneePill" id="' + entryId + '_'
+                '        <span class="badge '+assigneeName+'_color assigneePill" id="' + entryId + '_'
                 + assigneeName + '_assign">' +
                 this.pogsCollaborationPlugin.getSubjectByExternalId(
                     assigneeName).displayName;
@@ -161,7 +161,7 @@ class TodoListManager {
                         + 'data-todoid="' + entryId + '"></i></span>\n';
         } else {
             todoItem +=
-                '        <span class="badge badge-success assigneePill" id="' + entryId + '_'
+                '        <span class="badge '+assigneeName+'_color assigneePill" id="' + entryId + '_'
                 + assigneeName + '_assign">' +
                 this.pogsCollaborationPlugin.getSubjectByExternalId(assigneeName).displayName
                 + '</span>\n';

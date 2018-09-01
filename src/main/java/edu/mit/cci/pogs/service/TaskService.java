@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskhasresearchgroup.TaskHasResearchGroupDao;
@@ -34,6 +36,30 @@ public class TaskService {
         return taskHasResearchGroupDao.listByTaskId(taskId);
     }
 
+
+    private static void updateVideoPrimerUrl(Task tk) {
+        if (tk.getPrimerPageEnabled()&& tk.getPrimerVideoAutoplayMute()) {
+            String primerContent = tk.getPrimerText();
+            Pattern p = Pattern.compile("(?:https?://)?(?:www.)?(?:youtube.com|youtu.be|vimeo.com)/(?:watch\\?v=)?([^\\s|^\"])+");
+            Matcher urlMatcher = p.matcher(primerContent);
+            if(urlMatcher.find()){
+                String url = urlMatcher.group(0);
+                String oldUrl = url;
+
+                if(!url.contains("autoplay=1")) {
+                    if (!url.contains("?")) {
+                        url += "?autoplay=1&mute=1";
+                    } else {
+                        url += "&autoplay=1&mute=1";
+                    }
+                    tk.setPrimerText(primerContent.replace(oldUrl, url));
+                }
+            }
+
+
+        }
+    }
+
     public TaskBean createOrUpdate(TaskBean value) {
         Task tk = new Task();
 
@@ -57,6 +83,17 @@ public class TaskService {
         tk.setScoringType(value.getScoringType());
         tk.setSubjectCommunicationId(value.getSubjectCommunicationId());
         tk.setChatScriptId(value.getChatScriptId());
+        tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
+        if(tk.getInteractionTime()==null){
+            tk.setInteractionTime(0);
+        }
+        if(tk.getIntroTime()==null){
+            tk.setIntroTime(0);
+        }
+        if(tk.getPrimerTime() == null){
+            tk.setPrimerTime(0);
+        }
+        updateVideoPrimerUrl(tk);
         if (tk.getId() == null) {
             tk = taskDao.create(tk);
             value.setId(tk.getId());
@@ -73,7 +110,7 @@ public class TaskService {
 
     private void createOrUpdateTaskHasTaskConfiguration(TaskBean value) {
         TaskHasTaskConfiguration currentConfig = taskHasTaskConfigurationDao.getByTaskId(value.getId());
-        if(currentConfig!=null) {
+        if (currentConfig != null) {
             if (currentConfig.getTaskConfigurationId().longValue() == value.getTaskConfigurationId().longValue()) {
                 return;
             } else {

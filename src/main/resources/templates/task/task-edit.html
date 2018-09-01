@@ -123,7 +123,7 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="introText">Intro Text:</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" id="introText" th:field="*{introText}"
+                        <textarea class="form-control htmleditor" id="introText" th:field="*{introText}"
                                   rows="3"></textarea>
                     </div>
                 </div>
@@ -154,10 +154,20 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="primerText">Primer Text:</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" id="primerText" th:field="*{primerText}"
+                        <textarea class="form-control htmleditor" id="primerText" th:field="*{primerText}"
                                   rows="3"></textarea>
                     </div>
                 </div>
+                <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="primerVideoAutoplayMute">Primer Video
+                                        Should Autoplay muted:</label>
+                                    <div class="col-sm-10">
+                                        <input class="form-check-input" th:field="*{primerVideoAutoplayMute}"
+                                               type="checkbox" id="primerVideoAutoplayMute"/>
+                                        <small id="primerTimeHelp" class="form-text text-muted">
+                                        Auto play is only available if sound is muted.</small>
+                                    </div>
+                                </div>
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="primerTime">Primer Time:</label>
                     <div class="col-sm-10">
@@ -185,7 +195,7 @@
                     <label class="col-sm-2 col-form-label" for="interactionText">Interaction
                         Text:</label>
                     <div class="col-sm-10">
-                        <textarea class="form-control" id="interactionText"
+                        <textarea class="form-control htmleditor" id="interactionText"
                                   th:field="*{interactionText}" rows="3"></textarea>
                     </div>
                 </div>
@@ -287,6 +297,21 @@
             $(function () {
                 //$('select[name="researchgroups"]')
 
+
+                $(".htmleditor").summernote(
+                    {
+                    height: 200,
+                    toolbar: [
+                        // [groupName, [list of button]]
+                        ['para', ['style','ul', 'ol', 'paragraph']],
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['insert', ['picture','link','video','table','codeview']]
+                      ]
+                    }
+                );
                 $('#researchGroups')
                     .bootstrapDualListbox({
                                               selectedListLabel: "Chosen groups",

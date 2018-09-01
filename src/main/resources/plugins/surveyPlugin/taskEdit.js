@@ -280,7 +280,7 @@ class SurveyTaskEdit {
         var str = "";
         str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "introduction">';
         // add text area
-        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Introduction:</label><textarea class="form-control col-sm-8" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea><button type="button" class="btn btn-danger btn-sm remove-intro" id="removeQuestion' + question_number + '">remove</button> </div>';
+        str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Introduction:</label><textarea class="form-control col-sm-8 htmleditor" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea><button type="button" class="btn btn-danger btn-sm remove-intro" id="removeQuestion' + question_number + '">remove</button> </div>';
         // str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class="form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'">  <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>';
 
         if(withVideo){ // add video url
@@ -296,6 +296,22 @@ class SurveyTaskEdit {
 
             $(question_set).remove();
         });
+
+
+        $(".htmleditor").summernote(
+            {
+                height: 150,
+                toolbar: [
+                    // [groupName, [list of button]]
+                    ['para', ['style','ul', 'ol', 'paragraph']],
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                    ['fontsize', ['fontsize']],
+                    ['color', ['color']],
+                    ['insert', ['picture','link','video','table','codeview']]
+                ]
+            }
+        );
     }
 
 

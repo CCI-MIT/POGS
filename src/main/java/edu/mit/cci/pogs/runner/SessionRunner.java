@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.runner;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
+import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
@@ -25,6 +27,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
@@ -36,6 +39,7 @@ import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.TaskGroupService;
+import edu.mit.cci.pogs.utils.ColorUtils;
 
 @Component
 public class SessionRunner implements Runnable {
@@ -72,6 +76,7 @@ public class SessionRunner implements Runnable {
 
     private Map<String, Subject> checkedInWaitingSubjectList;
 
+    private Map<Long, Subject> checkedInWaitingSubjectListById;
 
     @Autowired
     private SessionDao sessionDao;
@@ -92,6 +97,10 @@ public class SessionRunner implements Runnable {
 
     @Autowired
     private TeamHasSubjectDao teamHasSubjectDao;
+
+    @Autowired
+    private SubjectAttributeDao subjectAttributeDao;
+
 
     @Autowired
     private CompletedTaskDao completedTaskDao;
@@ -123,8 +132,7 @@ public class SessionRunner implements Runnable {
         // if task playmode == playlist
         if (session.isTaskExecutionModeSequential()) {
             if ((session.getTeamCreationMoment().equals(
-                    TeamCreationTime.BEGINING_SESSION.getId().toString())) ||
-                    session.getTeamCreationMoment().equals(TeamCreationTime.BEGINING_ROUND)) {
+                    TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
                 setupStartingTimes(session, round, null);
@@ -137,8 +145,7 @@ public class SessionRunner implements Runnable {
         } else {
             //TODO:Handle multi task and task team and completed task creation
             if ((session.getTeamCreationMoment().equals(
-                    TeamCreationTime.BEGINING_SESSION.getId().toString())) ||
-                    session.getTeamCreationMoment().equals(TeamCreationTime.BEGINING_ROUND)) {
+                    TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
                 setupStartingTimesMultiTask(session, round, null);
@@ -149,8 +156,6 @@ public class SessionRunner implements Runnable {
         }
 
     }
-
-
 
 
     private void setupStartingTimesMultiTask(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
@@ -176,9 +181,9 @@ public class SessionRunner implements Runnable {
     private void setupStartingTimes(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
 
         //if firstRound
-        if(prevRound == null) {
+        if (prevRound == null) {
             round.setRoundStartTimestamp(session.getSessionStartDate().getTime() + session.getIntroAndSetupTime());
-        }else{
+        } else {
             round.setRoundStartTimestamp(round.getRoundFinishTimestamp());
         }
 
@@ -189,7 +194,7 @@ public class SessionRunner implements Runnable {
             newTw.setCompletedTasks(tw.getCompletedTasks());
             round.getTasks().add(newTw);
             newTw.setTaskStartTimestamp(elapsedTime);
-            elapsedTime = newTw.getTotalTaskTime();
+            elapsedTime += newTw.getTotalTaskTime();
         }
 
     }
@@ -257,7 +262,7 @@ public class SessionRunner implements Runnable {
             TeamWrapper teamWrapper = new TeamWrapper(t);
 
             for (TeamHasSubject ths : teamHasSubjectDao.listByTeamId(t.getId())) {
-                teamWrapper.getSubjects().add(checkedInWaitingSubjectList.get(ths.getSubjectId()));
+                teamWrapper.getSubjects().add(checkedInWaitingSubjectListById.get(ths.getSubjectId()));
             }
             teamWrappers.add(teamWrapper);
         }
@@ -267,6 +272,34 @@ public class SessionRunner implements Runnable {
         round.setRoundTeams(teamWrappers);
 
 
+        assignColorsToTeamMembers(round.getRoundTeams());
+    }
+
+    private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
+        for (TeamWrapper tw : roundTeams) {
+            List<Subject> subjectList = tw.getSubjects();
+            Color[] colors = ColorUtils.generateVisuallyDistinctColors(subjectList.size(),
+                    ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
+            for (int i = 0; i < subjectList.size(); i++) {
+                addColorSubjectAttribute(subjectList.get(i),
+                        ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME, colors[i]);
+                addColorSubjectAttribute(subjectList.get(i),
+                        ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME,
+                        ColorUtils.generateFontColorBasedOnBackgroundColor(colors[i]));
+            }
+        }
+    }
+
+    private void addColorSubjectAttribute(Subject su1, String attributeName, Color color) {
+        Subject su = su1;
+        SubjectAttribute sa = new SubjectAttribute();
+        sa.setAttributeName(attributeName);
+        sa.setStringValue("#" + Integer.toHexString(color.getRed())
+                + Integer.toHexString(color.getGreen()) +
+                Integer.toHexString(color.getBlue()));
+
+        sa.setSubjectId(su.getId());
+        subjectAttributeDao.create(sa);
     }
 
 
@@ -330,12 +363,13 @@ public class SessionRunner implements Runnable {
     private void setupSubjectList(SessionWrapper session) {
         subjectList = sessionService.listSubjectsBySessionId(session.getId());
         checkedInWaitingSubjectList = new HashMap<>();
+        checkedInWaitingSubjectListById = new HashMap<>();
     }
 
     private void setupRounds(SessionWrapper sessionz) {
         List<Round> rounds = roundDao.listBySessionId(sessionz.getId());
 
-        if (rounds.size() == 0) {
+        if (rounds!=null && rounds.size() == 0) {
             if (sessionz.getRoundsEnabled()) {
                 for (int i = 0; i < sessionz.getNumberOfRounds(); i++) {
                     createRound(i + 1, sessionz.getId());
@@ -364,6 +398,7 @@ public class SessionRunner implements Runnable {
 
     public void subjectCheckIn(Subject subject) {
         checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
+        checkedInWaitingSubjectListById.put(subject.getId(), subject);
 
     }
 
@@ -404,7 +439,7 @@ public class SessionRunner implements Runnable {
         runSession();
     }
 
-    public Map<String,Subject> getAllCheckedInSubjects(){
+    public Map<String, Subject> getAllCheckedInSubjects() {
         return checkedInWaitingSubjectList;
     }
 

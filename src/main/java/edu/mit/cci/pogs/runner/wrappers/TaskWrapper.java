@@ -149,7 +149,7 @@ public class TaskWrapper extends Task {
         return "/task/" + getId() + "/i";
     }
     public String getTaskPrimerUrl(){
-        return "/task/" + getId() + "/";
+        return "/task/" + getId() + "/p";
     }
     public String getTaskWorkUrl(){
         return "/task/" + getId() + "/w";

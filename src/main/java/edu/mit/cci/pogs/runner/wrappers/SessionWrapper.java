@@ -295,6 +295,6 @@ public class SessionWrapper extends Session {
                 return i;
             }
         }
-        return 0;
+        return this.sessionSchedule.size()-1;
     }
 }

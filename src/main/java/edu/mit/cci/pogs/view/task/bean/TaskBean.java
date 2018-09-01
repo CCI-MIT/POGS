@@ -16,6 +16,7 @@ public class TaskBean {
     private Boolean primerPageEnabled;
     private String primerText;
     private Integer primerTime;
+    private Boolean primerVideoAutoplayMute;
     private Boolean interactionWidgetEnabled;
     private String interactionText;
     private String communicationType;
@@ -56,6 +57,7 @@ public class TaskBean {
         this.scoringType = value.getScoringType();
         this.subjectCommunicationId = value.getSubjectCommunicationId();
         this.chatScriptId = value.getChatScriptId();
+        this.primerVideoAutoplayMute = value.getPrimerVideoAutoplayMute();
     }
 
     public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {
@@ -234,5 +236,11 @@ public class TaskBean {
         this.chatScriptId = chatScriptId;
     }
 
+    public Boolean getPrimerVideoAutoplayMute() {
+        return primerVideoAutoplayMute;
+    }
 
+    public void setPrimerVideoAutoplayMute(Boolean primerVideoAutoplayMute) {
+        this.primerVideoAutoplayMute = primerVideoAutoplayMute;
+    }
 }

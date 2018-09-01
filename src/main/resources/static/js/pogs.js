@@ -14,6 +14,54 @@ class Pogs {
         this.subscribe('onReady', pl.initFunc.bind(pl));
         return pl;
     }
+    setupSubjectColors(){
+
+        var subjectColorMap = [];
+
+        if(!this.teammates) return;
+
+        for(var i=0; i < this.teammates.length; i++) {
+
+            var backgroundColor = null;
+            var fontColor = null;
+            for (var j = 0; j < this.teammates[i].attributes.length; j++) {
+
+                if (this.teammates[i].attributes[j].attributeName
+                    == "SUBJECT_DEFAULT_BACKGROUND_COLOR") {
+                    backgroundColor = this.teammates[i].attributes[j].stringValue;
+                }
+                if (this.teammates[i].attributes[j].attributeName == "SUBJECT_DEFAULT_FONT_COLOR") {
+                    fontColor = this.teammates[i].attributes[j].stringValue;
+                }
+            }
+
+            if (fontColor && backgroundColor) {
+                subjectColorMap.push(
+                    {
+                        externalId: this.teammates[i].externalId,
+                        backgroundColor: backgroundColor,
+                        fontColor: fontColor
+                    });
+            }
+        }
+
+
+
+
+        var rule  = '';
+        for(var i=0; i < subjectColorMap.length ; i++){
+            rule += '.'+subjectColorMap[i].externalId+'_color { background-color: '
+                    + subjectColorMap[i].backgroundColor+'; color: '+
+                    subjectColorMap[i].fontColor+'} ';
+        }
+
+        var css = document.createElement('style'); // Creates <style></style>
+        css.type = 'text/css'; // Specifies the type
+        if (css.styleSheet) css.styleSheet.cssText = rule; // Support for IE
+        else css.appendChild(document.createTextNode(rule)); // Support for the rest
+        document.getElementsByTagName("head")[0].appendChild(css); // Specifies where to place the css
+
+    }
     setup (config) {
 
 
@@ -22,7 +70,7 @@ class Pogs {
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
-
+        this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
         this.hasCollaborationFeedbackWidget = config.hasCollaborationFeedbackWidget;
