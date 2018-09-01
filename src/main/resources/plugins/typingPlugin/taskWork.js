@@ -1,4 +1,4 @@
-class PogsOtClient extends AbstractOtClient {
+class PogsOtClient extends ot.AbstractOtClient {
     constructor(pogsPlugin, padSelector) {
         super(pogsPlugin.getCompletedTaskId(), pogsPlugin.getSubjectId(), padSelector);
         log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
