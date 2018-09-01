@@ -6,11 +6,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.mit.cci.pogs.model.dao.condition.ConditionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
@@ -23,16 +21,16 @@ public class StudyService {
 
     private final StudyHasResearchGroupDao studyHasResearchGroupDao;
 
-    private final ConditionDao conditionDao;
+
 
     private final SessionDao sessionDao;
 
     @Autowired
-    public StudyService(StudyDao studyDao, StudyHasResearchGroupDao studyHasResearchGroupDao,
-                        ConditionDao conditionDao, SessionDao sessionDao) {
+    public StudyService(StudyDao studyDao, StudyHasResearchGroupDao studyHasResearchGroupDao
+                        , SessionDao sessionDao) {
         this.studyDao = studyDao;
         this.studyHasResearchGroupDao = studyHasResearchGroupDao;
-        this.conditionDao = conditionDao;
+
         this.sessionDao = sessionDao;
     }
 
@@ -110,13 +108,10 @@ public class StudyService {
         return studyHasResearchGroupDao.listByStudyId(studyId);
     }
 
-    public List<Condition> listConditions(Study study) {
-        return conditionDao.listByStudyId(study.getId());
 
-    }
 
-    public List<Session> listSessionsByCondition(Condition condition) {
-        return sessionDao.listByConditionId(condition.getId());
+    public List<Session> listSessionsByStudyId(Long studyId) {
+        return sessionDao.listByStudyId(studyId);
 
     }
 

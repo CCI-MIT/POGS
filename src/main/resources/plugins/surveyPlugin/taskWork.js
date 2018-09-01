@@ -133,7 +133,7 @@ class Survey {
                 var cell = message.content.attributeIntegerValue;
                 if($("#answer" + cell).attr('type') == "text" && !($("#answer" + cell).is( ":focus" ))){ // sync text field when selected
                              $("#answer" + cell)
-                                 .addClass("form-control--error") //get subject backgroud COLOR
+                                 .addClass(message.sender+"_color focusOpacity") //get subject backgroud COLOR
                 }
             } else {
                 if (attrName.indexOf("surveyAnswer_") != -1) {
@@ -142,7 +142,7 @@ class Survey {
                         $("#answer" + cell).val(message.content.attributeStringValue);
                         $("#answer" + cell)
                         .delay(1000).queue(function (next) {
-                                $(this).removeClass("form-control--error");
+                                $(this).removeClass(message.sender+"_color focusOpacity");
                                 next();
                             });
                     }
@@ -156,9 +156,9 @@ class Survey {
                 else if (attrName.indexOf("changeSelect_") != -1) {
                     var cell = attrName.replace("changeSelect_", "");
                     $("#answer" + cell).val(message.content.attributeStringValue)
-                        .addClass("form-control--error")
+                        .addClass(message.sender+"_color focusOpacity")
                         .delay(1000).queue(function (next) {
-                            $(this).removeClass("form-control--error");
+                            $(this).removeClass(message.sender+"_color focusOpacity");
                             next();
                         });
                 }

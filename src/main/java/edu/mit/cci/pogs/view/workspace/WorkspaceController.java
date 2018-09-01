@@ -179,6 +179,7 @@ public class WorkspaceController {
 
             List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(), null, null);
             model.addAttribute("teammates", teammates);
+
         }
 
         return ret;
@@ -381,7 +382,10 @@ public class WorkspaceController {
                         round.getId(),
                         team.getId(),
                         task.getId());
-                //get team
+                if(completedTask == null) {
+                    completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
+                }
+
                 List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
                         round.getId(), task.getId());
 

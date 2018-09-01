@@ -1,6 +1,5 @@
 package edu.mit.cci.pogs.view.session;
 
-import org.jooq.tools.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,14 +9,12 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
@@ -34,11 +31,9 @@ import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
 import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
 import edu.mit.cci.pogs.service.ChatChannelService;
@@ -186,14 +181,13 @@ public class SessionController {
     @GetMapping("/admin/studies/{studyId}/sessions/create")
     public String createSession(@PathVariable("studyId") Long studyId, Model model) {
         SessionBean session = new SessionBean();
-
+        session.setRoundsEnabled(true);
+        session.setNumberOfRounds(1);
         session.setSessionHasTaskGroupRelationshipBean(new SessionHasTaskGroupRelationshipBean());
         Study study = studyDao.get(studyId);
         session.setStudyId(study.getId());
 
-        Condition condition = new Condition();
-        condition.setConditionName(DEFAULT_CONDITION_NAME);
-        condition.setStudyId(studyId);
+
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", session);
         return "session/session-edit";
@@ -212,6 +206,9 @@ public class SessionController {
     @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
         SessionBean session = new SessionBean(sessionDao.get(id));
+        session.setRoundsEnabled(true);
+        session.setNumberOfRounds(1);
+
         Study study = studyDao.get(studyId);
         session.setStudyId(study.getId());
 

@@ -17,7 +17,7 @@
             <a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a>
         </li>
         <li class="breadcrumb-item active" th:if="${sessionBean.id != null}">
-            <a th:href="${'/admin/sessions/' + sessionBean.id}" th:text="${sessionBean.sessionSuffix}"></a>
+            <a th:href="${'/admin/studies/' + study.id+ '/sessions/' + sessionBean.id}" th:text="${sessionBean.sessionSuffix}"></a>
         </li>
     </ol>
     <h2>Edit session</h2>
@@ -25,6 +25,11 @@
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{studyId}"/>
+        <input type="hidden" th:field="*{roundsEnabled}" th:value="true"/>
+        <input type="hidden" th:field="*{numberOfRounds}" th:value="1"/>
+
+
+
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Basic</legend>
             <div class="container">
@@ -33,12 +38,6 @@
                     <div class="container">
                         <div class="row">
                             <div class="col">
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label" for="conditionId">Condition Id:</label>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="text" id="conditionId" th:field="*{conditionId}"/>
-                                    </div>
-                                </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="sessionStartDate">Session Start Date:</label>
 
@@ -79,7 +78,7 @@
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label" for="sessionSuffix">Session Suffix:</label>
+                                    <label class="col-sm-3 col-form-label" for="sessionSuffix">Suffix:</label>
 
                                     <div class="input-group col-sm-9">
                                         <div class="input-group-prepend">
@@ -93,27 +92,7 @@
                     </div>
                 </fieldset>
             </div>
-            <div class="container">
-                <fieldset class="form-group row">
 
-                    <legend class="col-form-legend col-sm-2">Rounds</legend>
-
-                    <div class="container">
-                        <div class="form-group row" >
-                            <label class="col-sm-3 col-form-label" for="roundsEnabled">Enable rounds:</label>
-                            <div class="col-sm-9">
-                                <input class="form-check-input" th:field="*{roundsEnabled}" type="checkbox" id="roundsEnabled" />
-                            </div>
-                        </div>
-                        <div class="form-group row" >
-                            <label class="col-sm-3 col-form-label" for="numberOfRounds">Number Of Rounds:</label>
-                            <div class="col-sm-9">
-                                <input class="form-control" type="number" id="numberOfRounds" th:field="*{numberOfRounds}"/>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
             <div class="container">
                 <fieldset class="form-group row">
                     <legend class="col-form-legend col-sm-2">Pages</legend>
@@ -360,7 +339,7 @@
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="teamCreationMatrix">Team Creation Matrix:</label>
                     <div class="col-sm-9">
-                        <textarea class="form-control htmleditor" id="teamCreationMatrix" th:field="*{teamCreationMatrix}" rows="3"></textarea>
+                        <textarea class="form-control" id="teamCreationMatrix" th:field="*{teamCreationMatrix}" rows="3"></textarea>
                     </div>
                 </div>
 

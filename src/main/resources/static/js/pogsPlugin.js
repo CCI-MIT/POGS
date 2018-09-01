@@ -38,6 +38,8 @@ class PogsPlugin {
         return null;
     }
 
+
+
     subscribeTaskAttributeBroadcast (funct) {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
