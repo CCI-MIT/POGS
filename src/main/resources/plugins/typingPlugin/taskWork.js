@@ -20,6 +20,6 @@ class PogsOtClient extends AbstractOtClient {
 }
 
 const typingPlugin = pogs.createPlugin('typingPlugin', function() {
-    const otClient = new PogsOtClient(this);
+    const otClient = new PogsOtClient(this, '#padContent');
 });
 
