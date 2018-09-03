@@ -112,6 +112,10 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "Your session has ended!");
             return "workspace/error";
         }
+        if(sr.getSession().isTooLate()){
+            model.addAttribute("errorMessage", "You are too late, your session has already passed!");
+            return "workspace/error";
+        }
         sr.subjectCheckIn(su);
         return "redirect:/waiting_room/" + su.getSubjectExternalId();
     }

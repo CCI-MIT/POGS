@@ -126,7 +126,7 @@ public class SessionWrapper extends Session {
     }
 
 
-    private boolean isTooLate() {
+    public boolean isTooLate() {
 
         return DateUtils.now() > this.getSessionStartDate().getTime();
     }
@@ -274,6 +274,14 @@ public class SessionWrapper extends Session {
                 }
             }
         }
+    }
+
+    public ArrayList<SessionSchedule> getSessionSchedule() {
+        return sessionSchedule;
+    }
+
+    public void setSessionSchedule(ArrayList<SessionSchedule> sessionSchedule) {
+        this.sessionSchedule = sessionSchedule;
     }
 
     public boolean isCurrentScheduleTask() {

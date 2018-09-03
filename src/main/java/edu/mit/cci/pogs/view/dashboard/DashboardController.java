@@ -15,7 +15,10 @@ import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
+import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 
 @Controller
 public class DashboardController {
@@ -23,7 +26,7 @@ public class DashboardController {
     @Autowired
     private StudyDao studyDao;
 
-    @GetMapping("/dashboard")
+    @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
         //get session associated with user
         List<Study> studiesUserIsAllowedToSee = studyDao.listStudiesWithUserGroup(
@@ -33,17 +36,34 @@ public class DashboardController {
         List<SessionWrapper> liveSessionsResearcherCanSee = new ArrayList<>();
 
         for (SessionRunner sr : liveSessionRunners) {
+            for(Study study: studiesUserIsAllowedToSee) {
+                if(study.getId() == sr.getSession().getStudyId()){
+                    liveSessionsResearcherCanSee.add(sr.getSession());
+                }
+            }
         }
 
-        model.addAttribute("","");
-        return "dashboard";
+        model.addAttribute("liveSessionsResearcherCanSee",liveSessionsResearcherCanSee);
+        return "dashboard/dashboard-home";
     }
 
-    @GetMapping("/dashboard/session/{sessionId}")
-    public String dashboardForSession(@PathVariable("sessionId") String sessionId, Model model) {
+    @GetMapping("/admin/dashboard/sessions/{sessionId}")
+    public String dashboardForSession(@PathVariable("sessionId") Long sessionId, Model model) {
         //get all schedules and completed tasks for session
+        SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
 
-        // dashboard.js
-        return null;
+        RoundWrapper rw = sessionRunner.getSession().getCurrentRound();
+        if(rw!=null) {
+
+            List<TeamWrapper> teams = rw.getRoundTeams();
+            model.addAttribute("teams", teams);
+        }
+
+        List<SessionSchedule> sessionSchedule = sessionRunner.getSession().getSessionSchedule();
+
+        model.addAttribute("sessionz",sessionRunner.getSession());
+        model.addAttribute("sessionSchedule", sessionSchedule);
+
+        return "dashboard/dashboard-session";
     }
 }

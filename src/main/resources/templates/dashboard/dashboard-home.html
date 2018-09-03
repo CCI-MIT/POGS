@@ -6,7 +6,7 @@
 <!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
 <head>
     <meta charset="UTF-8">
-    <title>POGS - Study </title>
+    <title>POGS - Dashboard </title>
 </head>
 <body>
 <div layout:fragment="content" class="container">
@@ -15,12 +15,11 @@
     </ol>
     <h2>Live sessions Dashboard</h2>
 
-    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
 
-    <h3>Session subjects: </h3>
 
     <br/>
-    <table class="table table-striped">
+    <div class="information" th:if="${#lists.isEmpty(liveSessionsResearcherCanSee)}">There are no current live sessions associated with the research groups you are associated with!</div>
+    <table class="table table-striped" th:if="${not #lists.isEmpty(liveSessionsResearcherCanSee)}">
            <thead>
            <tr>
                <th>Session ID</th>
@@ -29,10 +28,10 @@
            </tr>
            </thead>
            <tbody>
-           <th:block th:each="sessionz : ${sessionsList}">
+           <th:block th:each="sessionz : ${liveSessionsResearcherCanSee}">
                <tr>
                    <td th:text="${sessionz.id}"></td>
-                   <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
+                   <td><a th:text="${sessionz.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionz.id} "></a></td>
                    <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
 
                </tr>

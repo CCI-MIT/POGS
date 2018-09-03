@@ -13,7 +13,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
         <li class="breadcrumb-item "><a href="/admin/studies">Studies</a></li>
-        <li class="breadcrumb-item active" th:if="${study.id != null}">
+        <li class="breadcrumb-item " th:if="${study.id != null}">
             <a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a>
         </li>
         <li class="breadcrumb-item active" th:if="${sessionBean.id != null}">
