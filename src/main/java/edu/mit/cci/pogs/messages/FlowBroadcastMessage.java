@@ -13,6 +13,7 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
         this.setSender("server");
         this.content = new FlowBroadcastMessageContent();
 
+        
         this.content.setNextUrl(sessionWrapper.getNextUrl());
         this.content.setSecondsRemainingCurrentUrl(sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
         this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());

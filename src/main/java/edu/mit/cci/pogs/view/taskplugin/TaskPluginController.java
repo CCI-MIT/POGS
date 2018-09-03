@@ -76,8 +76,10 @@ public class TaskPluginController {
         if (taskPluginConfigBean.getId() == null) {
             TaskConfiguration tc = taskConfigurationDao.create(taskPluginConfigBean);
             taskPluginConfigBean.setId(tc.getId());
-            for(TaskExecutionAttribute tea: taskPluginConfigBean.getAttributes()){
-                tea.setId(null);
+            if(taskPluginConfigBean.getAttributes()!=null) {
+                for (TaskExecutionAttribute tea : taskPluginConfigBean.getAttributes()) {
+                    tea.setId(null);
+                }
             }
         } else {
             taskConfigurationDao.update(taskPluginConfigBean);
