@@ -1,4 +1,4 @@
-class PogsOtClient extends AbstractOtClient {
+class PogsOtClient extends ot.AbstractOtClient {
     constructor(pogsPlugin, padSelector) {
         super(pogsPlugin.getCompletedTaskId(), pogsPlugin.getSubjectId(), padSelector);
         log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
@@ -20,6 +20,6 @@ class PogsOtClient extends AbstractOtClient {
 }
 
 const typingPlugin = pogs.createPlugin('typingPlugin', function() {
-    const otClient = new PogsOtClient(this);
+    const otClient = new PogsOtClient(this, '#padContent');
 });
 

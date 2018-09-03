@@ -1,6 +1,6 @@
 // Requires loglevel, fast-diff, ot.js and ot_client.js
 
-[ot.AbstractOrClient, ot.StompOtClient] = (function() {
+[ot.AbstractOtClient, ot.StompOtClient] = (function() {
     // Imports
     let Client = ot.Client;
     let Component = ot.Component;
