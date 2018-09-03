@@ -1,7 +1,9 @@
 class PogsOtClient extends ot.AbstractOtClient {
     constructor(pogsPlugin, padSelector) {
         super(pogsPlugin.getCompletedTaskId(), pogsPlugin.getSubjectId(), padSelector);
-        log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
+        log.info(`Initializing PogsOtClient for pad ${pogsPlugin.getCompletedTaskId()} as client ${pogsPlugin.getSubjectId()}`);
+
+        this._pogsPlugin = pogsPlugin;
 
         pogsPlugin.subscribeTaskAttributeBroadcast(function(message) {
             let attrName = message.content.attributeName;
@@ -15,7 +17,7 @@ class PogsOtClient extends ot.AbstractOtClient {
         if (log.getLevel() >= log.levels.DEBUG) {
             log.debug("Sending operation: " + JSON.stringify(operation));
         }
-        this._pogsPluin.sendOperation(operation);
+        this._pogsPlugin.sendOperation(operation);
     }
 }
 
