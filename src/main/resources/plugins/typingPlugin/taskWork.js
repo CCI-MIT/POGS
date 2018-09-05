@@ -14,7 +14,7 @@ class PogsOtClient extends ot.AbstractOtClient {
     }
 
     sendOperation(operation) {
-        if (log.getLevel() >= log.levels.DEBUG) {
+        if (log.getLevel() <= log.levels.DEBUG) {
             log.debug("Sending operation: " + JSON.stringify(operation));
         }
         this._pogsPlugin.sendOperation(operation);

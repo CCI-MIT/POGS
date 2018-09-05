@@ -141,10 +141,26 @@ ot.Client = (function() {
             }
         }
 
+        /**
+         * This method sends the operation to the server.
+         *
+         * Subclasses need to implement this method to send it to the server via the appropriate
+         * means of communication.
+         *
+         * @param operation the operation to be sent
+         */
         sendOperation(operation) {
 
         }
 
+        /**
+         * Apply this operation to the client's state.
+         *
+         * This method is called when an operation is received from the server and the change needs
+         * to be reflected in the client's text state.
+         *
+         * @param operation the operation received from the server
+         */
         applyOperation(operation) {
 
         }

@@ -44,6 +44,14 @@
         $input.data(LAST_VALUE_ATTRIBUTE, $input.val());
     }
 
+    /**
+     * A convenience implementation that takes care of everything except for communication.
+     *
+     * The subclass needs to do two things:
+     * 1. invoke the receiveOperation(operationJson) method whenever a new operation is received
+     *    from the server
+     * 2. implement the sendOperation(operation) method to send an operation to the server
+     */
     class AbstractOtClient extends Client {
         constructor (padId, clientId, padSelector) {
             super(padId, clientId);
@@ -69,13 +77,13 @@
          */
         receiveOperation(operationJson) {
             let operation = Operation.fromJSON(operationJson);
+            if (log.getLevel() <= log.levels.DEBUG) {
+                log.debug("Received operation: " + JSON.stringify(operation));
+            }
             this.processServerOperation(operation);
         }
 
         applyOperation(operation) {
-            if (log.getLevel() >= log.levels.DEBUG) {
-                log.debug("Applying operation: " + JSON.stringify(operation));
-            }
             let currentContent = this._inputWatcher.value;
             this._inputWatcher.value = operation.apply(currentContent);
         }
@@ -93,19 +101,11 @@
         }
 
         sendOperation(operation) {
-            if (log.getLevel() >= log.levels.DEBUG) {
+            if (log.getLevel() <= log.levels.DEBUG) {
                 log.debug("Sending operation: " + JSON.stringify(operation));
             }
             stomp.client.send(`/pogsapp/ot/pad/${this.padId}/operations/submit`,
                 {}, JSON.stringify(operation));
-        }
-
-        applyOperation(operation) {
-            if (log.getLevel() >= log.levels.DEBUG) {
-                log.debug("Applying operation: " + JSON.stringify(operation));
-            }
-            let currentContent = this._inputWatcher.value;
-            this._inputWatcher.value = operation.apply(currentContent);
         }
     }
 
