@@ -39,7 +39,8 @@ CREATE TABLE `auth_user` (
 
 LOCK TABLES `auth_user` WRITE;
 /*!40000 ALTER TABLE `auth_user` DISABLE KEYS */;
-INSERT INTO `auth_user` VALUES (1,'carlosbpf@gmail.com','$2a$10$ruvXFokY4swbT2idWfk2Ge8Vce.i0iXnSbvWGdoXoH7grMnYca3gW','Carlos','Paula',NULL);
+INSERT INTO `auth_user` VALUES (1,'carlosbpf@gmail.com','$2a$10$ruvXFokY4swbT2idWfk2Ge8Vce.i0iXnSbvWGdoXoH7grMnYca3gW','Carlos','Paula',NULL),
+                                (2, 'admin@pogs.mit.edu', '$2a$10$3vW6KMnqv/LVEgDfRd3hkeo3WQ7h9WqbpIag0GyJzwELnrQK5Zy9m' /* password = 'pogs123' */, 'POGS', 'Admin', 0);
 /*!40000 ALTER TABLE `auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -337,7 +338,8 @@ CREATE TABLE `research_group_has_auth_user` (
 
 LOCK TABLES `research_group_has_auth_user` WRITE;
 /*!40000 ALTER TABLE `research_group_has_auth_user` DISABLE KEYS */;
-INSERT INTO `research_group_has_auth_user` VALUES (1,1,1);
+INSERT INTO `research_group_has_auth_user` VALUES (1,1,1),
+                                                  (1,1,2);
 /*!40000 ALTER TABLE `research_group_has_auth_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
