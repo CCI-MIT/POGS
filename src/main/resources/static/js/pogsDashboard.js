@@ -139,9 +139,12 @@ class PogsDashboard {
 
             this.countDown = new Countdown(this.secondsRemainingCurrentUrl, currentUrl+"countdown",
                                            function () {
-                                               $(this.lastReference).removeClass("cardLive").addClass("cardPassed");
+                                               $("#" +this.lastReference +" .card-body").removeClass("cardLive").addClass("cardPassed");
                                                this.countDown == null;
                                                this.task = null;
+                                               if(this.lastReference.indexOf("_waiting_room")>=0){
+                                                   location.reload();
+                                               }
                                                console.log("countdown got null");
                                            }.bind(this));
             this.countDown.updateFinalMessage("DONE");
@@ -155,7 +158,7 @@ class PogsDashboard {
             console.log("TASK ID: " + taskId);
         }
         if( this.lastReference != currentUrl){
-            $(this.lastReference).removeClass("cardLive").addClass("cardPassed");
+            $("#"+this.lastReference + " .card-body").removeClass("cardLive").addClass("cardPassed");
             this.lastReference = currentUrl;
         }
 
