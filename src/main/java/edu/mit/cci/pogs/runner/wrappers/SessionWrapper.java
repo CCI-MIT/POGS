@@ -83,7 +83,15 @@ public class SessionWrapper extends Session {
             return (rw.getRoundStartTimestamp() + rw.getTotalRoundTime()) - DateUtils.now();
         }
     }
+    public String getCurrentUrl() {
+        Integer sessionScheduleIndex = getSessionScheduleIndex();
 
+        if(this.sessionSchedule == null || this.sessionSchedule.size() == 0){
+            return "/waiting_room";
+        }
+        return this.sessionSchedule.get(sessionScheduleIndex).getUrl();
+
+    }
     public String getNextUrl() {
 
         if (this.sessionSchedule == null || this.sessionSchedule.size() == 0) {
@@ -297,6 +305,7 @@ public class SessionWrapper extends Session {
 
     public Integer getSessionScheduleIndex() {
         Long now = DateUtils.now();
+        if(this.sessionSchedule== null) return 0;
         for (int i = 0; i < this.sessionSchedule.size(); i++) {
             SessionSchedule ss = this.sessionSchedule.get(i);
             if (ss.isHappeningNow(now)) {

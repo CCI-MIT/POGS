@@ -9,6 +9,7 @@ public class CommunicationMessage extends PogsMessage<CommunicationMessageConten
     }
     public enum CommunicationType {
 
+        CHECK_IN,
         JOINED, //To add to panel if not there
         MESSAGE,//NormalMessage
         IS_TYPING,//typing event

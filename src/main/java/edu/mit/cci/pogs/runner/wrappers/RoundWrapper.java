@@ -78,6 +78,7 @@ public class RoundWrapper extends Round {
     }
 
     public boolean isHappeningNow(Long currentTimestamp) {
+        if(roundStartTimestamp == null) return false;
         return currentTimestamp >= roundStartTimestamp && currentTimestamp <= getRoundFinishTimestamp();
     }
 

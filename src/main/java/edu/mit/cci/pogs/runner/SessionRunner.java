@@ -280,6 +280,7 @@ public class SessionRunner implements Runnable {
             List<Subject> subjectList = tw.getSubjects();
             Color[] colors = ColorUtils.generateVisuallyDistinctColors(subjectList.size(),
                     ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
+
             for (int i = 0; i < subjectList.size(); i++) {
                 addColorSubjectAttribute(subjectList.get(i),
                         ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME, colors[i]);

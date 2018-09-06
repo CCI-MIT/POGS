@@ -1,6 +1,9 @@
 package edu.mit.cci.pogs.utils;
 
 import java.awt.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 
@@ -47,6 +50,11 @@ public class ColorUtils {
             V_OFF = .615f;
     private static final long RAND_SEED = 0;
     private static Random rand = new Random(RAND_SEED);
+
+
+    private static Random random;
+
+
 
 
     public static Color generateFontColorBasedOnBackgroundColor(Color color){
@@ -101,7 +109,10 @@ public class ColorUtils {
             //System.out.println(rgb[i][0] + "\t" + rgb[i][1] + "\t" + rgb[i][2]);
         }
 
-        return rgbs;
+        List<Color> l = Arrays.asList(rgbs);
+        Collections.shuffle(l);
+        Color[] ret = new Color[l.size()];
+        return l.toArray(ret);
     }
 
     public static void hsv2rgb(float h, float s, float v, float[] rgb) {
