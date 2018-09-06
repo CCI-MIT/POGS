@@ -16,7 +16,6 @@ import java.util.List;
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
@@ -49,10 +48,9 @@ public class StudyController {
     public String getStudies(@PathVariable("studyId") Long studyId, Model model) {
         Study study = studyDao.get(studyId);
         model.addAttribute("study", study);
-        List<Condition> conditionList = studyService.listConditions(study);
-        model.addAttribute("conditionsList", conditionList);
-        List<Session> sessions = new ArrayList<>();
-        conditionList.forEach(condition -> sessions.addAll(studyService.listSessionsByCondition(condition)));
+
+
+        List<Session> sessions = studyService.listSessionsByStudyId(study.getId());
 
         model.addAttribute("sessionsList", sessions);
 

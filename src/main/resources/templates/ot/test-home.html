@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!--/*@thymesVar id="padId" type="java.lang.Long"*/-->
+    <!--/*@thymesVar id="clientId" type="java.lang.Long"*/-->
+
+    <form th:action="@{/ot/test-pad}" method="post">
+        <button type="submit" class="btn btn-primary btn-block">
+            New pad
+        </button>
+    </form>
+</div>
+</body>
+</html>

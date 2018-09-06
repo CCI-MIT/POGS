@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+
+    <!--/*@thymesVar id="padId" type="java.lang.String"*/-->
+    <!--/*@thymesVar id="clientId" type="java.lang.Long"*/-->
+    <!--/*@thymesVar id="testPadNumber" type="java.lang.Integer"*/-->
+
+    <div class="d-flex justify-content-between align-items-center">
+        <div class="alert alert-info">
+            You're viewing pad <span th:text="${padId}">padId</span> as client <span th:text="${clientId}">clientId</span>.
+            What you are typing can be seen by all other browser windows viewing this pad.
+            Click
+            <a target="_blank" th:href="@{/ot/test-pad/{testPadNumber}(testPadNumber=${testPadNumber})}">here</a> to open this pad in another tab.
+        </div>
+        <div>
+            <form th:action="@{/ot/test-pad}" method="post">
+                <button type="submit" class="btn btn-primary">
+                    New pad
+                </button>
+            </form>
+        </div>
+
+    </div>
+
+    <div>
+        <label for="padContent" class="sr-only">Pad content:</label>
+        <textarea class="form-control" id="padContent" name="padContent"></textarea>
+    </div>
+
+    <script th:src="@{/vendor/loglevel/dist/loglevel.min.js}"></script>
+
+    <!-- Standalone STOMP config for this test page-->
+    <script>
+        let stomp = {
+            client: null,
+            isConnected: false,
+            pendingSubscriptions: [],
+            subscribe(topic, callback) {
+                if (!stomp.isConnected) {
+                    console.log('Queuing subscription to topic ' + topic);
+                    stomp.pendingSubscriptions.push({topic, callback});
+                } else {
+                    console.log('Subscribing to topic ' + topic);
+                    stomp.client.subscribe(topic, callback);
+                }
+            }
+        };
+
+        $(function() {
+            const socket = new SockJS('/ws');
+            stomp.client = Stomp.over(socket);
+            stomp.client.debug = () => {};
+
+            stomp.client.connect({}, onConnected, onError);
+
+            function onConnected() {
+                console.info("stomp client connected");
+                stomp.isConnected = true;
+                for (let i = 0; i < stomp.pendingSubscriptions.length; i++) {
+                    let pendingSubscription = stomp.pendingSubscriptions[i];
+                    console.log('Subscribing to topic ' + pendingSubscription.topic);
+                    stomp.client.subscribe(pendingSubscription.topic, pendingSubscription.callback);
+                }
+                stomp.pendingSubscriptions = {};
+            }
+
+            function onError(err) {
+                console.info("Error in stomp client: " + err);
+            }
+        });
+    </script>
+    <!-- End STOMP config-->
+
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+
+        // Retrieve values from thymeleaf
+        const padId = /*[[${padId}]]*/ '0';
+        const clientId = /*[[${clientId}]]*/ '0';
+
+        /*]]>*/
+    </script>
+
+
+    <!-- Begin fast-diff library wrapper -->
+    <script>
+        // Needed to use fast-diff (avoid runtime error)
+        let module = {exports: {}}
+    </script>
+    <script th:src="@{/vendor/fast-diff/diff.js}"></script>
+    <script>
+        const fastDiff = {
+            diff: module.exports,
+            INSERT: module.exports.INSERT,
+            DELETE: module.exports.DELETE,
+            EQUAL: module.exports.EQUAL
+        };
+        module = undefined;
+    </script>
+    <!-- End fast-diff library wrapper -->
+
+
+    <!-- OT dependencies-->
+    <script th:src="@{/js/lib/ot.js}"></script>
+    <script th:src="@{/js/lib/ot_client.js}"></script>
+    <script th:src="@{/js/lib/ot_client_stomp.js}"></script>
+
+
+    <!-- Initialize StompOtClient -->
+    <script>
+        $(function() {
+            window.otClient = new ot.StompOtClient(padId, clientId, '#padContent');
+        });
+    </script>
+</div>
+</body>
+</html>

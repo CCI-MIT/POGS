@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dashboard </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+    </ol>
+    <h2>Live sessions Dashboard</h2>
+
+
+
+    <br/>
+    <div class="information" th:if="${#lists.isEmpty(liveSessionsResearcherCanSee)}">There are no current live sessions associated with the research groups you are associated with!</div>
+    <table class="table table-striped" th:if="${not #lists.isEmpty(liveSessionsResearcherCanSee)}">
+           <thead>
+           <tr>
+               <th>Session ID</th>
+               <th>Session name</th>
+               <th>Session start date </th>
+           </tr>
+           </thead>
+           <tbody>
+           <th:block th:each="sessionz : ${liveSessionsResearcherCanSee}">
+               <tr>
+                   <td th:text="${sessionz.id}"></td>
+                   <td><a th:text="${sessionz.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionz.id} "></a></td>
+                   <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+
+               </tr>
+           </th:block>
+           </tbody>
+       </table>
+</div>
+</body>
+</html>

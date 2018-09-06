@@ -9,4 +9,5 @@ public interface TodoEntryDao extends Dao<TodoEntry, Long> {
 
     List<TodoEntry> list();
     List<TodoEntry> listByCompletedTaskId(Long completedTaskId);
+    void delete(Long todoEntryId);
 }

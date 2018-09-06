@@ -112,7 +112,8 @@ class GroupChatManager {
 
                 if (message.content.message != "") {
                     this.channelBodyRef.append(this.createReceivedMessageHTML(
-                        message.content.message, this.resolveSubjectDisplayName(message.sender), new Date()));
+                        message.content.message, this.resolveSubjectDisplayName(message.sender),message.sender,
+                        new Date()));
                     this.adjustScroll();
                 }
 
@@ -124,6 +125,7 @@ class GroupChatManager {
                                               this.resolveSubjectDisplayName(
                                                   this.communicationPluginReference.getSubjectId()),
                                               new Date()));
+                this.adjustScroll();
             }
         }
 
@@ -133,7 +135,7 @@ class GroupChatManager {
 
             $("#friend-list").append(
             '                           <li class="list-group-item p-1 hover-bg-lightgray">\n'
-            + '                            <span class="d-xs-none username">'+this.subjectsInChannel[i].displayName+'</span>\n'
+            + '                            <span class="badge '+ this.subjectsInChannel[i].externalId+'_color username">'+this.subjectsInChannel[i].displayName+'</span>\n'
             + '                        </li>\n');
             //handle onclick to change CHAT channel
 
@@ -223,7 +225,7 @@ class GroupChatManager {
     createOwnMessageHTML(message,creator, timeStamp){
 
      return '<div class="row justify-content-end" >'
-            +'<div class="card message-card m-1">'
+            +'<div class="card message-card m-1 '+this.communicationPluginReference.getSubjectId()+'_color ">'
                + '<div class="card-body p-2">'
                     +'<span class="float-left mx-1"><b>'+creator+'</b></span>'
                     +'<span class="mx-2">'+message+'</span>'
@@ -232,11 +234,11 @@ class GroupChatManager {
             +'</div>'
         +'</div>';
     }
-    createReceivedMessageHTML(message, creator, timestamp) {
+    createReceivedMessageHTML(message, creator, externalId, timestamp) {
         return '<div class="row ">\n'
-               + '                            <div class="card message-card bg-lightblue m-1">\n'
+               + '                            <div class="card message-card bg-lightblue m-1 '+externalId+'_color">\n'
                + '                                <div class="card-body p-2">\n'
-               + '                                    <span class="float-left mx-1"><b>'+creator+'</b></span>\n'
+               + '                                    <span class="float-left mx-1 "><b>'+creator+'</b></span>\n'
                + '                                    <span class="mx-2">'+message+'</span>\n'
                + '                                    <span class="float-right mx-1"><small>'+minuteAndSecond(timestamp)+'</span>\n'
                + '                                </div>\n'
@@ -244,6 +246,7 @@ class GroupChatManager {
                + '                        </div>';
     }
 }
+
 
 class MatrixChatManager extends GroupChatManager {
     constructor(communicationPluginReference) {
@@ -284,7 +287,7 @@ class MatrixChatManager extends GroupChatManager {
                             $("#channelBody_" + originChatName)
                                 .append(this.createReceivedMessageHTML(
                                     message.content.message,
-                                    this.resolveSubjectDisplayName(message.sender),
+                                    this.resolveSubjectDisplayName(message.sender),message.sender,
                                     new Date()));
                         }
                     }else {
@@ -306,7 +309,7 @@ class MatrixChatManager extends GroupChatManager {
                         $("#channelBody_" + message.content.channel)
                             .append(this.createReceivedMessageHTML(
                                 message.content.message,
-                                this.resolveSubjectDisplayName(message.sender),
+                                this.resolveSubjectDisplayName(message.sender),message.sender,
                                 new Date()));
                     }else{
 
@@ -379,7 +382,7 @@ class MatrixChatManager extends GroupChatManager {
                         '                           <li class="list-group-item p-1 hover-bg-lightgray '
                         + 'username" data-external-id="'+ this.subjectsInChannel[i].externalId + '"'
                         + ' id="chat_'+ this.subjectsInChannel[i].externalId +'">\n'
-                        + '                            <span class="d-xs-none">'
+                        + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color">'
                         + this.subjectsInChannel[i].displayName + '</span>\n'
                         + '                        </li>\n');
                     this.getOrCreateChannelHTML('chat_'+ this.subjectsInChannel[i].externalId);
@@ -627,7 +630,7 @@ class DyadicChatManager extends GroupChatManager {
             if(this.subjectsInChannel[i].externalId != this.communicationPluginReference.getSubjectId()) {
                 $("#friend-list").append(
                     '                           <li class="list-group-item p-1 hover-bg-lightgray" id="'+this.subjectsInChannel[i].externalId+'_subject_ref">\n'
-                    + '                            <span class="d-xs-none username">'
+                    + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color username">'
                     + this.subjectsInChannel[i].displayName + '</span>\n'
                     + '                             <i class="fa fa-phone-square chatRequest chatRequestAvailable" data-status="AVAILABLE" data-externalId="'
                     + this.subjectsInChannel[i].externalId + '"style=""></i> <span class="badge badge-primary status-text-desc statusAvailable">available</span>  \n'

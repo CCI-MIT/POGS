@@ -112,6 +112,10 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "Your session has ended!");
             return "workspace/error";
         }
+        if(sr.getSession().isTooLate()){
+            model.addAttribute("errorMessage", "You are too late, your session has already passed!");
+            return "workspace/error";
+        }
         sr.subjectCheckIn(su);
         return "redirect:/waiting_room/" + su.getSubjectExternalId();
     }
@@ -179,6 +183,7 @@ public class WorkspaceController {
 
             List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(), null, null);
             model.addAttribute("teammates", teammates);
+
         }
 
         return ret;
@@ -381,7 +386,10 @@ public class WorkspaceController {
                         round.getId(),
                         team.getId(),
                         task.getId());
-                //get team
+                if(completedTask == null) {
+                    completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
+                }
+
                 List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
                         round.getId(), task.getId());
 
