@@ -6,9 +6,11 @@ class PogsOtClient extends ot.AbstractOtClient {
         this._pogsPlugin = pogsPlugin;
 
         pogsPlugin.subscribeTaskAttributeBroadcast(function(message) {
+            log.debug('Task attribute received: ' + message.content.attributeName);
             let attrName = message.content.attributeName;
             if (attrName == "operation") {
                 this.receiveOperation(message.content.attributeStringValue);
+                log.debug('Operation received: ' + message.content.attributeStringValue);
             }
         }.bind(this));
     }
