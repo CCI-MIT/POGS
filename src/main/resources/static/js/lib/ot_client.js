@@ -74,7 +74,16 @@ ot.Client = (function() {
             this._latestKnownServerOperationId = operation.id;
             switch (this._status) {
                 case clientStatus.SYNCHRONIZED:
-                    throw "No outstanding operation: " + operation;
+                    // This might be desirable if the client has reloaded the page
+                    // and is catching up to the current state
+                    log.warn(`No outstanding operation ${operation.id} - assuming we re-joined and our own operation is being re-played.`);
+                    try {
+                        this._client.applyOperation(operation);
+                    } catch (err) {
+                        throw `Tried to apply server ack for operation ${operation.id} as no
+                                outstanding operation was found, but failed with error ${err}`;
+                    }
+                    break;
                 case clientStatus.AWAITING_CONFIRM:
                     log.debug("Currently AWAITING_CONFIRM: reverting to synchronized");
                     this._outstanding = null;
