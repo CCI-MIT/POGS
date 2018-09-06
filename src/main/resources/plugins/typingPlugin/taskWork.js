@@ -9,8 +9,8 @@ class PogsOtClient extends ot.AbstractOtClient {
             log.debug('Task attribute received: ' + message.content.attributeName);
             let attrName = message.content.attributeName;
             if (attrName == "operation") {
-                this.receiveOperation(message.content.attributeStringValue);
                 log.debug('Operation received: ' + message.content.attributeStringValue);
+                this.receiveOperation(JSON.parse(message.content.attributeStringValue));
             }
         }.bind(this));
     }

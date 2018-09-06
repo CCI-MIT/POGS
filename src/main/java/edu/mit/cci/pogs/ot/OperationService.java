@@ -15,8 +15,10 @@ public class OperationService {
 
     private Map<String, OperationState> serverStates = new HashMap<>();
 
-    public void initializeState(String padId, String initialText) {
-        serverStates.put(padId, new OperationStateImpl(initialText));
+    public OperationState initializeState(String padId, String initialText) {
+        final OperationStateImpl state = new OperationStateImpl(initialText);
+        serverStates.put(padId, state);
+        return state;
     }
 
     public OperationState getState(String padId) {
@@ -28,15 +30,23 @@ public class OperationService {
     }
 
     public Operation processOperation(String padId, Operation operation) {
+        return processOperation(padId, operation, false);
+    }
+
+    public Operation processOperation(String padId, Operation operation, boolean create) {
         if (operation.getPadId() != null && !Objects.equals(operation.getPadId(), padId)) {
             throw new IllegalArgumentException(String.format(
                     "This operation's padId %s does not match the given padId %s.",
                     operation.getPadId(), padId));
         }
 
-        final OperationState operationState = serverStates.get(padId);
+        OperationState operationState = serverStates.get(padId);
         if (operationState == null) {
-            throw new IllegalArgumentException("There is no server state with the given padId");
+            if (create) {
+                operationState = initializeState(padId, "");
+            } else {
+                throw new IllegalArgumentException("There is no server state with the given padId");
+            }
         }
 
         return operationState.apply(operation);
