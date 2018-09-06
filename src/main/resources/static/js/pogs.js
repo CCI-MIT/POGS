@@ -277,10 +277,9 @@ class Pogs {
             };
             this.stompClient.send(url, {}, JSON.stringify(chatMessage));
         }
-        if(event){
+        if (typeof event !== 'undefined') {
             event.preventDefault()
         }
-
     }
 }
 
