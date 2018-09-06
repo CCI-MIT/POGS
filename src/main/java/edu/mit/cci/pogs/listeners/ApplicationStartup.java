@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.listeners;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -18,6 +19,8 @@ import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 public class ApplicationStartup {
 
 
+    @Value( "${plugins.dir}" )
+    private String pathToPlugins;
     /**
      * This method is called during Spring's startup.
      *
@@ -38,7 +41,12 @@ public class ApplicationStartup {
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
         Resource resource = new ClassPathResource("plugins");
-        File file = resource.getFile();
+        File file = null;
+        try {
+            file = resource.getFile();
+        } catch (IOException e) {
+            file = new File(pathToPlugins);
+        }
         String[] plugins = file.list();
         for(String p:plugins) {
             TaskPlugin tp = new TaskPlugin(p, file.getAbsolutePath()+ File.separatorChar+ p);
