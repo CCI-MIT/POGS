@@ -86,8 +86,8 @@ public class Operation {
         return new Operation(-1);
     }
 
-    public static Operation begin(int parentId) {
-        return new Operation(parentId);
+    public static Operation begin(Integer parentId) {
+        return new Operation(parentId != null ? parentId : -1);
     }
 
     public static Operation fromDto(OperationDto dto) {
@@ -181,7 +181,8 @@ public class Operation {
                     operationB.baseLength, targetLength));
         }
 
-        if (metaData.getAuthorId() != operationB.metaData.getAuthorId()) {
+        if (metaData != null &&
+                !Objects.equals(metaData.getAuthorId(), operationB.metaData.getAuthorId())) {
             throw new IllegalArgumentException("Cannot compose operations from different authors");
         }
 
