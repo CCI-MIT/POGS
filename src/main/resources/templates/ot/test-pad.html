@@ -9,14 +9,16 @@
 <body>
 <div layout:fragment="content">
 
-    <!--/*@thymesVar id="padId" type="java.lang.Long"*/-->
+    <!--/*@thymesVar id="padId" type="java.lang.String"*/-->
     <!--/*@thymesVar id="clientId" type="java.lang.Long"*/-->
+    <!--/*@thymesVar id="testPadNumber" type="java.lang.Integer"*/-->
 
     <div class="d-flex justify-content-between align-items-center">
         <div class="alert alert-info">
             You're viewing pad <span th:text="${padId}">padId</span> as client <span th:text="${clientId}">clientId</span>.
             What you are typing can be seen by all other browser windows viewing this pad.
-            Click <a target="_blank" th:href="@{/ot/test-pad/{padId}(padId=${padId})}">here</a> to open this pad in another tab.
+            Click
+            <a target="_blank" th:href="@{/ot/test-pad/{testPadNumber}(testPadNumber=${testPadNumber})}">here</a> to open this pad in another tab.
         </div>
         <div>
             <form th:action="@{/ot/test-pad}" method="post">
@@ -82,8 +84,8 @@
         /*<![CDATA[*/
 
         // Retrieve values from thymeleaf
-        const padId = /*[[${padId}]]*/ 0;
-        const clientId = /*[[${clientId}]]*/ 0;
+        const padId = /*[[${padId}]]*/ '0';
+        const clientId = /*[[${clientId}]]*/ '0';
 
         /*]]>*/
     </script>
