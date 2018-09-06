@@ -238,17 +238,22 @@ class Pogs {
             }
         }
 
-        //schedule check-in ping
+        var x = setInterval(function () {
 
-        // Tell your username to the server
-//        this.stompClient.send("/app/chat.addUser",
-//                         {},
-//                         JSON.stringify({sender: username, type: 'JOIN'})
-//        );
+            this.sendCheckInMessage();
+
+        }.bind(this), 5000);// 5 seconds
+
         this.fire(null, 'onReady', this);
     }
     onError(error) {
         this.fire(null, 'onError', this);
+    }
+    sendCheckInMessage(){
+        this.sendMessage("/pogsapp/checkIn.sendMessage", "CHECK_IN",
+                         {message: window.location.pathname, type: "CHECK_IN"},
+                                 this.subjectId, null, this.completedTaskId,
+                                 this.sessionId);
     }
     onFlowBroadcastReceived(message) {
 
@@ -284,75 +289,6 @@ class Pogs {
     }
 }
 
-//TODO: put it in an external file
-class Countdown{
-    constructor(countDownDate, htmlReference, finalFunction){
-    // Update the count down every 1 second
-        this.countDownDate = countDownDate;
-        this.htmlReference = htmlReference;
-        this.finalFunction = finalFunction;
 
-        function trailingZeros(val) {
-            if (val < 10) {
-                return '0' + val;
-            } else {
-                return val;
-            }
-        }
-
-        var x = setInterval(function () {
-
-            // Get todays date and time
-            var now = new Date().getTime();
-
-            // Find the distance between now an the count down date
-            var distance = this.countDownDate - now;
-
-            // Time calculations for days, hours, minutes and seconds
-            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-            if (isNaN(days)) {
-                days = 0;
-            }
-            if (isNaN(hours)) {
-                hours = 0;
-            }
-            if (isNaN(minutes)) {
-                minutes = 0;
-            }
-            if (isNaN(seconds)) {
-                seconds = 0;
-            }
-
-    //
-            //trailingZeros
-            if (distance > 0) {
-                if (document.getElementById(this.htmlReference) != null) {
-                    document.getElementById(this.htmlReference).innerHTML =
-                        ((minutes > 0) ? (trailingZeros(minutes.toString()) + ':' ) : (''))
-                        + trailingZeros(seconds.toString())
-                        + ((minutes > 0) ? (' minutes')
-                        : (' seconds'));
-                }
-            } else {
-                if (document.getElementById(this.htmlReference) != null) {
-                    document.getElementById(this.htmlReference).innerHTML = "Redirecting ...";
-                }
-            }
-
-            // If the count down is finished, write some text
-            if (distance < 0) {
-                clearInterval(x);
-                this.finalFunction.call(pogs);
-            }
-        }.bind(this), 1000);
-    }
-    updateCountDownDate(countDownDate) {
-        this.countDownDate = countDownDate;
-    }
-}
 
 new Pogs();

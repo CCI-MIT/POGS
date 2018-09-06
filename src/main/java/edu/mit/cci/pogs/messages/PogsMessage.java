@@ -13,7 +13,7 @@ public class PogsMessage <ContentType>{
     public enum MessageType {
         COMMUNICATION_MESSAGE,
 
-        FLOW_CHECK_IN,
+        CHECK_IN,
         FLOW_BROADCAST,
 
         TASK_ATTRIBUTE,

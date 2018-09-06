@@ -18,7 +18,8 @@
 
 
     <br/>
-    <div class="information" th:if="${#lists.isEmpty(liveSessionsResearcherCanSee)}">There are no current live sessions associated with the research groups you are associated with!</div>
+
+    <div class="alert alert-info" th:if="${#lists.isEmpty(liveSessionsResearcherCanSee)}">There are no current live sessions associated with the research groups you are associated with!</div>
     <table class="table table-striped" th:if="${not #lists.isEmpty(liveSessionsResearcherCanSee)}">
            <thead>
            <tr>

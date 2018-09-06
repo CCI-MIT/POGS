@@ -19,7 +19,7 @@ public class WorkspaceFlowWSController {
 
     @MessageMapping("/flow.checkIn")
     public void getCheckin(@Payload PogsMessage pogsMessage) {
-        if(pogsMessage.getType().equals(PogsMessage.MessageType.FLOW_CHECK_IN)) {
+        if(pogsMessage.getType().equals(PogsMessage.MessageType.CHECK_IN)) {
             String externalId = pogsMessage.getSender();
             Subject subject = workspaceService.getSubject(externalId);
 

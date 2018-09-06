@@ -197,7 +197,7 @@ class VotingPoolManager {
 
     deleteOption(optionId) {
         var optionRef = VOTING_POOL_IDS.VOTING_POOL_OPTION_ID + optionId ;
-        console.log("Inisde delete option", optionRef);
+        //console.log("Inisde delete option", optionRef);
         $('#' + optionRef).remove()
     }
 
@@ -206,10 +206,10 @@ class VotingPoolManager {
         if(message.content.collaborationType != COLLABORATION_TYPE.VOTING_LIST){
             return;
         }
-        console.log("Message received nothing happening")
+        //console.log("Message received nothing happening")
         var votingPools = message.content.votingPools;
 
-        console.log("Voting pools: " +votingPools)
+        //console.log("Voting pools: " +votingPools)
         if (message.content.triggeredBy == VOTING_TYPE.DELETE_OPTION ||
             message.content.triggeredBy == VOTING_TYPE.DELETE_VOTING_POOL) {
             if (message.content.triggeredBy == VOTING_TYPE.DELETE_OPTION) {
@@ -221,7 +221,7 @@ class VotingPoolManager {
         } else {
             for (var i = 0; i < votingPools.length; i++) {
                 var pool = votingPools[i];
-                console.log("Voting question: " +pool.votingQuestion)
+                //console.log("Voting question: " +pool.votingQuestion)
                 this.createNewVotingPool(pool.votingQuestion,pool.votingPoolId);
                 for( var j=0 ; j < pool.votingOptions.length; j++){
                     var option = pool.votingOptions[j];
