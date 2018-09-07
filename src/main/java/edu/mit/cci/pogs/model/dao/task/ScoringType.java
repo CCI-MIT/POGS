@@ -2,8 +2,8 @@ package edu.mit.cci.pogs.model.dao.task;
 
 public enum ScoringType {
 
-    RIGHT_ANSWER_BASED('S', "Sequential, fixed order"),
-    PARALLEL_RANDOM_ORDER('L', "Parallel, randomized");
+    RIGHT_ANSWER_BASED('S', "Answer key"),
+    EXTERNAL_SERVICE('L', "External service");
 
     private Character scoringTypeChar;
     private String scoringType;
