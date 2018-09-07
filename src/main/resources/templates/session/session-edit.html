@@ -28,7 +28,7 @@
         <input type="hidden" th:field="*{roundsEnabled}" th:value="true"/>
         <input type="hidden" th:field="*{numberOfRounds}" th:value="1"/>
 
-
+        <input type="hidden" th:field="*{status}" th:value="P">
 
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Basic</legend>
@@ -65,17 +65,6 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label" for="status">Status:</label>
-                                    <div class="col-sm-9">
-                                        <select class="custom-select" th:field="*{status}" id="status">
-                                            <option
-                                                    th:each="rg: ${sessionStatuses}"
-                                                    th:value="${rg.id}"
-                                                    th:text="${rg.status}" ></option>
-                                        </select>
-                                    </div>
-                                </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="sessionSuffix">Suffix:</label>
