@@ -50,7 +50,7 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
             .from(SESSION).getQuery();
         Timestamp timestamp = new Timestamp(new Date().getTime() + initWindow);
         query.addConditions(SESSION.SESSION_START_DATE.lessThan(timestamp));
-        //query.addConditions(SESSION.SESSION_START_DATE.greaterThan(new Timestamp(new Date().getTime())));
+        query.addConditions(SESSION.SESSION_START_DATE.greaterThan(new Timestamp(new Date().getTime())));
         query.addConditions(SESSION.STATUS.eq(SessionStatus.NOTSTARTED.getId().toString()));
         query.addOrderBy(SESSION.SESSION_START_DATE);
         return query.fetchInto(Session.class);
