@@ -1,5 +1,8 @@
 <div style="width: 100%">
-    <textarea class="form-control" id="padContent" name="padContent" rows="10"></textarea>
+    <label for="padContent" class="sr-only">Please type in this text field:</label>
+    <div style="position: relative" class="text-left">
+        <textarea class="form-control" id="padContent" rows="5" autocomplete="off"></textarea>
+    </div>
 
     <!-- Required scripts-->
 
@@ -20,9 +23,12 @@
     </script>
     <!-- End fast-diff library wrapper -->
 
+    <script src="/vendor/autosize/dist/autosize.min.js"></script>
+
 
     <!-- OT dependencies-->
     <script src="/js/lib/ot.js"></script>
+    <script src="/js/lib/ot_input_watcher.js"></script>
     <script src="/js/lib/ot_client.js"></script>
-    <script src="/js/lib/ot_client_stomp.js"></script>
+    <script src="/js/lib/ot_client_impl.js"></script>
 </div>

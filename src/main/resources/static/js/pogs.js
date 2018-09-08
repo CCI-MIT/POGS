@@ -49,10 +49,12 @@ class Pogs {
 
 
         var rule  = '';
-        for(var i=0; i < subjectColorMap.length ; i++){
-            rule += '.'+subjectColorMap[i].externalId+'_color { background-color: '
-                    + subjectColorMap[i].backgroundColor+'; color: '+
-                    subjectColorMap[i].fontColor+'} ';
+        for (let i = 0; i < subjectColorMap.length; i++){
+            rule += `.${subjectColorMap[i].externalId}_color, `
+                + `[data-author=subject-${subjectColorMap[i].externalId}] {`
+                + `background-color: ${subjectColorMap[i].backgroundColor};`
+                + `color: ${subjectColorMap[i].fontColor};`
+                + '}';
         }
 
         var css = document.createElement('style'); // Creates <style></style>

@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.view.ot;
 
 import edu.mit.cci.pogs.ot.OperationService;
+import edu.mit.cci.pogs.utils.ColorUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -8,7 +9,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -52,6 +56,13 @@ public class OperationalTransformationController {
         if (operationService.getState(padId) == null) {
             return "redirect:/ot/test-pad";
         }
+
+        final List<String> colors = Arrays.stream(ColorUtils.generateVisuallyDistinctColors(50))
+             .map(color -> String.format("#%02x%02x%02x",
+                     color.getRed(), color.getGreen(), color.getBlue()))
+             .collect(Collectors.toList());
+
+        model.addAttribute("authorColors", colors);
 
         model.addAttribute("padId", padId);
         model.addAttribute("testPadNumber", testPadNumber);

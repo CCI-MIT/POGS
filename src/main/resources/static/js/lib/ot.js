@@ -1,10 +1,19 @@
 let ot = {};
 [ot.Component, ot.Operation] = (function() {
     class Component {
+        /**
+         * Constructs a new component.
+         *
+         * Retain and payload should not be both specified.
+         *
+         * @param type the type of this component
+         * @param retain the amount of characters to skip
+         * @param payload
+         */
         constructor(type, retain, payload) {
             this._type = type;
-            this._retain = retain;
-            this._payload = payload;
+            this._retain = retain != null ? retain : 0;
+            this._payload = payload != null ? payload : '';
         }
 
         get type() {
@@ -70,8 +79,12 @@ let ot = {};
             }
         }
 
+        canMergeWith(otherComponent) {
+            return this.type === otherComponent.type;
+        }
+
         merge(otherComponent) {
-            if (otherComponent.type !== this._type) {
+            if (!this.canMergeWith(otherComponent)) {
                 throw "Cannot merge with component of type " + otherComponent.type;
             }
             switch (this._type) {
@@ -173,17 +186,23 @@ let ot = {};
         }
 
         retain(retain) {
-            this.addComponent(new Component('RETAIN', retain, ''));
+            if (retain > 0) {
+                this.addComponent(new Component('RETAIN', retain, ''));
+            }
             return this;
         }
 
         insert(payload) {
-            this.addComponent(new Component('INSERT', 0, payload));
+            if (payload.length > 0) {
+                this.addComponent(new Component('INSERT', 0, payload));
+            }
             return this;
         }
 
         delete(payload) {
-            this.addComponent(new Component('DELETE', 0, payload));
+            if (payload.length > 0) {
+                this.addComponent(new Component('DELETE', 0, payload));
+            }
             return this;
         }
 
@@ -207,7 +226,7 @@ let ot = {};
             if (this._components.length > 0) {
                 let lastComponentIndex = this._components.length - 1;
                 let lastComponent = this._components[lastComponentIndex];
-                if (lastComponent.type === component.type) {
+                if (lastComponent.canMergeWith(component)) {
                     this._components[lastComponentIndex] = lastComponent.merge(component);
                     return;
                 }

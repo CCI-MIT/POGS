@@ -54,7 +54,7 @@ public class OperationalTransformationWsController {
                 objectMapper.readValue(pogsMessage.getContent(), OperationDto.class);
         Operation operation = Operation.fromDto(pogsMessageContent);
         final OperationDto operationDto = operationService.processOperation(
-                pogsMessage.getCompletedTaskId(), operation, true).toDto();
+                operation.getPadId(), operation, true).toDto();
 
         final TaskAttributeMessageContent messageContent =
                 new TaskAttributeMessageContent("operation", true);

@@ -65,6 +65,10 @@ public class ColorUtils {
         return (yiq >= 128) ? Color.black : Color.white;
 
     }
+
+    public static Color[] generateVisuallyDistinctColors(int ncolors) {
+        return generateVisuallyDistinctColors(ncolors, MIN_COMPONENT, MAX_COMPONENT);
+    }
     /*
      * Returns an array of ncolors RGB triplets such that each is as unique from the rest as possible
      * and each color has at least one component greater than minComponent and one less than maxComponent.

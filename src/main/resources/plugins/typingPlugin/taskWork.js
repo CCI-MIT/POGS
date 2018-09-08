@@ -1,7 +1,9 @@
 class PogsOtClient extends ot.AbstractOtClient {
-    constructor(pogsPlugin, padSelector) {
-        super(pogsPlugin.getCompletedTaskId(), pogsPlugin.getSubjectId(), padSelector);
-        log.info(`Initializing PogsOtClient for pad ${pogsPlugin.getCompletedTaskId()} as client ${pogsPlugin.getSubjectId()}`);
+    constructor(pogsPlugin, padElementId) {
+        const padId = "pad-for-task-" + pogsPlugin.getCompletedTaskId();
+        const clientId = "subject-" + pogsPlugin.getSubjectId();
+        super(padId, clientId, padElementId);
+        log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
 
         this._pogsPlugin = pogsPlugin;
 
@@ -24,6 +26,6 @@ class PogsOtClient extends ot.AbstractOtClient {
 }
 
 const typingPlugin = pogs.createPlugin('typingPlugin', function() {
-    const otClient = new PogsOtClient(this, '#padContent');
+    const otClient = new PogsOtClient(this, 'padContent');
 });
 
