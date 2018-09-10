@@ -9,7 +9,7 @@ public interface TodoEntryAssignmentDao extends Dao<TodoEntryAssignment, Long> {
 
     List<TodoEntryAssignment> get();
     TodoEntryAssignment getByTodoEntryIdSubjectId(Long todoEntryId, Long subjectId);
-    List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, boolean currentlyAssigned);
+    List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, Boolean currentlyAssigned);
     void delete(Long todoEntryId);
 }
 

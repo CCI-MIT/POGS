@@ -29,7 +29,7 @@ public class TodoEntryService {
 
     private void deleteTodoEntry(Long id) {
         List<TodoEntryAssignment> todoEntryAssignmentList = todoEntryAssignmentDao
-                .listByTodoEntryId(id,false);
+                .listByTodoEntryId(id,null);
         for(TodoEntryAssignment tea: todoEntryAssignmentList) {
             todoEntryAssignmentDao.delete(tea.getId());
         }

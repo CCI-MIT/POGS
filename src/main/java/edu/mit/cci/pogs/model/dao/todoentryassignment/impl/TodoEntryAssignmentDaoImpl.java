@@ -50,11 +50,14 @@ public class TodoEntryAssignmentDaoImpl extends AbstractDao<TodoEntryAssignment,
 
     }
 
-    public List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, boolean currentlyAssigned) {
+    public List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, Boolean currentlyAssigned) {
         final SelectQuery<Record> query = dslContext.select()
                 .from(TODO_ENTRY_ASSIGNMENT).getQuery();
         query.addConditions(TODO_ENTRY_ASSIGNMENT.TODO_ENTRY_ID.eq(todoEntryId));
-        query.addConditions(TODO_ENTRY_ASSIGNMENT.CURRENT_ASSIGNED.eq(currentlyAssigned));
+
+        if(currentlyAssigned!= null) {
+            query.addConditions(TODO_ENTRY_ASSIGNMENT.CURRENT_ASSIGNED.eq(currentlyAssigned));
+        }
         return query.fetchInto(TodoEntryAssignment.class);
     }
 
