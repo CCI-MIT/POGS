@@ -259,14 +259,15 @@ class Pogs {
     }
     onFlowBroadcastReceived(message) {
 
-
-        this.nextUrl = message.content.nextUrl;
-        if(message.content.nextUrl.indexOf("http") == -1) {
-            this.nextUrl = this.nextUrl + '/' + this.subjectId;
+        if((message.content.currentUrl + "/" +this.subjectId == window.location.pathname)) {
+            this.nextUrl = message.content.nextUrl;
+            if (message.content.nextUrl.indexOf("http") == -1) {
+                this.nextUrl = this.nextUrl + '/' + this.subjectId;
+            }
+            var finalDate = (new Date().getTime() + parseInt(
+                message.content.secondsRemainingCurrentUrl));
+            this.countDown.updateCountDownDate(finalDate)
         }
-        var finalDate = (new Date().getTime() + parseInt(
-            message.content.secondsRemainingCurrentUrl));
-        this.countDown.updateCountDownDate(finalDate)
 
     }
     sendMessage(url, type, messageContent, sender, receiver, completedTaskId,
