@@ -52,11 +52,12 @@ class PogsDashboard {
         }
     }
     onNewTaskStarted(){
-        this.taskCommunicationCount = 0;
-        var teamsCompTasks = this.completedTasksByTeam[this.taskId];
+        this.taskCommunicationCount = [];
+        var teamsCompTasks = this.completedTasksByTeam[this.task];
+        console.log("Teams that task "+this.task+" has : " + teamsCompTasks.length);
         for(var i =0; i < teamsCompTasks.length ; i++) {
             var completedTask = teamsCompTasks[i].completedTaskId;
-
+            this.taskCommunicationCount[completedTask] = 0;
             this.subscribeTopicAndFireEvent(
                 '/topic/public/task/' + completedTask
                 + '/feedback',
@@ -84,6 +85,10 @@ class PogsDashboard {
                 message.content.triggeredBy != TODO_TYPE.UNASSIGN_ME) {
                 var todoEntries = message.content.todoEntries;
                 console.log("Todo entries found: " + todoEntries.length);
+                var teamId = this.getTeamByCompletedTask(message.completedTaskId);
+                if(teamId != null) {
+                    $("#" +this.lastReference + teamId + "_collab_todo").text(todoEntries.length);
+                }
             }
 
             return;
@@ -94,12 +99,43 @@ class PogsDashboard {
                 message.content.triggeredBy != VOTING_TYPE.DELETE_VOTING_POOL) {
                     var votingPools = message.content.votingPools;
                     console.log("Voting pools: " + votingPools.length);
+                    var teamId = this.getTeamByCompletedTask(message.completedTaskId);
+                    if(teamId != null) {
+                        $("#" +this.lastReference + teamId + "_collab_voting").text(todoEntries.length);
+                    }
                 }
             return;
         }
     }
+    updateCommunicationCount(completedTask){
+
+        this.taskCommunicationCount[completedTask]++;
+        console.log("Total message count : " + completedTask + " - "+ this.taskCommunicationCount[completedTask]);
+
+        var teamId = this.getTeamByCompletedTask(completedTask);
+        if(teamId != null) {
+            $("#" + this.lastReference+ teamId + "_communication").text(this.taskCommunicationCount[completedTask]);
+        }
+    }
+    getTeamByCompletedTask(completedTask) {
+        var teamsCompTasks = this.completedTasksByTeam[this.task];
+        for(var i =0; i < teamsCompTasks.length ; i++) {
+            var completedTaskTemp = teamsCompTasks[i].completedTaskId;
+            if(completedTaskTemp == completedTask) {
+                return teamsCompTasks[i].teamId;
+            }
+        }
+        return null;
+    }
     onCommunicationMessageReceived(message){
 
+        if (message.content.type == "MESSAGE") {
+
+            if (message.content.message != "") {
+                console.log("Completed Task: " + message.completedTaskId)
+                this.updateCommunicationCount(message.completedTaskId);
+            }
+        }
     }
     onCheckInReceived(message){
 
@@ -134,34 +170,56 @@ class PogsDashboard {
             this.lastReference = currentUrl;
         }
 
-
         if(this.countDown == null){
-
-            this.countDown = new Countdown(this.secondsRemainingCurrentUrl, currentUrl+"countdown",
-                                           function () {
-                                               $("#" +this.lastReference +" .card-body").removeClass("cardLive").addClass("cardPassed");
-                                               this.countDown == null;
-                                               this.task = null;
-                                               if(this.lastReference.indexOf("_waiting_room")>=0){
-                                                   location.reload();
-                                               }
-                                               console.log("countdown got null");
-                                           }.bind(this));
-            this.countDown.updateFinalMessage("DONE");
+            this.createCountDown(currentUrl);
         }
+        if(!(currentUrl.indexOf("_w") > 0)){
+            this.task == null;
+            console.log("Not a work task page");
+        }
+
         if(currentUrl.indexOf("_w") > 0 && this.task == null){
 
             var end = currentUrl.indexOf("_w");
             var start = currentUrl.indexOf("_task_");
             var taskId = currentUrl.substring(start + 6,end);
             this.task = taskId;
-            console.log("TASK ID: " + taskId);
-        }
-        if( this.lastReference != currentUrl){
-            $("#"+this.lastReference + " .card-body").removeClass("cardLive").addClass("cardPassed");
-            this.lastReference = currentUrl;
+            this.onNewTaskStarted();
+            console.log("Registering listeners to TASK ID: " + taskId);
         }
 
+        if( this.lastReference != currentUrl){
+            //console.log("Flow changed URL prev:" + this.lastReference + " - current: " + currentUrl);
+
+            if(this.lastReference.indexOf("_waiting_room")>=0) {
+                location.reload();
+            }
+
+            $("#" +this.lastReference +" .card-body")
+                .removeClass("cardLive").addClass("cardPassed");
+
+            this.lastReference = currentUrl;
+
+            //console.log("Creating countdown with reference: " + currentUrl+"countdown");
+            this.createCountDown(currentUrl);
+
+
+        }
+
+    }
+    createCountDown(currentUrl){
+        this.countDown = new Countdown(this.secondsRemainingCurrentUrl, currentUrl+"countdown",
+                                       function () {
+                                           this.countDown == null;
+                                           this.task = null;
+
+                                           console.log("Last reference was waiting room :" + this.lastReference);
+
+
+                                           //$("#" +this.lastReference +" .card-body")
+                                           //    .removeClass("cardLive").addClass("cardPassed");
+                                       }.bind(this));
+        this.countDown.updateFinalMessage("DONE");
     }
     onError(error) {
         this.fire(null, 'onError', this);

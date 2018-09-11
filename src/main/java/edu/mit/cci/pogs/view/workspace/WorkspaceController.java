@@ -344,7 +344,8 @@ public class WorkspaceController {
                 }
 
                 model.addAttribute("communicationType", cc);
-                model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint.NO_CHAT) ? (true) : (false)));
+                model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
+                        .NO_CHAT.getId().toString()) ? (true) : (false)));
 
                 boolean hasCollaborationTodoListEnabled = sessionWrapper
                         .getCollaborationTodoListEnabled();

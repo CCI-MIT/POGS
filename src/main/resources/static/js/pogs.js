@@ -112,13 +112,12 @@ class Pogs {
 
 
         this.initializeWebSockets();
+        //window.location.href.indexOf("/w/")>=0
+        $('<div/>', {
+            id: "countdown",
+            'class': "float-right",
+        }).appendTo(".header");
 
-        if(window.location.href.indexOf("/w/")>=0){
-            $('<div/>', {
-                id: "countdown",
-                'class': "float-right",
-            }).appendTo(".header");
-        }
         this.countDown = new Countdown(this.secondsRemainingCurrentUrl, "countdown",
                                        function () {
                                            window.location = this.nextUrl

@@ -39,12 +39,8 @@ public class WorkspaceTaskWSController {
             Long completedTaskId = Long.parseLong(taskAttributeMessage.getCompletedTaskId());
             Long sessionId = Long.parseLong(taskAttributeMessage.getSessionId());
 
-            //Subject subject = workspaceService.getSubject(externalId);
-            //if loggable attribute
+
             if(taskAttributeMessage.getLoggableAttribute()){
-                //check if attribute exits
-
-
 
                 completedTaskAttributeService.createOrUpdate(
                         taskAttributeMessage.getAttributeName(),

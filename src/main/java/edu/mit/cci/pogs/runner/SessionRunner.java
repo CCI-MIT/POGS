@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.runner;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +21,6 @@ import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
-import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
@@ -32,8 +33,8 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
+import edu.mit.cci.pogs.runner.wrappers.CompletedTaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
-import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
@@ -48,6 +49,8 @@ public class SessionRunner implements Runnable {
     private static Map<Long, SessionRunner> liveRunners = new HashMap<>();
 
     private boolean sessionHasStarted = false;
+
+    private static final Logger _log = LoggerFactory.getLogger(SessionRunner.class);
 
     public static Collection<SessionRunner> getLiveRunners() {
         return liveRunners.values();
@@ -65,6 +68,7 @@ public class SessionRunner implements Runnable {
 
     public static void removeSessionRunner(Long sessionId) {
         if (liveRunners.get(sessionId) != null) {
+            liveRunners.get(sessionId).setShouldRun(false);
             liveRunners.remove(sessionId);
         }
     }
@@ -105,9 +109,11 @@ public class SessionRunner implements Runnable {
     @Autowired
     private CompletedTaskDao completedTaskDao;
 
+    private boolean shouldRun;
 
     public void init() {
-
+        _log.info("Configuring session: " + session.getSessionSuffix());
+        shouldRun = true;
         configureSession();
         setupRounds(this.session);
         setupTaskList(this.session);
@@ -116,15 +122,20 @@ public class SessionRunner implements Runnable {
     }
 
     private void runSession() {
-        while (!session.isSessionStatusDone()) {
+        while (shouldRun) {
 
             if ((allSubjectsAreWaiting() || sessionIsReadyToStart())
                     && !sessionHasStarted) {
+                _log.info("Starting session: " + session.getSessionSuffix());
                 sessionHasStarted = true;
                 startSession();
             }
+            if(session.getSecondsRemainingForSession() < 0 ){
+                shouldRun = false;
+            }
         }
         SessionRunner.removeSessionRunner(session.getId());
+        _log.info("Exiting session runner for session" + session.getSessionSuffix() );
     }
 
 
@@ -220,7 +231,7 @@ public class SessionRunner implements Runnable {
         for (CompletedTask ct : completedTasks) {
             for (TaskWrapper taskWrapper : session.getTaskList()) {
                 if (ct.getTaskId() == taskWrapper.getId()) {
-                    taskWrapper.getCompletedTasks().add(ct);
+                    taskWrapper.getCompletedTasks().add( new CompletedTaskWrapper(ct));
                     continue;
                 }
             }
@@ -450,5 +461,9 @@ public class SessionRunner implements Runnable {
 
     public void setSession(Session session) {
         this.session = new SessionWrapper(session);
+    }
+
+    public void setShouldRun(boolean shouldRun) {
+        this.shouldRun = shouldRun;
     }
 }

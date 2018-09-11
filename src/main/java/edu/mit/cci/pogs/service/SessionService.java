@@ -101,7 +101,8 @@ public class SessionService {
             SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
             sessionRunner.setSession(s);
             SessionRunner.addSessionRunner(s.getId(),sessionRunner);
-            sessionRunner.run();
+            Thread t = new Thread(sessionRunner);
+            t.start();
 
 
         }

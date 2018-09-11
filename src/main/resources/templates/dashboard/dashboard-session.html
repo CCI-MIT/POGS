@@ -24,52 +24,14 @@
     </ol>
     <h2 th:text="${'Live sessions ' + sessionz.sessionSuffix}" ></h2>
     <br/>
-    <!--
-
-
-    Acordeon for TEAMS
-           - URLs
-                 - 2018-09-03 13:36:18 - 2018-09-03 13:40:00 - /waiting_room
-                 - 2018-09-03 13:40:00 - 2018-09-03 13:41:00 - /intro
-                 - 2018-09-03 13:41:00 - 2018-09-03 13:41:20 - /display_name
-                 - 2018-09-03 13:41:20 - 2018-09-03 13:41:40 - /roster
-
-                 - 2018-09-03 13:41:40 - 2018-09-03 13:43:40 - /round/21/task/3/w
-
-                 - 2018-09-03 13:43:40 - 2018-09-03 13:45:50 - /round/21/task/4/i
-                 - 2018-09-03 13:45:50 - 2018-09-03 14:52:30 - /round/21/task/4/w
-
-                 - 2018-09-03 14:52:30 - 2018-09-03 14:54:30 - /round/21/task/1/i
-                 - 2018-09-03 14:54:30 - 2018-09-03 14:56:30 - /round/21/task/1/w
-
-                 - 2018-09-03 14:56:30 - 2018-09-03 14:58:30 - /round/21/task/2/i
-                 - 2018-09-03 14:58:30 - 2018-09-03 15:01:50 - /round/21/task/2/p
-                 - 2018-09-03 15:01:50 - 2018-09-03 15:03:50 - /round/21/task/2/w
-
-                 - 2018-09-03 15:03:50 - 2018-09-03 15:05:30 - /done
-
-    -->
     <script>
     $(function () {
         pogsDashboard.setup({
             sessionId: '[(${sessionz.id})]',
-            completedTasksByTeam: '[(${completedTasksByTeam})]',
+            completedTasksByTeam: [(${completedTasksByTeam})]
             }
         );
 
-        //1 listen to flow broadcasts.
-        //2 for each flow check URL BOX and set it to "live"
-
-        //3 Listen for subjects "analytics ping messages"//implement client side
-        //4 Listen for TASK WORK DATA:
-          // 4.1 - Listen to feedback broadcasts //IMPLEMENT CLIENT SIDE
-
-          // 4.2 - Listen to communication
-             //- 2 messages
-          // 4.3 - Listen to collaboration
-            //- 3 undone todo items
-            //- 2 voting pools (3 votes)
-        //5 Live log for all
         });
     </script>
     <style>
@@ -112,21 +74,26 @@
                                 <span th:class="${'badge-pill badge-dark badge-pill subjectpill ' +subj.subjectExternalId+'_pill'} " th:each="subj : ${teamWrapper.subjects}"
                                 th:text="${subj.subjectExternalId}" th:id="${subj.subjectExternalId}"></span>
                             </span>
-                            <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Participation:</b>
-                                <div class="progress">
-                                  <div class="progress-bar" role="progressbar" style="width: 55%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">minsa01</div>
-                                  <div class="progress-bar bg-info" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">minsa02</div>
+                            <th:block th:if="${schedule.taskReference !=null and not schedule.taskReference.soloTask}">
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Participation:</b>
+                                    <div class="progress">
+                                      <div class="progress-bar" role="progressbar" style="width: 55%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">minsa01</div>
+                                      <div class="progress-bar bg-info" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">minsa02</div>
+                                    </div>
+                                    <div> <span>33</span> total interactions</div>
                                 </div>
-                                <div> <span>33</span> total interactions</div>
-                            </div>
-                            <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Communication:</b>
-                                <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'communication'}">10</span> Messages sent</div>
-                            </div>
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and schedule.taskReference.communicationType != 'N' }" ><b>Communication:</b>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_communication'}">0</span> Messages sent</div>
+                                </div>
 
-                            <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Collaboration:</b>
-                                <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_todo'}">4</span> Todo items created</div>
-                                <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_voting'}">1</span> Voting widgets created</div>
-                            </div>
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and (schedule.taskReference.collaborationTodoListEnabled or schedule.taskReference.collaborationVotingWidgetEnabled)}" ><b>Collaboration:</b>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_todo'}">0</span> Todo items created</div>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_voting'}">0</span> Voting widgets created</div>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${schedule.taskReference !=null and schedule.taskReference.soloTask}">
+                                <div><b>Solo task</b></div>
+                            </th:block>
                             <div class="hr"></div>
                             <br/>
                         </li>
