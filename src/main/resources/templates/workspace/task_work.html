@@ -27,6 +27,11 @@
          <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Pool</button>
 
     </div>
+    <div id="feedbackBarContainer"  class="flex-column w-100" style="padding-top: 5px"
+    th:if="${hasCollaborationFeedbackWidget}">
+        <div class="progress">
+        </div>
+    </div>
 
     <style  th:inline="text">
 
@@ -131,7 +136,7 @@
 
                 </div>
                 <div class="input-group" id="sendForm">
-                    <input type="text" class="form-control border-0" placeholder="Input message..." id="messageInput">
+                    <input type="text" class="form-control border-0" placeholder="Input message..." id="messageInput" autocomplete="off">
                     <span class="input-group-addon">
                         <button class="btn border-0 bg-white text-primary hover-color-darkblue" type="button" id="messageSubmitButton">Send</button>
                     </span>

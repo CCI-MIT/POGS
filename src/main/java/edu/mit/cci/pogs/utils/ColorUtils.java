@@ -234,6 +234,7 @@ public class ColorUtils {
         return Math.sqrt(worst);
     }
 
+
     private static float[] randYUVBetterThan(float bestDistSqrd, float minComponent, float maxComponent, float[][] in) {
         for(int attempt = 1; attempt < 100 * in.length; attempt++) {
             float[] candidate = randYUVinRGBRange(minComponent, maxComponent);

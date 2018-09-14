@@ -2,7 +2,8 @@
 
 const COLLABORATION_TYPE = {
     TODO_LIST: "TODO_LIST",
-    VOTING_LIST: "VOTING_LIST"
+    VOTING_LIST: "VOTING_LIST",
+    FEEDBACK_BAR: "FEEDBACK_BAR"
 }
 
 const VOTING_TYPE = {
@@ -43,6 +44,7 @@ class CollaborationPlugin extends PogsPlugin {
         }
         if (this.pogsRef.hasCollaborationFeedbackWidget) {
             console.log("HasCollaboratonVoting");
+            new FeedbackBarManager(this);
         }
 
     }

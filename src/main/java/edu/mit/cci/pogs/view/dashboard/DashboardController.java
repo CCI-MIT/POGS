@@ -56,10 +56,10 @@ public class DashboardController {
         //get all schedules and completed tasks for session
         SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
 
-        RoundWrapper rw = sessionRunner.getSession().getCurrentRound();
-        if(rw!=null) {
+        List<RoundWrapper> rw = sessionRunner.getSession().getSessionRounds();
+        if(rw!=null && rw.size() > 0) {
 
-            List<TeamWrapper> teams = rw.getRoundTeams();
+            List<TeamWrapper> teams = rw.get(0).getRoundTeams();
             model.addAttribute("teams", teams);
         }
 

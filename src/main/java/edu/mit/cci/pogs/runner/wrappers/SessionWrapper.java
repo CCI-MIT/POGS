@@ -3,7 +3,9 @@ package edu.mit.cci.pogs.runner.wrappers;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
@@ -20,6 +22,7 @@ public class SessionWrapper extends Session {
         super(session);
         this.sessionRounds = new ArrayList<>();
         this.taskList = new ArrayList<>();
+        this.feedbackCounter = new HashMap<>();
     }
 
 
@@ -27,6 +30,7 @@ public class SessionWrapper extends Session {
 
     private List<TaskWrapper> taskList;
 
+    private Map<Long,Map<String,Integer>> feedbackCounter;
 
     public RoundWrapper getCurrentRound() {
         for (RoundWrapper rw : sessionRounds) {
@@ -49,6 +53,24 @@ public class SessionWrapper extends Session {
         return null;
     }
 
+    public Map<Long, Map<String, Integer>> getFeedbackCounter() {
+        return feedbackCounter;
+    }
+
+    public void addSubjectContribution(Long completedTaskId, String subjectExternalId, Integer contribution){
+        Map<String,Integer> map =this.feedbackCounter.get(completedTaskId);
+        if(map== null){
+            map = new HashMap<>();
+        }
+        Integer currentCount = map.get(subjectExternalId);
+        if(currentCount == null){
+            currentCount = 0;
+        }
+        currentCount = currentCount + contribution;
+        map.put(subjectExternalId, currentCount);
+        this.feedbackCounter.put(completedTaskId,map);
+
+    }
     public Long getSecondsRemainingForSession() {
 
         Integer roundSize = this.sessionRounds.size();

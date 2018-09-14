@@ -84,10 +84,10 @@ class Wackamole {
             var externalId = player.externalId;
             var displayName = player.displayName;
             var isCurrentPlayer = (externalId == myId);
-            if (isCurrentPlayer) {
-                self.changeCursorColor(self.subjectColors[key]);
-            }
-            var playerObj = new Player(externalId, displayName, self.subjectColors[key], isCurrentPlayer);
+            //if (isCurrentPlayer) {
+            //    self.changeCursorColor(self.subjectColors[key]);
+            //}
+            var playerObj = new Player(externalId, displayName,  isCurrentPlayer);
             self.teammates[player.externalId] = playerObj;
         });
     }
@@ -110,7 +110,7 @@ class Wackamole {
                 if (!($("#whack_cell" + cell).hasClass("hasMole"))) {
                     self.totalTarget++;
                     $("#whack_cell" + cell).addClass("hasMole");
-                    $("#whack_cell" + cell).append('<i class="fa fa-optin-monster" data-cell-reference-index="' + cell + '"></i>');
+                    $("#whack_cell" + cell).append('<i class="fa monster fa-optin-monster" data-cell-reference-index="' + cell + '"></i>');
                 }
 
             }
@@ -151,6 +151,13 @@ class Wackamole {
             }
             else if (attrName == 'targetHit') {
                 self.totalHitOnTarget++;
+                //TODO:
+                $("#whack_cell" + cell)
+                    .addClass("hit_color")
+                    .delay(1000).queue(function (next) {
+                    $(this).removeClass("hit_color");
+                    next();
+                });
             }
         }
     }
@@ -219,6 +226,14 @@ class Wackamole {
                     self.pogsPlugin.saveCompletedTaskAttribute('targetHit',
                         "", 0.0,
                         0, false);
+                    //TODO: add animation
+                    $("#whack_cell" + cell)
+                        .addClass("hit_color")
+                        .delay(1000).queue(function (next) {
+                        $(this).removeClass("hit_color");
+                        next();
+                    });
+
                 }
 
                 $("#whack_cell" + cell).css('background-color', self.teammates[self.subjectId].color);
@@ -394,10 +409,9 @@ class Wackamole {
 }
 
 class Player {
-    constructor(id, name, color, isCurrentPlayer) {
+    constructor(id, name,  isCurrentPlayer) {
         this.externalId = id;
         this.displayName = name;
-        this.color = color;
         this.isCurrentPlayer = isCurrentPlayer;
         this.setUpPointer();
         // TODO: should score be tied to players?
@@ -406,13 +420,13 @@ class Player {
 
     setUpPointer() {
         if (this.isCurrentPlayer) {
-            $("#myPointerColor").css("color", this.color);
+            $("#myPointerColor").addClass(this.externalId + "_activecolor");
         }
         else {
-            $("#pointerContainer").append('<i id="' + this.externalId + 'Pointer" class="fa fa-mouse-pointer" style="color:' + this.color + ';display:none"></i>')
+            $("#pointerContainer").append('<i id="' + this.externalId + 'Pointer" class="'+this.externalId+'_activecolor fa fa-mouse-pointer" style="display:none"></i>')
         }
         console.log("init player " + this.externalId);
-        console.log("color: " + this.color);
+        //console.log("color: " + this.color);
     }
 
     updatePosition(x, y) {

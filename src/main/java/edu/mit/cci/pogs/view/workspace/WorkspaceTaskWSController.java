@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import edu.mit.cci.pogs.messages.PogsMessage;
 import edu.mit.cci.pogs.messages.TaskAttributeMessage;
@@ -15,6 +16,8 @@ import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
 
 @Controller
@@ -38,9 +41,14 @@ public class WorkspaceTaskWSController {
             String externalId = taskAttributeMessage.getSender();
             Long completedTaskId = Long.parseLong(taskAttributeMessage.getCompletedTaskId());
             Long sessionId = Long.parseLong(taskAttributeMessage.getSessionId());
+            SessionRunner sr = SessionRunner.getSessionRunner(sessionId);
 
 
             if(taskAttributeMessage.getLoggableAttribute()){
+
+                if(sr!=null){
+                    sr.getSession().addSubjectContribution(completedTaskId, externalId, 1);
+                }
 
                 completedTaskAttributeService.createOrUpdate(
                         taskAttributeMessage.getAttributeName(),

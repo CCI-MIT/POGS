@@ -7,7 +7,8 @@ public class CollaborationMessage extends PogsMessage<CollaborationMessageConten
 
     public enum CollaborationType {
         TODO_LIST,
-        VOTING_LIST
+        VOTING_LIST,
+        FEEDBACK_BAR
     }
 
     public enum TodoType {
