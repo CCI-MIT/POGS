@@ -13,11 +13,11 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/admin">Home</a></li>
         <li class="breadcrumb-item "><a href="/admin/studies">Studies</a></li>
-        <li class="breadcrumb-item active" th:if="${study.id != null}">
+        <li class="breadcrumb-item " th:if="${study.id != null}">
             <a th:href="${'/admin/studies/' + study.id}" th:text="${study.studyName}"></a>
         </li>
         <li class="breadcrumb-item active" th:if="${sessionBean.id != null}">
-            <a th:href="${'/admin/sessions/' + sessionBean.id}" th:text="${sessionBean.sessionSuffix}"></a>
+            <a th:href="${'/admin/studies/' + study.id+ '/sessions/' + sessionBean.id}" th:text="${sessionBean.sessionSuffix}"></a>
         </li>
     </ol>
     <h2>Edit session</h2>
@@ -25,6 +25,11 @@
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{studyId}"/>
+        <input type="hidden" th:field="*{roundsEnabled}" th:value="true"/>
+        <input type="hidden" th:field="*{numberOfRounds}" th:value="1"/>
+
+        <input type="hidden" th:field="*{status}" th:value="P">
+
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Basic</legend>
             <div class="container">
@@ -34,15 +39,9 @@
                         <div class="row">
                             <div class="col">
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="conditionId">Condition Id:</label>
-                                    <div class="col-sm-6">
-                                        <input class="form-control" type="text" id="conditionId" th:field="*{conditionId}"/>
-                                    </div>
-                                </div>
-                                <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="sessionStartDate">Session Start Date:</label>
+                                    <label class="col-sm-3 col-form-label" for="sessionStartDate">Session Start Date:</label>
 
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-9">
                                         <div class="form-group">
                                             <div class="input-group date" id="x" data-target-input="nearest">
                                                 <input type="text" class="form-control" data-target="#sessionStartDate1" id="sessionStartDate" th:field="*{sessionStartDate}"/>
@@ -66,22 +65,11 @@
                                 </div>
                             </div>
                             <div class="col">
-                                <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="status">Status:</label>
-                                    <div class="col-sm-6">
-                                        <select class="custom-select" th:field="*{status}" id="status">
-                                            <option
-                                                    th:each="rg: ${sessionStatuses}"
-                                                    th:value="${rg.id}"
-                                                    th:text="${rg.status}" ></option>
-                                        </select>
-                                    </div>
-                                </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="sessionSuffix">Session Suffix:</label>
+                                    <label class="col-sm-3 col-form-label" for="sessionSuffix">Suffix:</label>
 
-                                    <div class="input-group col-sm-6">
+                                    <div class="input-group col-sm-9">
                                         <div class="input-group-prepend">
                                             <span class="input-group-text" id="sessionSuffix3" th:text="${study.studySessionPrefix}"></span>
                                         </div>
@@ -93,27 +81,7 @@
                     </div>
                 </fieldset>
             </div>
-            <div class="container">
-                <fieldset class="form-group row">
 
-                    <legend class="col-form-legend col-sm-2">Rounds</legend>
-
-                    <div class="container">
-                        <div class="form-group row" >
-                            <label class="col-sm-6 col-form-label" for="roundsEnabled">Enable rounds:</label>
-                            <div class="col-sm-6">
-                                <input class="form-check-input" th:field="*{roundsEnabled}" type="checkbox" id="roundsEnabled" />
-                            </div>
-                        </div>
-                        <div class="form-group row" >
-                            <label class="col-sm-6 col-form-label" for="numberOfRounds">Number Of Rounds:</label>
-                            <div class="col-sm-6">
-                                <input class="form-control" type="number" id="numberOfRounds" th:field="*{numberOfRounds}"/>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </div>
             <div class="container">
                 <fieldset class="form-group row">
                     <legend class="col-form-legend col-sm-2">Pages</legend>
@@ -122,59 +90,59 @@
                             <legend class="col-form-legend col-sm-2">Intro</legend>
                             <div class="container">
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="introPageEnabled">Intro Page Enabled:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="introPageEnabled">Intro Page Enabled:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-check-input" th:field="*{introPageEnabled}" type="checkbox" id="introPageEnabled" />
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="introText">Intro Text:</label>
-                                    <div class="col-sm-6">
-                                        <textarea class="form-control" id="introText" th:field="*{introText}" rows="3"></textarea>
+                                    <label class="col-sm-3 col-form-label" for="introText">Intro Text:</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control htmleditor" id="introText" th:field="*{introText}" rows="3"></textarea>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="introTime">Intro Time:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="introTime">Intro Time:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="number" id="introTime" th:field="*{introTime}"/>
                                         <small id="introTimeHelp" class="form-text text-muted">In seconds</small>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="rosterPageEnabled">Roster Page Enabled:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="rosterPageEnabled">Roster Page Enabled:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-check-input" th:field="*{rosterPageEnabled}" type="checkbox" id="rosterPageEnabled" />
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="rosterTime">Roster Time:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="rosterTime">Roster Time:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="number" id="rosterTime" th:field="*{rosterTime}"/>
                                         <small id="rosterTimeHelp" class="form-text text-muted">In seconds</small>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="waitingRoomTime">Waiting Room Time:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="waitingRoomTime">Waiting Room Time:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="number" id="waitingRoomTime" th:field="*{waitingRoomTime}"/>
                                         <small id="waitingRoomTimeHelp" class="form-text text-muted">In seconds</small>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="displayNameChangePageEnabled">Display Name Change Page Enabled:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="displayNameChangePageEnabled">Display Name Change Page Enabled:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-check-input" value="false" th:field="*{displayNameChangePageEnabled}" type="checkbox" id="displayNameChangePageEnabled" />
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="displayNameChangeTime">Display Name Change Time:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="displayNameChangeTime">Display Name Change Time:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="number" id="displayNameChangeTime" th:field="*{displayNameChangeTime}"/>
                                         <small id="displayNameChangeTimeHelp" class="form-text text-muted">In seconds</small>
                                     </div>
@@ -187,26 +155,26 @@
                             <legend class="col-form-legend col-sm-2">Done</legend>
                             <div class="container">
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="donePageEnabled">Done Page Enabled:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="donePageEnabled">Done Page Enabled:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-check-input" th:field="*{donePageEnabled}" type="checkbox" id="donePageEnabled" />
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="donePageText">Done Page Text:</label>
-                                    <div class="col-sm-6">
-                                        <textarea class="form-control" id="donePageText" th:field="*{donePageText}" rows="3"></textarea>
+                                    <label class="col-sm-3 col-form-label" for="donePageText">Done Page Text:</label>
+                                    <div class="col-sm-9">
+                                        <textarea class="form-control htmleditor" id="donePageText" th:field="*{donePageText}" rows="3"></textarea>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="text" id="doneRedirectUrl" th:field="*{doneRedirectUrl}"/>
                                     </div>
                                 </div>
                                 <div class="form-group row">
-                                    <label class="col-sm-6 col-form-label" for="donePageTime">Done Page Time:</label>
-                                    <div class="col-sm-6">
+                                    <label class="col-sm-3 col-form-label" for="donePageTime">Done Page Time:</label>
+                                    <div class="col-sm-9">
                                         <input class="form-control" type="number" id="donePageTime" th:field="*{donePageTime}"/>
                                         <small id="donePageTimeHelp" class="form-text text-muted">In seconds</small>
                                     </div>
@@ -222,8 +190,8 @@
             <legend class="col-form-legend col-sm-8">Advanced - Tasks</legend>
             <div class="container">
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="taskExecutionType">Task Execution Type:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="taskExecutionType">Task Execution Type:</label>
+                    <div class="col-sm-9">
 
                         <select class="custom-select" th:field="*{taskExecutionType}" id="taskExecutionType">
                             <option
@@ -240,15 +208,15 @@
             <legend class="col-form-legend col-sm-8">Advanced - Communication</legend>
             <div class="container">
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="chatBotName">Chat Bot Name:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="chatBotName">Chat Bot Name:</label>
+                    <div class="col-sm-9">
                         <input class="form-control" type="text" id="chatBotName" th:field="*{chatBotName}"/>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="communicationType">Communication Type:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="communicationType">Communication Type:</label>
+                    <div class="col-sm-9">
 
                         <select class="custom-select" th:field="*{communicationType}" id="communicationType">
                             <option
@@ -264,14 +232,14 @@
             <legend class="col-form-legend col-sm-8">Advanced - Feedback</legend>
             <div class="container">
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="scoreboardEnabled">Scoreboard Enabled:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="scoreboardEnabled">Scoreboard Enabled:</label>
+                    <div class="col-sm-9">
                         <input class="form-check-input" th:field="*{scoreboardEnabled}" type="checkbox" id="scoreboardEnabled" />
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="scoreboardDisplayType">Scoreboard Display Type:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="scoreboardDisplayType">Scoreboard Display Type:</label>
+                    <div class="col-sm-9">
 
                         <select class="custom-select" th:field="*{scoreboardDisplayType}" id="scoreboardDisplayType">
                             <option
@@ -283,8 +251,8 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="scoreboardUseDisplayNames">Scoreboard Use Display Names:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="scoreboardUseDisplayNames">Scoreboard Use Display Names:</label>
+                    <div class="col-sm-9">
                         <input class="form-check-input" th:field="*{scoreboardUseDisplayNames}" type="checkbox" id="scoreboardUseDisplayNames" />
                     </div>
                 </div>
@@ -294,20 +262,20 @@
             <legend class="col-form-legend col-sm-8">Advanced - Collaboration tools</legend>
             <div class="container">
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="collaborationTodoListEnabled">Collaboration Todo List Enabled:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="collaborationTodoListEnabled">Collaboration Todo List Enabled:</label>
+                    <div class="col-sm-9">
                         <input class="form-check-input" th:field="*{collaborationTodoListEnabled}" type="checkbox" id="collaborationTodoListEnabled" />
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration Feedback Widget Enabled:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration Feedback Widget Enabled:</label>
+                    <div class="col-sm-9">
                         <input class="form-check-input" th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox" id="collaborationFeedbackWidgetEnabled" />
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="collaborationVotingWidgetEnabled">Collaboration Voting Widget Enabled:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="collaborationVotingWidgetEnabled">Collaboration Voting Widget Enabled:</label>
+                    <div class="col-sm-9">
                         <input class="form-check-input" th:field="*{collaborationVotingWidgetEnabled}" type="checkbox" id="collaborationVotingWidgetEnabled" />
                     </div>
                 </div>
@@ -317,8 +285,8 @@
             <legend class="col-form-legend col-sm-8">Advanced - Team composition</legend>
             <div class="container">
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="teamCreationMethod">Team Creation Method:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="teamCreationMethod">Team Creation Method:</label>
+                    <div class="col-sm-9">
 
 
                         <select class="custom-select" th:field="*{teamCreationMethod}" id="teamCreationMethod">
@@ -331,8 +299,8 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="teamCreationType">Team Membership Type:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="teamCreationType">Team Membership Type:</label>
+                    <div class="col-sm-9">
 
                         <select class="custom-select" th:field="*{teamCreationType}" id="teamCreationType">
                             <option
@@ -345,8 +313,8 @@
                     </div>
                 </div>
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="teamCreationMoment">Team Creation Moment:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="teamCreationMoment">Team Creation Moment:</label>
+                    <div class="col-sm-9">
                         <select class="custom-select" th:field="*{teamCreationMoment}" id="teamCreationMoment">
                             <option
                                     th:each="rg: ${teamCreationTimes}"
@@ -358,22 +326,22 @@
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="teamCreationMatrix">Team Creation Matrix:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="teamCreationMatrix">Team Creation Matrix:</label>
+                    <div class="col-sm-9">
                         <textarea class="form-control" id="teamCreationMatrix" th:field="*{teamCreationMatrix}" rows="3"></textarea>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="teamMinSize">Team size:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="teamMinSize">Team size:</label>
+                    <div class="col-sm-9">
                         <input class="form-control" type="number" id="teamMinSize" th:field="*{teamMinSize}"/>
                     </div>
                 </div>
 
                 <div class="form-group row">
-                    <label class="col-sm-6 col-form-label" for="couldNotAssignToTeamMessage">Could Not Assign To Team Message:</label>
-                    <div class="col-sm-6">
+                    <label class="col-sm-3 col-form-label" for="couldNotAssignToTeamMessage">Could Not Assign To Team Message:</label>
+                    <div class="col-sm-9">
                         <input class="form-control" type="text" id="couldNotAssignToTeamMessage" th:field="*{couldNotAssignToTeamMessage}"/>
                     </div>
                 </div>
@@ -399,6 +367,20 @@
             $(function() {
                 //$('select[name="researchgroups"]')
 
+                $(".htmleditor").summernote(
+                    {
+                    height: 200,
+                    toolbar: [
+                        // [groupName, [list of button]]
+                        ['para', ['style','ul', 'ol', 'paragraph']],
+                        ['style', ['bold', 'italic', 'underline', 'clear']],
+                        ['font', ['strikethrough', 'superscript', 'subscript']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['insert', ['picture','link','video','table','codeview']]
+                      ]
+                    }
+                );
                 $('#taskGroups')
                     .bootstrapDualListbox({
                                               selectedListLabel:"Chosen groups",

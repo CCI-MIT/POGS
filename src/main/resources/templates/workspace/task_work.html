@@ -8,6 +8,26 @@
 </head>
 <body>
 <div layout:fragment="content">
+    <div th:if="${hasTabs}">
+        <ul class="nav nav-tabs">
+          <li class="nav-item" th:each="task:${taskList}">
+            <a class="nav-link" th:classappend="${task.id == taskId} ? active : nothing" th:href="${'/round/' +round.id + task.taskWorkUrl +'/' + subject.subjectExternalId}" th:text="${task.taskName}"></a>
+          </li>
+        </ul>
+    </div>
+
+    <div id="todoListContainer" class="flex-column w-100" style="padding-top: 5px"
+        th:if="${hasCollaborationTodoListEnabled}">
+        <button id = "createTodoItem" class="btn btn-outline-primary btn-sm">Create Todo Entry</button>
+    </div>
+
+    <div id="votingPoolContainer"  class="flex-column w-100" style="padding-top: 5px"
+        th:if="${hasCollaborationVotingWidget}">
+        <div id="votingModal" class=""></div>
+         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Pool</button>
+
+    </div>
+
     <style  th:inline="text">
 
         /*<![CDATA[*/
@@ -15,15 +35,7 @@
 
         /*]]>*/
     </style>
-    <script th:inline="text">
-
-        /*<![CDATA[*/
-
-        [(${taskWorkJs})]
-
-        /*]]>*/
-    </script>
-    <div class="form-group waiting_message">
+    <div class="form-group waiting_message tab-content">
         <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
 
         <div th:remove="tag" th:utext="${taskWorkHtml}" ></div>
@@ -36,22 +48,23 @@
 
 
                     pogs.setup({
-                                   currentUrl: window.location,
-                                   sessionId: '[(${pogsSession.id})]',
-                                   subjectId: '[(${subject.subjectExternalId})]',
-                                   subjectCanTalkTo: [(${subjectCanTalkTo})],
-                                   channelSubjectIsIn: [(${channelSubjectIsIn})],
-                                   secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
-                                   nextUrl : '[(${nextUrl})]',
-                                   teammates: [(${teammates})],
-                                   taskConfigurationAttributes: [(${taskConfigurationAttributes})],
-                                   completedTaskId:'[(${completedTask.id})]',
-                                   hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
-                                   hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
-                                   hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
-                                   hasChat: [(${hasChat})],
-                                   communicationType: '[(${communicationType})]'
-                               });
+                       currentUrl: window.location,
+                       sessionId: '[(${pogsSession.id})]',
+                       subjectId: '[(${subject.subjectExternalId})]',
+                       subjectCanTalkTo: [(${subjectCanTalkTo})],
+                       channelSubjectIsIn: [(${channelSubjectIsIn})],
+                       secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                       nextUrl : '[(${nextUrl})]',
+                       teammates: [(${teammates})],
+                       taskConfigurationAttributes: [(${taskConfigurationAttributes})],
+                       completedTaskId:'[(${completedTask.id})]',
+                       hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
+                       hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
+                       hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
+                       hasChat: [(${hasChat})],
+                       eventsUntilNow: [(${eventsUntilNow})],
+                       communicationType: '[(${communicationType})]'
+                   });
 
 
                 });
@@ -61,11 +74,20 @@
 
         </div>
     </div>
+
+    <script th:inline="text">
+        /*<![CDATA[*/
+
+        [(${taskWorkJs})]
+
+        /*]]>*/
+    </script>
+
 </div>
 <div layout:fragment="communication" th:if="${hasChat}">
     <div class="container-fluid h-100" style="width:350px;">
         <div class="row h-100">
-            <div class="col-3 border-chat-lightgray px-0" style="display:none" id="subjectContainer">
+            <div class="col-3 border-chat-lightgray px-0" style="" id="subjectContainer">
                 <div id="sidebar-content" class="h-100 w-100">
                     <div class=" p-0 d-xs-none w-100">
                         <div class="col-1 w-100 sidebarSubDivisionTitle">

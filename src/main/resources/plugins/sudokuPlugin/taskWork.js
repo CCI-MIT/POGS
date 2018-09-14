@@ -32,12 +32,11 @@ class SudokuGame {
         var attrName = message.content.attributeName;
         if(message.sender != this.pogsPlugin.subjectId) {
             if (attrName == "focusInCell") {
-                console.log("Focus in Cell " + message.content.attributeIntegerValue);
 
                 $("#sudoku_cell" + message.content.attributeIntegerValue)
-                    .addClass("sudoku__gametable-cell--error") //get subject backgroud COLOR
+                    .addClass(message.sender+"_color focusOpacity") //get subject backgroud COLOR sudoku__gametable-cell--error
                     .delay(1000).queue(function (next) {
-                    $(this).removeClass("sudoku__gametable-cell--error");
+                    $(this).removeClass(message.sender+"_color focusOpacity");
                     next();
                 });
             } else {

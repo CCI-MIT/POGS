@@ -1,0 +1,95 @@
+package edu.mit.cci.pogs.view.dashboard;
+
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
+import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
+import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
+
+@Controller
+public class DashboardController {
+
+    @Autowired
+    private StudyDao studyDao;
+
+    @GetMapping("/admin/dashboard")
+    public String dashboard(Model model) {
+        //get session associated with user
+        List<Study> studiesUserIsAllowedToSee = studyDao.listStudiesWithUserGroup(
+                AuthUserDetailsService.getLoggedInUser());
+
+        Collection<SessionRunner> liveSessionRunners = SessionRunner.getLiveRunners();
+        List<SessionWrapper> liveSessionsResearcherCanSee = new ArrayList<>();
+
+        for (SessionRunner sr : liveSessionRunners) {
+            for(Study study: studiesUserIsAllowedToSee) {
+                if(study.getId() == sr.getSession().getStudyId()){
+                    liveSessionsResearcherCanSee.add(sr.getSession());
+                }
+            }
+        }
+
+        model.addAttribute("liveSessionsResearcherCanSee",liveSessionsResearcherCanSee);
+        return "dashboard/dashboard-home";
+    }
+
+    @GetMapping("/admin/dashboard/sessions/{sessionId}")
+    public String dashboardForSession(@PathVariable("sessionId") Long sessionId, Model model) {
+        //get all schedules and completed tasks for session
+        SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
+
+        RoundWrapper rw = sessionRunner.getSession().getCurrentRound();
+        if(rw!=null) {
+
+            List<TeamWrapper> teams = rw.getRoundTeams();
+            model.addAttribute("teams", teams);
+        }
+
+        List<SessionSchedule> sessionSchedule = sessionRunner.getSession().getSessionSchedule();
+
+
+
+        model.addAttribute("sessionz",sessionRunner.getSession());
+        model.addAttribute("sessionSchedule", sessionSchedule);
+        model.addAttribute("completedTasksByTeam",getCompletedTasksForTeamsByTask(
+                sessionRunner.getSession()).toString());
+
+        return "dashboard/dashboard-session";
+    }
+
+    private JSONObject getCompletedTasksForTeamsByTask(SessionWrapper sessionWrapper){
+
+        JSONObject jo = new JSONObject();
+        for(TaskWrapper tw: sessionWrapper.getTaskList()){
+            JSONArray ja = new JSONArray();
+
+            for(CompletedTask ct: tw.getCompletedTasks()){
+                JSONObject ctJson = new JSONObject();
+                ctJson.put("teamId", ct.getTeamId());
+                ctJson.put("subjectId", ct.getSubjectId());
+                ctJson.put("completedTaskId", ct.getId());
+                ja.add(ctJson);
+            }
+            jo.put(tw.getId(),ja);
+        }
+        return jo;
+    }
+}

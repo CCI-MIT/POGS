@@ -11,7 +11,7 @@ public class SessionBean {
     private Long id;
     private String sessionSuffix;
     private Timestamp sessionStartDate;
-    private Long conditionId;
+    private Long studyId;
     private String status;
     private Integer waitingRoomTime;
     private Boolean introPageEnabled;
@@ -46,7 +46,7 @@ public class SessionBean {
 
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
 
-    private Long studyId;
+
 
 
     public SessionBean() {
@@ -57,7 +57,7 @@ public class SessionBean {
         this.id = value.getId();
         this.sessionSuffix = value.getSessionSuffix();
         this.sessionStartDate = value.getSessionStartDate();
-        this.conditionId = value.getConditionId();
+        this.studyId = value.getStudyId();
         this.status = value.getStatus();
         this.waitingRoomTime = value.getWaitingRoomTime();
         this.introPageEnabled = value.getIntroPageEnabled();
@@ -115,13 +115,6 @@ public class SessionBean {
         this.sessionStartDate = sessionStartDate;
     }
 
-    public Long getConditionId() {
-        return conditionId;
-    }
-
-    public void setConditionId(Long conditionId) {
-        this.conditionId = conditionId;
-    }
 
     public String getStatus() {
         return status;

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dashboard </title>
+
+        <script src="../../js/Countdown.js" th:src="@{/js/Countdown.js}"></script>
+        <script src="../../js/pogsDashboard.js" th:src="@{/js/pogsDashboard.js}"></script>
+
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">
+            <a
+            th:href="${'/admin/dashboard/sessions/' + sessionz.id}"
+            th:text="${sessionz.sessionSuffix}"></a>
+        </li>
+    </ol>
+    <h2 th:text="${'Live sessions ' + sessionz.sessionSuffix}" ></h2>
+    <br/>
+    <script>
+    $(function () {
+        pogsDashboard.setup({
+            sessionId: '[(${sessionz.id})]',
+            completedTasksByTeam: [(${completedTasksByTeam})]
+            }
+        );
+
+        });
+    </script>
+    <style>
+        .subjectpill {font-size: 12px; margin: 3px;}
+        .cardPassed {background-color: #5a6268}
+        .cardLive h1 small {color: #1c7430}
+    </style>
+    <div class="container">
+      <div class="row text-center" >
+      <th:block th:each="schedule,stCount : ${sessionSchedule}">
+        <div class="col-md-4" th:id="${#strings.replace(schedule.url,'/','_')}">
+        <div class="card mb-4 box-shadow">
+          <div class="card-header">
+            <h4 th:if="${#strings.contains(schedule.url,'waiting_room')}" class="my-0 font-weight-normal">Waiting room</h4>
+            <h4 th:if="${#strings.contains(schedule.url,'intro')}" class="my-0 font-weight-normal">Session Intro</h4>
+            <h4 th:if="${#strings.contains(schedule.url,'display_name')}" class="my-0 font-weight-normal">Display name</h4>
+            <h4 th:if="${#strings.contains(schedule.url,'roster')}" class="my-0 font-weight-normal">Roster</h4>
+            <h4 th:if="${#strings.contains(schedule.url,'i') and schedule.taskReference !=null}" class="my-0 font-weight-normal" th:text="${'Task: ' + schedule.taskReference.taskName + ' Intro'}"></h4>
+            <h4 th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" class="my-0 font-weight-normal" th:text="${'Task: ' + schedule.taskReference.taskName + ' Work'}"></h4>
+            <h4 th:if="${#strings.contains(schedule.url,'p') and schedule.taskReference !=null}" class="my-0 font-weight-normal" th:text="${'Task: ' + schedule.taskReference.taskName + ' Primer'}"></h4>
+            <h4 th:if="${#strings.contains(schedule.url,'done')}" class="my-0 font-weight-normal">Done</h4>
+          </div>
+          <div class="card-body" th:classappend="${schedule.alreadyPassed} ? 'cardPassed' : ''">
+            <h1 class="card-title pricing-card-title">
+              <small class="" th:if="${not schedule.alreadyPassed and schedule.toBeDone}" th:id="${ #strings.replace(schedule.url,'/','_') + 'countdown'}">TO BE STARTED</small>
+              <small class="" th:if="${not schedule.alreadyPassed and not schedule.toBeDone}" th:id="${ #strings.replace(schedule.url,'/','_') + 'countdown'}"></small>
+              <small class="" th:if="${schedule.alreadyPassed}" th:id="${ #strings.replace(schedule.url,'/','_') + 'countdown'}">DONE</small>
+            </h1>
+
+            <small class="text-muted" th:text="${#dates.format(schedule.startTimestamp, 'dd/MM/yyyy HH:mm:ss')}"></small>
+            <small> - </small>
+            <small class="text-muted" th:text="${#dates.format(schedule.endTimestamp, 'dd/MM/yyyy HH:mm:ss')}"></small>
+            <div th:if="${#strings.contains(schedule.url,'waiting_room')}"></div>
+            <div class="subjectContainer">
+                <div th:if="${not #strings.contains(schedule.url,'waiting_room') and not #lists.isEmpty(teams)}">
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li th:each="teamWrapper : ${teams}">
+                            <span th:text="${'Team #'+teamWrapper.team.id}"></span><br/>
+                            <span th:id="${teamWrapper.team.id}">
+                                <span th:class="${'badge-pill badge-dark badge-pill subjectpill ' +subj.subjectExternalId+'_pill'} " th:each="subj : ${teamWrapper.subjects}"
+                                th:text="${subj.subjectExternalId}" th:id="${subj.subjectExternalId}"></span>
+                            </span>
+                            <th:block th:if="${schedule.taskReference !=null and not schedule.taskReference.soloTask}">
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Participation:</b>
+                                    <div class="progress">
+                                      <div class="progress-bar" role="progressbar" style="width: 55%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">minsa01</div>
+                                      <div class="progress-bar bg-info" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">minsa02</div>
+                                    </div>
+                                    <div> <span>33</span> total interactions</div>
+                                </div>
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and schedule.taskReference.communicationType != 'N' }" ><b>Communication:</b>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_communication'}">0</span> Messages sent</div>
+                                </div>
+
+                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and (schedule.taskReference.collaborationTodoListEnabled or schedule.taskReference.collaborationVotingWidgetEnabled)}" ><b>Collaboration:</b>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_todo'}">0</span> Todo items created</div>
+                                    <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_voting'}">0</span> Voting widgets created</div>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${schedule.taskReference !=null and schedule.taskReference.soloTask}">
+                                <div><b>Solo task</b></div>
+                            </th:block>
+                            <div class="hr"></div>
+                            <br/>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+          </div>
+          </div>
+        </div>
+      </th:block>
+      </div>
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</div>
+</body>
+</html>

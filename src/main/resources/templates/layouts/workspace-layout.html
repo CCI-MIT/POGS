@@ -16,15 +16,19 @@
     <link rel="stylesheet" type="text/css" href="../../dist/vendor/font-awesome/css/font-awesome.css"
           th:href="@{/vendor/font-awesome/css/font-awesome.css}">
 
+
     <script src="../../dist/vendor/jquery/dist/jquery.min.js"
             th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
-    <script src="../../js/pogs.js" th:src="@{/js/pogs.js}"></script>
+    <script src="../../dist/vendor/loglevel/dist/loglevel.min.js"
+            th:src="@{/vendor/loglevel/dist/loglevel.min.js}"></script>
+    <script src="../../js/Countdown.js" th:src="@{/js/Countdown.js}"></script>
+    <script src="../../static/js/pogs.js" th:src="@{/js/pogs.js}"></script>
 
-    <script src="../../js/pogsPlugin.js" th:src="@{/js/pogsPlugin.js}"></script>
-    <script src="../../js/pogsCommunicationPlugin.js" th:src="@{/js/pogsCommunicationPlugin.js}"></script>
-    <script src="../../js/pogsCollaborationPlugin.js" th:src="@{/js/pogsCollaborationPlugin.js}"></script>
-    <script src="../../js/votingPoolManager.js" th:src="@{/js/votingPoolManager.js}"></script>
-    <script src="../../js/todoListManager.js" th:src="@{/js/todoListManager.js}"></script>
+    <script src="../../static/js/pogsPlugin.js" th:src="@{/js/pogsPlugin.js}"></script>
+    <script src="../../static/js/pogsCommunicationPlugin.js" th:src="@{/js/pogsCommunicationPlugin.js}"></script>
+    <script src="../../static/js/pogsCollaborationPlugin.js" th:src="@{/js/pogsCollaborationPlugin.js}"></script>
+    <script src="../../static/js/votingPoolManager.js" th:src="@{/js/votingPoolManager.js}"></script>
+    <script src="../../static/js/todoListManager.js" th:src="@{/js/todoListManager.js}"></script>
 
 
 </head>
@@ -33,7 +37,7 @@
 <div class="flexbox">
     <div class="header">
         <!--<img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/>-->
-        POGS
+        <span>POGS</span>
     </div>
     <div class="main">
         <div class="flexbox-row">

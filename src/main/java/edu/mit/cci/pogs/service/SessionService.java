@@ -1,17 +1,5 @@
 package edu.mit.cci.pogs.service;
 
-import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.mit.cci.pogs.cron.SessionCron;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.completedtaskattribute.CompletedTaskAttributeDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
@@ -20,13 +8,22 @@ import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.SessionRunner;
-import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class SessionService {
@@ -43,6 +40,10 @@ public class SessionService {
     private final EventLogDao eventLogDao;
     private final SubjectCommunicationService subjectCommunicationService;
     private final SubjectAttributeDao subjectAttributeDao;
+
+    private final TodoEntryService todoEntryService;
+
+    private final VotingService votingService;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
 
@@ -63,8 +64,13 @@ public class SessionService {
                           RoundDao roundDao,
                           EventLogDao eventLogDao,
                           SubjectCommunicationService subjectCommunicationService,
-                          SubjectAttributeDao subjectAttributeDao
+                          SubjectAttributeDao subjectAttributeDao,
+                          TodoEntryService todoEntryService,
+                          VotingService votingService
+
                           ) {
+        this.todoEntryService = todoEntryService;
+        this.votingService = votingService;
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
         this.sessionDao = sessionDao;
         this.subjectDao = subjectdao;
@@ -105,7 +111,7 @@ public class SessionService {
         session.setId(sessionBean.getId());
         session.setSessionSuffix(sessionBean.getSessionSuffix());
         session.setSessionStartDate(sessionBean.getSessionStartDate());
-        session.setConditionId(sessionBean.getConditionId());
+        session.setStudyId(sessionBean.getStudyId());
         session.setStatus(sessionBean.getStatus());
         session.setWaitingRoomTime(sessionBean.getWaitingRoomTime());
         session.setIntroPageEnabled(sessionBean.getIntroPageEnabled());
@@ -138,6 +144,25 @@ public class SessionService {
         session.setTeamCreationMethod(sessionBean.getTeamCreationMethod());
         session.setTeamCreationMatrix(sessionBean.getTeamCreationMatrix());
 
+        if(session.getRosterTime()==null){
+            session.setRosterTime(0);
+        }
+        if(session.getIntroTime()==null){
+            session.setIntroTime(0);
+        }
+        if(session.getDonePageTime()==null){
+            session.setDonePageTime(0);
+        }
+        if(session.getWaitingRoomTime()==null){
+            session.setWaitingRoomTime(0);
+        }
+        if(session.getFixedInteractionTime()==null){
+            session.setFixedInteractionTime(0);
+        }
+        if(session.getDisplayNameChangeTime()==null){
+            session.setDisplayNameChangeTime(0);
+        }
+
         if (sessionBean.getId() == null) {
             session = sessionDao.create(session);
             sessionBean.setId(session.getId());
@@ -145,6 +170,7 @@ public class SessionService {
         } else {
             sessionDao.update(session);
             createOrUpdateSessionHasTaskGroups(sessionBean);
+            SessionRunner.removeSessionRunner(session.getId());
         }
 
         return session;
@@ -207,7 +233,7 @@ public class SessionService {
 
     public void updateSubjectList(SubjectsBean subjectsBean) {
         List<SubjectBean> subjectList = subjectsBean.getSubjectList();
-        for (SubjectBean subject : subjectList) {
+        for (Subject subject : subjectList) {
             subject.setSessionId(subjectsBean.getSessionId());
             if(subject.getId()!=null){
                 subjectDao.update(subject);
@@ -237,6 +263,9 @@ public class SessionService {
 
             List<CompletedTask> completedTasks = completedTaskDao.listByRoundId(r.getId());
             for(CompletedTask ct: completedTasks) {
+
+                todoEntryService.deleteTodoEntryByCompletedTaskId(ct.getId());
+                votingService.deleteVotingPoolByCompletedTaskId(ct.getId());
                 completedTaskAttributeDao.deleteByCompletedTaskId(ct.getId());
                 eventLogDao.deleteByCompletedTaskId(ct.getId());
             }

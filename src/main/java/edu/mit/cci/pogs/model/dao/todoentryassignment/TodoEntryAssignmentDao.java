@@ -5,11 +5,11 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TodoEntryAssignment;
 
 import java.util.List;
 
-public interface TodoEntryAssignmentDao extends Dao<TodoEntryAssignment, Long>
+public interface TodoEntryAssignmentDao extends Dao<TodoEntryAssignment, Long> {
 
-    {
-//        TodoEntryAssignment get();
-        List<TodoEntryAssignment> get();
-
-    }
+    List<TodoEntryAssignment> get();
+    TodoEntryAssignment getByTodoEntryIdSubjectId(Long todoEntryId, Long subjectId);
+    List<TodoEntryAssignment> listByTodoEntryId(Long todoEntryId, Boolean currentlyAssigned);
+    void delete(Long todoEntryId);
+}
 

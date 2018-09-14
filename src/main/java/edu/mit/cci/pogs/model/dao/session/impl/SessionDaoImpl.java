@@ -36,11 +36,11 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
  
         return query.fetchInto(Session.class);
     }
-    public List<Session> listByConditionId(Long conditionId){
+    public List<Session> listByStudyId(Long studyId){
         final SelectQuery<Record> query = dslContext.select()
                 .from(SESSION).getQuery();
 
-        query.addConditions(SESSION.CONDITION_ID.eq(conditionId));
+        query.addConditions(SESSION.STUDY_ID.eq(studyId));
         return query.fetchInto(Session.class);
     }
 
@@ -50,6 +50,7 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
             .from(SESSION).getQuery();
         Timestamp timestamp = new Timestamp(new Date().getTime() + initWindow);
         query.addConditions(SESSION.SESSION_START_DATE.lessThan(timestamp));
+        query.addConditions(SESSION.SESSION_START_DATE.greaterThan(new Timestamp(new Date().getTime())));
         query.addConditions(SESSION.STATUS.eq(SessionStatus.NOTSTARTED.getId().toString()));
         query.addOrderBy(SESSION.SESSION_START_DATE);
         return query.fetchInto(Session.class);

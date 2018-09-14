@@ -1,0 +1,34 @@
+<div style="width: 100%">
+    <label for="padContent" class="sr-only">Please type in this text field:</label>
+    <div style="position: relative" class="text-left">
+        <textarea class="form-control" id="padContent" rows="5" autocomplete="off"></textarea>
+    </div>
+
+    <!-- Required scripts-->
+
+    <!-- Begin fast-diff library wrapper -->
+    <script>
+        // Needed to use fast-diff (avoid runtime error)
+        let module = {exports: {}}
+    </script>
+    <script src="/vendor/fast-diff/diff.js"></script>
+    <script>
+        const fastDiff = {
+            diff: module.exports,
+            INSERT: module.exports.INSERT,
+            DELETE: module.exports.DELETE,
+            EQUAL: module.exports.EQUAL
+        };
+        module = undefined;
+    </script>
+    <!-- End fast-diff library wrapper -->
+
+    <script src="/vendor/autosize/dist/autosize.min.js"></script>
+
+
+    <!-- OT dependencies-->
+    <script src="/js/lib/ot.js"></script>
+    <script src="/js/lib/ot_input_watcher.js"></script>
+    <script src="/js/lib/ot_client.js"></script>
+    <script src="/js/lib/ot_client_impl.js"></script>
+</div>

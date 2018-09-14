@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.runner.wrappers;
 
+import java.util.Date;
+
 public class SessionSchedule {
 
     private Long startTimestamp;
@@ -73,6 +75,15 @@ public class SessionSchedule {
         this.sessionReference = sessionReference;
     }
 
+    public boolean isAlreadyPassed() {
+        Long currentTimestamp = new Date().getTime();
+        return currentTimestamp >= getStartTimestamp() && currentTimestamp > getEndTimestamp();
+    }
+
+    public boolean isToBeDone() {
+        Long currentTimestamp = new Date().getTime();
+        return currentTimestamp < getStartTimestamp();
+    }
 
     public boolean isHappeningNow(Long currentTimestamp) {
         return currentTimestamp >= getStartTimestamp() && currentTimestamp < getEndTimestamp();

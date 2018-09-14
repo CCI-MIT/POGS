@@ -2,7 +2,6 @@
   <configuration default="false" name="POGS (development)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="edu.mit.cci.pogs.PlatformForOnlineGroupStudiesApplication" />
-    <option name="SHOW_IN_DASHBOARD" value="true" />
     <option name="ACTIVE_PROFILES" value="development" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <module name="pogs" />

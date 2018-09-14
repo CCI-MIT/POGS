@@ -9,7 +9,7 @@ public interface SessionDao extends Dao<Session, Long> {
  
     List<Session> list();
 
-    List<Session> listByConditionId(Long conditionId);
+    List<Session> listByStudyId(Long conditionId);
 
     List<Session> listStartsIn(long initWindow);
 }

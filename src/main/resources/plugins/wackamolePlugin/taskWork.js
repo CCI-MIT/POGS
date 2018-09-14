@@ -1,16 +1,30 @@
 class Wackamole {
     constructor(pogsPlugin) {
         this.pogsPlugin = pogsPlugin;
+        this.memberReady = 0;
+        this.currentMoleNumber = 0;
+        this.maxMoleNumber = 1;
+        this.moleAppearTime = 1000; // time in millisecond
+        this.clickDelay = 0; // time in millisecond
+
         this.subjectColors = ["red", "green", "blue", "purple", "aqua"]; // maximum no. of players = 5
+
         this.numberOfClicks = 0; // TODO: keep track of the number of clicks
+        this.totalHitOnTarget = 0; // Change later
+        this.playerHitOnTarget = 0;
+        this.totalTarget = 0;
+        this.multiplayerRound = 0;
         console.log(pogsPlugin);
     }
 
-    setupGrid(title, teammates) {
+    setupGrid(title, teammates, whackBluePrint) {
         var self = this;
-        var score = 0;
+        var whackValues = $.parseJSON(whackBluePrint);
 
-        console.log("self for setup"+self);
+        console.log(whackValues);
+        console.log(whackBluePrint);
+
+        var score = 0;
 
         $("#wackamoleTitle").text(title);
 
@@ -19,18 +33,25 @@ class Wackamole {
             console.log(teammate);
         });
 
-        // change cursor color
-        // self.changeCursorColor("#00FFFF");
+        $.each(whackValues, function (i, e) {
+            if (teammates[e.player].externalId == self.pogsPlugin.getSubjectId()) {
+                self.maxMoleNumber = e.maxMoleNum;
+                self.moleAppearTime = e.moleAppearTime * 1000; // time in millisecond
+                self.clickDelay = e.clickDelay * 1000;
+            }
+        });
 
         // Only show readyView at start
         $("#gameColumn").children().hide();
-        $("#informationColumn").children().hide();
+        $("#informationColumn").hide();
         $("#readyView").show();
         $("#readyBtn").on('click', self.handleReadyOnClick.bind(self));
 
         // Game grid appearred
         $(".whack_gametable-cell").each(function (i) {
             $("#whack_cell" + i).on('click', self.handleCellOnClick.bind(self));
+            $("#whack_cell" + i).on('removeMole', self.handleCellRemoveMole.bind(self));
+            $("#whack_cell" + i).on('addMole', self.handleCellAddMole.bind(self));
         });
 
         // mouse move event
@@ -42,9 +63,9 @@ class Wackamole {
 
     debounce(func, wait, immediate) {
         var timeout;
-        return function() {
+        return function () {
             var context = this, args = arguments;
-            var later = function() {
+            var later = function () {
                 timeout = null;
                 if (!immediate) func.apply(context, args);
             };
@@ -59,7 +80,7 @@ class Wackamole {
         var self = this;
         self.subjectId = myId; // this is my id
         self.teammates = {};
-        $.each(teammates, function(key, player) {
+        $.each(teammates, function (key, player) {
             var externalId = player.externalId;
             var displayName = player.displayName;
             var isCurrentPlayer = (externalId == myId);
@@ -72,21 +93,51 @@ class Wackamole {
     }
 
     broadcastReceived(message) {
-        if(message.sender != this.subjectId) {
-            var attrName = message.content.attributeName;
-            if (attrName == 'mouseMove') {
-                console.log("received-> " + message.content.attributeStringValue )
+        var self = this;
+        var attrName = message.content.attributeName;
+        if (message.sender != this.pogsPlugin.getSubjectId()) {
+            if (attrName == "removeMole") {
+                var cell = message.content.attributeIntegerValue;
+
+                $("#whack_cell" + cell).removeClass("hasMole");
+                $("#whack_cell" + cell).find('.fa-optin-monster').remove();
+
+            }
+            else if (attrName == "addMole") {
+                var cell = message.content.attributeIntegerValue;
+
+                //safe checking in case multi mole spawn at same spot
+                if (!($("#whack_cell" + cell).hasClass("hasMole"))) {
+                    self.totalTarget++;
+                    $("#whack_cell" + cell).addClass("hasMole");
+                    $("#whack_cell" + cell).append('<i class="fa fa-optin-monster" data-cell-reference-index="' + cell + '"></i>');
+                }
+
+            }
+            else if (attrName == "memberReady") {
+                this.memberReady++;
+                if (self.pogsPlugin.getTeammates().length == self.memberReady) {
+                    // 5 seconds Count down, then display gameGrid
+                    // and mole start popping up randomly
+                    var countDownDate = new Date().getTime() + 5000;
+                    this.countDownTo(countDownDate, "loadingCountDown");
+
+                    setTimeout(function () {
+                        $("#countDownModal").modal("hide");
+                        $("#gameColumn").remove('.modal-backdrop');
+                        $("#gameColumn").removeClass("after_modal_appended");
+                        self.molePopUp();
+                    }, 5000);
+                }
+            }
+
+            else if (attrName == 'mouseMove') {
                 var position = message.content.attributeStringValue.split(":");
                 this.teammates[message.sender].updatePosition(position[0], position[1]);
             }
-            else if(attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
+            else if (attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
                 var cell = message.content.attributeIntegerValue;
-                if(!($("#whack_cell"+cell).hasClass("clicked"))) {
-
-                    if($("#whack_cell"+cell).hasClass("hasMole")){
-                        var newScore = parseInt($("#score").text()) + 1;
-                        $("#score").text(newScore);
-                    }
+                if (!($("#whack_cell" + cell).hasClass("clicked"))) {
 
                     $("#whack_cell" + cell).css('background-color', this.teammates[message.sender].color);
                     $("#whack_cell" + cell).addClass('clicked');
@@ -98,16 +149,15 @@ class Wackamole {
                 }
                 console.log("click message recieved");
             }
+            else if (attrName == 'targetHit') {
+                self.totalHitOnTarget++;
+            }
         }
     }
 
     handleReadyOnClick(event) {
         var self = this;
-        console.log("self for handle"+self);
 
-        // for single player
-        console.log("clicked");
-        console.log(event);
         $("#gameColumn").children().hide();
 
         // Show CountDown hovering over gameGrid and result table
@@ -115,46 +165,90 @@ class Wackamole {
         $('.modal-backdrop').appendTo('#gameColumn');
         $("#gameColumn").addClass("after_modal_appended");
         $(".whack_grid").show();
+        $("#informationColumn").show();
         $("#informationColumn").children().show();
+        // $(".fa-mouse-pointer").css("color", self.teammates[self.subjectId].color);
+        $("#loadingCountDown").html("Waiting for teammates...");
 
-        // 5 seconds Count down, then display gameGrid
-        // and mole start popping up randomly
-        var countDownDate = new Date().getTime() + 5000;
-        this.countDownTo(countDownDate, "loadingCountDown");
+        self.memberReady++;
 
-        setTimeout(function () {
-            $("#countDownModal").modal("hide");
-            $("#gameColumn").remove('.modal-backdrop');
-            $("#gameColumn").removeClass("after_modal_appended");
-            self.molePopUp();
-        }, 5000);
+        // Broadcast member ready
+        self.pogsPlugin.saveCompletedTaskAttribute('memberReady',
+            "", 0.0,
+            0, false);
+
+        if (this.pogsPlugin.getTeammates().length == self.memberReady) {
+            // 5 seconds Count down, then display gameGrid
+            // and mole start popping up randomly
+            var countDownDate = new Date().getTime() + 5000;
+            self.countDownTo(countDownDate, "loadingCountDown");
+
+            setTimeout(function () {
+                $("#countDownModal").modal("hide");
+                $("#gameColumn").remove('.modal-backdrop');
+                $("#gameColumn").removeClass("after_modal_appended");
+
+                self.molePopUp();
+
+            }, 5000);
+        }
+
     }
 
     handleCellOnClick(event) {
-        console.log("clickEvent: " + event);
+        var self = this;
         var cell = parseInt($(event.target).data("cell-reference-index"));
 
-        this.numberOfClicks++;
-        // broadcast mouse click
-        this.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
+        setTimeout(function () {
+
+            // broadcast cell click
+            self.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
+                "", 0.0,
+                cell, false);
+
+            if (!($("#whack_cell" + cell).hasClass("clicked"))) {
+
+                self.numberOfClicks++;
+
+                // increment score if a mole is present in cell
+                if ($("#whack_cell" + cell).hasClass("hasMole")) {
+                    self.totalHitOnTarget++;
+                    self.playerHitOnTarget++;
+                    // broadcast target hit because broadcast cell click broadcast has delay
+                    // and mole might disappear when cell click broadcast is received
+                    self.pogsPlugin.saveCompletedTaskAttribute('targetHit',
+                        "", 0.0,
+                        0, false);
+                }
+
+                $("#whack_cell" + cell).css('background-color', self.teammates[self.subjectId].color);
+                $("#whack_cell" + cell).addClass('clicked');
+
+
+                // after 0.5 second the cell background change back to white
+                setTimeout(function () {
+                    $("#whack_cell" + cell).css('background-color', 'white');
+                    $("#whack_cell" + cell).removeClass('clicked');
+                }, 500);
+            }
+        }, self.clickDelay);
+
+    }
+
+    handleCellRemoveMole(event) {
+        var cell = parseInt($(event.target).data("cell-reference-index"));
+
+        this.pogsPlugin.saveCompletedTaskAttribute('removeMole',
             "", 0.0,
             cell, false);
+    }
 
-        if(!($("#whack_cell"+cell).hasClass("clicked"))) {
+    handleCellAddMole(event) {
+        var cell = parseInt($(event.target).data("cell-reference-index"));
 
-            if($("#whack_cell"+cell).hasClass("hasMole")){
-                var newScore = parseInt($("#score").text()) + 1;
-                $("#score").text(newScore);
-            }
-
-            $("#whack_cell" + cell).css('background-color', this.teammates[this.subjectId].color);
-            $("#whack_cell" + cell).addClass('clicked');
-
-            setTimeout(function () {
-                $("#whack_cell" + cell).css('background-color', 'white');
-                $("#whack_cell" + cell).removeClass('clicked');
-            }, 1000); // TODO: change back to 500 after testing
-        }
+        this.pogsPlugin.saveCompletedTaskAttribute('addMole',
+            "", 0.0,
+            cell, false);
     }
 
     handleMouseMove(event) {
@@ -165,7 +259,6 @@ class Wackamole {
         this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
             x + ":" + y, 0.0,
             0, false);
-        console.log("mouse move event" + x + ":" + y );
     }
 
     countDownTo(countDownDate, elementId) {
@@ -189,46 +282,73 @@ class Wackamole {
                 clearInterval(x);
                 document.getElementById(elementId).innerHTML = "0s";
             }
-        }, 1000);
+        }, 300);
     }
 
     molePopUp() {
         var self = this;
+        self.memberReady = 0;
+
+
+        var lastRound = parseInt($("#rounds").text());
+        $("#rounds").text(lastRound + 1);
+        self.multiplayerRound++;
+
         var roundEndTime = new Date().getTime() + 60000;
-        var lastPopUpCell = -1;
+
+        self.countDownTo(roundEndTime, "roundTimeRemain");
 
         var x = setInterval(function () {
             // Time Left
             var now = new Date().getTime();
             var distance = roundEndTime - now;
-            var seconds = Math.floor(distance / 1000);
-            document.getElementById("roundTimeRemain").innerHTML = seconds + "s";
 
-            // Make mole appear
+            if (self.currentMoleNumber < self.maxMoleNumber) {
+                // add new mole
+                var randomCell = Math.floor(Math.random() * 100);
+                // check if cell already contain mole
+                while ($("#whack_cell" + randomCell).hasClass("hasMole")) {
+                    randomCell = Math.floor(Math.random() * 100);
+                }
+                $("#whack_cell" + randomCell).addClass("hasMole");
+                $("#whack_cell" + randomCell).append('<i class="fa fa-optin-monster" data-cell-reference-index="' + randomCell + '"></i>');
 
-            // remove last mole
-            if(lastPopUpCell >= 0){
-                $("#whack_cell"+lastPopUpCell).removeClass("hasMole");
-                $("#whack_cell"+lastPopUpCell).find('.fa-optin-monster').remove();
+                // trigger mole added event
+                $("#whack_cell" + randomCell).trigger("addMole");
+                self.totalTarget++;
+                self.currentMoleNumber++;
+
+                // remove mole after moleAppearTime
+                setTimeout(function () {
+                    $("#whack_cell" + randomCell).removeClass("hasMole");
+                    $("#whack_cell" + randomCell).find('.fa-optin-monster').remove();
+
+                    // trigger mole remove event
+                    $("#whack_cell" + randomCell).trigger("removeMole");
+
+                    self.currentMoleNumber--;
+
+                }, self.moleAppearTime);
+
             }
-            // add new mole
-            var randomCell = Math.floor(Math.random()*100);
-            $("#whack_cell"+randomCell).addClass("hasMole");
-            $("#whack_cell"+randomCell).append('<i class="fa fa-optin-monster" data-cell-reference-index="'+randomCell+'"></i>');
-            lastPopUpCell = randomCell;
 
-            // If the count down is over, write some text
+            // If the count down is over, empty all mole and print gamer over at time slot
             if (distance < 0) {
+                console.log("total target appeared: " + self.totalTarget);
+                console.log("Number of clicks: " + self.numberOfClicks);
+                console.log("Player hitOnTarget: " + self.playerHitOnTarget);
+                console.log("total hitOnTarget: " + self.totalHitOnTarget);
                 clearInterval(x);
                 document.getElementById("roundTimeRemain").innerHTML = "GameOver";
-
-                $("#whack_cell"+lastPopUpCell).removeClass("hasMole");
-                $("#whack_cell"+lastPopUpCell).find('.fa-optin-monster').remove();
+                $(".whack_gametable-cell").find('.fa-optin-monster').remove();
+                $(".whack_gametable-cell").removeClass("hasMole");
+                self.displayEvaluationForm();
             }
-        }, 1000); // TODO: change back to 500 after testing
+        }, 170); // This is mole appear frequency when moleNum is less than maxMoleNum
+
     }
 
-    changeCursorColor(colorInHex){
+    changeCursorColor(colorInHex) {
         var canvas = document.createElement("canvas");
         canvas.width = 24;
         canvas.height = 24;
@@ -240,8 +360,35 @@ class Wackamole {
         ctx.textBaseline = "top";
         ctx.fillText("\uf245", 0, 0);
         var dataURL = canvas.toDataURL('image/png')
-        $('#wackamoleContainer').css('cursor', 'url('+dataURL+'), auto');
-        $('.whack_gametable-cell').css('cursor', 'url('+dataURL+'), auto');
+        $('#wackamoleContainer').css('cursor', 'url(' + dataURL + '), auto');
+        $('.whack_gametable-cell').css('cursor', 'url(' + dataURL + '), auto');
+    }
+
+    displayEvaluationForm() {
+        var str = '';
+        for (var id in this.teammates) {
+            var player = this.teammates[id];
+            if (player.externalId != this.subjectId) {
+                str += "<div class='row mar m-3'>" +
+                    "<div class='col-md-1 offset-md-6 rounded' style='background-color:red;'></div>" +
+                    "<div class='col-md-3'><input type='text' class='form-control' id='value1'></div></div>";
+            }
+        }
+        $("#gameColumn").hide();
+        $("#playerEvalList").append(str).show();
+
+        // TODO: make ready scree show up after evaluation.
+        // Currently it shows up at the same time as the evaluation
+        if(this.multiplayerRound < 20)
+        {
+            this.numberOfClicks = 0;
+            this.totalHitOnTarget = 0;
+            this.playerHitOnTarget = 0;
+            this.totalTarget = 0;
+            $("#gameColumn").children().hide();
+            $("#gameColumn").show();
+            $("#readyView").show();
+        }
     }
 
 }
@@ -256,25 +403,27 @@ class Player {
         // TODO: should score be tied to players?
 
     }
+
     setUpPointer() {
-        if(this.isCurrentPlayer) {
+        if (this.isCurrentPlayer) {
             $("#myPointerColor").css("color", this.color);
         }
         else {
-            $("#pointerContainer").append('<i id="'+this.externalId+'Pointer" class="fa fa-mouse-pointer" style="color:'+this.color+';display:none"></i>')
+            $("#pointerContainer").append('<i id="' + this.externalId + 'Pointer" class="fa fa-mouse-pointer" style="color:' + this.color + ';display:none"></i>')
         }
-        console.log("init player "+this.externalId);
-        console.log("color: "+this.color);
+        console.log("init player " + this.externalId);
+        console.log("color: " + this.color);
     }
+
     updatePosition(x, y) {
-        $("#"+this.externalId+"Pointer").css({left: x+"px", top: y+"px", position:'absolute'}).show();
+        $("#" + this.externalId + "Pointer").css({left: x + "px", top: y + "px", position: 'absolute'}).show();
     }
 }
 
 var wackamolePlugin = pogs.createPlugin('wackamoleTaskPlugin', function () {
     console.log("Wack-a-mole Plugin Loaded");
     var wackamole = new Wackamole(this);
-    wackamole.setupGrid("Wack-a-mole", this.getTeammates())
+    wackamole.setupGrid("Wack-a-mole", this.getTeammates(), this.getStringAttribute("whackBluePrint"))
     this.subscribeTaskAttributeBroadcast(wackamole.broadcastReceived.bind(wackamole))
     console.log("teammates" + this.getTeammates());
     wackamole.initPlayers(this.getTeammates(), this.getSubjectId());

@@ -38,7 +38,6 @@ class CommunicationPlugin extends PogsPlugin {
         this.initFunc = this.init;
     }
     init(){
-            console.log("Init config : " + this.pogsRef.communicationType);
             if (this.pogsRef.communicationType == COMMUNICATION_TYPE.GROUP_CHAT) {
                 var gcm = new GroupChatManager(this);
                 gcm.changeChannelTo(CHAT_BODY.GROUP.htmlRef, CHAT_BODY.GROUP.displayString, null);
@@ -51,9 +50,6 @@ class CommunicationPlugin extends PogsPlugin {
             if(this.pogsRef.communicationType == COMMUNICATION_TYPE.MATRIX_CHAT) {
                 var mtm = new MatrixChatManager(this);
                 mtm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
-                // get the constraint matrix
-                // get the subchannel configs
-
             }
 
 
@@ -116,10 +112,20 @@ class GroupChatManager {
 
                 if (message.content.message != "") {
                     this.channelBodyRef.append(this.createReceivedMessageHTML(
-                        message.content.message, this.resolveSubjectDisplayName(message.sender), new Date()));
+                        message.content.message, this.resolveSubjectDisplayName(message.sender),message.sender,
+                        new Date()));
                     this.adjustScroll();
                 }
 
+            }
+        }else{
+            if (message.content.message != "") {
+                this.channelBodyRef.append(
+                    this.createOwnMessageHTML(message.content.message,
+                                              this.resolveSubjectDisplayName(
+                                                  this.communicationPluginReference.getSubjectId()),
+                                              new Date()));
+                this.adjustScroll();
             }
         }
 
@@ -129,7 +135,7 @@ class GroupChatManager {
 
             $("#friend-list").append(
             '                           <li class="list-group-item p-1 hover-bg-lightgray">\n'
-            + '                            <span class="d-xs-none username">'+this.subjectsInChannel[i].displayName+'</span>\n'
+            + '                            <span class="badge '+ this.subjectsInChannel[i].externalId+'_color username">'+this.subjectsInChannel[i].displayName+'</span>\n'
             + '                        </li>\n');
             //handle onclick to change CHAT channel
 
@@ -208,11 +214,6 @@ class GroupChatManager {
         var message = $("#messageInput").val();
         $("#messageInput").val("");
 
-        this.channelBodyRef.append(
-            this.createOwnMessageHTML(message,
-                                      this.resolveSubjectDisplayName(
-                                          this.communicationPluginReference.getSubjectId()),
-                                      new Date()));
         this.sendRegularMessage(message);
 
         this.adjustScroll();
@@ -224,7 +225,7 @@ class GroupChatManager {
     createOwnMessageHTML(message,creator, timeStamp){
 
      return '<div class="row justify-content-end" >'
-            +'<div class="card message-card m-1">'
+            +'<div class="card message-card m-1 '+this.communicationPluginReference.getSubjectId()+'_color ">'
                + '<div class="card-body p-2">'
                     +'<span class="float-left mx-1"><b>'+creator+'</b></span>'
                     +'<span class="mx-2">'+message+'</span>'
@@ -233,11 +234,11 @@ class GroupChatManager {
             +'</div>'
         +'</div>';
     }
-    createReceivedMessageHTML(message, creator, timestamp) {
+    createReceivedMessageHTML(message, creator, externalId, timestamp) {
         return '<div class="row ">\n'
-               + '                            <div class="card message-card bg-lightblue m-1">\n'
+               + '                            <div class="card message-card bg-lightblue m-1 '+externalId+'_color">\n'
                + '                                <div class="card-body p-2">\n'
-               + '                                    <span class="float-left mx-1"><b>'+creator+'</b></span>\n'
+               + '                                    <span class="float-left mx-1 "><b>'+creator+'</b></span>\n'
                + '                                    <span class="mx-2">'+message+'</span>\n'
                + '                                    <span class="float-right mx-1"><small>'+minuteAndSecond(timestamp)+'</span>\n'
                + '                                </div>\n'
@@ -245,6 +246,7 @@ class GroupChatManager {
                + '                        </div>';
     }
 }
+
 
 class MatrixChatManager extends GroupChatManager {
     constructor(communicationPluginReference) {
@@ -261,42 +263,78 @@ class MatrixChatManager extends GroupChatManager {
         $("#list-group2").removeClass("d-none")
     }
     onCommunicationBroadcastReceived(message) {
+        var isOwnMessage = false;
 
-        if (message.sender != this.communicationPluginReference.getSubjectId()) {
-            if (message.content.type == CHAT_TYPE.MESSAGE) {
+        if (message.sender == this.communicationPluginReference.getSubjectId()) {
+            isOwnMessage = true;
+        }
+        var isToCurrentSubject = false;
+        if (message.receiver == this.communicationPluginReference.getSubjectId()) {
+            isToCurrentSubject = true;
+        }
+        if (message.content.type == CHAT_TYPE.MESSAGE) {
 
-                //if is private chat message.content.channel.indexOf("chat_")
-                //if is channel
-                if (message.content.message != "") {
-                    var originChatName = "";
+            if (message.content.message != "") {
+                var originChatName = "";
 
-                    if(message.content.channel.indexOf("chat_")>=0){
-                        originChatName = "chat_"+message.sender;
-                        $("#channelBody_"+originChatName)
-                            .append(this.createReceivedMessageHTML(
-                                message.content.message,
-                                this.resolveSubjectDisplayName(message.sender),
-                                new Date()));
-                    } else{
-                        originChatName = message.content.channel;
-                        $("#channelBody_"+message.content.channel)
-                            .append(this.createReceivedMessageHTML(
-                                message.content.message,
-                                this.resolveSubjectDisplayName(message.sender),
-                                new Date()));
+                if(message.content.channel.indexOf("chat_")>=0){
+
+
+                    if(!isOwnMessage) {
+                        if(isToCurrentSubject) {
+                            originChatName = "chat_" + message.sender;
+
+                            $("#channelBody_" + originChatName)
+                                .append(this.createReceivedMessageHTML(
+                                    message.content.message,
+                                    this.resolveSubjectDisplayName(message.sender),message.sender,
+                                    new Date()));
+                        }
+                    }else {
+
+                        originChatName = "chat_" + message.receiver;
+                        $("#channelBody_" + originChatName).append(
+                            this.createOwnMessageHTML(message.content.message,
+                                                      this.resolveSubjectDisplayName(
+                                                          this.communicationPluginReference.getSubjectId()),
+                                                      new Date()));
+
                     }
-                    if(this.channel == originChatName) {
-                        //message is for the current channel
 
-                        this.adjustScroll();
+                } else{
+                    originChatName = message.content.channel;
+
+                    if(!isOwnMessage) {
+                        isToCurrentSubject = true;
+                        $("#channelBody_" + message.content.channel)
+                            .append(this.createReceivedMessageHTML(
+                                message.content.message,
+                                this.resolveSubjectDisplayName(message.sender),message.sender,
+                                new Date()));
                     }else{
-                       //add it to the body and trigger notification icon
-                        this.addNotification(originChatName);
+
+                        $("#channelBody_" + message.content.channel).append(
+                            this.createOwnMessageHTML(message.content.message,
+                                                      this.resolveSubjectDisplayName(
+                                                          this.communicationPluginReference.getSubjectId()),
+                                                      new Date()));
                     }
                 }
 
+                if(this.channel == originChatName) {
+                    //message is for the current channel
+
+                    this.adjustScroll();
+                }else{
+                   //add it to the body and trigger notification icon
+                    if(isToCurrentSubject) {
+                        this.addNotification(originChatName);
+                    }
+                }
             }
+
         }
+
 
     }
     clearNotification(chatName) {
@@ -344,7 +382,7 @@ class MatrixChatManager extends GroupChatManager {
                         '                           <li class="list-group-item p-1 hover-bg-lightgray '
                         + 'username" data-external-id="'+ this.subjectsInChannel[i].externalId + '"'
                         + ' id="chat_'+ this.subjectsInChannel[i].externalId +'">\n'
-                        + '                            <span class="d-xs-none">'
+                        + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color">'
                         + this.subjectsInChannel[i].displayName + '</span>\n'
                         + '                        </li>\n');
                     this.getOrCreateChannelHTML('chat_'+ this.subjectsInChannel[i].externalId);
@@ -440,6 +478,10 @@ class DyadicChatManager extends GroupChatManager {
             if (message.content.type == CHAT_TYPE.STATUS) {
                 this.updateTeamSubjectStatus(message.sender, message.content.message);
             }
+        } else {
+            if (message.content.type == CHAT_TYPE.MESSAGE) {
+                super.onCommunicationBroadcastReceived(message);
+            }
         }
 
 
@@ -482,8 +524,7 @@ class DyadicChatManager extends GroupChatManager {
             this.requestSent = $(event.target).data("externalid");
 
             this.setBusyStatus();
-            console.log("Request sent from: " + this.communicationPluginReference.getSubjectId() +
-                        " to :" + $(event.target).data("externalid"));
+
             this.changeChannelTo("requestsent", "Waiting ...", this.requestSent);
             this.sendMessage("", this.channel, CHAT_TYPE.REQUEST_CHAT, this.requestSent);
         }else{
@@ -589,7 +630,7 @@ class DyadicChatManager extends GroupChatManager {
             if(this.subjectsInChannel[i].externalId != this.communicationPluginReference.getSubjectId()) {
                 $("#friend-list").append(
                     '                           <li class="list-group-item p-1 hover-bg-lightgray" id="'+this.subjectsInChannel[i].externalId+'_subject_ref">\n'
-                    + '                            <span class="d-xs-none username">'
+                    + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color username">'
                     + this.subjectsInChannel[i].displayName + '</span>\n'
                     + '                             <i class="fa fa-phone-square chatRequest chatRequestAvailable" data-status="AVAILABLE" data-externalId="'
                     + this.subjectsInChannel[i].externalId + '"style=""></i> <span class="badge badge-primary status-text-desc statusAvailable">available</span>  \n'

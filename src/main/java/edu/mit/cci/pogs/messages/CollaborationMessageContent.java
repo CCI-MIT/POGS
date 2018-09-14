@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.messages;
 
+import org.jooq.tools.json.JSONObject;
+
 public class CollaborationMessageContent {
 
     private String message;
@@ -30,4 +32,5 @@ public class CollaborationMessageContent {
     public void setMessageType(String messageType) {
         this.messageType = messageType;
     }
+
 }

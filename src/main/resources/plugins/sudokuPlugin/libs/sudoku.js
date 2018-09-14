@@ -5,6 +5,9 @@
     A Sudoku puzzle generator and solver JavaScript library.
 
     Please see the README for more details.
+
+    From GitHub repo: https://github.com/robatron/sudoku.js/blob/master/sudoku.js
+    License: MIT (https://github.com/robatron/sudoku.js/blob/master/LICENSE)
 */
 
 (function(root){

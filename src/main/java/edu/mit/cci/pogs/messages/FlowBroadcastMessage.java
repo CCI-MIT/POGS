@@ -13,10 +13,17 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
         this.setSender("server");
         this.content = new FlowBroadcastMessageContent();
 
+
         this.content.setNextUrl(sessionWrapper.getNextUrl());
+        this.content.setCurrentUrl(sessionWrapper.getCurrentUrl());
         this.content.setSecondsRemainingCurrentUrl(sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
         this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());
         this.content.setSecondsRemainingForCurrentRound(sessionWrapper.getSecondsRemainingForCurrentRound().toString());
+
+        //System.out.println("nextUrl:" + this.content.getNextUrl());
+        //System.out.println("secondsRemainingCurrentUrl:" + this.content.getSecondsRemainingCurrentUrl());
+        //System.out.println("secondsRemainingForSession:" + this.content.getSecondsRemainingForSession());
+        //System.out.println("secondsRemainingForCurrentRound:" + this.content.getSecondsRemainingForCurrentRound());
 
     }
 
@@ -30,6 +37,7 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
 class FlowBroadcastMessageContent {
 
     private String nextUrl;
+    private String currentUrl;
     private String secondsRemainingCurrentUrl;
     private String secondsRemainingForSession;
     private String secondsRemainingForCurrentRound;
@@ -40,6 +48,14 @@ class FlowBroadcastMessageContent {
 
     public void setNextUrl(String nextUrl) {
         this.nextUrl = nextUrl;
+    }
+
+    public String getCurrentUrl() {
+        return currentUrl;
+    }
+
+    public void setCurrentUrl(String currentUrl) {
+        this.currentUrl = currentUrl;
     }
 
     public String getSecondsRemainingCurrentUrl() {
