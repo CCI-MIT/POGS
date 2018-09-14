@@ -1,57 +1,31 @@
 package edu.mit.cci.pogs.view.session;
 
-import org.jooq.tools.json.JSONArray;
+import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
+import edu.mit.cci.pogs.model.dao.session.*;
+import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
+import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
+import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
+import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
+import edu.mit.cci.pogs.service.ChatChannelService;
+import edu.mit.cci.pogs.service.SessionService;
+import edu.mit.cci.pogs.service.SubjectCommunicationService;
+import edu.mit.cci.pogs.utils.MessageUtils;
+import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
+import edu.mit.cci.pogs.view.session.beans.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
-import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
-import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
-import edu.mit.cci.pogs.model.dao.session.SessionDao;
-import edu.mit.cci.pogs.model.dao.session.SessionStatus;
-import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
-import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
-import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
-import edu.mit.cci.pogs.model.dao.session.TeamCreationType;
-import edu.mit.cci.pogs.model.dao.study.StudyDao;
-import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
-import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
-import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
-import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Condition;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
-import edu.mit.cci.pogs.service.ChatChannelService;
-import edu.mit.cci.pogs.service.SessionService;
-import edu.mit.cci.pogs.service.SubjectCommunicationService;
-import edu.mit.cci.pogs.utils.MessageUtils;
-import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
-import edu.mit.cci.pogs.view.session.beans.ChatChannelBean;
-import edu.mit.cci.pogs.view.session.beans.SessionBean;
-import edu.mit.cci.pogs.view.session.beans.SessionHasTaskGroupRelationshipBean;
-import edu.mit.cci.pogs.view.session.beans.SubjectBean;
-import edu.mit.cci.pogs.view.session.beans.SubjectCommunicationBean;
-import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Controller
 public class SessionController {
@@ -85,6 +59,9 @@ public class SessionController {
 
     @Autowired
     private SubjectCommunicationService subjectCommunicationService;
+
+    @Autowired
+    private SubjectAttributeDao subjectAttributeDao;
 
     private static final String DEFAULT_CONDITION_NAME = "";
 
@@ -157,6 +134,7 @@ public class SessionController {
         for (SubjectBean sb : sbList) {
             subjectsBean.setSubjectList(sbList);
             sb.setSubjectCommunications(subjectCommunicationDao.listByFromSubjectId(sb.getId()));
+            sb.setSubjectAttributes(subjectAttributeDao.listBySubjectId(sb.getId()));
         }
 
         List<ChatChannel> chatChannels = chatChannelDao.listBySessionId(id);
@@ -362,6 +340,7 @@ public class SessionController {
         for (SubjectBean sb : sbList) {
             subjectsBean.setSubjectList(sbList);
             sb.setSubjectCommunications(subjectCommunicationDao.listByFromSubjectId(sb.getId()));
+            sb.setSubjectAttributes(subjectAttributeDao.listBySubjectId(sb.getId()));
         }
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", session);

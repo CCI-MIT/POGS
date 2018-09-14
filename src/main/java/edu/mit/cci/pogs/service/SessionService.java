@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,13 +22,6 @@ import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
@@ -47,6 +42,7 @@ public class SessionService {
     private final RoundDao roundDao;
     private final EventLogDao eventLogDao;
     private final SubjectCommunicationService subjectCommunicationService;
+    private final SubjectAttributeDao subjectAttributeDao;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
 
@@ -66,7 +62,8 @@ public class SessionService {
                           TeamDao teamDao,
                           RoundDao roundDao,
                           EventLogDao eventLogDao,
-                          SubjectCommunicationService subjectCommunicationService
+                          SubjectCommunicationService subjectCommunicationService,
+                          SubjectAttributeDao subjectAttributeDao
                           ) {
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
         this.sessionDao = sessionDao;
@@ -78,6 +75,7 @@ public class SessionService {
         this.roundDao = roundDao;
         this.eventLogDao =  eventLogDao;
         this.subjectCommunicationService = subjectCommunicationService;
+        this.subjectAttributeDao = subjectAttributeDao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -209,12 +207,22 @@ public class SessionService {
 
     public void updateSubjectList(SubjectsBean subjectsBean) {
         List<SubjectBean> subjectList = subjectsBean.getSubjectList();
-        for (Subject subject : subjectList) {
+        for (SubjectBean subject : subjectList) {
             subject.setSessionId(subjectsBean.getSessionId());
             if(subject.getId()!=null){
                 subjectDao.update(subject);
             }else{
                 subjectDao.create(subject);
+            }
+            List<SubjectAttribute> subjectAttributes = subject.getSubjectAttributes();
+            if (subjectAttributes!=null) {
+                for (SubjectAttribute subjectAttribute : subjectAttributes) {
+                    if (subjectAttribute.getId() != null) {
+                        subjectAttributeDao.update(subjectAttribute);
+                    } else {
+                        subjectAttributeDao.create(subjectAttribute);
+                    }
+                }
             }
         }
         subjectCommunicationService.createSubjectCommunications(subjectsBean.getSessionId(), true);
