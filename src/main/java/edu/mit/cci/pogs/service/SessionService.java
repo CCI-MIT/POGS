@@ -222,10 +222,6 @@ public class SessionService {
 
     }
 
-    public List<Session> listSessionByConditionId(Long conditionId) {
-        return sessionDao.listByConditionId(conditionId);
-    }
-
     public List<Subject> listSubjectsBySessionId(Long sessionId) {
         return subjectDao.listBySessionId(sessionId);
     }
@@ -233,7 +229,7 @@ public class SessionService {
 
     public void updateSubjectList(SubjectsBean subjectsBean) {
         List<SubjectBean> subjectList = subjectsBean.getSubjectList();
-        for (Subject subject : subjectList) {
+        for (SubjectBean subject : subjectList) {
             subject.setSessionId(subjectsBean.getSessionId());
             if(subject.getId()!=null){
                 subjectDao.update(subject);
