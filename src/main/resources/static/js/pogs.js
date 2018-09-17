@@ -55,6 +55,9 @@ class Pogs {
                 + `background-color: ${subjectColorMap[i].backgroundColor};`
                 + `color: ${subjectColorMap[i].fontColor};`
                 + '}';
+            rule += `.${subjectColorMap[i].externalId}_activecolor {`
+                    + `color: ${subjectColorMap[i].backgroundColor};`
+                    + '}';
         }
 
         var css = document.createElement('style'); // Creates <style></style>
@@ -127,6 +130,7 @@ class Pogs {
 
         this.setupCommunication();
         this.setupCollaboration();
+
 
         if(this.eventsUntilNow) {
             if (this.eventsUntilNow.length > 0) {

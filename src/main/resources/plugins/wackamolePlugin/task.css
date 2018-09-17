@@ -1,6 +1,6 @@
 .whack_grid { margin:1em auto; border-collapse:collapse }
 .whack_grid td {
-    cursor:pointer;
+    /*cursor:pointer;*/
     border:1px solid #ccc;
     text-align:center;
     font-family:sans-serif;
@@ -33,7 +33,7 @@
 }
 
 /*Monster color*/
-.fa{
+.monster{
     color: black;
 }
 

@@ -33,7 +33,6 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
-import edu.mit.cci.pogs.runner.wrappers.CompletedTaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
@@ -114,6 +113,7 @@ public class SessionRunner implements Runnable {
     public void init() {
         _log.info("Configuring session: " + session.getSessionSuffix());
         shouldRun = true;
+        sessionHasStarted = false;
         configureSession();
         setupRounds(this.session);
         setupTaskList(this.session);
@@ -231,7 +231,7 @@ public class SessionRunner implements Runnable {
         for (CompletedTask ct : completedTasks) {
             for (TaskWrapper taskWrapper : session.getTaskList()) {
                 if (ct.getTaskId() == taskWrapper.getId()) {
-                    taskWrapper.getCompletedTasks().add( new CompletedTaskWrapper(ct));
+                    taskWrapper.getCompletedTasks().add(ct);
                     continue;
                 }
             }
@@ -289,7 +289,8 @@ public class SessionRunner implements Runnable {
     private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
-            Color[] colors = ColorUtils.generateVisuallyDistinctColors(subjectList.size(),
+            Color[] colors = ColorUtils.generateVisuallyDistinctColors(
+                    ((subjectList.size()>10)?(subjectList.size()):(10)),
                     ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
 
             for (int i = 0; i < subjectList.size(); i++) {
@@ -306,9 +307,9 @@ public class SessionRunner implements Runnable {
         Subject su = su1;
         SubjectAttribute sa = new SubjectAttribute();
         sa.setAttributeName(attributeName);
-        sa.setStringValue("#" + Integer.toHexString(color.getRed())
-                + Integer.toHexString(color.getGreen()) +
-                Integer.toHexString(color.getBlue()));
+
+        sa.setStringValue(String.format("#%02x%02x%02x", color.getRed(),
+                color.getGreen(), color.getBlue()));
 
         sa.setSubjectId(su.getId());
         subjectAttributeDao.create(sa);

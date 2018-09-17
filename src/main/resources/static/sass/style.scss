@@ -71,12 +71,15 @@ body {
 /* Workspace classes */
 
 .message-card {
-  max-width: 60%;
+  max-width: 80%;
 }
 .message-scroll {
   overflow-y: auto;
 }
-
+.hit_color{
+  background-color: red;
+  opacity: 0.35;
+}
 .bg-lightgrey {
   background-color: #f1f1f1;
 }

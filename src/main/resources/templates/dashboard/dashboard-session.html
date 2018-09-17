@@ -75,12 +75,9 @@
                                 th:text="${subj.subjectExternalId}" th:id="${subj.subjectExternalId}"></span>
                             </span>
                             <th:block th:if="${schedule.taskReference !=null and not schedule.taskReference.soloTask}">
-                                <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Participation:</b>
-                                    <div class="progress">
-                                      <div class="progress-bar" role="progressbar" style="width: 55%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">minsa01</div>
-                                      <div class="progress-bar bg-info" role="progressbar" style="width: 45%;" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100">minsa02</div>
-                                    </div>
-                                    <div> <span>33</span> total interactions</div>
+                                <div th:id="${ teamWrapper.team.id+ #strings.replace(schedule.url,'/','_') + 'progress'}" th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null}" ><b>Participation:</b>
+                                    <div class="progress"></div>
+                                    <div> <span th:id="${ teamWrapper.team.id + #strings.replace(schedule.url,'/','_') + 'totalInteractions'}">0</span> total interactions</div>
                                 </div>
                                 <div th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and schedule.taskReference.communicationType != 'N' }" ><b>Communication:</b>
                                     <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_communication'}">0</span> Messages sent</div>
@@ -91,7 +88,7 @@
                                     <div><span th:id="${ #strings.replace(schedule.url,'/','_') +teamWrapper.team.id+'_collab_voting'}">0</span> Voting widgets created</div>
                                 </div>
                             </th:block>
-                            <th:block th:if="${schedule.taskReference !=null and schedule.taskReference.soloTask}">
+                            <th:block th:if="${#strings.contains(schedule.url,'w') and schedule.taskReference !=null and schedule.taskReference.soloTask}">
                                 <div><b>Solo task</b></div>
                             </th:block>
                             <div class="hr"></div>

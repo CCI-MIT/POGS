@@ -112,6 +112,7 @@ public class WorkspaceCollaborationWSController {
                         .getMessageType());
         VotingPoolCollaborationMessage allVotingOptions = new VotingPoolCollaborationMessage();
         allVotingOptions.setType(PogsMessage.MessageType.COLLABORATION_MESSAGE);
+        allVotingOptions.setCompletedTaskId(completedTaskId.toString());
         VotingPoolMessageContent vpmc = new VotingPoolMessageContent();
 
 
@@ -207,11 +208,13 @@ public class WorkspaceCollaborationWSController {
 
         TodoListCollaborationMessage allTodoEntriesMessage = new TodoListCollaborationMessage();
         allTodoEntriesMessage.setType(PogsMessage.MessageType.COLLABORATION_MESSAGE);
+        allTodoEntriesMessage.setCompletedTaskId(completedTaskId.toString());
         TodoListMessageContent cmc = new TodoListMessageContent();
         cmc.setCollaborationType(CollaborationMessage.CollaborationType.TODO_LIST);
         cmc.setMessageType(CollaborationMessage.TodoType.BROADCAST_TODO_ITEMS.name().toString());
         allTodoEntriesMessage.setContent(cmc);
         cmc.setTriggeredBy(pogsMessage.getContent().getMessageType());
+
 
 
         if (todoType.equals(CollaborationMessage.TodoType.CREATE_TODO)) {
