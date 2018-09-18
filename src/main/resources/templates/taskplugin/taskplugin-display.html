@@ -40,7 +40,10 @@
         <tbody>
         <th:block th:each="config : ${taskConfigurationList}">
             <tr>
-                <td><a th:text="${config.configurationName}" th:href="${'/admin/taskplugins/' + taskPlugin.taskPluginName + '/' + config.id} "></a></td>
+                <td><a th:text="${config.configurationName}" th:href="${'/admin/taskplugins/' + taskPlugin.taskPluginName + '/' + config.id} "></a>
+                <a th:href="${'/taskplugin/' + taskPlugin.taskPluginName + '/' + config.configurationName + '/w/su01'} " target="_blank"
+                class="btn btn-outline-primary float-right">
+                Test plugin in workspace</a></td>
             </tr>
         </th:block>
         </tbody>

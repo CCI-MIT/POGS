@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.records.TaskConfigurationRecord;
 
@@ -39,6 +40,18 @@ public class TaskConfigurationDaoImpl extends AbstractDao<TaskConfiguration, Lon
                 .from(TASK_CONFIGURATION).getQuery();
         query.addConditions(TASK_CONFIGURATION.TASK_PLUGIN_NAME.eq(taskPluginName));
         return query.fetchInto(TaskConfiguration.class);
+    }
+
+    public TaskConfiguration getByTaskPluginConfigurationName(String taskPluginName) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(TASK_CONFIGURATION).getQuery();
+        query.addConditions(TASK_CONFIGURATION.CONFIGURATION_NAME.eq(taskPluginName));
+        Record record =  query.fetchOne();
+        if(record == null) {
+            return null;
+        }else{
+            return record.into(TaskConfiguration.class);
+        }
     }
 
 

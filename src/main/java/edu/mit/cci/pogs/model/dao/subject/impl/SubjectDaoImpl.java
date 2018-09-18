@@ -74,6 +74,7 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         }
         return query.fetchInto(Subject.class);
     }
- 
+
+
 }
  

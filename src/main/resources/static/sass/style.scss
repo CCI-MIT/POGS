@@ -29,7 +29,6 @@ body {
 }
 .flexbox .main {
   flex: 1;
-  background: red
 }
 .flexbox .header,
 .flexbox .footer {
@@ -46,15 +45,25 @@ body {
   background: white;
   padding: 1em;
 }
+
+.flexbox-row .information{
+  background: #fff;
+  padding: 1em;
+  max-width: 475px;
+  max-height: 600px;
+}
+.scrollInfo {
+  overflow-y: scroll;
+}
 .flexbox-row .mainContent {
   flex: 1;
-  background: white
+  background: white;
+  min-width: 400px;
 }
 
 .centerContent {
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 .waiting_message {
   color: black;
@@ -113,6 +122,9 @@ body {
 
 .border-chat-window {
   border: 1px solid #e2e0e0;
+}
+.chat_time{
+  flex-grow: 1;
 }
 .sidebarSubDivisionTitle{
   color: #325e8c;

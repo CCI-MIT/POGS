@@ -86,7 +86,8 @@ class GroupChatManager {
         this.communicationPluginReference = communicationPluginReference;
         this.subjectsInChannel = communicationPluginReference.getTeammates();
         this.setupSubjectPanel();
-
+        this.lastMessageAuthor = null;
+        this.shouldHideAuthorInConsecutive = true;
         this.sendJoinedMessage();
         this.setupHTML();
         this.communicationPluginReference.
@@ -223,24 +224,50 @@ class GroupChatManager {
     }
 
     createOwnMessageHTML(message,creator, timeStamp){
-
+        var hideAuthor = false;
+        if(this.shouldHideAuthorInConsecutive){
+            if(this.lastMessageAuthor == null){
+                this.lastMessageAuthor = this.communicationPluginReference.getSubjectId();
+            }else{
+                if(this.lastMessageAuthor == this.communicationPluginReference.getSubjectId()){
+                    hideAuthor = true;
+                }else{
+                    this.lastMessageAuthor = this.communicationPluginReference.getSubjectId()
+                    hideAuthor = false;
+                }
+            }
+        }
      return '<div class="row justify-content-end" >'
             +'<div class="card message-card m-1 '+this.communicationPluginReference.getSubjectId()+'_color ">'
-               + '<div class="card-body p-2">'
-                    +'<span class="float-left mx-1"><b>'+creator+'</b></span>'
+               + '<div class="card-body p-1">'
+                    +((hideAuthor)?(''):('<span class="float-left mx-1"><b>'+creator+'</b></span>'))
                     +'<span class="mx-2">'+message+'</span>'
-                    +'<span class="float-right mx-1"><small>'+minuteAndSecond(timeStamp)+'</small></span>'
+                    +'<span class="float-right mx-1 chat_time"><small style="font-size: 10px">'+minuteAndSecond(timeStamp)+'</small></span>'
                 +'</div>'
             +'</div>'
         +'</div>';
     }
     createReceivedMessageHTML(message, creator, externalId, timestamp) {
+
+        var hideAuthor = false;
+        if(this.shouldHideAuthorInConsecutive){
+            if(this.lastMessageAuthor == null){
+                this.lastMessageAuthor = externalId;
+            }else{
+                if(this.lastMessageAuthor == externalId){
+                    hideAuthor = true;
+                } else {
+                    this.lastMessageAuthor = externalId;
+                    hideAuthor = false;
+                }
+            }
+        }
         return '<div class="row ">\n'
                + '                            <div class="card message-card bg-lightblue m-1 '+externalId+'_color">\n'
-               + '                                <div class="card-body p-2">\n'
-               + '                                    <span class="float-left mx-1 "><b>'+creator+'</b></span>\n'
+               + '                                <div class="card-body p-1">\n'
+               + ((hideAuthor)?(''):('                                    <span class="float-left mx-1 "><b>'+creator+'</b></span>\n'))
                + '                                    <span class="mx-2">'+message+'</span>\n'
-               + '                                    <span class="float-right mx-1"><small>'+minuteAndSecond(timestamp)+'</span>\n'
+               + '                                    <span class="float-right mx-1 chat_time"><small style="font-size: 10px">'+minuteAndSecond(timestamp)+'</span>\n'
                + '                                </div>\n'
                + '                            </div>\n'
                + '                        </div>';
@@ -251,7 +278,7 @@ class GroupChatManager {
 class MatrixChatManager extends GroupChatManager {
     constructor(communicationPluginReference) {
         super(communicationPluginReference);
-
+        this.shouldHideAuthorInConsecutive = true;
         this.showChannelsList();
         this.subjectCanTalkTo = this.communicationPluginReference.getSubjectCanTalkToSubjects();
         this.channelsSubjectIsIn = this.communicationPluginReference.getChannelsSubjectIsIn();
@@ -427,6 +454,7 @@ class DyadicChatManager extends GroupChatManager {
         this.requestSent = null;
         this.requestReceived = null;
         this.inChatWith = null;
+        this.shouldHideAuthorInConsecutive = true;
         this.setAvailableStatus();
     }
     setupHTML() {

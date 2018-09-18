@@ -44,32 +44,36 @@ public class WorkspaceTaskWSController {
             SessionRunner sr = SessionRunner.getSessionRunner(sessionId);
 
 
-            if(taskAttributeMessage.getLoggableAttribute()){
+            if(sr!=null) {
+                if (taskAttributeMessage.getLoggableAttribute()) {
 
-                if(sr!=null){
                     sr.getSession().addSubjectContribution(completedTaskId, externalId, 1);
-                }
 
-                completedTaskAttributeService.createOrUpdate(
-                        taskAttributeMessage.getAttributeName(),
-                        taskAttributeMessage.getAttributeStringValue(),
-                        taskAttributeMessage.getAttributeDoubleValue(),
-                        taskAttributeMessage.getAttributeIntegerValue(),
-                        Long.parseLong(taskAttributeMessage.getCompletedTaskId())
-                );
-                Subject sender = subjectDao.getByExternalId(taskAttributeMessage.getSender());
-                if(sender!=null) {
-                    EventLog el = new EventLog();
-                    el.setCompletedTaskId(completedTaskId);
-                    el.setSessionId(sessionId);
-                    el.setSender(taskAttributeMessage.getSender());
-                    el.setReceiver(taskAttributeMessage.getReceiver());
-                    el.setTimestamp(new Timestamp(new Date().getTime()));
-                    el.setEventType(taskAttributeMessage.getType().name().toString());
-                    el.setEventContent(taskAttributeMessage.toJSON().toString());
-                    el.setSenderSubjectId(sender.getId());
-                    eventLogDao.create(el);
+
+                    completedTaskAttributeService.createOrUpdate(
+                            taskAttributeMessage.getAttributeName(),
+                            taskAttributeMessage.getAttributeStringValue(),
+                            taskAttributeMessage.getAttributeDoubleValue(),
+                            taskAttributeMessage.getAttributeIntegerValue(),
+                            Long.parseLong(taskAttributeMessage.getCompletedTaskId())
+                    );
+                    Subject sender = subjectDao.getByExternalId(taskAttributeMessage.getSender());
+                    if (sender != null) {
+                        EventLog el = new EventLog();
+                        el.setCompletedTaskId(completedTaskId);
+                        el.setSessionId(sessionId);
+                        el.setSender(taskAttributeMessage.getSender());
+                        el.setReceiver(taskAttributeMessage.getReceiver());
+                        el.setTimestamp(new Timestamp(new Date().getTime()));
+                        el.setEventType(taskAttributeMessage.getType().name().toString());
+                        el.setEventContent(taskAttributeMessage.toJSON().toString());
+                        el.setSenderSubjectId(sender.getId());
+                        eventLogDao.create(el);
+                    }
+
                 }
+            } else{
+                //handle in memory event log for testing
 
             }
 

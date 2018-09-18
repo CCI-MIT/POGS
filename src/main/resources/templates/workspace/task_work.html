@@ -7,6 +7,10 @@
     <title>POGS</title>
 </head>
 <body>
+
+<div layout:fragment="information" th:classappend="${'scrollInfo'}" th:if="${task.interactionWidgetEnabled}">
+    <div th:remove="tag" th:utext="${task.interactionText}" ></div>
+</div>
 <div layout:fragment="content">
     <div th:if="${hasTabs}">
         <ul class="nav nav-tabs">

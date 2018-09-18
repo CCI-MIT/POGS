@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -27,6 +28,7 @@ import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
 import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
+import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
@@ -40,6 +42,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
@@ -49,6 +52,7 @@ import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
+import edu.mit.cci.pogs.utils.ColorUtils;
 
 @Controller
 public class WorkspaceController {
@@ -94,6 +98,9 @@ public class WorkspaceController {
 
     @Autowired
     private SubjectCommunicationDao subjectCommunicationDao;
+
+    @Autowired
+    private TaskConfigurationDao taskConfigurationDao;
 
     @PostMapping("/check_in")
     public String register(@RequestParam("externalId") String externalId, Model model) {
@@ -257,8 +264,94 @@ public class WorkspaceController {
         }
         return configurationArray;
     }
+    private Subject generateFakeSubject(String subjectExternalId){
+        Subject su = new Subject();
+        su.setSubjectExternalId(subjectExternalId);
+        su.setSubjectDisplayName(subjectExternalId);
+        return su;
+    }
 
-    @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
+    @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
+    public String taskWorkPluginTest(
+                           @PathVariable("taskPlugin") String taskPlugin,
+                           @PathVariable("pluginConfig") String pluginConfig,
+                           @PathVariable("subjectExternalId") String subjectExternalId,
+                           Model model) {
+        TaskPlugin pl = TaskPlugin.getTaskPlugin(taskPlugin);
+        if (pl != null) {
+            //get task configurations
+            TaskConfiguration tc = taskConfigurationDao.getByTaskPluginConfigurationName(pluginConfig);
+
+            List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
+                    .listByTaskConfigurationId(tc.getId());
+
+
+            model.addAttribute("taskConfigurationAttributes",
+                    attributesToJsonArray(taskExecutionAttributes));
+            //get task html & js from plugin file system
+            model.addAttribute("taskCss", pl.getTaskCSSContent());
+            model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
+            model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
+
+
+            JSONArray allLogs = new JSONArray();
+
+            model.addAttribute("eventsUntilNow", allLogs);
+
+            model.addAttribute("subject", generateFakeSubject(subjectExternalId));
+
+
+
+            model.addAttribute("teammates", getFakeTeamatesJSONObject());
+        }
+
+        return "workspace/task_workplugin";
+    }
+
+    private JSONArray getFakeTeamatesJSONObject() {
+        List<Subject> teammates = new ArrayList<>();
+        teammates.add(generateFakeSubject( "su01"));
+        teammates.add(generateFakeSubject( "su02"));
+        teammates.add(generateFakeSubject( "su03"));
+        teammates.add(generateFakeSubject( "su04"));
+
+        JSONArray ja = new JSONArray();
+        Color[] colors = ColorUtils.generateVisuallyDistinctColors(
+                10,
+                ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
+        int colorIndex = 0;
+        for (Subject s : teammates) {
+            JSONObject subject = new JSONObject();
+            subject.put("externalId", s.getSubjectExternalId());
+            subject.put("displayName", s.getSubjectDisplayName());
+
+            JSONArray subjectAttributes = new JSONArray();
+
+            JSONObject att = new JSONObject();
+            Color color = colors[colorIndex];
+            att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME);
+
+            att.put("stringValue",
+                    String.format("#%02x%02x%02x", color.getRed(),
+                            color.getGreen(), color.getBlue())
+                    );
+            subjectAttributes.add(att);
+
+            att = new JSONObject();
+            color = ColorUtils.generateFontColorBasedOnBackgroundColor(colors[colorIndex]);
+            att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME);
+            att.put("stringValue",String.format("#%02x%02x%02x", color.getRed(),
+                    color.getGreen(), color.getBlue()));
+            colorIndex++;
+
+            subjectAttributes.add(att);
+
+            subject.put("attributes", subjectAttributes);
+            ja.add(subject);
+        }
+        return ja;
+    }
+        @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
     public String taskWork(@PathVariable("roundId") Long roundId,
                            @PathVariable("taskId") Long taskId,
                            @PathVariable("subjectExternalId") String subjectExternalId,
