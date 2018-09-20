@@ -75,6 +75,7 @@ class Pogs {
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
+        this.chatBotName = config.chatBotName;
         this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;

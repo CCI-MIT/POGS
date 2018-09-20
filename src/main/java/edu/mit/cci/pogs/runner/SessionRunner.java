@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import edu.mit.cci.pogs.model.dao.chatentry.ChatEntryDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
@@ -104,12 +106,18 @@ public class SessionRunner implements Runnable {
     @Autowired
     private SubjectAttributeDao subjectAttributeDao;
 
+    @Autowired
+    private ChatEntryDao chatEntryDao;
 
     @Autowired
     private CompletedTaskDao completedTaskDao;
 
+    @Autowired
+    private ApplicationContext context;
+
     private boolean shouldRun;
 
+    private List<Thread> chatRunners = new ArrayList<>();
     public void init() {
         _log.info("Configuring session: " + session.getSessionSuffix());
         shouldRun = true;
@@ -135,6 +143,9 @@ public class SessionRunner implements Runnable {
             }
         }
         SessionRunner.removeSessionRunner(session.getId());
+        for(Thread th : this.chatRunners){
+            th.interrupt();
+        }
         _log.info("Exiting session runner for session" + session.getSessionSuffix() );
     }
 
@@ -148,6 +159,7 @@ public class SessionRunner implements Runnable {
                 createCompletedTasks(session, round, true);
                 setupStartingTimes(session, round, null);
                 session.createSessionSchedule();
+                checkAndScheduleChatScripts(session);
 
             } else {
                 //TODO:Handle before task , team and completed task creation
@@ -161,11 +173,26 @@ public class SessionRunner implements Runnable {
                 createCompletedTasks(session, round, true);
                 setupStartingTimesMultiTask(session, round, null);
                 session.createSessionSchedule();
-
+                checkAndScheduleChatScripts(session);
 
             }
         }
 
+    }
+
+    private void checkAndScheduleChatScripts(SessionWrapper session) {
+        for (TaskWrapper task : session.getTaskList()) {
+            if(task.getChatScriptId() != null ) {
+                //create new script scheduler
+                ChatScriptRunner csr = (ChatScriptRunner) context.getBean("chatScriptRunner");
+                csr.setSession(session);
+                csr.setTaskWrapper(task);
+                csr.setChatEntryList(chatEntryDao.listChatEntryByChatScript(task.getChatScriptId()));
+                Thread thread = new Thread(csr);
+                thread.start();
+                chatRunners.add(thread);
+            }
+        }
     }
 
 
@@ -201,11 +228,11 @@ public class SessionRunner implements Runnable {
         Long elapsedTime = round.getRoundStartTimestamp();
 
         for (TaskWrapper tw : session.getTaskList()) {
-            TaskWrapper newTw = new TaskWrapper(tw);
-            newTw.setCompletedTasks(tw.getCompletedTasks());
-            round.getTasks().add(newTw);
-            newTw.setTaskStartTimestamp(elapsedTime);
-            elapsedTime += newTw.getTotalTaskTime();
+
+            tw.setCompletedTasks(tw.getCompletedTasks());
+            round.getTasks().add(tw);
+            tw.setTaskStartTimestamp(elapsedTime);
+            elapsedTime += tw.getTotalTaskTime();
         }
 
     }

@@ -18,25 +18,28 @@
         </li>
     </ol>
     <h2>Edit user</h2>
-    <form action="#" th:action="@{/admin/users}" th:object="${authUser}" method="post">
+    <form action="#" id="userSave" th:action="@{/admin/users}" th:object="${authUser}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" name="id" th:value="*{id}"/>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="firstName">First Name:</label>
             <div class="col-sm-10">
                 <input class="form-control" type="text" id="firstName" th:field="*{firstName}"/>
+                <div class="invalid-feedback">Please provide a first name</div>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="lastName">Last Name:</label>
             <div class="col-sm-10">
                 <input class="form-control" type="text" id="lastName" th:field="*{lastName}"/>
+                <div class="invalid-feedback">Please provide a last name</div>
             </div>
         </div>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="emailAddress">Email Address:</label>
             <div class="col-sm-10">
                 <input class="form-control" type="text" id="emailAddress" th:field="*{emailAddress}"/>
+                <div class="invalid-feedback">Please provide a valid email address</div>
             </div>
         </div>
         <div th:if="${authUser.id == null}"  class="form-group row">
@@ -44,6 +47,7 @@
             <div class="col-sm-10">
                 <input class="form-control" type="password" id="password" th:field="*{password}"
                        autocomplete="new-password"/>
+                       <div class="invalid-feedback">Please provide a valid password</div>
             </div>
         </div>
 
@@ -57,9 +61,13 @@
                         th:value="${rg.id}"
                         th:text="${rg.groupName}" ></option>
             </select>
+            <small id="introTimeHelp" class="form-text text-muted">The research groups are used to filter the sessions and tasks the researcher can manage.</small>
         </fieldset>
         <script>
-
+            function validateEmail(email) {
+                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
             $(function() {
                  //$('select[name="researchgroups"]')
 
@@ -76,6 +84,38 @@
                 dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
                 dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
                 dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+
+                $( "#userSave" ).submit(function( event ) {
+                    var valid = true;
+
+                    //first name
+                    if($("#firstName").val()==""){
+                        $("#firstName").addClass("is-invalid");
+                        valid = false;
+                    }
+                    //last name
+                    if($("#lastName").val()==""){
+                        $("#lastName").addClass("is-invalid");
+                        valid = false;
+                    }
+                    //email
+                    if($("#emailAddress").val()=="" ||! validateEmail($("#emailAddress").val())){
+                        $("#emailAddress").addClass("is-invalid");
+                        valid = false;
+                    }
+                    //password
+                    if($("#password").val()==""){
+                        $("#password").addClass("is-invalid");
+                        valid = false;
+                    }
+                    if(!valid){
+                       event.preventDefault();
+                       event.stopPropagation();
+                    }
+
+                });
+
+
             });
         </script>
         <!-- End research group field -->

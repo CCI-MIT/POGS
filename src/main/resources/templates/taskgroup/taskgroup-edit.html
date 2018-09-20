@@ -18,13 +18,16 @@
         </li>
     </ol>
     <h2>Edit task group</h2>
-    <form action="#" th:action="@{/admin/taskgroups}" th:object="${taskGroup}" method="post">
+    <form action="#" th:action="@{/admin/taskgroups}" th:object="${taskGroup}" id="taskGroupSave" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <div class="form-group row">
             <label class="col-sm-2 col-form-label" for="taskGroupName">Task Group Name:</label>
             <div class="col-sm-10">
                 <input class="form-control" type="text" id="taskGroupName" th:field="*{taskGroupName}"/>
+                <div class="invalid-feedback">
+                               Please provide a valid task group name.
+                            </div>
             </div>
         </div>
         <div class="container">
@@ -89,6 +92,19 @@
                             $( this ).text("#" + (index + 1))
                         });
                     }
+
+                    $( "#taskGroupSave" ).submit(function( event ) {
+                        var valid = true;
+                        if($("#taskGroupName").val()== ""){
+                            $("#taskGroupName").addClass("is-invalid");
+                            valid = false;
+                        }
+                        if(!valid){
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                    });
+
                 });
 
 

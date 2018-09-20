@@ -13,7 +13,8 @@ class PogsTaskConfigEditor {
                 var isValid = true; //$(e.target).parents('form').isValid();
                 var taskEditorResponse = this.editor.beforeSubmit();
                 if($("#configurationName").val()==""){
-                    alert("Configuration name can\'t be empty!");
+                    $("#configurationName").addClass("is-invalid");
+                    $("#configurationNameError").show();
                     return false;
                 }
 
@@ -28,6 +29,10 @@ class PogsTaskConfigEditor {
                 }
             }.bind(this));
     }
+}
+function isValidUsernameRegex(value){
+    var regexp = /^[a-zA-Z0-9]+$/;
+    return (regexp.test(value));
 }
 var pogsTaskConfigEditor = new PogsTaskConfigEditor();
 

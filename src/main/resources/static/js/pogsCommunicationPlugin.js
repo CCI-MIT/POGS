@@ -54,7 +54,9 @@ class CommunicationPlugin extends PogsPlugin {
 
 
     }
-
+    getChatBotName(){
+        return this.pogsRef.chatBotName;
+    }
     getChannelsSubjectIsIn(){
         return this.pogsRef.channelSubjectIsIn;
     }
@@ -112,6 +114,8 @@ class GroupChatManager {
             if (message.content.type == CHAT_TYPE.MESSAGE) {
 
                 if (message.content.message != "") {
+
+
                     this.channelBodyRef.append(this.createReceivedMessageHTML(
                         message.content.message, this.resolveSubjectDisplayName(message.sender),message.sender,
                         new Date()));
@@ -208,7 +212,12 @@ class GroupChatManager {
         if (sub){
             return sub.displayName;
         }else{
-            return "";
+            var chatBotName = this.communicationPluginReference.getChatBotName();
+            if(chatBotName!= ''){
+                return chatBotName
+            }else {
+                return "";
+            }
         }
     }
     triggerSendMessage() {
@@ -680,8 +689,10 @@ function minuteAndSecond(timestamp){
             return val;
         }
     }
-    var hours = Math.floor((timestamp % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    var minutes = Math.floor((timestamp % (1000 * 60 * 60)) / (1000 * 60));
+
+    var date = new Date(timestamp);
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
 
     return trailingZeros(hours.toString()) + ':' + trailingZeros(minutes.toString());
 }

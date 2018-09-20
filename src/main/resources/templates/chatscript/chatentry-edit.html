@@ -21,7 +21,7 @@
     <div class="col">
         <div class="col-12">
             <a th:href="${'/admin/chatscripts/' + chatscript.id}" class="btn btn-outline-primary float-right">
-                Edit chatscripts</a>
+                Edit chat scripts</a>
         </div>
     </div>
     <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
@@ -31,7 +31,7 @@
         <div class="col"></div>
         <div class="col">
             <div class="col-12">
-                <button id="addChatentry" class="btn">Add Chatentry</button>
+                <button id="addChatentry" class="btn">Add chat entry</button>
             </div>
         </div>
         <script>
@@ -40,7 +40,11 @@
 
                     var index = $("#chatEntryList tr").length ;
                     var chatscriptId = $("#chatScriptId").val();
-                    var toAdd = "<tr><td><input type='hidden' value='' id='chatEntryList"+index+".id' name='chatEntryList["+index+"].id' /><input type='hidden' value='' value='"+chatscriptId+"' name='chatEntryList["+index+"].chatscriptId' /><input type='text' name='chatEntryList["+index+"].chatEntryValue'/></td><td><input type='text' name='chatEntryList["+index+"].chatElapsedTime' /></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteChatentry' ></button></td></tr>";
+                    var toAdd = "<tr><td><input type='number' min='0' step='1' name='chatEntryList["+index+"].chatElapsedTime' /></td>" +
+                     "<td><input type='hidden' value='' id='chatEntryList"+index+".id' name='chatEntryList["+index+"].id' />" +
+                      "<input type='hidden' value='' value='"+chatscriptId+"' name='chatEntryList["+index+"].chatscriptId' />" +
+                       "<input type='text' class='chatValue' name='chatEntryList["+index+"].chatEntryValue'/></td>" +
+                        "<td><button type='button' class='pull-right fa fa-trash btn-danger deleteChatentry' ></button></td></tr>";
                     $("#chatEntryList").append(toAdd);
                 });
                 $(".deleteChatentry").click(function () {
@@ -56,26 +60,30 @@
     <form action="#" th:action="@{/admin/chatscripts/chatentries/edit}" th:object="${chatEntriesBean}" method="post">
         <input type="hidden" name="chatscriptId" id="chatscriptId" th:value="${chatscript.id}">
         <!--<input type="hidden" name="studyId" th:value="${study.id}">-->
-        <table class="table table-striped">
+        <table class="table table-striped" style="width: 500px;">
             <thead>
             <tr>
-                <th>Chatentry value</th>
-                <th>Chatentry elapsed time</th>
+                <th width="150">Elapsed time</th>
+                <th width="350">Value</th>
                 <th></th>
             </tr>
             </thead>
             <tbody id="chatEntryList">
 
             <tr th:each="person, rowStat : *{chatEntryList}">
-                <td><input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].id}"  /><input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].chatScriptId}"  /><input type="text" th:field="*{chatEntryList[__${rowStat.index}__].chatEntryValue}" /></td>
-                <td><input type="text" th:field="*{chatEntryList[__${rowStat.index}__].chatElapsedTime}" /></td>
+                <td><input type="number" min="0" step="1" th:field="*{chatEntryList[__${rowStat.index}__].chatElapsedTime}" /></td>
+                <td>
+                    <input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].id}"  />
+                    <input type="hidden" th:field="*{chatEntryList[__${rowStat.index}__].chatScriptId}"  />
+                    <input type="text" class="chatValue" th:field="*{chatEntryList[__${rowStat.index}__].chatEntryValue}" />
+                </td>
                 <td><button type="button" class="pull-right fa fa-trash btn-danger deleteChatentry" ></button></td>
             </tr>
 
             </tbody>
         </table>
         <br/>
-        <button type="submit" class="btn btn-primary">Save chatentry list</button>
+        <button type="submit" class="btn btn-primary">Save chat entry list</button>
         <br/>
     </form>
 </div>

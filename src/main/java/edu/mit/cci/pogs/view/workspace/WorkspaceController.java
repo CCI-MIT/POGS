@@ -271,6 +271,62 @@ public class WorkspaceController {
         return su;
     }
 
+    @GetMapping("/task/{taskId}/t/{subjectExternalId}")
+    public String taskConfigTest(@PathVariable("taskId") Long taskId,
+                           @PathVariable("subjectExternalId") String subjectExternalId,
+                           Model model) {
+
+        Task task = taskDao.get(taskId);
+        TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+        if (pl != null) {
+            //get task configurations
+            TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
+                    .getByTaskId(task.getId());
+            List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
+                    .listByTaskConfigurationId(configuration.getTaskConfigurationId());
+
+            model.addAttribute("task", new TaskWrapper(task));
+            model.addAttribute("taskConfigurationAttributes",
+                    attributesToJsonArray(taskExecutionAttributes));
+
+            JSONArray allLogs = new JSONArray();
+            model.addAttribute("eventsUntilNow", allLogs);
+
+            //get task html & js from plugin file system
+            model.addAttribute("taskCss", pl.getTaskCSSContent());
+            model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
+            model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
+
+            model.addAttribute("subject", generateFakeSubject(subjectExternalId));
+            model.addAttribute("teammates", getFakeTeamatesJSONObject());
+
+            JSONArray ja = new JSONArray();
+            ja.add("su01");
+            ja.add("su02");
+            ja.add("su03");
+            ja.add("su04");
+
+            model.addAttribute("subjectCanTalkTo",ja);
+
+            model.addAttribute("hasCollaborationTodoListEnabled",
+                    task.getCollaborationTodoListEnabled());
+            model.addAttribute("hasCollaborationFeedbackWidget",
+                    task.getCollaborationFeedbackWidgetEnabled());
+            model.addAttribute("hasCollaborationVotingWidget",
+                    task.getCollaborationVotingWidgetEnabled());
+
+            String cc = task.getCommunicationType();
+
+
+            model.addAttribute("communicationType", cc);
+            model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
+                .NO_CHAT.getId().toString()) ? (true) : (false)));
+
+        }
+
+        return "workspace/task_workpreview";
+    }
+
     @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
     public String taskWorkPluginTest(
                            @PathVariable("taskPlugin") String taskPlugin,
@@ -299,7 +355,6 @@ public class WorkspaceController {
             model.addAttribute("eventsUntilNow", allLogs);
 
             model.addAttribute("subject", generateFakeSubject(subjectExternalId));
-
 
 
             model.addAttribute("teammates", getFakeTeamatesJSONObject());
@@ -351,7 +406,8 @@ public class WorkspaceController {
         }
         return ja;
     }
-        @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
+
+    @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
     public String taskWork(@PathVariable("roundId") Long roundId,
                            @PathVariable("taskId") Long taskId,
                            @PathVariable("subjectExternalId") String subjectExternalId,
@@ -437,6 +493,7 @@ public class WorkspaceController {
                 }
 
                 model.addAttribute("communicationType", cc);
+                model.addAttribute("chatBotName", sessionWrapper.getChatBotName());
                 model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
                         .NO_CHAT.getId().toString()) ? (true) : (false)));
 

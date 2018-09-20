@@ -31,7 +31,8 @@
 
             <th>Task Name</th>
             <th>Task Plugin Type</th>
-            <th>Scoring Type</th>
+            <th>Task work time</th>
+            <th></th>
 
         </tr>
         </thead>
@@ -41,8 +42,10 @@
                 <td th:text="${task.id}"></td>
                 <td><a th:text="${task.taskName}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
                 <td><a th:text="${task.taskPluginType}" th:href="${'/admin/tasks/'+ task.id+ '/edit'}"></a></td>
-                <td><a th:text="${task.scoringType}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
-
+                <td><a th:text="${task.interactionTime + ' seconds'}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
+                <td><a th:href="${'/task/' + task.id + '/t/su01'} " target="_blank"
+                                    class="btn btn-outline-primary float-right">
+                                    Preview task in workspace</a></td>
             </tr>
         </th:block>
         </tbody>

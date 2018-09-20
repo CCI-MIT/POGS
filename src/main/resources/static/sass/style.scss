@@ -13,7 +13,9 @@ header{
 .deleteTask {
   cursor: pointer;
 }
-
+.chatValue{
+  width:320px;
+}
 /* Workspace classes */
 html,
 body {
@@ -122,6 +124,10 @@ body {
 
 .border-chat-window {
   border: 1px solid #e2e0e0;
+}
+.task_work {
+  max-height: 800px;
+  overflow-y: scroll;
 }
 .chat_time{
   flex-grow: 1;

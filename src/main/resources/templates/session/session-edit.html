@@ -21,14 +21,16 @@
         </li>
     </ol>
     <h2>Edit session</h2>
-    <form action="#" th:action="@{/admin/sessions}" th:object="${sessionBean}" method="post">
+    <form action="#" id="saveSession" th:action="@{/admin/sessions}" th:object="${sessionBean}" method="post">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{studyId}"/>
         <input type="hidden" th:field="*{roundsEnabled}" th:value="true"/>
         <input type="hidden" th:field="*{numberOfRounds}" th:value="1"/>
 
-        <input type="hidden" th:field="*{status}" th:value="P">
+        <input type="hidden" th:field="*{status}" th:value="P" />
+
+        <input type="hidden" th:field="*{teamCreationType}" />
 
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Basic</legend>
@@ -75,6 +77,7 @@
                                         </div>
                                         <input type="text" class="form-control" id="sessionSuffix" aria-describedby="sessionSuffix3" th:field="*{sessionSuffix}"/>
                                     </div>
+                                    <div class="invalid-feedback" id="sessionSuffixError">Please provida a valid suffix use numbers and letters only</div>
                                 </div>
                             </div>
                         </div>
@@ -87,64 +90,68 @@
                     <legend class="col-form-legend col-sm-2">Pages</legend>
                     <div class="container">
                         <fieldset class="form-group row">
-                            <legend class="col-form-legend col-sm-2">Intro</legend>
-                            <div class="container">
-                                <div class="form-group row">
+                            <legend class="col-form-legend col-sm-2">Intro page</legend>
+                            <div class="container" >
+                                <div class="form-group row hiddable" >
                                     <label class="col-sm-3 col-form-label" for="introPageEnabled">Intro Page Enabled:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-check-input" th:field="*{introPageEnabled}" type="checkbox" id="introPageEnabled" />
+                                        <input class="form-check-input" th:field="*{introPageEnabled}" type="checkbox" id="introPageEnabled" data-trigger="intro" />
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="intro">
                                     <label class="col-sm-3 col-form-label" for="introText">Intro Text:</label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control htmleditor" id="introText" th:field="*{introText}" rows="3"></textarea>
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="intro">
                                     <label class="col-sm-3 col-form-label" for="introTime">Intro Time:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" type="number" id="introTime" th:field="*{introTime}"/>
+                                        <input class="form-control" type="number" data-number="intro" min="0" step="1" id="introTime" th:field="*{introTime}"/>
                                         <small id="introTimeHelp" class="form-text text-muted">In seconds</small>
+                                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="rosterPageEnabled">Roster Page Enabled:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-check-input" th:field="*{rosterPageEnabled}" type="checkbox" id="rosterPageEnabled" />
+                                        <input class="form-check-input" th:field="*{rosterPageEnabled}" data-trigger="roster"  type="checkbox" id="rosterPageEnabled" />
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="roster">
                                     <label class="col-sm-3 col-form-label" for="rosterTime">Roster Time:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" type="number" id="rosterTime" th:field="*{rosterTime}"/>
+                                        <input class="form-control" data-number="roster" min="0" step="1" type="number" id="rosterTime" th:field="*{rosterTime}"/>
                                         <small id="rosterTimeHelp" class="form-text text-muted">In seconds</small>
+                                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="waitingRoomTime">Waiting Room Time:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" type="number" id="waitingRoomTime" th:field="*{waitingRoomTime}"/>
+                                        <input class="form-control" type="number"  min="0" step="1" id="waitingRoomTime" th:field="*{waitingRoomTime}"/>
                                         <small id="waitingRoomTimeHelp" class="form-text text-muted">In seconds</small>
+                                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
 
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="displayNameChangePageEnabled">Display Name Change Page Enabled:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-check-input" value="false" th:field="*{displayNameChangePageEnabled}" type="checkbox" id="displayNameChangePageEnabled" />
+                                        <input class="form-check-input" value="false" data-trigger="displayName"  th:field="*{displayNameChangePageEnabled}" type="checkbox" id="displayNameChangePageEnabled" />
                                     </div>
                                 </div>
 
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="displayName">
                                     <label class="col-sm-3 col-form-label" for="displayNameChangeTime">Display Name Change Time:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" type="number" id="displayNameChangeTime" th:field="*{displayNameChangeTime}"/>
+                                        <input class="form-control" type="number" data-number="displayName" min="0" step="1" id="displayNameChangeTime" th:field="*{displayNameChangeTime}"/>
                                         <small id="displayNameChangeTimeHelp" class="form-text text-muted">In seconds</small>
+                                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
                             </div>
@@ -157,26 +164,27 @@
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="donePageEnabled">Done Page Enabled:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-check-input" th:field="*{donePageEnabled}" type="checkbox" id="donePageEnabled" />
+                                        <input class="form-check-input" th:field="*{donePageEnabled}" data-trigger="done"  type="checkbox" id="donePageEnabled" />
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="done">
                                     <label class="col-sm-3 col-form-label" for="donePageText">Done Page Text:</label>
                                     <div class="col-sm-9">
                                         <textarea class="form-control htmleditor" id="donePageText" th:field="*{donePageText}" rows="3"></textarea>
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="done">
                                     <label class="col-sm-3 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
                                     <div class="col-sm-9">
                                         <input class="form-control" type="text" id="doneRedirectUrl" th:field="*{doneRedirectUrl}"/>
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <div class="form-group row hideable" data-hide="done">
                                     <label class="col-sm-3 col-form-label" for="donePageTime">Done Page Time:</label>
                                     <div class="col-sm-9">
-                                        <input class="form-control" type="number" id="donePageTime" th:field="*{donePageTime}"/>
+                                        <input class="form-control" type="number" data-number="done" min="0" step="1" id="donePageTime" th:field="*{donePageTime}"/>
                                         <small id="donePageTimeHelp" class="form-text text-muted">In seconds</small>
+                                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
                             </div>
@@ -231,53 +239,45 @@
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-8">Advanced - Feedback</legend>
             <div class="container">
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="scoreboardEnabled">Scoreboard Enabled:</label>
-                    <div class="col-sm-9">
-                        <input class="form-check-input" th:field="*{scoreboardEnabled}" type="checkbox" id="scoreboardEnabled" />
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="scoreboardDisplayType">Scoreboard Display Type:</label>
-                    <div class="col-sm-9">
+            <div class="form-check form-check-inline">
 
-                        <select class="custom-select" th:field="*{scoreboardDisplayType}" id="scoreboardDisplayType">
+                        <input class="form-check-input" th:field="*{scoreboardEnabled}" type="checkbox" id="scoreboardEnabled" disabled/>
+                        <label class="col-form-label" for="scoreboardEnabled">Scoreboard Enabled</label>
+
+            </div>
+             <div class="form-check form-check-inline">
+
+                        <label class="col-form-label" for="scoreboardDisplayType">Scoreboard Display Type:</label>
+                        <select class="custom-select" th:field="*{scoreboardDisplayType}" id="scoreboardDisplayType" disabled>
                             <option
                                     th:each="rg: ${scoreboardDisplayTypes}"
                                     th:value="${rg.id}"
                                     th:text="${rg.scoreboardDisplayType}" ></option>
                         </select>
 
-                    </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="scoreboardUseDisplayNames">Scoreboard Use Display Names:</label>
-                    <div class="col-sm-9">
-                        <input class="form-check-input" th:field="*{scoreboardUseDisplayNames}" type="checkbox" id="scoreboardUseDisplayNames" />
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" th:field="*{scoreboardUseDisplayNames}" type="checkbox" disabled id="scoreboardUseDisplayNames" />
+                    <label class="col-form-label" for="scoreboardUseDisplayNames">Use Display Names</label>
                 </div>
             </div>
         </fieldset>
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-8">Advanced - Collaboration tools</legend>
             <div class="container">
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="collaborationTodoListEnabled">Collaboration Todo List Enabled:</label>
-                    <div class="col-sm-9">
-                        <input class="form-check-input" th:field="*{collaborationTodoListEnabled}" type="checkbox" id="collaborationTodoListEnabled" />
-                    </div>
+                <div class="form-check form-check-inline">
+
+                    <input class="form-check-input" th:field="*{collaborationTodoListEnabled}" type="checkbox" id="collaborationTodoListEnabled" />
+                    <label class=" col-form-label" for="collaborationTodoListEnabled">Todo List Enabled</label>
+
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration Feedback Widget Enabled:</label>
-                    <div class="col-sm-9">
-                        <input class="form-check-input" th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox" id="collaborationFeedbackWidgetEnabled" />
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox" id="collaborationFeedbackWidgetEnabled" />
+                    <label class=" col-form-label" for="collaborationFeedbackWidgetEnabled">Feedback Widget Enabled</label>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="collaborationVotingWidgetEnabled">Collaboration Voting Widget Enabled:</label>
-                    <div class="col-sm-9">
-                        <input class="form-check-input" th:field="*{collaborationVotingWidgetEnabled}" type="checkbox" id="collaborationVotingWidgetEnabled" />
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" th:field="*{collaborationVotingWidgetEnabled}" type="checkbox" id="collaborationVotingWidgetEnabled" />
+                    <label class=" col-form-label" for="collaborationVotingWidgetEnabled">Voting Widget Enabled:</label>
                 </div>
             </div>
         </fieldset>
@@ -295,20 +295,6 @@
                                     th:value="${rg.id}"
                                     th:text="${rg.teamCreationMethod}" ></option>
                         </select>
-
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <label class="col-sm-3 col-form-label" for="teamCreationType">Team Membership Type:</label>
-                    <div class="col-sm-9">
-
-                        <select class="custom-select" th:field="*{teamCreationType}" id="teamCreationType">
-                            <option
-                                    th:each="rg: ${teamCreationTypes}"
-                                    th:value="${rg.id}"
-                                    th:text="${rg.teamCreationType}" ></option>
-                        </select>
-
 
                     </div>
                 </div>
@@ -336,6 +322,7 @@
                     <label class="col-sm-3 col-form-label" for="teamMinSize">Team size:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="number" id="teamMinSize" th:field="*{teamMinSize}"/>
+                        <div class="invalid-feedback">Please provide a valid team size greater or equal to 2.</div>
                     </div>
                 </div>
 
@@ -363,9 +350,26 @@
             </select>
         </fieldset>
         <script>
-
+            function isValidUsernameRegex(value){
+                var regexp = /^[a-zA-Z0-9]+$/;
+                return (regexp.test(value));
+            }
+            function validateUrl(value) {
+              return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
+            }
             $(function() {
-                //$('select[name="researchgroups"]')
+
+                function checkboxOnClickOnLoad(){
+                                    var trigg = $(this).data("trigger");
+                                    if($(this).is(':checked')){
+                                        console.log("trying to show stuff");
+                                        $(".hideable[data-hide='"+trigg+"']").show();
+                                    }else{
+                                        $(".hideable[data-hide='"+trigg+"']").hide();
+                                    }
+                                };
+                $(":checkbox").click(checkboxOnClickOnLoad);
+                $(":checkbox").each(checkboxOnClickOnLoad);
 
                 $(".htmleditor").summernote(
                     {
@@ -394,6 +398,89 @@
                 dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
                 dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
                 dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+
+                function teamCreationSetup(){
+                    var teamMe = $("#teamCreationMethod").val();
+                    if(teamMe == "S"){
+                        //hide matrix
+                        //hide team size
+                        $("#teamMinSize").parent().parent().hide();
+                        $("#teamCreationMatrix").parent().parent().hide();
+                    }
+                    if(teamMe == "C"){
+                        //hide matrix
+                        //show team size
+                        $("#teamMinSize").parent().parent().show();
+                        $("#teamCreationMatrix").parent().parent().hide();
+                    }
+                    if(teamMe == "E"){
+                        $("#teamMinSize").parent().parent().hide();
+                        $("#teamCreationMatrix").parent().parent().show();
+                    }
+
+
+                }
+                $("#teamCreationMethod").change(teamCreationSetup);
+                teamCreationSetup();
+
+                $( "#saveSession" ).submit(function( event ) {
+                    var valid = true;
+
+                    //time checking not empty or zero
+                    $(":checkbox").each(function(){
+
+                        var trig = $(this).data("trigger");
+                        if(trig){
+                            if($(this).is(':checked')){
+                                console.log(':input[data-number="'+trig+'"]');
+                                var numberVar = $(':input[data-number="'+trig+'"]').val();
+                                if((numberVar=="" )||(parseInt(numberVar)<5)){
+                                   $(':input[data-number="'+trig+'"]').addClass("is-invalid");
+                                   valid = false;
+                                }
+                            }
+                        }
+
+                    });
+
+                     var teamMe = $("#teamCreationMethod").val();
+                        if(teamMe == "S"){
+                        }
+                        if(teamMe == "C"){
+                            //hide matrix
+                            //show team size
+                            var teamSize = $("#teamMinSize").val();
+                            if(teamSize == "" || parseInt(teamSize) <= 1){
+                                $("#teamMinSize").addClass("is-invalid");
+                                valid = false;
+                            }
+                        }
+                        if(teamMe == "E"){
+                            var matrixvalue = $("#teamCreationMatrix").val();
+                            if(matrixvalue == ""){
+                                $("#teamCreationMatrix").addClass("is-invalid");
+                                valid = false;
+                            }
+                        }
+                        if(!isValidUsernameRegex($("#sessionSuffix").val())){
+                            $("#sessionSuffixError").show();
+                            valid = false;
+                        }
+
+                        if($("#couldNotAssignToTeamMessage").val()==""){
+                            $("#couldNotAssignToTeamMessage").addClass("is-invalid");
+                            valid = false;
+                        }
+
+
+
+                    if(!valid){
+                        event.preventDefault();
+                        event.stopPropagation();
+                      }
+
+                });
+
             });
         </script>
         <!-- End research group field -->

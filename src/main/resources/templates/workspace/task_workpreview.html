@@ -12,13 +12,6 @@
     <div th:remove="tag" th:utext="${task.interactionText}" ></div>
 </div>
 <div layout:fragment="content">
-    <div th:if="${hasTabs}">
-        <ul class="nav nav-tabs">
-          <li class="nav-item" th:each="task:${taskList}">
-            <a class="nav-link" th:classappend="${task.id == taskId} ? active : nothing" th:href="${'/round/' +round.id + task.taskWorkUrl +'/' + subject.subjectExternalId}" th:text="${task.taskName}"></a>
-          </li>
-        </ul>
-    </div>
 
     <div id="todoListContainer" class="flex-column w-100" style="padding-top: 5px"
         th:if="${hasCollaborationTodoListEnabled}">
@@ -45,9 +38,10 @@
         /*]]>*/
     </style>
     <div class="form-group waiting_message tab-content">
-        <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+        <div class="d-flex align-items-center flex-column justify-content-center h-100
+          text-white" style="height: 100%">
 
-        <div class="task_work" th:remove="tag" th:utext="${taskWorkHtml}" ></div>
+        <div th:remove="tag" th:utext="${taskWorkHtml}" ></div>
 
 
             <script>
@@ -58,19 +52,18 @@
 
                     pogs.setup({
                        currentUrl: window.location,
-                       sessionId: '[(${pogsSession.id})]',
+                       sessionId: '-1',
                        subjectId: '[(${subject.subjectExternalId})]',
                        subjectCanTalkTo: [(${subjectCanTalkTo})],
-                       channelSubjectIsIn: [(${channelSubjectIsIn})],
-                       secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
-                       nextUrl : '[(${nextUrl})]',
+                       channelSubjectIsIn: [],
+                       secondsRemainingCurrentUrl: 60*1000*5,
+                       nextUrl : window.location.href.replace("[(${subject.subjectExternalId})]",""),
                        teammates: [(${teammates})],
                        taskConfigurationAttributes: [(${taskConfigurationAttributes})],
-                       completedTaskId:'[(${completedTask.id})]',
+                       completedTaskId:'-1',
                        hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
                        hasCollaborationFeedbackWidget: [(${hasCollaborationFeedbackWidget})],
                        hasCollaborationTodoListEnabled: [(${hasCollaborationTodoListEnabled})],
-                       chatBotName: '[(${chatBotName})]',
                        hasChat: [(${hasChat})],
                        eventsUntilNow: [(${eventsUntilNow})],
                        communicationType: '[(${communicationType})]'
@@ -96,7 +89,6 @@
 </div>
 <div layout:fragment="communication" th:if="${hasChat}">
     <div class="container-fluid h-100" style="width:350px;">
-
         <div class="row h-100">
             <div class="col-3 border-chat-lightgray px-0" style="" id="subjectContainer">
                 <div id="sidebar-content" class="h-100 w-100">
@@ -149,7 +141,6 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 </body>

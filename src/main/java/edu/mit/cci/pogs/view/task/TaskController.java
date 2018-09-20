@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.task.ScoringType;
@@ -24,6 +25,7 @@ import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
@@ -53,11 +55,18 @@ public class TaskController {
     @Autowired
     private TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
 
+    @Autowired
+    private ChatScriptDao chatScriptDao;
+
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(Timestamp.class, new SqlTimestampPropertyEditor());
     }
 
+    @ModelAttribute("chatScripts")
+    public List<ChatScript> getChatScripts(){
+        return chatScriptDao.list();
+    }
     @ModelAttribute("communicationConstraints")
     public List<CommunicationConstraint> getCommunicationConstraints() {
         return Arrays.asList(CommunicationConstraint.values());

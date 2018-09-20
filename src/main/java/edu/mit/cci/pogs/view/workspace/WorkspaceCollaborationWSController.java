@@ -182,6 +182,7 @@ public class WorkspaceCollaborationWSController {
         jo.put("messageType", pogsMessage.getContent().getMessageType());
         jo.put("message", pogsMessage.getContent().getMessage());
         JSONObject listContent = allVotingOptions.getContent().toJSON();
+
         if (listContent != null) {
             Iterator<String> it = listContent.keySet().iterator();
             while (it.hasNext()) {
@@ -199,12 +200,8 @@ public class WorkspaceCollaborationWSController {
 
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
-        SessionRunner sessionWrapper = SessionRunner.getSessionRunner(sessionId);
-        Map<String, Subject> subjectMap = sessionWrapper.getAllCheckedInSubjects();
-        CollaborationMessage.TodoType todoType = CollaborationMessage
-                .TodoType.getType(pogsMessage.getContent().getMessageType());
 
-        Subject su = subjectMap.get(pogsMessage.getSender());
+        SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
 
         TodoListCollaborationMessage allTodoEntriesMessage = new TodoListCollaborationMessage();
         allTodoEntriesMessage.setType(PogsMessage.MessageType.COLLABORATION_MESSAGE);
@@ -212,125 +209,135 @@ public class WorkspaceCollaborationWSController {
         TodoListMessageContent cmc = new TodoListMessageContent();
         cmc.setCollaborationType(CollaborationMessage.CollaborationType.TODO_LIST);
         cmc.setMessageType(CollaborationMessage.TodoType.BROADCAST_TODO_ITEMS.name().toString());
-        allTodoEntriesMessage.setContent(cmc);
-        cmc.setTriggeredBy(pogsMessage.getContent().getMessageType());
+
+        if(sessionRunner!=null) {
+
+            Map<String, Subject> subjectMap = sessionRunner.getAllCheckedInSubjects();
+            CollaborationMessage.TodoType todoType = CollaborationMessage
+                    .TodoType.getType(pogsMessage.getContent().getMessageType());
+
+            Subject su = subjectMap.get(pogsMessage.getSender());
 
 
-
-        if (todoType.equals(CollaborationMessage.TodoType.CREATE_TODO)) {
-            //do what it needs to do to create the todo
-            TodoEntry te = new TodoEntry();
-            te.setCompletedTaskId(completedTaskId);
-
-            te.setCreatorId(su.getId());
-            te.setText(pogsMessage.getContent().getMessage());
-            te.setMarkedDone(false);
-            te.setTodoEntryDate(new Timestamp(new Date().getTime()));
-            todoEntryDao.create(te);
-
-        }
-        if (todoType.equals(CollaborationMessage.TodoType.DELETE_TODO)) {
-            Long todoEntryId = Long.parseLong(pogsMessage.getContent().getMessage());
-            TodoEntry te = todoEntryDao.get(todoEntryId);
-            te.setDeletedAt(new Timestamp(new Date().getTime()));
-            todoEntryDao.update(te);
-            cmc.setTriggeredData(todoEntryId.toString());
-
-        }
-        if (todoType.equals(CollaborationMessage.TodoType.ASSIGN_ME)) {
-            Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
-
-            TodoEntry te = todoEntryDao.get(todoEntry);
+            allTodoEntriesMessage.setContent(cmc);
+            cmc.setTriggeredBy(pogsMessage.getContent().getMessageType());
 
 
-            TodoEntryAssignment tea = todoEntryAssignmentDao.getByTodoEntryIdSubjectId(todoEntry, su.getId());
-            if (tea != null) {
-                tea.setCurrentAssigned(true);
-                todoEntryAssignmentDao.update(tea);
-            } else {
-                tea = new TodoEntryAssignment();
-                tea.setCurrentAssigned(true);
-                tea.setSubjectId(su.getId());
-                tea.setTodoEntryId(te.getId());
-                tea.setAssignmentDate(new Timestamp(new Date().getTime()));
-                todoEntryAssignmentDao.create(tea);
-            }
+            if (todoType.equals(CollaborationMessage.TodoType.CREATE_TODO)) {
+                //do what it needs to do to create the todo
+                TodoEntry te = new TodoEntry();
+                te.setCompletedTaskId(completedTaskId);
 
-
-        }
-        if (todoType.equals(CollaborationMessage.TodoType.UNASSIGN_ME)) {
-            Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
-
-            TodoEntry te = todoEntryDao.get(todoEntry);
-
-            TodoEntryAssignment tea = todoEntryAssignmentDao.getByTodoEntryIdSubjectId(todoEntry, su.getId());
-            if (tea != null) {
-                tea.setCurrentAssigned(false);
-                todoEntryAssignmentDao.update(tea);
-            }
-            cmc.setTriggeredData(todoEntry.toString());
-            cmc.setTriggeredData2(su.getSubjectExternalId());
-
-        }
-        if (todoType.equals(CollaborationMessage.TodoType.MARK_DONE)) {
-            Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
-            TodoEntry te = todoEntryDao.get(todoEntry);
-            if (te != null) {
-                te.setMarkedDone(true);
-                te.setMarkedDoneDate(new Timestamp(new Date().getTime()));
-                todoEntryDao.update(te);
-            }
-
-        }
-        if (todoType.equals(CollaborationMessage.TodoType.MARK_UNDONE)) {
-            Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
-            TodoEntry te = todoEntryDao.get(todoEntry);
-            if (te != null) {
+                te.setCreatorId(su.getId());
+                te.setText(pogsMessage.getContent().getMessage());
                 te.setMarkedDone(false);
-                te.setMarkedDoneDate(null);
-                todoEntryDao.update(te);
+                te.setTodoEntryDate(new Timestamp(new Date().getTime()));
+                todoEntryDao.create(te);
+
             }
-        }
+            if (todoType.equals(CollaborationMessage.TodoType.DELETE_TODO)) {
+                Long todoEntryId = Long.parseLong(pogsMessage.getContent().getMessage());
+                TodoEntry te = todoEntryDao.get(todoEntryId);
+                te.setDeletedAt(new Timestamp(new Date().getTime()));
+                todoEntryDao.update(te);
+                cmc.setTriggeredData(todoEntryId.toString());
+
+            }
+            if (todoType.equals(CollaborationMessage.TodoType.ASSIGN_ME)) {
+                Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
+
+                TodoEntry te = todoEntryDao.get(todoEntry);
 
 
-        List<TodoEntry> allTodoEntries = todoEntryDao.listByCompletedTaskId(completedTaskId);//there should be a method to get from completed ID
-        for (TodoEntry te : allTodoEntries) {
-            List<TodoEntryAssignment> todoEntryAssignmentList = todoEntryAssignmentDao.listByTodoEntryId(te.getId(), true);
-            List<String> assignedSubjects = new ArrayList<>();
-            if (todoEntryAssignmentList != null) {
-                for (TodoEntryAssignment tea : todoEntryAssignmentList) {
+                TodoEntryAssignment tea = todoEntryAssignmentDao.getByTodoEntryIdSubjectId(todoEntry, su.getId());
+                if (tea != null) {
+                    tea.setCurrentAssigned(true);
+                    todoEntryAssignmentDao.update(tea);
+                } else {
+                    tea = new TodoEntryAssignment();
+                    tea.setCurrentAssigned(true);
+                    tea.setSubjectId(su.getId());
+                    tea.setTodoEntryId(te.getId());
+                    tea.setAssignmentDate(new Timestamp(new Date().getTime()));
+                    todoEntryAssignmentDao.create(tea);
+                }
 
-                    su = null;
-                    for (Subject as : subjectMap.values()) {
-                        if (as.getId() == tea.getSubjectId()) {
-                            su = as;
-                            break;
-                        }
-                    }
-                    if (su != null) {
-                        assignedSubjects.add(su.getSubjectExternalId());
-                    }
+
+            }
+            if (todoType.equals(CollaborationMessage.TodoType.UNASSIGN_ME)) {
+                Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
+
+                TodoEntry te = todoEntryDao.get(todoEntry);
+
+                TodoEntryAssignment tea = todoEntryAssignmentDao.getByTodoEntryIdSubjectId(todoEntry, su.getId());
+                if (tea != null) {
+                    tea.setCurrentAssigned(false);
+                    todoEntryAssignmentDao.update(tea);
+                }
+                cmc.setTriggeredData(todoEntry.toString());
+                cmc.setTriggeredData2(su.getSubjectExternalId());
+
+            }
+            if (todoType.equals(CollaborationMessage.TodoType.MARK_DONE)) {
+                Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
+                TodoEntry te = todoEntryDao.get(todoEntry);
+                if (te != null) {
+                    te.setMarkedDone(true);
+                    te.setMarkedDoneDate(new Timestamp(new Date().getTime()));
+                    todoEntryDao.update(te);
+                }
+
+            }
+            if (todoType.equals(CollaborationMessage.TodoType.MARK_UNDONE)) {
+                Long todoEntry = Long.parseLong(pogsMessage.getContent().getMessage());
+                TodoEntry te = todoEntryDao.get(todoEntry);
+                if (te != null) {
+                    te.setMarkedDone(false);
+                    te.setMarkedDoneDate(null);
+                    todoEntryDao.update(te);
                 }
             }
-            cmc.addTodoEntry(te.getId(), te.getText(), te.getMarkedDone(), assignedSubjects);
 
-        }
 
-        JSONObject jo = new JSONObject();
-        jo.put("collaborationType", pogsMessage.getContent().getCollaborationType());
-        jo.put("messageType", pogsMessage.getContent().getMessageType());
-        jo.put("message", pogsMessage.getContent().getMessage());
-        JSONObject listContent = allTodoEntriesMessage.getContent().toJSON();
-        if (listContent != null) {
-            Iterator<String> it = listContent.keySet().iterator();
-            while (it.hasNext()) {
-                String prop = it.next();
-                jo.put(prop, listContent.get(prop));
+            List<TodoEntry> allTodoEntries = todoEntryDao.listByCompletedTaskId(completedTaskId);//there should be a method to get from completed ID
+            for (TodoEntry te : allTodoEntries) {
+                List<TodoEntryAssignment> todoEntryAssignmentList = todoEntryAssignmentDao.listByTodoEntryId(te.getId(), true);
+                List<String> assignedSubjects = new ArrayList<>();
+                if (todoEntryAssignmentList != null) {
+                    for (TodoEntryAssignment tea : todoEntryAssignmentList) {
+
+                        su = null;
+                        for (Subject as : subjectMap.values()) {
+                            if (as.getId() == tea.getSubjectId()) {
+                                su = as;
+                                break;
+                            }
+                        }
+                        if (su != null) {
+                            assignedSubjects.add(su.getSubjectExternalId());
+                        }
+                    }
+                }
+                cmc.addTodoEntry(te.getId(), te.getText(), te.getMarkedDone(), assignedSubjects);
+
             }
+
+            JSONObject jo = new JSONObject();
+            jo.put("collaborationType", pogsMessage.getContent().getCollaborationType());
+            jo.put("messageType", pogsMessage.getContent().getMessageType());
+            jo.put("message", pogsMessage.getContent().getMessage());
+            JSONObject listContent = allTodoEntriesMessage.getContent().toJSON();
+            if (listContent != null) {
+                Iterator<String> it = listContent.keySet().iterator();
+                while (it.hasNext()) {
+                    String prop = it.next();
+                    jo.put(prop, listContent.get(prop));
+                }
+            }
+
+
+            createLogEntry(completedTaskId, sessionId, pogsMessage, su, jo.toString());
         }
-
-
-        createLogEntry(completedTaskId, sessionId, pogsMessage, su, jo.toString());
         messagingTemplate.convertAndSend("/topic/public/task/" + pogsMessage.getCompletedTaskId() + "/collaboration", allTodoEntriesMessage);
     }
 }

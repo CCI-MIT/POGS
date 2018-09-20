@@ -35,7 +35,7 @@
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="taskPluginType">Task Plugin
                         Type:</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-4">
                         <select class="custom-select" th:field="*{taskPluginType}"
                                 id="taskPluginType">
                             <option
@@ -44,11 +44,9 @@
                                     th:text="${rg.taskPluginName}"></option>
                         </select>
                     </div>
-                </div>
 
-                <div class="form-group row">
                     <label class="col-sm-2 col-form-label">Task Plugin Configuration:</label>
-                    <div class="col-sm-10">
+                    <div class="col-sm-4">
                         <th:block th:each="rg: ${taskPluginTypes}">
                             <select class="custom-select pluginConfigSelect" style="display: none"
                                     th:id="${rg.taskPluginName + '_configOptions'}"
@@ -88,7 +86,7 @@
                         })
                     });
                 </script>
-                <div class="form-group row">
+                <!-- div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="scoringType">Scoring Type:</label>
                     <div class="col-sm-10">
                         <select class="custom-select" th:field="*{scoringType}" id="scoringType">
@@ -98,7 +96,7 @@
                                     th:text="${rg.scoringType}"></option>
                         </select>
                     </div>
-                </div>
+                </div-->
                 <div class="form-group row">
                     <label class="col-sm-2 col-form-label" for="soloTask">Solo Task:</label>
                     <div class="col-sm-10">
@@ -117,21 +115,22 @@
                         Enabled:</label>
                     <div class="col-sm-10">
                         <input class="form-check-input" th:field="*{introPageEnabled}"
-                               type="checkbox" id="introPageEnabled"/>
+                               type="checkbox" id="introPageEnabled" data-trigger="intro"/>
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row hideable" data-hide="intro">
                     <label class="col-sm-2 col-form-label" for="introText">Intro Text:</label>
                     <div class="col-sm-10">
                         <textarea class="form-control htmleditor" id="introText" th:field="*{introText}"
                                   rows="3"></textarea>
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row hideable" data-hide="intro">
                     <label class="col-sm-2 col-form-label" for="introTime">Intro Time:</label>
                     <div class="col-sm-10">
-                        <input class="form-control" type="number" id="introTime"
+                        <input class="form-control" type="number" min="0" step="1" id="introTime"
                                th:field="*{introTime}"/>
+                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                         <small id="introTimeHelp" class="form-text text-muted">In seconds</small>
                     </div>
                 </div>
@@ -147,18 +146,18 @@
                         Enabled:</label>
                     <div class="col-sm-10">
                         <input class="form-check-input" th:field="*{primerPageEnabled}"
-                               type="checkbox" id="primerPageEnabled"/>
+                               type="checkbox" id="primerPageEnabled" data-trigger="primer"/>
                     </div>
                 </div>
 
-                <div class="form-group row">
+                <div class="form-group row hideable" data-hide="primer">
                     <label class="col-sm-2 col-form-label" for="primerText">Primer Text:</label>
                     <div class="col-sm-10">
                         <textarea class="form-control htmleditor" id="primerText" th:field="*{primerText}"
                                   rows="3"></textarea>
                     </div>
                 </div>
-                <div class="form-group row">
+                <div class="form-group row hideable" data-hide="primer">
                                     <label class="col-sm-2 col-form-label" for="primerVideoAutoplayMute">Primer Video
                                         Should Autoplay muted:</label>
                                     <div class="col-sm-10">
@@ -168,12 +167,13 @@
                                         Auto play is only available if sound is muted.</small>
                                     </div>
                                 </div>
-                <div class="form-group row">
+                <div class="form-group row hideable" data-hide="primer">
                     <label class="col-sm-2 col-form-label" for="primerTime">Primer Time:</label>
                     <div class="col-sm-10">
-                        <input class="form-control" type="number" id="primerTime"
+                        <input class="form-control" type="number" id="primerTime" min="0" step="1"
                                th:field="*{primerTime}"/>
                         <small id="primerTimeHelp" class="form-text text-muted">In seconds</small>
+                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                     </div>
                 </div>
             </div>
@@ -186,12 +186,22 @@
                     <label class="col-sm-2 col-form-label" for="interactionTime">Interaction
                         Time:</label>
                     <div class="col-sm-10">
-                        <input class="form-control" type="number" id="interactionTime"
+                        <input class="form-control" type="number" id="interactionTime" min="0" step="1"
                                th:field="*{interactionTime}"/>
+                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                         <small id="interactionTimeHelp" class="form-text text-muted">In seconds</small>
                     </div>
                 </div>
                 <div class="form-group row">
+                                    <label class="col-sm-2 col-form-label" for="interactionWidgetEnabled">Interaction
+                                        Widget Enabled:</label>
+                                    <div class="col-sm-10">
+                                        <input class="form-check-input" th:field="*{interactionWidgetEnabled}"
+                                               type="checkbox" id="interactionWidgetEnabled" data-trigger="widget"/>
+                                    <small id="interHelp" class="form-text text-muted">If enabled a panel will be displayed on the left side of the workspace</small>
+                                    </div>
+                </div>
+                <div class="form-group row hideable" data-hide="widget">
                     <label class="col-sm-2 col-form-label" for="interactionText">Interaction
                         Text:</label>
                     <div class="col-sm-10">
@@ -199,14 +209,7 @@
                                   th:field="*{interactionText}" rows="3"></textarea>
                     </div>
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="interactionWidgetEnabled">Interaction
-                        Widget Enabled:</label>
-                    <div class="col-sm-10">
-                        <input class="form-check-input" th:field="*{interactionWidgetEnabled}"
-                               type="checkbox" id="interactionWidgetEnabled"/>
-                    </div>
-                </div>
+
             </div>
         </fieldset>
 
@@ -220,6 +223,7 @@
                     <div class="col-sm-6">
 
                         <select class="custom-select" th:field="*{communicationType}" id="communicationType">
+
                             <option
                                     th:each="rg: ${communicationConstraints}"
                                     th:value="${rg.id}"
@@ -227,6 +231,21 @@
                         </select>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-sm-6 col-form-label" for="chatScriptId">Chat script:</label>
+                    <div class="col-sm-6">
+
+                        <select class="custom-select" th:field="*{chatScriptId}" id="chatScriptId">
+                        <option value="" >Select a chat script</option>
+                            <option
+                                    th:each="cs: ${chatScripts}"
+                                    th:value="${cs.id}"
+                                    th:text="${cs.chatScriptName}" ></option>
+                        </select>
+                    </div>
+                </div>
+
+
 
             </div>
         </fieldset>
@@ -234,33 +253,32 @@
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-2">Collaboration (*)</legend>
             <div class="container">
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="collaborationTodoListEnabled">Collaboration
-                        Todo List Enabled:</label>
-                    <div class="col-sm-10">
-                        <input class="form-check-input" th:field="*{collaborationTodoListEnabled}"
-                               type="checkbox" id="collaborationTodoListEnabled"/>
-                    </div>
+                <div class="form-check form-check-inline">
+
+                    <input class="form-check-input" th:field="*{collaborationTodoListEnabled}"
+                           type="checkbox" id="collaborationTodoListEnabled"/>
+                    <label class="col-form-label" for="collaborationTodoListEnabled">Collaboration
+                    Todo List Enabled</label>
+
                 </div>
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="collaborationVotingWidgetEnabled">Collaboration
-                        Voting Widget Enabled:</label>
-                    <div class="col-sm-10">
-                        <input class="form-check-input"
-                               th:field="*{collaborationVotingWidgetEnabled}" type="checkbox"
-                               id="collaborationVotingWidgetEnabled"/>
-                    </div>
+                <div class="form-check form-check-inline">
+
+                    <input class="form-check-input"
+                           th:field="*{collaborationVotingWidgetEnabled}" type="checkbox"
+                           id="collaborationVotingWidgetEnabled"/>
+                    <label class="col-form-label" for="collaborationVotingWidgetEnabled">Collaboration
+                    Voting Widget Enabled</label>
+
                 </div>
 
 
-                <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration
-                        Feedback Widget Enabled:</label>
-                    <div class="col-sm-10">
-                        <input class="form-check-input"
-                               th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox"
-                               id="collaborationFeedbackWidgetEnabled"/>
-                    </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input"
+                           th:field="*{collaborationFeedbackWidgetEnabled}" type="checkbox"
+                           id="collaborationFeedbackWidgetEnabled"/>
+                    <label class="col-form-label" for="collaborationFeedbackWidgetEnabled">Collaboration
+                    Feedback Widget Enabled</label>
+
                 </div>
 
             </div>
@@ -276,6 +294,11 @@
                         th:value="${rg.id}"
                         th:text="${rg.groupName}"></option>
             </select>
+            <div class="invalid-feedback" id="researchGroupError">
+                            Choose at least one research group. <br/>
+                            If you choose a research group that you are not associated with you won't be able to edit this task.
+            </div>
+
         </fieldset>
         <script>
 
