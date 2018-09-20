@@ -266,7 +266,7 @@ public class Operation {
      * a.transform(b) = [a’, b’], where a.compose(b’) == b.compose(a’)
      *
      * @param operationB The operation to be transformed.
-     * @return The original operation, transformed to be applied after this operation.
+     * @return a pair of operations, each to be applied after this or the passed operation
      */
     public TransformedOperationPair transform(Operation operationB) {
         Operation operationA = this;
@@ -274,8 +274,8 @@ public class Operation {
         if (operationA.baseLength != operationB.baseLength) {
             throw new IllegalArgumentException(String.format(
                     "Both operations must have the same baseLength: operationA.baseLength = %d, "
-                            + "operationB.baseLength = %d",
-                    operationA.baseLength, operationB.baseLength));
+                            + "operationB.baseLength = %d.\nOperationA: %s\nOperationB: %s",
+                    operationA.baseLength, operationB.baseLength, operationA, operationB));
         }
 
         if (!Objects.equals(operationA.parentId, operationB.parentId)) {

@@ -1,58 +1,55 @@
-let Component = ot.Component;
-let Operation = ot.Operation;
-
-describe('Component tests', function() {
+describe('ot.Component tests', function() {
     it("Simple insertion into empty string", function() {
-        let insert = new Component('INSERT', 0, 'test');
+        let insert = new ot.Component('INSERT', 0, 'test');
         let result = insert.apply("", 0);
         expect(result).toBe("test")
     });
 
     it("Insertion in the middle of a string", function() {
-        let insert = new Component('INSERT', 0, 'a');
+        let insert = new ot.Component('INSERT', 0, 'a');
         let result = insert.apply("test", 2);
         expect(result).toBe("teast")
     });
 
     it("Simple deletion test", function() {
-        let insert = new Component('DELETE', 0, 'test');
+        let insert = new ot.Component('DELETE', 0, 'test');
         let result = insert.apply("test", 0);
         expect(result).toBe("")
     });
 
     it("Deletion in the middle of the string", function() {
-        let insert = new Component('DELETE', 0, 'st');
+        let insert = new ot.Component('DELETE', 0, 'st');
         let result = insert.apply("test", 2);
         expect(result).toBe("te")
     });
 
     it("Merge test for retain", function() {
-        let retain = new Component('RETAIN', 1, '');
-        let retain2 = new Component('RETAIN', 2, '');
+        let retain = new ot.Component('RETAIN', 1, '');
+        let retain2 = new ot.Component('RETAIN', 2, '');
         let result = retain.merge(retain2);
         expect(result.retain).toBe(3)
     });
 
     it("Merge test for insert", function() {
-        let insert = new Component('INSERT', 0, 'te');
-        let insert2 = new Component('INSERT', 0, 'st');
+        let insert = new ot.Component('INSERT', 0, 'te');
+        let insert2 = new ot.Component('INSERT', 0, 'st');
         let result = insert.merge(insert2);
         expect(result.payload).toBe('test')
     });
 
     it("Merge test for delete", function() {
-        let del = new Component('DELETE', 0, 'te');
-        let del2 = new Component('DELETE', 0, 'st');
+        let del = new ot.Component('DELETE', 0, 'te');
+        let del2 = new ot.Component('DELETE', 0, 'st');
         let result = del.merge(del2);
         expect(result.payload).toBe('test')
     });
 });
 
 
-describe('Operation apply tests', function() {
+describe('ot.Operation apply tests', function() {
 
     it("Simple insertion", function() {
-        let operation = Operation.begin(-1)
+        let operation = ot.Operation.begin(-1)
             .insert('test');
 
         let result = operation.apply("");
@@ -60,7 +57,7 @@ describe('Operation apply tests', function() {
     });
 
     it("Delete then re-insert", function() {
-        let operation = Operation.begin(-1)
+        let operation = ot.Operation.begin(-1)
             .delete('t')
             .insert('T')
             .retain(3);
@@ -71,12 +68,12 @@ describe('Operation apply tests', function() {
 });
 
 
-describe('Operation composition tests', function() {
+describe('ot.Operation composition tests', function() {
 
     it("Simple insertions", function() {
-        let operation1 = Operation.begin(-1)
+        let operation1 = ot.Operation.begin(-1)
             .insert('test');
-        let operation2 = Operation.begin(-1)
+        let operation2 = ot.Operation.begin(-1)
             .retain(4)
             .insert('goat');
 
@@ -87,14 +84,14 @@ describe('Operation composition tests', function() {
     });
 
     it("Multiple components", function() {
-        let opA = Operation.begin(-1)
+        let opA = ot.Operation.begin(-1)
             .retain(6)
             .delete('bla')
             .insert('ipsum')
             .retain(7)
             .delete("erm")
             .retain(1);
-        let opB = Operation.begin(-1)
+        let opB = ot.Operation.begin(-1)
             .retain(18)
             .insert('sit')
             .retain(1)
@@ -110,11 +107,11 @@ describe('Operation composition tests', function() {
     });
 });
 
-describe('Operation transformation tests', function() {
+describe('ot.Operation transformation tests', function() {
     it("Simple transform invariant", function() {
-        let opA = Operation.begin(-1)
+        let opA = ot.Operation.begin(-1)
             .insert('go');
-        let opB = Operation.begin(-1)
+        let opB = ot.Operation.begin(-1)
             .insert('at');
 
         let transformedPair = opA.transform(opB);
@@ -130,9 +127,9 @@ describe('Operation transformation tests', function() {
     });
 
     it("Simple transform invariant", function() {
-        let opA = Operation.begin(-1)
+        let opA = ot.Operation.begin(-1)
             .insert('go');
-        let opB = Operation.begin(-1)
+        let opB = ot.Operation.begin(-1)
             .insert('at');
 
         let transformedPair = opA.transform(opB);
@@ -148,14 +145,14 @@ describe('Operation transformation tests', function() {
     });
 
     it("Multiple component transform", function() {
-        let opA = Operation.begin()
+        let opA = ot.Operation.begin()
             .retain(10)
             .delete("brown fox")
             .insert("lazy dog")
             .retain(16)
             .delete("lazy dog")
             .insert("brown fox");
-        let opB = Operation.begin()
+        let opB = ot.Operation.begin()
             .retain(4)
             .delete("quick brown")
             .retain(5)
@@ -178,10 +175,10 @@ describe('Operation transformation tests', function() {
     });
 
     it("Multiple component transform invariant", function() {
-        let opA = Operation.begin()
+        let opA = ot.Operation.begin()
             .delete("lorem ipsum")
             .insert("dolor sit amet");
-        let opB = Operation.begin()
+        let opB = ot.Operation.begin()
             .retain(6)
             .insert("consectetur adipiscing elit ")
             .retain(5);

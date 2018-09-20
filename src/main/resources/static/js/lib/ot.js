@@ -119,8 +119,25 @@ let ot = {};
         }
     }
 
+    /**
+     * An operation that spans a text of a certain length and optionally inserts or deletes components.
+     *
+     * The operation contains a set of components, which either retain, insert, or delete text.
+     * This set of components of length baseLength must span the entire text, resulting in a new
+     * text of length targetLength.
+     */
     class Operation {
 
+        /**
+         * Constructs a new operation on this pad.
+         *
+         * The parentId is either the id of the latest known server operation or -1,
+         * if no operations are known yet.
+         *
+         * @param padId the id of the pad this operation is operating on
+         * @param parentId the id of the operation that this operation is based on
+         * @param authorId the author of this operation
+         */
         constructor(padId, parentId, authorId) {
             this.padId = padId;
             this.id = null;
@@ -208,6 +225,11 @@ let ot = {};
 
         withPadId(padId) {
             this.padId = padId;
+            return this;
+        }
+
+        withAuthorId(authorId) {
+            this.metaData.authorId = authorId;
             return this;
         }
 
@@ -312,6 +334,23 @@ let ot = {};
             return composedOperation;
         }
 
+        /**
+         * Transforms an operation, resulting in a pair of operations, which can each be applied
+         * after the corresponding input operation was applied.
+         *
+         * Usage:
+         * [operationAPrime, operationBPrime] = operationA.transform(operationB)
+         *
+         * Note: the parentIds of the transformed operations are derived from the passed operations.
+         * operationAPrime.parentId = operationB.id
+         * operationBPrime.parentId = operationA.id
+         *
+         * The following must hold:
+         * a.transform(b) = [a’, b’], where a.compose(b’) == b.compose(a’)
+         *
+         * @param operationB the operation to be transformed
+         * @returns {*[]} an array containing operationAPrime and operationBPrime
+         */
         transform(operationB) {
             let operationA = this;
 
@@ -321,13 +360,14 @@ let ot = {};
             }
 
             if (operationA.parentId !== operationB.parentId) {
-                throw "Both operations must have the same parent.";
+                throw `Both operations must have the same parent. Found operationA.parentId = `
+                    + `${operationA.parentId} and operationB.parentId = ${operationB.parentId}`;
             }
 
-            let operationAPrime = Operation.begin(operationA.id)
+            let operationAPrime = Operation.begin(operationB.id != null ? operationB.id : operationB.parentId)
                 .withPadId(this.padId)
                 .withMetaData(operationA.metaData);
-            let operationBPrime = Operation.begin(operationA.id)
+            let operationBPrime = Operation.begin(operationA.id != null ? operationB.id : operationA.parentId)
                 .withPadId(this.padId)
                 .withMetaData(operationB.metaData);
 
