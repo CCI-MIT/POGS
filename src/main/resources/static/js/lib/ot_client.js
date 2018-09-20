@@ -1,4 +1,4 @@
-// Requires loglevel and ot.js
+// Requires ot.js and supports loglevel (optional - configurable logging)
 
 ot.Client = (function() {
     // Imports
@@ -9,6 +9,20 @@ ot.Client = (function() {
         AWAITING_CONFIRM: Symbol("awaiting_confirm"),
         AWAITING_WITH_BUFFER: Symbol("awaiting_with_buffer")
     };
+
+    //wrap log in function to make loglevel dependency optional
+    function debug(msg) {
+        if (typeof log !== 'undefined') {
+            log.debug(msg);
+        }
+    }
+    function warn(msg) {
+        if (typeof log !== 'undefined') {
+            log.warn(msg);
+        } else {
+            console.warn(msg);
+        }
+    }
 
     class ClientState {
 
@@ -21,7 +35,7 @@ ot.Client = (function() {
         }
 
         applyClient(operation) {
-            log.debug("Applying client operation");
+            debug("Applying client operation");
             operation.parentId = this._latestKnownServerOperationId;
             switch (this._status) {
                 case clientStatus.SYNCHRONIZED:
@@ -30,21 +44,21 @@ ot.Client = (function() {
                     this._status = clientStatus.AWAITING_CONFIRM;
                     break;
                 case clientStatus.AWAITING_CONFIRM:
-                    log.debug("Currently AWAITING_CONFIRM: buffering operation");
+                    debug("Currently AWAITING_CONFIRM: buffering operation");
                     this._buffer = operation;
                     this._status = clientStatus.AWAITING_WITH_BUFFER;
                     break;
                 case clientStatus.AWAITING_WITH_BUFFER:
-                    log.debug("Currently AWAITING_WITH_BUFFER: buffering operation");
+                    debug("Currently AWAITING_WITH_BUFFER: buffering operation");
                     this._buffer = this._buffer.compose(operation);
                     break;
             }
         }
 
         applyServer(operation) {
-            log.debug(`Applying operation ${operation.id} from server`);
+            debug(`Applying operation ${operation.id} from server`);
             if (operation.id > this._latestKnownServerOperationId + 1) {
-                log.warn(`Operation id jumped from ${this._latestKnownServerOperationId} to ${operation.id}`);
+                warn(`Operation id jumped from ${this._latestKnownServerOperationId} to ${operation.id}`);
             }
             this._latestKnownServerOperationId = operation.id;
             switch (this._status) {
@@ -52,13 +66,13 @@ ot.Client = (function() {
                     this._client.applyOperation(operation);
                     break;
                 case clientStatus.AWAITING_CONFIRM:
-                    log.debug("Currently AWAITING_CONFIRM - transforming outstanding");
+                    debug("Currently AWAITING_CONFIRM - transforming outstanding");
                     let pair = this._outstanding.transform(operation);
                     this._outstanding = pair[0];
                     this._client.applyOperation(pair[1]);
                     break;
                 case clientStatus.AWAITING_WITH_BUFFER:
-                    log.debug("Currently AWAITING_WITH_BUFFER - transforming outstanding and buffer");
+                    debug("Currently AWAITING_WITH_BUFFER - transforming outstanding and buffer");
                     let pair1 = this._outstanding.transform(operation);
                     let pair2 = this._buffer.transform(pair1[1]);
                     this._outstanding = pair1[0];
@@ -70,13 +84,13 @@ ot.Client = (function() {
         }
 
         serverAck(operation) {
-            log.debug(`Processing server ack for operation ${operation.id}`);
+            debug(`Processing server ack for operation ${operation.id}`);
             this._latestKnownServerOperationId = operation.id;
             switch (this._status) {
                 case clientStatus.SYNCHRONIZED:
                     // This might be desirable if the client has reloaded the page
                     // and is catching up to the current state
-                    log.warn(`No outstanding operation ${operation.id} - assuming we re-joined and our own operation is being re-played.`);
+                    warn(`No outstanding operation ${operation.id} - assuming we re-joined and our own operation is being re-played.`);
                     try {
                         this._client.applyOperation(operation);
                     } catch (err) {
@@ -85,12 +99,12 @@ ot.Client = (function() {
                     }
                     break;
                 case clientStatus.AWAITING_CONFIRM:
-                    log.debug("Currently AWAITING_CONFIRM: reverting to synchronized");
+                    debug("Currently AWAITING_CONFIRM: reverting to synchronized");
                     this._outstanding = null;
                     this._status = clientStatus.SYNCHRONIZED;
                     break;
                 case clientStatus.AWAITING_WITH_BUFFER:
-                    log.debug("Currently AWAITING_CONFIRM: sending buffer");
+                    debug("Currently AWAITING_CONFIRM: sending buffer");
                     this._outstanding = this._buffer;
                     this._outstanding.parentId = operation.id;
                     this._client.sendOperation(this._outstanding);
