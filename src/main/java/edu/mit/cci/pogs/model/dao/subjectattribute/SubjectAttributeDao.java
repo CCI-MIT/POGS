@@ -10,5 +10,7 @@ public interface SubjectAttributeDao extends Dao<SubjectAttribute, Long> {
     List<SubjectAttribute> list();
 
     List<SubjectAttribute> listBySubjectId(Long subjectId);
+
+    void deleteBySubjectId(Long subjectId);
 }
  

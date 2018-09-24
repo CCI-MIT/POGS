@@ -239,6 +239,7 @@ public class SessionService {
             List<SubjectAttribute> subjectAttributes = subject.getSubjectAttributes();
             if (subjectAttributes!=null) {
                 for (SubjectAttribute subjectAttribute : subjectAttributes) {
+                    subjectAttribute.setSubjectId(subject.getId());
                     if (subjectAttribute.getId() != null) {
                         subjectAttributeDao.update(subjectAttribute);
                     } else {
@@ -268,7 +269,12 @@ public class SessionService {
             completedTaskDao.deleteByRoundId(r.getId());
 
             for(Team team: teamList) {
+                List<TeamHasSubject>  teamHasSubjects = teamHasSubjectDao.listByTeamId(team.getId());
                 teamHasSubjectDao.deleteByTeamId(team.getId());
+                for(TeamHasSubject ths: teamHasSubjects){
+                    subjectAttributeDao.deleteBySubjectId(ths.getSubjectId());
+                }
+
             }
             teamDao.deleteByRoundId(r.getId());
 

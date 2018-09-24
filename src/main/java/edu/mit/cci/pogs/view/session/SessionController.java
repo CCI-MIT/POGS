@@ -247,7 +247,11 @@ public class SessionController {
         SubjectsBean subjectsBean = new SubjectsBean();
         List<SubjectBean> sbList = new ArrayList<>();
         for (Subject su : sessionService.listSubjectsBySessionId(session.getId())) {
-            sbList.add(new SubjectBean(su));
+            SubjectBean subjectBean = new SubjectBean(su);
+            List<SubjectAttribute> subjectAttributes = subjectAttributeDao.listBySubjectId(su.getId());
+            subjectBean.setSubjectAttributes(subjectAttributes);
+            sbList.add(subjectBean);
+
         }
         subjectsBean.setSubjectList(sbList);
 

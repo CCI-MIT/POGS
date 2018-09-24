@@ -13,7 +13,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
  
 import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT_ATTRIBUTE;
- 
+import static edu.mit.cci.pogs.model.jooq.Tables.TEAM_HAS_SUBJECT;
+
 @Repository
 public class SubjectAttributeDaoImpl extends AbstractDao<SubjectAttribute, Long, SubjectAttributeRecord> implements SubjectAttributeDao {
  
@@ -38,6 +39,12 @@ public class SubjectAttributeDaoImpl extends AbstractDao<SubjectAttribute, Long,
                 .from(SUBJECT_ATTRIBUTE).getQuery();
         query.addConditions(SUBJECT_ATTRIBUTE.SUBJECT_ID.eq(subjectId));
         return query.fetchInto(SubjectAttribute.class);
+    }
+
+    public void deleteBySubjectId(Long subjectId) {
+        dslContext.delete(SUBJECT_ATTRIBUTE)
+                .where(SUBJECT_ATTRIBUTE.SUBJECT_ID.eq(subjectId))
+                .execute();
     }
  
 }

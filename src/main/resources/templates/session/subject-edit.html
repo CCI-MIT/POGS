@@ -34,7 +34,12 @@
 
                     var index = $("#subjectList tr").length ;
                     var sessionId = $("#sessionId").val();
-                    var toAdd = "<tr><td><input type='hidden' value='' id='subjectList"+index+".id' name='subjectList["+index+"].id' /><input type='hidden' value='' value='"+sessionId+"' name='subjectList["+index+"].sessionId' /><input type='text' name='subjectList["+index+"].subjectExternalId'/></td><td><input type='text' name='subjectList["+index+"].subjectDisplayName' /></td><td><button type=\"button\" class=\"pull-right fa btn-notice addAttribute\" >Add Attribute</button><table><tbody></tbody></table></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteSubject' ></button></td></tr>";
+                    var toAdd = "<tr>" +
+                     "<td><input type='hidden' value='' id='subjectList"+index+".id' name='subjectList["+index+"].id' />" +
+                      "<input type='hidden' value='' value='"+sessionId+"' name='subjectList["+index+"].sessionId' />" +
+                       "<input type='text' name='subjectList["+index+"].subjectExternalId'/></td>" +
+                        "<td><input type='text' name='subjectList["+index+"].subjectDisplayName' /></td>" +
+                         "<td><button type=\"button\" class=\"btn pull-right btn-notice addAttribute\" data-id=\""+index+"\" >Add Attribute</button><table><tbody></tbody></table></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteSubject' ></button></td></tr>";
                     $("#subjectList").append(toAdd);
                 });
                 $(".deleteSubject").click(function () {
@@ -44,10 +49,15 @@
                     }
                 });
                 $(".addAttribute").click(function () {
-                    var index = $("#attributeList tr").length ;
-                    var attributeId = $("#attributeId").val();
+                    var indexSubject = $(this).data("id");
+                    var indexAttribute = $("#attributeList tr").length ;
+                    console.log(" index" + indexSubject);
                     // var type = typeof(attributeId);
-                    var attribute = "<tr><td><input type='text' placeholder = 'Attribute Name' value='' id='attributeList"+index+".id' name='attributeList["+index+"].id' /></td><td><input type='text' placeholder = 'Attribute Value' value='' value='"+attributeId+"' name='attributeList["+index+"].attributeId' /></td><td><button type='button' class='pull-right fa fa-trash btn-danger deleteAttribute' ></button></td></tr>";
+                    var attribute = "<tr><td>" +
+                    "<input type='hidden'  id='subjectList["+indexSubject+"].subjectAttributes"+indexAttribute+".id' name='subjectList["+indexSubject+"].subjectAttributes["+indexAttribute+"].id' />" +
+                     "<input type='text' placeholder = 'Attribute Name'  id='subjectList"+indexSubject+".subjectAttributes"+indexAttribute+".attributeName' name='subjectList["+indexSubject+"].subjectAttributes["+indexAttribute+"].attributeName' /></td>" +
+                     "<td><input type='text' placeholder = 'Attribute Value' id='subjectList"+indexSubject+".subjectAttributes"+indexAttribute+".stringValue' name='subjectList["+indexSubject+"].subjectAttributes["+indexAttribute+"].stringValue' /></td>" +
+                     "<td><button type='button' class='pull-right fa fa-trash btn-danger deleteAttribute' ></button></td></tr>";
                     // (this).parent().$("#attributeList").append(attribute)
                     // $("#attributeList").append(attribute);
                     console.log($(this).parent());
@@ -81,7 +91,22 @@
                     <tr th:each="person, rowStat : *{subjectList}">
                         <td><input type="hidden" th:field="*{subjectList[__${rowStat.index}__].id}"  /><input type="hidden" th:field="*{subjectList[__${rowStat.index}__].sessionId}"  /><input type="text" th:field="*{subjectList[__${rowStat.index}__].subjectExternalId}" /></td>
                         <td><input type="text" th:field="*{subjectList[__${rowStat.index}__].subjectDisplayName}" /></td>
-                        <td><button type="button" class="pull-right fa btn-notice addAttribute" >Add Attribute</button> <table><tbody></tbody></table> </td>
+                        <td><button type="button" class="btn pull-right btn-notice addAttribute" th:data-id="*{__${rowStat.index}__}" >Add Attribute</button>
+                                <table><tbody>
+                                    <tr th:each=" attr, rowStat2: *{subjectList[__${rowStat.index}__].subjectAttributes}">
+                                        <td>
+                                            <input type="hidden" th:field="*{subjectList[__${rowStat.index}__].subjectAttributes[__${rowStat2.index}__].id}" />
+                                            <input type='text' placeholder = 'Attribute Name' th:field="*{subjectList[__${rowStat.index}__].subjectAttributes[__${rowStat2.index}__].attributeName}" />
+                                        </td>
+                                         <td>
+                                            <input type='text' placeholder = 'Attribute Value' th:field="*{subjectList[__${rowStat.index}__].subjectAttributes[__${rowStat2.index}__].stringValue}" />
+                                         </td>
+                                         <td>
+                                            <button type='button' class='pull-right fa fa-trash btn-danger deleteAttribute' ></button>
+                                         </td>
+                                    </tr>
+                                </tbody></table>
+                         </td>
                         <td><button type="button" class="pull-right fa fa-trash btn-danger deleteSubject" ></button></td>
                     </tr>
             </tbody>

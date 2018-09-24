@@ -2,6 +2,56 @@ class Survey {
     constructor(pogsPlugin) {
         this.pogsPlugin = pogsPlugin;
     }
+    resolveVariablesForNetworkQuestions(surveyItem){
+        var regex = new RegExp(/\${.*}/gi);
+        var allVariables = ['\\${allTeammates}','\\${otherTeamates}', '\\${lastTaskName}',
+                            '\\${allTasksNames}', '\\${sessionName}'];
+
+        var replacements = [['m01', 'm02', 'm03'], [['m02', 'm03']],"Last task name", ["tast 1", "task 2","task 3"],
+        "session one"]
+        if(surveyItem.question.match(regex)) {
+            for(var i=0; i < allVariables.length; i ++) {
+                var replacer = "";
+                if(surveyItem.question.match('/' + allVariables[i] + '/gi')) {
+                    if(replacements[i].constructor === Array) {
+
+                       for(var j =0 ; j < replacements[i].length; j ++) {
+                           replacer += replacements[i][j];
+                           if(j + 1 != replacements[i].length){
+                               replacer += ", ";
+                           }
+                       }
+
+                    } else {
+                        replacer = replacements[i];
+                    }
+                    surveyItem.question =
+                        surveyItem.question.replace('/' + allVariables[i] + '/gi', replacer);
+                }
+            }
+        } else {
+            if (surveyItem.options && surveyItem.options.length > 0) {
+                for (var i = 0; i < surveyItem.options.length; i++) {
+                    if (surveyItem.options[i].match(regex)) {
+
+
+
+                    if (surveyItem.options[i].match('/' + allVariables[i] + '/gi')) {
+                        if(replacements[i].constructor === Array) {
+                            surveyItem.options = replacements[i];
+                        }else{
+                            surveyItem.options[i] =
+                                surveyItem.question.replace('/' + allVariables[i] + '/gi', replacements[i]);
+                        }
+                    }
+
+
+                    }
+                }
+            }
+        }
+        return surveyItem;
+    }
     setupSurvey(surveyBluePrint){
     console.log("starting survey setup...");
         /*
@@ -32,6 +82,7 @@ class Survey {
 
         var str = '';
         $.each(surveyValues,function(i,e){
+            e = this.resolveVariablesForNetworkQuestions(e);
             console.log(e.type);
             if(e.type == "text"){ // setup text question
                 str += '<div class="form-group" style="min-width: 300px;">'
@@ -101,7 +152,7 @@ class Survey {
             }
 
             console.log(i + '----'+ JSON.stringify(e));
-        });
+        }.bind(this));
 
         $('#surveyForm').append(str);
 

@@ -6,22 +6,16 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 
-public class SubjectBean extends Subject{
+public class SubjectBean extends Subject {
 
-    public List<SubjectAttribute> getSubjectAttributes() {
-        return subjectAttributes;
-    }
-
-    public void setSubjectAttributes(List<SubjectAttribute> subjectAttributes) {
-        this.subjectAttributes = subjectAttributes;
-    }
 
     private List<SubjectAttribute> subjectAttributes;
 
-    public SubjectBean(){
+    public SubjectBean() {
 
     }
-    public SubjectBean(Subject su){
+
+    public SubjectBean(Subject su) {
         super(su);
     }
 
@@ -33,5 +27,13 @@ public class SubjectBean extends Subject{
 
     public void setSubjectCommunications(List<SubjectCommunication> subjectCommunications) {
         this.subjectCommunications = subjectCommunications;
+    }
+
+    public List<SubjectAttribute> getSubjectAttributes() {
+        return subjectAttributes;
+    }
+
+    public void setSubjectAttributes(List<SubjectAttribute> subjectAttributes) {
+        this.subjectAttributes = subjectAttributes;
     }
 }
