@@ -23,6 +23,7 @@ import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
+import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
@@ -487,6 +488,23 @@ public class WorkspaceController {
                     model.addAttribute("hasTabs", false);
                 }
 
+                if(sessionWrapper.getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())){
+                    model.addAttribute("lastTask","");
+                } else {
+                    TaskWrapper lastTask = null;
+                    for(int i =0; i< sessionWrapper.getTaskList().size(); i++){
+                        TaskWrapper tw = sessionWrapper.getTaskList().get(i);
+
+                        if(tw.getId() == task.getId()){
+                            if(i== 0){
+                                model.addAttribute("lastTask","");
+                            } else{
+                                model.addAttribute("lastTask",sessionWrapper.getTaskList().get(i-1).getTaskName());
+                            }
+                        }
+                    }
+                }
+                model.addAttribute("allTasksList", getJsonTaskList(sessionWrapper.getTaskList()));
                 String cc = sessionWrapper.getCommunicationType();
                 if (task.getCommunicationType() != null || !task.getCommunicationType().equals(cc)) {
                     cc = task.getCommunicationType();
@@ -572,6 +590,17 @@ public class WorkspaceController {
         }
 
         return "workspace/task_work";
+    }
+
+    private JSONArray getJsonTaskList(List<TaskWrapper> taskList) {
+        JSONArray ja = new JSONArray();
+        for(TaskWrapper tw: taskList){
+            JSONObject jo = new JSONObject();
+            jo.put("taskName",tw.getTaskName());
+            jo.put("id",tw.getId());
+            ja.add(jo);
+        }
+        return ja;
     }
 
     private JSONObject getLogJson(EventLog el) {

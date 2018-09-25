@@ -1,18 +1,34 @@
 class Survey {
     constructor(pogsPlugin) {
         this.pogsPlugin = pogsPlugin;
+        this.replacements  = [];
+        this.replacements.push(this.pogsPlugin.getTeammatesDisplayNames());
+        this.replacements.push(this.pogsPlugin.getOtherTeammates());
+        this.replacements.push(this.pogsPlugin.getLastTask());
+        this.replacements.push(this.pogsPlugin.getTaskList());
+        this.replacements.push(this.pogsPlugin.getOtherTasks());
+        this.replacements.push(this.pogsPlugin.getSessionName());
     }
     resolveVariablesForNetworkQuestions(surveyItem){
         var regex = new RegExp(/\${.*}/gi);
         var allVariables = ['\\${allTeammates}','\\${otherTeamates}', '\\${lastTaskName}',
-                            '\\${allTasksNames}', '\\${sessionName}'];
+                            '\\${allTasksNames}','\\${otherTasksNames}', '\\${sessionName}'];
 
-        var replacements = [['m01', 'm02', 'm03'], [['m02', 'm03']],"Last task name", ["tast 1", "task 2","task 3"],
-        "session one"]
+        var replacements = this.replacements;
+
+        // [['m01', 'm02', 'm03'],
+        //     ['m02', 'm03'],
+        //     "Last task name",
+        //     ["tast 1", "task 2","task 3"],
+        //     ["task 2","task3"],
+        //     "session one"]
+
         if(surveyItem.question.match(regex)) {
+
             for(var i=0; i < allVariables.length; i ++) {
+
                 var replacer = "";
-                if(surveyItem.question.match('/' + allVariables[i] + '/gi')) {
+                if(surveyItem.question.match(new RegExp(allVariables[i] ,'gi'))) {
                     if(replacements[i].constructor === Array) {
 
                        for(var j =0 ; j < replacements[i].length; j ++) {
@@ -26,26 +42,34 @@ class Survey {
                         replacer = replacements[i];
                     }
                     surveyItem.question =
-                        surveyItem.question.replace('/' + allVariables[i] + '/gi', replacer);
+                        surveyItem.question.replace( new RegExp( allVariables[i] ,'gi'), replacer);
                 }
             }
         } else {
-            if (surveyItem.options && surveyItem.options.length > 0) {
-                for (var i = 0; i < surveyItem.options.length; i++) {
-                    if (surveyItem.options[i].match(regex)) {
+
+            if (surveyItem.value !== undefined && surveyItem.value.length > 0) {
+                for (var i = 0; i < surveyItem.value.length; i++) {
 
 
+                    if (surveyItem.value[i].match(new RegExp(regex,'gi'))) {
 
-                    if (surveyItem.options[i].match('/' + allVariables[i] + '/gi')) {
-                        if(replacements[i].constructor === Array) {
-                            surveyItem.options = replacements[i];
-                        }else{
-                            surveyItem.options[i] =
-                                surveyItem.question.replace('/' + allVariables[i] + '/gi', replacements[i]);
+                        for(var j = 0; j < allVariables.length; j++) {
+                            if (surveyItem.value[i].match(new RegExp(allVariables[j], 'gi'))) {
+
+                                if (replacements[i].constructor === Array) {
+                                    surveyItem.value = [];
+
+                                    for(var k =0 ; k < replacements[j].length; k ++){
+                                        surveyItem.value.push(replacements[j][k]);
+                                    }
+                                    return surveyItem;
+                                } else {
+                                    surveyItem.value[i] =
+                                        surveyItem.value.replace(new RegExp(allVariables[j], 'gi'),
+                                                                 replacements[j]);
+                                }
+                            }
                         }
-                    }
-
-
                     }
                 }
             }
@@ -82,6 +106,7 @@ class Survey {
 
         var str = '';
         $.each(surveyValues,function(i,e){
+            console.log("Before method: " + e)
             e = this.resolveVariablesForNetworkQuestions(e);
             console.log(e.type);
             if(e.type == "text"){ // setup text question

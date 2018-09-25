@@ -44,6 +44,8 @@ public class SessionBean {
     private String teamCreationMethod;
     private String teamCreationMatrix;
 
+    private Integer   fixedInteractionTime;
+
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
 
 
@@ -89,6 +91,7 @@ public class SessionBean {
         this.teamMaxSize = value.getTeamMaxSize();
         this.teamCreationMethod = value.getTeamCreationMethod();
         this.teamCreationMatrix = value.getTeamCreationMatrix();
+        fixedInteractionTime = value.getFixedInteractionTime();
     }
 
     public Long getId() {
@@ -387,5 +390,13 @@ public class SessionBean {
     public boolean getHasSessionStarted() {
         return !getStatus()
                 .equals(SessionStatus.NOTSTARTED.getId().toString());
+    }
+
+    public Integer getFixedInteractionTime() {
+        return fixedInteractionTime;
+    }
+
+    public void setFixedInteractionTime(Integer fixedInteractionTime) {
+        this.fixedInteractionTime = fixedInteractionTime;
     }
 }

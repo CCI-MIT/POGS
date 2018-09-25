@@ -13,6 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
@@ -64,8 +65,28 @@ public class DashboardController {
         }
 
         List<SessionSchedule> sessionSchedule = sessionRunner.getSession().getSessionSchedule();
+        if(sessionRunner.getSession().getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())) {
+            List<TaskWrapper> taskWrappers = sessionRunner.getSession().getTaskList();
 
+            for (int i =0; i < sessionSchedule.size(); i++){
+                SessionSchedule ss = sessionSchedule.get(i);
+                if(ss.getTaskReference()!=null){
 
+                    for(TaskWrapper tw: taskWrappers){
+                        if(tw.getId() != ss.getTaskReference().getId()){
+                            SessionSchedule schedule = new SessionSchedule(ss.getStartTimestamp(),
+                                    ss.getEndTimestamp(),
+                                    tw,
+                                    ss.getRoundReference(),
+                                    ss.getSessionReference(),
+                                    tw.getTaskWorkUrl());
+                            sessionSchedule.add(i,schedule);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
 
         model.addAttribute("sessionz",sessionRunner.getSession());
         model.addAttribute("sessionSchedule", sessionSchedule);

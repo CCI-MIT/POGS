@@ -6,8 +6,48 @@ class PogsPlugin {
         this.initFunc = initFunc;
         this.pogsRef = pogsRef;
     }
-    getSubjectId(){
+    getSubjectId() {
         return this.pogsRef.subjectId;
+    }
+    getSessionName(){
+        return this.pogsRef.sessionName;
+    }
+    getTaskList(){
+        var taskList = []
+        for(var i =0; i< this.pogsRef.taskList.length; i ++){
+            taskList.push(this.pogsRef.taskList[i].taskName);
+        }
+        return taskList;
+    }
+    getOtherTasks(){
+        var taskList = []
+        for(var i =0; i< this.pogsRef.taskList.length; i ++){
+            if(this.pogsRef.taskList[i].id != this.pogsRef.task) {
+                taskList.push(this.pogsRef.taskList[i].taskName);
+            }
+        }
+        return taskList;
+    }
+    getLastTask(){
+        return this.pogsRef.lastTask;
+    }
+    getTeammatesDisplayNames() {
+        var teamm = [];
+        var teammates = this.getTeammates();
+        for(var i = 0; i < teammates.length; i ++) {
+                teamm.push(teammates[i].displayName);
+        }
+        return teamm;
+    }
+    getOtherTeammates() {
+        var teamm = [];
+        var teammates = this.getTeammates();
+        for(var i = 0; i < teammates.length; i ++) {
+            if(teammates[i].externalId == this.pogsRef.subjectId){
+                teamm.push(teammates[i].displayName);
+            }
+        }
+        return teamm;
     }
     getTeammates(){
         return this.pogsRef.teammates;

@@ -143,6 +143,7 @@ public class SessionService {
         session.setTeamMaxSize(sessionBean.getTeamMaxSize());
         session.setTeamCreationMethod(sessionBean.getTeamCreationMethod());
         session.setTeamCreationMatrix(sessionBean.getTeamCreationMatrix());
+        session.setFixedInteractionTime(sessionBean.getFixedInteractionTime());
 
         if(session.getRosterTime()==null){
             session.setRosterTime(0);

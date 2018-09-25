@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
+import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
@@ -155,6 +157,11 @@ public class SessionRunner implements Runnable {
         if (session.isTaskExecutionModeSequential()) {
             if ((session.getTeamCreationMoment().equals(
                     TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
+
+                if(session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
+                    session.randomizeTaskOrder();
+                }
+
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
                 setupStartingTimes(session, round, null);
@@ -166,7 +173,6 @@ public class SessionRunner implements Runnable {
             }
 
         } else {
-            //TODO:Handle multi task and task team and completed task creation
             if ((session.getTeamCreationMoment().equals(
                     TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
                 createTeams(session, null, round);
@@ -179,6 +185,8 @@ public class SessionRunner implements Runnable {
         }
 
     }
+
+
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {

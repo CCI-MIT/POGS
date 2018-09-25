@@ -2,6 +2,8 @@ package edu.mit.cci.pogs.runner.wrappers;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -137,6 +139,9 @@ public class SessionWrapper extends Session {
     public void setTaskList(List<TaskWrapper> taskList) {
         this.taskList = taskList;
     }
+    public void randomizeTaskOrder(){
+        Collections.shuffle(this.taskList);
+    }
 
     public List<RoundWrapper> getSessionRounds() {
         return sessionRounds;
@@ -209,9 +214,7 @@ public class SessionWrapper extends Session {
 
     public boolean isTaskExecutionModeParallel() {
         return this.getTaskExecutionType().equals(
-                TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString()) ||
-                this.getTaskExecutionType().equals(
-                        TaskExecutionType.PARALLEL_RANDOM_ORDER.getId().toString());
+                TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString());
     }
 
 

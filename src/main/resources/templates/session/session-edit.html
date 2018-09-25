@@ -177,6 +177,7 @@
                                     <label class="col-sm-3 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
                                     <div class="col-sm-9">
                                         <input class="form-control" type="text" id="doneRedirectUrl" th:field="*{doneRedirectUrl}"/>
+                                        <div class="invalid-feedback">Please provide a valid URL.</div>
                                     </div>
                                 </div>
                                 <div class="form-group row hideable" data-hide="done">
@@ -210,7 +211,20 @@
 
                     </div>
                 </div>
+                <div class="form-group row" id="fixedInteractionTimeContainer">
+                    <label class="col-sm-3 col-form-label" for="fixedInteractionTime">Fixed iteraction time:</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="number" data-number="done" min="0" step="1" id="fixedInteractionTime" th:field="*{fixedInteractionTime}"/>
+                        <small id="fixedInteractionTimeHelp" class="form-text text-muted">In seconds</small>
+                        <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
+                    </div>
+                </div>
             </div>
+
+
+
+
+
         </fieldset>
         <fieldset class="form-group row">
             <legend class="col-form-legend col-sm-8">Advanced - Communication</legend>
@@ -398,7 +412,14 @@
                 dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
                 dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
                 dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
-
+                function teamExecSetup(){
+                    var ex = $("#taskExecutionType").val();
+                    if(ex == "P"){
+                        $("#fixedInteractionTimeContainer").show();
+                    }else{
+                        $("#fixedInteractionTimeContainer").hide();
+                    }
+                }
                 function teamCreationSetup(){
                     var teamMe = $("#teamCreationMethod").val();
                     if(teamMe == "S"){
@@ -420,6 +441,7 @@
 
 
                 }
+                $("#taskExecutionType").change(teamExecSetup);
                 $("#teamCreationMethod").change(teamCreationSetup);
                 teamCreationSetup();
 
@@ -442,6 +464,10 @@
                         }
 
                     });
+                    if(!validateUrl($("#doneRedirectUrl").val())){
+                        $("#doneRedirectUrl").addClass("is-invalid");
+                        valid = false;
+                    }
 
                      var teamMe = $("#teamCreationMethod").val();
                         if(teamMe == "S"){
@@ -472,6 +498,14 @@
                             valid = false;
                         }
 
+                        var ex = $("#taskExecutionType").val();
+                        if(ex == "P"){
+                            var time = $("#fixedInteractionTime").val();
+                            if(time == "" || parseInt(time) <5 ){
+                                $("#fixedInteractionTime").addClass("is-invalid");
+                                valid = false;
+                            }
+                        }
 
 
                     if(!valid){

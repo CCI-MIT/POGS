@@ -28,7 +28,7 @@
     <div id="votingPoolContainer"  class="flex-column w-100" style="padding-top: 5px"
         th:if="${hasCollaborationVotingWidget}">
         <div id="votingModal" class=""></div>
-         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Pool</button>
+         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Poll</button>
 
     </div>
     <div id="feedbackBarContainer"  class="flex-column w-100" style="padding-top: 5px"
@@ -60,11 +60,15 @@
                        currentUrl: window.location,
                        sessionId: '[(${pogsSession.id})]',
                        subjectId: '[(${subject.subjectExternalId})]',
+                       taskId : '[(${task.id})]',
+                       lastTask: '[(${lastTask})]',
+                       sessionName: '[(${pogsSession.sessionSuffix})]',
                        subjectCanTalkTo: [(${subjectCanTalkTo})],
                        channelSubjectIsIn: [(${channelSubjectIsIn})],
                        secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
                        nextUrl : '[(${nextUrl})]',
                        teammates: [(${teammates})],
+                       taskList: [(${allTasksList})],
                        taskConfigurationAttributes: [(${taskConfigurationAttributes})],
                        completedTaskId:'[(${completedTask.id})]',
                        hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],

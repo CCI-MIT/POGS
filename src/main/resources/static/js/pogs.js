@@ -75,6 +75,10 @@ class Pogs {
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
+        this.taskList = config.taskList;
+        this.task = config.task;
+        this.lastTask = config.lastTask;
+        this.sessionName = config.sessionName;
         this.chatBotName = config.chatBotName;
         this.setupSubjectColors();
 
