@@ -1,5 +1,21 @@
 
 <div>
+    <div class="container-fluid information">
+    You can use this special variables to enable network functionality:
+    <ul>
+        <li><b>${allTeammates}</b> all of teammates of a given team in a session. If used in the question
+        it will render the list of display names separated by coma. If used in an option, it will be
+        rendered as each teammate as an option.
+        </li>
+        <li><b>${otherTeamates}</b> all teammates but the current subject answering the survey. This renders as a coma separated list
+        in questions, and separate options if used in options.</li>
+        <li><b>${lastTaskName}</b> if used in sequential mode, the last task's name, if in parallel it will render an empty string. This way the survey can use it in reference to the last task. Only rendered as text</li>
+        <li><b>${allTasksNames}</b> all tasks names in the current session. The list will render as coma separated task names or as option items if used in an option field</li>
+        <li><b>${otherTasksNames}</b> all tasks names but the current survey in question. The list will render as coma separated values or as options if used in an option field.</li>
+        <li><b>${sessionName}</b> It will render the session suffix.</li>
+    </ul>
+    </div>
+</div>
     <div id="survey">
 
     </div>

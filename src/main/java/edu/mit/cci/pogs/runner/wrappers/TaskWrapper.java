@@ -14,7 +14,9 @@ public class TaskWrapper extends Task {
     private List<CompletedTask> completedTasks;
 
     private List<TeamWrapper> taskTeams;
+    public TaskWrapper() {
 
+    }
 
     public TaskWrapper(Task value) {
         super(value);

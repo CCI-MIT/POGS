@@ -19,9 +19,14 @@
 
     <script src="../../dist/vendor/jquery/dist/jquery.min.js"
             th:src="@{/vendor/jquery/dist/jquery.min.js}"></script>
+
     <script src="../../dist/vendor/loglevel/dist/loglevel.min.js"
             th:src="@{/vendor/loglevel/dist/loglevel.min.js}"></script>
+
     <script src="../../js/Countdown.js" th:src="@{/js/Countdown.js}"></script>
+
+
+
     <script src="../../static/js/pogs.js" th:src="@{/js/pogs.js}"></script>
 
     <script src="../../static/js/pogsPlugin.js" th:src="@{/js/pogsPlugin.js}"></script>
@@ -40,16 +45,16 @@
         <!--<img src="../../static/img/logo.jpg" th:src="@{/img/logo.jpg}"/>-->
         <span>POGS</span>
     </div>
-    <div class="main">
-        <div class="flexbox-row">
+    <div class="main flexbox-row">
+
             <div layout:fragment="information" class="information" ></div>
-            <div class="mainContent">
+            <div class="mainContent scrollInfo">
                 <div layout:fragment="content" class="centerContent  h-100">
                     This is the page content.
                 </div>
             </div>
             <div class="communication" layout:fragment="communication" ></div>
-        </div>
+
     </div>
     <div class="footer" layout:fragment="footer" >
         Copyright © 2018 MIT Center for Collective Intelligence
@@ -75,10 +80,9 @@
     </div>
 </div>
 
-<script src="../../dist/vendor/popper.js/dist/umd/popper.min.js"
-        th:src="@{/vendor/popper.js/dist/umd/popper.min.js}"></script>
-<script src="../../dist/vendor/bootstrap/dist/js/bootstrap.min.js"
-        th:src="@{/vendor/bootstrap/dist/js/bootstrap.min.js}"></script>
+
+<script src="../../dist/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"
+        th:src="@{/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 

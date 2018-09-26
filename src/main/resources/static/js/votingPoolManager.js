@@ -31,10 +31,10 @@ class VotingPoolManager {
             promptEntry = '';
         }
         var votingPoolText = prompt(
-            "Please describe the issue to be voted on (Max. 25 characters).", promptEntry);
+            "Please describe the issue to be voted on (Max. 50 characters).", promptEntry);
 
-        if (votingPoolText.length >= 26) {
-            alert("Task description should be less than 25 characters.");
+        if (votingPoolText.length >= 50) {
+            alert("Task description should be less than 50 characters.");
             this.createVotingPool(votingPoolText);
             return;
         }

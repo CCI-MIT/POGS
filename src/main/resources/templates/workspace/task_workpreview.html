@@ -21,7 +21,7 @@
     <div id="votingPoolContainer"  class="flex-column w-100" style="padding-top: 5px"
         th:if="${hasCollaborationVotingWidget}">
         <div id="votingModal" class=""></div>
-         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Pool</button>
+         <button id="createVotingPool" class="btn btn-outline-primary btn-sm">Create Voting Poll</button>
 
     </div>
     <div id="feedbackBarContainer"  class="flex-column w-100" style="padding-top: 5px"
@@ -57,8 +57,9 @@
                        subjectCanTalkTo: [(${subjectCanTalkTo})],
                        channelSubjectIsIn: [],
                        secondsRemainingCurrentUrl: 60*1000*5,
-                       nextUrl : window.location.href.replace("[(${subject.subjectExternalId})]",""),
+                       nextUrl : window.location.href.replace("/[(${subject.subjectExternalId})]",""),
                        teammates: [(${teammates})],
+                       taskList: [(${allTasksList})],
                        taskConfigurationAttributes: [(${taskConfigurationAttributes})],
                        completedTaskId:'-1',
                        hasCollaborationVotingWidget: [(${hasCollaborationVotingWidget})],
@@ -116,7 +117,7 @@
 
                 </div>
             </div>
-            <div class="card-body border-chat-window  d-flex flex-column p-0" style="flex: 9 1" id="chatContainer"><!--  -->
+            <div class="card-body border-chat-window  d-flex flex-column p-0 col-9" style="flex: 9 1" id="chatContainer"><!--  -->
                 <div class="d-flex flex-row justify-content-start" style="background-color: #0E5EA9;color:white">
                     <div class="col-1 p-1">
                         <i class="fa fa-address-book subject-icon" style="font-size:30px;" id="toggleTrigger"></i>

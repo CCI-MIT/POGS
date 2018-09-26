@@ -19,7 +19,7 @@
         </li>
     </ol>
     <h2>Edit task</h2>
-    <form action="#" th:action="@{/admin/tasks}" th:object="${task}" method="post">
+    <form action="#" th:action="@{/admin/tasks}" th:object="${task}" method="post" id="taskEdit">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" th:field="*{id}"/>
         <fieldset class="form-group row">
@@ -333,6 +333,44 @@
                 dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
                 dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
                 dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+
+                function checkboxOnClickOnLoad(){
+                                    var trigg = $(this).data("trigger");
+                                    if($(this).is(':checked')){
+
+                                        $(".hideable[data-hide='"+trigg+"']").show();
+                                    }else{
+                                        $(".hideable[data-hide='"+trigg+"']").hide();
+                                    }
+                                };
+                $(":checkbox").click(checkboxOnClickOnLoad);
+                $(":checkbox").each(checkboxOnClickOnLoad);
+
+                $("#taskEdit").submit(function( event ) {
+                   var valid = true;
+
+                   //time checking not empty or zero
+                   $(":checkbox").each(function(){
+
+                       var trig = $(this).data("trigger");
+                       if(trig){
+                           if($(this).is(':checked')){
+                               console.log(':input[data-number="'+trig+'"]');
+                               var numberVar = $(':input[data-number="'+trig+'"]').val();
+                               if((numberVar=="" )||(parseInt(numberVar)<5)){
+                                  $(':input[data-number="'+trig+'"]').addClass("is-invalid");
+                                  valid = false;
+                               }
+                           }
+                       }
+
+                   });
+
+                   if(!valid){
+                       event.preventDefault();
+                       event.stopPropagation();
+                   }
+                });
             });
         </script>
         <!-- End research group field -->

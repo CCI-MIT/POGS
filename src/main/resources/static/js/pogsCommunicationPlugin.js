@@ -88,12 +88,44 @@ class GroupChatManager {
         this.communicationPluginReference = communicationPluginReference;
         this.subjectsInChannel = communicationPluginReference.getTeammates();
         this.setupSubjectPanel();
+
         this.lastMessageAuthor = null;
         this.shouldHideAuthorInConsecutive = true;
         this.sendJoinedMessage();
         this.setupHTML();
         this.communicationPluginReference.
             subscribeCommunicationBroadcast(this.onCommunicationBroadcastReceived.bind(this));
+
+    }
+    setupSubjectPopovers() {
+
+        for(var i = 0; i < this.subjectsInChannel.length; i ++) {
+            var properties = "";
+
+            for (var j = 0; j < this.subjectsInChannel[i].attributes.length; j++) {
+
+                if(this.subjectsInChannel[i].attributes[j].attributeName!="SUBJECT_DEFAULT_BACKGROUND_COLOR" &&
+                   this.subjectsInChannel[i].attributes[j].attributeName!="SUBJECT_DEFAULT_FONT_COLOR") {
+                    properties +=
+                        "<h5><b>" + this.subjectsInChannel[i].attributes[j].attributeName + ": </b>"
+                        + this.subjectsInChannel[i].attributes[j].stringValue + "</h5>"
+                }
+            }
+
+            if(properties != "") {
+                $('.' + this.subjectsInChannel[i].externalId + '_popover').popover(
+                    {
+                        title: "<h4><strong class='" + this.subjectsInChannel[i].externalId
+                               + "_color'>" +
+                               this.subjectsInChannel[i].displayName + "</strong> properties</h4>",
+                        content: properties, html: true, placement: "bottom",
+
+                        trigger: "hover", offset: 9000, flip: false, container: 'body'
+                    });
+            }
+
+
+        }
 
     }
     changeChannelTo(channelName, displayName, receiver){
@@ -139,12 +171,13 @@ class GroupChatManager {
         for(var i = 0; i < this.subjectsInChannel.length; i ++) {
 
             $("#friend-list").append(
-            '                           <li class="list-group-item p-1 hover-bg-lightgray">\n'
+            '                           <li class="list-group-item p-1 hover-bg-lightgray '+this.subjectsInChannel[i].externalId+'_popover" data-toggle="popover">\n'
             + '                            <span class="badge '+ this.subjectsInChannel[i].externalId+'_color username">'+this.subjectsInChannel[i].displayName+'</span>\n'
             + '                        </li>\n');
             //handle onclick to change CHAT channel
 
         }
+        this.setupSubjectPopovers()
     }
     getOrCreateChannelHTML(channelName) {
         if($("#channelBody_" + channelName).length){
@@ -416,8 +449,8 @@ class MatrixChatManager extends GroupChatManager {
                 if (this.subjectCanTalkTo[j] == this.subjectsInChannel[i].externalId) {
                     $("#friend-list").append(
                         '                           <li class="list-group-item p-1 hover-bg-lightgray '
-                        + 'username" data-external-id="'+ this.subjectsInChannel[i].externalId + '"'
-                        + ' id="chat_'+ this.subjectsInChannel[i].externalId +'">\n'
+                        + 'username '+this.subjectsInChannel[i].externalId+'_popover" data-external-id="'+ this.subjectsInChannel[i].externalId + '"'
+                        + ' id="chat_'+ this.subjectsInChannel[i].externalId +'" data-toggle="popover">\n'
                         + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color">'
                         + this.subjectsInChannel[i].displayName + '</span>\n'
                         + '                        </li>\n');
@@ -435,6 +468,7 @@ class MatrixChatManager extends GroupChatManager {
             $("#messageInput").focus();
 
         }.bind(this));
+        this.setupSubjectPopovers();
     }
     setupChannelsPanel() {
         for(var i = 0; i < this.channelsSubjectIsIn.length; i ++) {
@@ -666,7 +700,7 @@ class DyadicChatManager extends GroupChatManager {
         for(var i = 0; i < this.subjectsInChannel.length; i ++) {
             if(this.subjectsInChannel[i].externalId != this.communicationPluginReference.getSubjectId()) {
                 $("#friend-list").append(
-                    '                           <li class="list-group-item p-1 hover-bg-lightgray" id="'+this.subjectsInChannel[i].externalId+'_subject_ref">\n'
+                    '                           <li class="list-group-item p-1 hover-bg-lightgray '+this.subjectsInChannel[i].externalId+'_popover" data-toggle="popover" id="'+this.subjectsInChannel[i].externalId+'_subject_ref">\n'
                     + '                            <span class="badge d-xs-none '+this.subjectsInChannel[i].externalId+'_color username">'
                     + this.subjectsInChannel[i].displayName + '</span>\n'
                     + '                             <i class="fa fa-phone-square chatRequest chatRequestAvailable" data-status="AVAILABLE" data-externalId="'
@@ -676,7 +710,8 @@ class DyadicChatManager extends GroupChatManager {
             //handle onclick to change CHAT channel
         }
         $(".chatRequest").click(this.handleSendRequestCommunication.bind(this));
-        this.toggleSubjectList(null);
+        //this.toggleSubjectList(null);
+        this.setupSubjectPopovers();
     }
 
 }

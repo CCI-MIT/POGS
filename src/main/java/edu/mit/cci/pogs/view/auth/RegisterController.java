@@ -32,6 +32,6 @@ public class RegisterController {
     public String register(@ModelAttribute RegisterBean registerBean) {
 
         userService.createUser(registerBean);
-        return "redirect:/";
+        return "redirect:/admin";
     }
 }

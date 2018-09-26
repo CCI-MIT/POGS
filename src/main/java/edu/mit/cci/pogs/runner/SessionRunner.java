@@ -7,9 +7,11 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,29 +157,35 @@ public class SessionRunner implements Runnable {
     private void configureRound(SessionWrapper session, RoundWrapper round) {
         // if task playmode == playlist
         if (session.isTaskExecutionModeSequential()) {
+
+            setupStartingTimes(session, round, null);
+
             if ((session.getTeamCreationMoment().equals(
                     TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
 
-                if(session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
-                    session.randomizeTaskOrder();
-                }
-
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
-                setupStartingTimes(session, round, null);
-                session.createSessionSchedule();
-                checkAndScheduleChatScripts(session);
+
 
             } else {
                 //TODO:Handle before task , team and completed task creation
             }
 
+            if(session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
+                session.randomizeTaskOrder();
+            }
+
+            session.createSessionSchedule();
+            checkAndScheduleChatScripts(session);
+
         } else {
             if ((session.getTeamCreationMoment().equals(
                     TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
+
+                setupStartingTimesMultiTask(session, round, null);
+
                 createTeams(session, null, round);
                 createCompletedTasks(session, round, true);
-                setupStartingTimesMultiTask(session, round, null);
                 session.createSessionSchedule();
                 checkAndScheduleChatScripts(session);
 
@@ -206,6 +214,10 @@ public class SessionRunner implements Runnable {
 
     private void setupStartingTimesMultiTask(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
 
+
+        Long now = new Date().getTime() + 1000*5;
+        session.setSessionStartDate(new Timestamp(now));
+
         Long taskStartTime = session.getSessionStartDate().getTime() + session.getIntroAndSetupTime();
         round.setRoundStartTimestamp(taskStartTime);
 
@@ -228,6 +240,8 @@ public class SessionRunner implements Runnable {
 
         //if firstRound
         if (prevRound == null) {
+            Long now = new Date().getTime() + 1000*5;
+            session.setSessionStartDate(new Timestamp(now));
             round.setRoundStartTimestamp(session.getSessionStartDate().getTime() + session.getIntroAndSetupTime());
         } else {
             round.setRoundStartTimestamp(round.getRoundFinishTimestamp());
@@ -247,7 +261,7 @@ public class SessionRunner implements Runnable {
 
     private void createCompletedTasks(SessionWrapper session, RoundWrapper round, boolean hasOrder) {
         int taskOrderCounter = 1;
-        for (Task task : session.getTaskList()) {
+        for (TaskWrapper task : session.getTaskList()) {
             if (task.getSoloTask()) {
                 for (Subject subject : checkedInWaitingSubjectList.values()) {
                     createCompletedTask(null, subject, round, task, taskOrderCounter);
@@ -273,17 +287,22 @@ public class SessionRunner implements Runnable {
         }
     }
 
-    private void createCompletedTask(Team team, Subject subject, Round currentRound, Task task, Integer order) {
+    private void createCompletedTask(Team team, Subject subject, Round currentRound, TaskWrapper task, Integer order) {
         CompletedTask ct = new CompletedTask();
         ct.setCompledTaskOrder(order.shortValue());
         ct.setRoundId(currentRound.getId());
         ct.setTaskId(task.getId());
 
+        ct.setStartTime(new Timestamp(task.getTaskStartTimestamp()));
+        ct.setExpectedFinishTime(new Timestamp(task.getTaskEndTimestamp()));
+
         if (subject != null) {
             ct.setSubjectId(subject.getId());
+            ct.setSolo("true");
         }
         if (team != null) {
             ct.setTeamId(team.getId());
+            ct.setSolo("false");
         }
         completedTaskDao.create(ct);
     }

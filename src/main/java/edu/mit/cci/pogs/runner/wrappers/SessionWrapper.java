@@ -294,6 +294,7 @@ public class SessionWrapper extends Session {
     private void removeIntrosAndPrimersFromSchedule() {
         List<SessionSchedule> allSchedules = new ArrayList<>(this.sessionSchedule);
         boolean foundOneTask = false;
+        long taskFinalTimestamp = 0l;
         for (SessionSchedule ss : allSchedules) {
             if (ss.getTaskReference() != null) {
                 if (!ss.getUrl().endsWith("/w")) {
@@ -301,9 +302,16 @@ public class SessionWrapper extends Session {
                 } else {
                     if (!foundOneTask) {
                         foundOneTask = true;
+                        taskFinalTimestamp = ss.getEndTimestamp();
                     } else {
                         this.sessionSchedule.remove(ss);
                     }
+                }
+            } else {
+                if (ss.getUrl().endsWith("/done")) {
+                    long doneTime  = ss.getEndTimestamp() - ss.getStartTimestamp();
+                    ss.setStartTimestamp(taskFinalTimestamp);
+                    ss.setEndTimestamp(taskFinalTimestamp + doneTime);
                 }
             }
         }

@@ -119,6 +119,7 @@ class Pogs {
         }
 
 
+
         this.initializeWebSockets();
         //window.location.href.indexOf("/w/")>=0
         if(!(window.location.href.indexOf("/waiting_room")>=0)) {

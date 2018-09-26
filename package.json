@@ -33,8 +33,8 @@
     "loglevel": "^1.6.1",
     "moment": "^2.22.1",
     "noty": "^2.4.1",
-    "popper": "^1.0.1",
-    "popper.js": "^1.12.9",
+    "popper.js": "^1.14.4",
+    "qtip2": "^3.0.3",
     "spin.js": "2.3.2",
     "summernote": "^0.8.10",
     "tooltipster": "^4.2.5"

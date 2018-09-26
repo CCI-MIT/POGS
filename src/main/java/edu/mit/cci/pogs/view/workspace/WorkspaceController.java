@@ -317,7 +317,19 @@ public class WorkspaceController {
                     task.getCollaborationVotingWidgetEnabled());
 
             String cc = task.getCommunicationType();
+            List<TaskWrapper> fakeTaskList = new ArrayList<>();
+            TaskWrapper tw = new TaskWrapper();
+            tw.setTaskName("Task name");
+            tw.setId(01l);
+            fakeTaskList.add(tw);
 
+            tw = new TaskWrapper();
+            tw.setTaskName("Task name 2");
+            tw.setId(02l);
+            fakeTaskList.add(tw);
+            model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
+
+            model.addAttribute("lastTask","");
 
             model.addAttribute("communicationType", cc);
             model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
@@ -359,6 +371,22 @@ public class WorkspaceController {
 
 
             model.addAttribute("teammates", getFakeTeamatesJSONObject());
+
+            List<TaskWrapper> fakeTaskList = new ArrayList<>();
+            TaskWrapper tw = new TaskWrapper();
+            tw.setTaskName("Task name");
+            tw.setId(01l);
+            fakeTaskList.add(tw);
+
+            tw = new TaskWrapper();
+            tw.setTaskName("Task name 2");
+            tw.setId(02l);
+            fakeTaskList.add(tw);
+            model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
+
+            model.addAttribute("lastTask","");
+
+
         }
 
         return "workspace/task_workplugin";
@@ -394,6 +422,7 @@ public class WorkspaceController {
             subjectAttributes.add(att);
 
             att = new JSONObject();
+
             color = ColorUtils.generateFontColorBasedOnBackgroundColor(colors[colorIndex]);
             att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME);
             att.put("stringValue",String.format("#%02x%02x%02x", color.getRed(),
@@ -401,6 +430,17 @@ public class WorkspaceController {
             colorIndex++;
 
             subjectAttributes.add(att);
+
+            att = new JSONObject();
+            att.put("attributeName", "age");
+            att.put("stringValue","13");
+            subjectAttributes.add(att);
+
+            att = new JSONObject();
+            att.put("attributeName", "education");
+            att.put("stringValue","Graduate");
+            subjectAttributes.add(att);
+
 
             subject.put("attributes", subjectAttributes);
             ja.add(subject);
