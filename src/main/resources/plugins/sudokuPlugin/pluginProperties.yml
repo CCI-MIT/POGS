@@ -1,15 +1,8 @@
-plugin:
-    name: sudokuPlugin
-    description: A sudoku grid like task implementation, the researcher can setup the grid size
-
-configurationAtrributes:
-  -
-    name: gridCols
-    type: integer
-  -
-    name: gridRows
-    type: integer
+name: sudokuPlugin
+description: A sudoku grid like task implementation, the researcher can setup the grid size
 
 scoring:
-    completedTaskAttributeSubjectAnswerPrefix : answer
-    completedTaskAttributeCorrectAnswerPrefix : rightAnswer
+    scoringType : indexedAnswerOneAnswerKey
+    answerKeyPrefix: answerSheet
+    answerKeyFormat: CSV
+    answerSheetPrefix: sudokuAnswer_

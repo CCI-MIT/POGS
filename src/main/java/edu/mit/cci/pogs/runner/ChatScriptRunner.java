@@ -45,7 +45,7 @@ public class ChatScriptRunner implements Runnable {
                 Thread.sleep(timeBeforeStarts);
             }
             Long lastTimeDiff = 0l;
-            for(ChatEntry ce: chatEntryList){
+            for(ChatEntry ce: chatEntryList) {
                 Thread.sleep((ce.getChatElapsedTime() - lastTimeDiff)*1000);
                 lastTimeDiff =  ce.getChatElapsedTime();
                 createAndSendMessage(ce);

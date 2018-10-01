@@ -1,5 +1,8 @@
 package edu.mit.cci.pogs.model.dao.taskplugin;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -97,6 +100,23 @@ public class TaskPlugin {
         return ret;
     }
 
+    public TaskPluginProperties getTaskPluginProperties() {
+
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+
+        try {
+            TaskPluginProperties taskPluginProperties = mapper.readValue(new File(
+                    this.pluginRootFolder + File.separatorChar + "libs" + File.separatorChar + "pluginProperties.yml"
+                    ),
+                    TaskPluginProperties.class);
+
+            return taskPluginProperties;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+        
+    }
 
     public String getTaskEditJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskEdit.js");

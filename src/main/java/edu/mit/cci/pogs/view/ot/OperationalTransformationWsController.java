@@ -8,6 +8,7 @@ import edu.mit.cci.pogs.messages.TaskAttributeMessageContent;
 import edu.mit.cci.pogs.ot.OperationService;
 import edu.mit.cci.pogs.ot.api.Operation;
 import edu.mit.cci.pogs.ot.dto.OperationDto;
+import edu.mit.cci.pogs.utils.DateUtils;
 import edu.mit.cci.pogs.view.workspace.WorkspaceTaskWSController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -18,6 +19,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
+import java.util.Date;
 
 @Controller
 public class OperationalTransformationWsController {
@@ -62,6 +64,7 @@ public class OperationalTransformationWsController {
         final TaskAttributeMessage message = new TaskAttributeMessage(MessageType.TASK_ATTRIBUTE,
                 messageContent, pogsMessage.getSender(), null,
                 pogsMessage.getCompletedTaskId(), pogsMessage.getSessionId());
+
 
 //        messagingTemplate.convertAndSend("/pogsapp/task.saveAttribute", message);
 //        return message;

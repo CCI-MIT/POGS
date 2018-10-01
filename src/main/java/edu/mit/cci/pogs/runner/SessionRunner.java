@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.awt.*;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -40,12 +41,14 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
+import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.TaskGroupService;
 import edu.mit.cci.pogs.utils.ColorUtils;
+import edu.mit.cci.pogs.utils.DateUtils;
 
 @Component
 public class SessionRunner implements Runnable {
@@ -134,6 +137,9 @@ public class SessionRunner implements Runnable {
     }
 
     private void runSession() {
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
         while (shouldRun) {
 
             if ((allSubjectsAreWaiting() || sessionIsReadyToStart())
@@ -145,6 +151,27 @@ public class SessionRunner implements Runnable {
             if(session.getSecondsRemainingForSession() < 0 ){
                 shouldRun = false;
             }
+            if(session.getSessionSchedule()!=null) {
+                for (int i = 0; i < session.getSessionSchedule().size(); i++) {
+                    SessionSchedule ss = session.getSessionSchedule().get(i);
+                    _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
+                    if (ss.getTaskReference() != null) {
+                        if ((session.getTeamCreationMoment().equals(
+                                TeamCreationTime.BEGINING_TASK.getId().toString()))) {
+                            createTeams(session, null, session.getCurrentRound());
+                            createCompletedTasks(session, session.getCurrentRound(), true);
+                            //TODO handle team creation before task.
+                        }
+                    }
+                    while (ss.isHappeningNow(DateUtils.now())) {
+
+                    }
+                    _log.info("Finishing session schedule: " + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
+
+
+                }
+            }
+
         }
         SessionRunner.removeSessionRunner(session.getId());
         for(Thread th : this.chatRunners){
@@ -164,8 +191,8 @@ public class SessionRunner implements Runnable {
                     TeamCreationTime.BEGINING_SESSION.getId().toString()))) {
 
                 createTeams(session, null, round);
-                createCompletedTasks(session, round, true);
 
+                createCompletedTasks(session, round, true);
 
             } else {
                 //TODO:Handle before task , team and completed task creation
@@ -215,7 +242,7 @@ public class SessionRunner implements Runnable {
     private void setupStartingTimesMultiTask(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
 
 
-        Long now = new Date().getTime() + 1000*5;
+        Long now = new Date().getTime() + 1000*20;
         session.setSessionStartDate(new Timestamp(now));
 
         Long taskStartTime = session.getSessionStartDate().getTime() + session.getIntroAndSetupTime();
@@ -317,7 +344,44 @@ public class SessionRunner implements Runnable {
                 createTeam(task, teamConfig, session, round);
             }
         } else {
-            //TODO: Handle the other kinds of team creation, Matrix, research defined
+            if (session.getTeamCreationMethod().equals(
+                    TeamCreationMethod.RANDOMLY_MATRIX.getId().toString())) {
+                String matrix = session.getTeamCreationMatrix();
+                String lines[] = matrix.split("\r\n");
+                int checkedInSubjects = checkedInWaitingSubjectList.keySet().size();
+                String[] matrixLineConfig = null;
+                for(String line: lines){
+                    if(Integer.parseInt(line.substring(0,1)) == checkedInSubjects){
+                        matrixLineConfig = line.split(",");
+                    }
+                }
+                if(matrixLineConfig!= null){
+                    List<List<Subject>> subjects = new ArrayList<>();
+                    List<Subject> subjectsLeft;
+                    List<Subject> checkedSubsNotInGroups = new ArrayList<>();
+                    checkedSubsNotInGroups.addAll(this.checkedInWaitingSubjectList.values());
+                    Collections.shuffle(checkedSubsNotInGroups);
+                    for(int i = 1; i< matrixLineConfig.length; i++){
+                        Integer total = Integer.parseInt(matrixLineConfig[i]);
+                        subjectsLeft = new ArrayList<>();
+                        subjectsLeft.addAll(checkedSubsNotInGroups);
+
+                        List<Subject> currentTeam = new ArrayList<>();
+                        for(Subject subject: subjectsLeft){
+                            if(currentTeam.size()!=total){
+                                checkedSubsNotInGroups.remove(subject);
+                                currentTeam.add(subject);
+                            }
+                        }
+                        subjects.add(currentTeam);
+                    }
+                    for (List<Subject> teamConfig : subjects) {
+                        createTeam(task, teamConfig, session, round);
+                    }
+                }
+                //did not find the right line setup (should not happen)
+            }
+
         }
 
         List<Team> teams = teamDao.listByRoundId(round.getId());
