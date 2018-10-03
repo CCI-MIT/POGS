@@ -8,6 +8,8 @@ public class ScoringConfiguration {
 
     private String answerSheetPrefix;
 
+    private String scoreAttributeName;
+
     private String url;
 
     public ScoringType getScoringType() {
@@ -48,5 +50,13 @@ public class ScoringConfiguration {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getScoreAttributeName() {
+        return scoreAttributeName;
+    }
+
+    public void setScoreAttributeName(String scoreAttributeName) {
+        this.scoreAttributeName = scoreAttributeName;
     }
 }

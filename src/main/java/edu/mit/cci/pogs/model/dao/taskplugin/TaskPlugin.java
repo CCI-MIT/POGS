@@ -115,7 +115,7 @@ public class TaskPlugin {
             e.printStackTrace();
         }
         return null;
-        
+
     }
 
     public String getTaskEditJsContent() {

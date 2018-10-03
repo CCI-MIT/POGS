@@ -4,7 +4,7 @@ public enum ScoringType {
 
     indexedAnswerOneAnswerKey('S', "Answer key"),
     externalService('L', "External service"),
-    attributeIsScore('A',"Attribute is score");
+    scoreIsAttribute('A',"Score is an attribute");
 
         private Character scoringTypeChar;
         private String scoringType;

@@ -1,5 +1,7 @@
-plugin:
-    name: typingPlugin
-    description: A simple typing task that provides a Google Doc-like shared textfield that all participants can type in simultaneously
+name: typingPlugin
+description: A simple typing task that provides a Google Doc-like shared textfield that all participants can type in simultaneously
 
-configurationAtrributes:
+scoring:
+    scoringType : externalService
+    url: http://localhost:8080/letscoretypingtext
+    answerSheetPrefix: finalText

@@ -204,6 +204,7 @@ public class SessionRunner implements Runnable {
 
             session.createSessionSchedule();
             checkAndScheduleChatScripts(session);
+            scheduleTaskScoring(session);
 
         } else {
             if ((session.getTeamCreationMoment().equals(
@@ -215,13 +216,26 @@ public class SessionRunner implements Runnable {
                 createCompletedTasks(session, round, true);
                 session.createSessionSchedule();
                 checkAndScheduleChatScripts(session);
+                scheduleTaskScoring(session);
 
             }
         }
 
     }
 
+    private void scheduleTaskScoring(SessionWrapper session){
+        for (TaskWrapper task : session.getTaskList()) {
+            if(task.getShouldScore()) {//task.shouldBeScored
+                ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                csr.setSession(session);
+                csr.setTaskWrapper(task);
 
+                Thread thread = new Thread(csr);
+                thread.start();
+                chatRunners.add(thread);
+            }
+        }
+    }
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {

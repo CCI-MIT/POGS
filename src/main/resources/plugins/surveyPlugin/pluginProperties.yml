@@ -1,15 +1,8 @@
-plugin:
-    name: surveyPlugin
-    description: A surveyPlugin
-
-configurationAtrributes:
-  -
-    name: gridCols
-    type: integer
-  -
-    name: gridRows
-    type: integer
+name: surveyPlugin
+description: A survey like task implementation, the researcher can setup the fields and their right answer
 
 scoring:
-    completedTaskAttributeSubjectAnswerPrefix : answer
-    completedTaskAttributeCorrectAnswerPrefix : rightAnswer
+    scoringType : indexedAnswerOneAnswerKey
+    answerKeyPrefix: answerSheet
+    answerKeyFormat: CSV
+    answerSheetPrefix: sudokuAnswer_

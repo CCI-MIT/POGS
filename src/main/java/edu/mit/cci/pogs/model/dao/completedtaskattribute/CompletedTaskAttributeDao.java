@@ -9,6 +9,8 @@ public interface CompletedTaskAttributeDao extends Dao<CompletedTaskAttribute, L
  
     List<CompletedTaskAttribute> list();
 
+    List<CompletedTaskAttribute> listByAttributePrefix(String attributePrefix, Long completedTaskId);
+
     CompletedTaskAttribute getByAttributeNameCompletedTaskId(String attributeName, Long completedTaskId);
 
     void deleteByCompletedTaskId(Long completedTaskId);

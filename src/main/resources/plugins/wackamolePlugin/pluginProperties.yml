@@ -1,15 +1,6 @@
-plugin:
-    name: wackamolePlugin
-    description: A Wack-A-Mole game plugin
-
-configurationAtrributes:
-  -
-    name: gridCols
-    type: integer
-  -
-    name: gridRows
-    type: integer
+name: wackamolePlugin
+description: A Wack-A-Mole game plugin
 
 scoring:
-    completedTaskAttributeSubjectAnswerPrefix : answer
-    completedTaskAttributeCorrectAnswerPrefix : rightAnswer
+    scoringType : scoreIsAttribute
+    scoreAttributeName: finalScore
