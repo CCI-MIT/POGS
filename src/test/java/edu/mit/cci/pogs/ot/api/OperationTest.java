@@ -172,7 +172,7 @@ public class OperationTest {
      */
 
     @Test
-    public void testTransform__givenTwoInserts__shouldMoveSecondForward() {
+    public void testTransform__givenTwoInserts__secondShouldStayAtBeginning() {
         final TransformTestInput testInput = getTransformTestInputForTwoInserts();
         assertTransformedOutputMatches("Two insert operations not transformed correctly",
                 testInput);
@@ -186,9 +186,9 @@ public class OperationTest {
 
     private TransformTestInput getTransformTestInputForTwoInserts() {
         final Operation opA = Operation.begin()
-                                       .insert("go");
-        final Operation opB = Operation.begin()
                                        .insert("at");
+        final Operation opB = Operation.begin()
+                                       .insert("go");
 
         final String inputString = "";
         final String expected = "goat";
@@ -294,18 +294,18 @@ public class OperationTest {
     // Helpers
 
     private void assertTransformedOutputMatches(String message, TransformTestInput testInput) {
-        final Operation opA = testInput.opA;
-        final Operation opB = testInput.opB;
+        final Operation op1 = testInput.opA;
+        final Operation op2 = testInput.opB;
 
-        final TransformedOperationPair transformedPair = opA.transform(opB);
+        final TransformedOperationPair transformedPair = op2.transform(op1);
 
         final Operation opAPrime = transformedPair.getAPrime();
         final Operation opBPrime = transformedPair.getBPrime();
 
-        final String applyA = opA.apply(testInput.inputString);
-        assertEquals(message, testInput.expectedOutput, opBPrime.apply(applyA));
-        final String applyB = opB.apply(testInput.inputString);
-        assertEquals(message, testInput.expectedOutput, opAPrime.apply(applyB));
+        final String apply1 = op1.apply(testInput.inputString);
+        assertEquals(message, testInput.expectedOutput, opAPrime.apply(apply1));
+        final String apply2 = op2.apply(testInput.inputString);
+        assertEquals(message, testInput.expectedOutput, opBPrime.apply(apply2));
     }
 
     private void assertTransformInvariantHolds(TransformTestInput testInput) {

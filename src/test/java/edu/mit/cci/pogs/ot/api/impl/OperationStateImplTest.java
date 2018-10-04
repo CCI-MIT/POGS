@@ -63,7 +63,7 @@ public class OperationStateImplTest {
         operationState.apply(op2);
 
         assertEquals("Concurrent operation not transformed correctly",
-                "Lorem ipsumgoat", operationState.getText());
+                "goatLorem ipsum", operationState.getText());
     }
 
     @Test
@@ -74,18 +74,20 @@ public class OperationStateImplTest {
         final Operation op2 = Operation
                 .begin()
                 .insert("goat");
+        // text = goatlorem ipsum
+
         final Operation op3 = Operation
                 .begin(1)
                 .retain(15)
                 .insert("brown fox");
+
+        //text = goatlorem ipsumbrown fox
         final Operation op4 = Operation
                 .begin(2)
-                .delete("l")
-                .insert("L")
-                .retain(10)
+                .delete("g")
+                .insert("G")
+                .retain(14)
                 .insert(" dolor sit amet. ")
-                .retain(4)
-                .insert(" ")
                 .delete("brown")
                 .insert("orange")
                 .retain(4);
@@ -96,38 +98,46 @@ public class OperationStateImplTest {
         operationState.apply(op4);
 
         assertEquals("Multiple concurrent operation not transformed correctly",
-                "Lorem ipsum dolor sit amet. goat orange fox", operationState.getText());
+                "Goatlorem ipsum dolor sit amet. orange fox", operationState.getText());
     }
 
     @Test
     public void testApply__givenMultipleConcurrentAndOutdatedOperations__shouldTransformAndApplyCorrectly() {
         final Operation op1 = Operation.begin()
                 .insert("lorem ipsum");
+        operationState.apply(op1); // id = 0
+
         final Operation op2 = Operation.begin()
                 .insert("goat");
-        // Text = lorem ipsumgoat
+        operationState.apply(op2); // id = 1
+        // Text = goatlorem ipsum
+
         final Operation op3 = Operation.begin(1)
                 .retain(15)
                 .insert("brown fox");
-        // Text = lorem ipsumgoatbrown fox
+        operationState.apply(op3); // id = 2
+        // Text = goatlorem ipsumbrown fox
+
         final Operation op4 = Operation.begin(2)
-                .delete("l")
-                .insert("L")
-                .retain(10)
+                .delete("g")
+                .insert("G")
+                .retain(14)
                 .insert(" dolor sit amet. ")
-                .retain(4)
-                .insert(" ")
                 .delete("brown")
                 .insert("orange")
                 .retain(4);
-        // Text = Lorem ipsum dolor sit amet. goat orange fox
+        operationState.apply(op4); // id = 3
+        // Text = Goatlorem ipsum dolor sit amet. orange fox
+
         final Operation op5 = Operation.begin(1)
+                .retain(4)
                 .delete("l")
                 .retain(4)
                 .delete(" ipsum")
-                .retain(4)
                 .insert(" test");
-        // Text = Lorem dolor sit amet. goat orange fox test
+        operationState.apply(op5); //id = 4
+        // Text = Goat orem dolor sit amet. goat orange fox test
+
         final Operation op6 = Operation.begin(0)
                 .retain(4)
                 .delete("m")
@@ -135,20 +145,15 @@ public class OperationStateImplTest {
                 .retain(1)
                 .insert(" this")
                 .retain(5);
+        operationState.apply(op6); // id = 5
         // Text = LoreM this dolor sit amet. goat orange fox test
-        final Operation op7 = Operation.begin(1)
-                .delete("lorem ipsum")
-                .retain(4);
 
-        operationState.apply(op1);
-        operationState.apply(op2);
-        operationState.apply(op3);
-        operationState.apply(op4);
-        operationState.apply(op5);
-        operationState.apply(op6);
-        operationState.apply(op7);
+        final Operation op7 = Operation.begin(1)
+                .retain(4)
+                .delete("lorem ipsum");
+        operationState.apply(op7); // id = 6
 
         assertEquals("Multiple concurrent operation not transformed correctly",
-                "LM this dolor sit amet. goat orange fox test", operationState.getText());
+                "GoatM this test dolor sit amet. orange fox", operationState.getText());
     }
 }
