@@ -112,7 +112,7 @@ ot.AbstractOtClient = (function() {
             case fastDiff.EQUAL:
                 return new Component('RETAIN', differenceObj[1].length, '');
             default:
-                throw "Shouldn't happen";
+                throw new Error("Shouldn't happen");
         }
     }
 

@@ -70,9 +70,9 @@ let ot = {};
                     let textBefore = text.substring(0, cursorPosition);
                     let textAfter = text.substring(cursorPosition);
                     if (!textAfter.startsWith(this._payload)) {
-                        throw "This operation cannot be applied to text " + text + " at position "
+                        throw new Error("This operation cannot be applied to text " + text + " at position "
                         + cursorPosition + ". Expected '" + this._payload + "', found '"
-                        + textAfter.substring(0, this._payload.length) + "'.";
+                        + textAfter.substring(0, this._payload.length) + "'.");
                     }
                     return textBefore + textAfter.substring(this._payload.length);
                 }
@@ -85,7 +85,7 @@ let ot = {};
 
         merge(otherComponent) {
             if (!this.canMergeWith(otherComponent)) {
-                throw "Cannot merge with component of type " + otherComponent.type;
+                throw new Error("Cannot merge with component of type " + otherComponent.type);
             }
             switch (this._type) {
                 case 'RETAIN':
@@ -180,7 +180,7 @@ let ot = {};
             if (!(json.hasOwnProperty('padId') && json.hasOwnProperty('id')
                 && json.hasOwnProperty('parentId') && json.hasOwnProperty('components')
                 && Array.isArray(json.components) && json.hasOwnProperty('metaData'))) {
-                throw "Invalid operation format: " + json;
+                throw new Error("Invalid operation format: " + json);
             }
             let operation = new Operation(json.padId, json.parentId, json.authorId);
             operation.id = json.id;
@@ -189,7 +189,7 @@ let ot = {};
                 let componentJson = json.components[i];
                 if (!(componentJson.hasOwnProperty('type') && componentJson.hasOwnProperty('retain')
                     && componentJson.hasOwnProperty('payload'))) {
-                    throw "Invalid component format: " + componentJson;
+                    throw new Error("Invalid component format: " + componentJson);
                 }
                 operation.addComponent(new Component(componentJson.type, componentJson.retain,
                     componentJson.payload));
@@ -242,7 +242,7 @@ let ot = {};
             this._baseLength += component.retain + component.getCharactersRemoved();
             this._targetLength += component.retain + component.getCharactersAdded();
             if (this._targetLength < 0) {
-                throw "Operation would reduce target length below zero.";
+                throw new Error("Operation would reduce target length below zero.");
             }
 
             if (this._components.length > 0) {
@@ -258,9 +258,9 @@ let ot = {};
 
         apply(text) {
             if (text.length !== this._baseLength) {
-                throw "Operation with baseLength " + this._baseLength
+                throw new Error("Operation with baseLength " + this._baseLength
                 + " cannot be applied to text of length " + text.length + ": "
-                + JSON.stringify(this._components);
+                + JSON.stringify(this._components));
             }
             let outputText = text;
             let position = 0;
@@ -274,8 +274,8 @@ let ot = {};
 
         compose(opB) {
             if (this._targetLength !== opB.baseLength) {
-                throw "The second operation's baseLength (" + opB.baseLength
-                + ") must be the first operation's targetLength (" + this._targetLength + ").";
+                throw new Error("The second operation's baseLength (" + opB.baseLength
+                + ") must be the first operation's targetLength (" + this._targetLength + ").");
             }
 
             let composedOperation = Operation.begin(this.parentId)
@@ -300,11 +300,11 @@ let ot = {};
                 }
 
                 if (componentA == null) {
-                    throw "Operation a is too short.";
+                    throw new Error("Operation a is too short.");
                 }
 
                 if (componentB == null) {
-                    throw "Operation b is too short.";
+                    throw new Error("Operation b is too short.");
                 }
 
                 if (componentA.size() > componentB.size()) {
@@ -355,13 +355,13 @@ let ot = {};
             let operationA = this;
 
             if (operationA.baseLength !== operationB.baseLength) {
-                throw "Both operations must have the same baseLength: operationA.baseLength = "
-                + operationA.baseLength + ", operationB.baseLength = " + operationB.baseLength;
+                throw new Error("Both operations must have the same baseLength: operationA.baseLength = "
+                + operationA.baseLength + ", operationB.baseLength = " + operationB.baseLength);
             }
 
             if (operationA.parentId !== operationB.parentId) {
-                throw `Both operations must have the same parent. Found operationA.parentId = `
-                    + `${operationA.parentId} and operationB.parentId = ${operationB.parentId}`;
+                throw new Error(`Both operations must have the same parent. Found operationA.parentId = `
+                    + `${operationA.parentId} and operationB.parentId = ${operationB.parentId}`);
             }
 
             let operationAPrime = Operation.begin(operationB.id != null ? operationB.id : operationB.parentId)
@@ -390,11 +390,11 @@ let ot = {};
                 }
 
                 if (componentA == null) {
-                    throw "Operation a is too short.";
+                    throw new Error("Operation a is too short.");
                 }
 
                 if (componentB == null) {
-                    throw "Operation b is too short.";
+                    throw new Error("Operation b is too short.");
                 }
 
                 let shorterComponent;

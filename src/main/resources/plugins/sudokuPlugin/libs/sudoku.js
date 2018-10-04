@@ -201,7 +201,7 @@
             }
         }
         if(nr_givens < MIN_GIVENS){
-            throw "Too few givens. Minimum givens is " + MIN_GIVENS;
+            throw new Error("Too few givens. Minimum givens is " + MIN_GIVENS);
         }
 
         // Default reverse to false
@@ -497,7 +497,7 @@
         
         // Make sure `board` is a string of length 81
         if(board.length != SQUARES.length){
-            throw "Board/squares length mismatch.";
+            throw new Error("Board/squares length mismatch.");
             
         } else {
             for(var i in SQUARES){
@@ -768,7 +768,7 @@
         if(max){
             return Math.floor(Math.random() * (max - min)) + min;
         } else {
-            throw "Range undefined";
+            throw new Error("Range undefined");
         }
     };
 

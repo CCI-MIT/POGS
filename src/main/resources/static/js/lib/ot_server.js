@@ -19,8 +19,8 @@ ot.ServerState = (function() {
 
         transform(operation) {
             if (operation.parentId >= this._operations.length) {
-                throw "Operation with parent " + operation.parentId + " is not based on any "
-                + "operations in this state (size = " + this._operations.length + ")";
+                throw new Error("Operation with parent " + operation.parentId + " is not based on any "
+                + "operations in this state (size = " + this._operations.length + ")");
             }
 
             let concurrentOperations = this.findOperationsSince(operation.parentId);
