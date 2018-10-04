@@ -283,10 +283,10 @@ public class Operation {
             throw new IllegalArgumentException("Both operations must have the same parent.");
         }
 
-        Operation operationAPrime = Operation.begin(operationA.getId())
+        Operation operationAPrime = Operation.begin(operationB.id != null ? operationB.id : operationB.parentId)
                                              .withPadId(padId)
                                              .withMetaData(operationA.getMetaData());
-        Operation operationBPrime = Operation.begin(operationA.getId())
+        Operation operationBPrime = Operation.begin(operationA.id != null ? operationA.id : operationA.parentId)
                                              .withPadId(padId)
                                              .withMetaData(operationB.getMetaData());
 

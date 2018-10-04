@@ -44,8 +44,8 @@ public class OperationStateImpl implements OperationState {
         Operation transformedOperation = operation;
         for (Operation concurrentOperation : concurrentOperations) {
             final TransformedOperationPair transformedOperationPair =
-                    concurrentOperation.transform(transformedOperation);
-            transformedOperation = transformedOperationPair.getBPrime();
+                    transformedOperation.transform(concurrentOperation);
+            transformedOperation = transformedOperationPair.getAPrime();
         }
         return transformedOperation;
     }
