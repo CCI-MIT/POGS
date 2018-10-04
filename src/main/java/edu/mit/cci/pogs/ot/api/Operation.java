@@ -104,6 +104,7 @@ public class Operation {
 
     public OperationDto toDto() {
         final OperationDto dto = new OperationDto();
+        dto.setParentId(parentId);
         dto.setPadId(padId);
         dto.setId(id);
         dto.setMetaData(metaData);
