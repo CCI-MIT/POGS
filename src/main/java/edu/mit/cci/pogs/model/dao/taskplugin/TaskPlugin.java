@@ -29,23 +29,23 @@ public class TaskPlugin {
         this.pluginRootFolder = pluginRootFolder;
     }
 
-    public static TaskPlugin getTaskPlugin(String sessionId) {
-        return registeredPlugins.get(sessionId);
+    public static TaskPlugin getTaskPlugin(String pluginId) {
+        return registeredPlugins.get(pluginId);
     }
 
     public static List<TaskPlugin> getAllTaskPlugins() {
         return new ArrayList<>(registeredPlugins.values());
     }
 
-    public static void addTaskPlugin(String sessionId, TaskPlugin sessionRunner) {
-        if (registeredPlugins.get(sessionId) == null) {
-            registeredPlugins.put(sessionId, sessionRunner);
+    public static void addTaskPlugin(String pluginID, TaskPlugin sessionRunner) {
+        if (registeredPlugins.get(pluginID) == null) {
+            registeredPlugins.put(pluginID, sessionRunner);
         }
     }
 
-    private static void removeTaskPlugin(Long sessionId) {
-        if (registeredPlugins.get(sessionId) != null) {
-            registeredPlugins.remove(sessionId);
+    private static void removeTaskPlugin(Long pluginId) {
+        if (registeredPlugins.get(pluginId) != null) {
+            registeredPlugins.remove(pluginId);
         }
     }
 
@@ -106,7 +106,7 @@ public class TaskPlugin {
 
         try {
             TaskPluginProperties taskPluginProperties = mapper.readValue(new File(
-                    this.pluginRootFolder + File.separatorChar + "libs" + File.separatorChar + "pluginProperties.yml"
+                    this.pluginRootFolder +  File.separatorChar + "pluginProperties.yml"
                     ),
                     TaskPluginProperties.class);
 

@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.service;
 
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.completedtaskattribute.CompletedTaskAttributeDao;
+import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
@@ -40,6 +41,7 @@ public class SessionService {
     private final EventLogDao eventLogDao;
     private final SubjectCommunicationService subjectCommunicationService;
     private final SubjectAttributeDao subjectAttributeDao;
+    private final CompletedTaskScoreDao completedTaskScoreDao;
 
     private final TodoEntryService todoEntryService;
 
@@ -66,8 +68,8 @@ public class SessionService {
                           SubjectCommunicationService subjectCommunicationService,
                           SubjectAttributeDao subjectAttributeDao,
                           TodoEntryService todoEntryService,
-                          VotingService votingService
-
+                          VotingService votingService,
+                          CompletedTaskScoreDao completedTaskScoreDao
                           ) {
         this.todoEntryService = todoEntryService;
         this.votingService = votingService;
@@ -82,6 +84,7 @@ public class SessionService {
         this.eventLogDao =  eventLogDao;
         this.subjectCommunicationService = subjectCommunicationService;
         this.subjectAttributeDao = subjectAttributeDao;
+        this.completedTaskScoreDao =completedTaskScoreDao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -266,6 +269,7 @@ public class SessionService {
                 votingService.deleteVotingPoolByCompletedTaskId(ct.getId());
                 completedTaskAttributeDao.deleteByCompletedTaskId(ct.getId());
                 eventLogDao.deleteByCompletedTaskId(ct.getId());
+                completedTaskScoreDao.deleteByCompletedTaskId(ct.getId());
             }
             completedTaskDao.deleteByRoundId(r.getId());
 

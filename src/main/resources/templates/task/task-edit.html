@@ -98,10 +98,15 @@
                     </div>
                 </div-->
                 <div class="form-group row">
-                    <label class="col-sm-2 col-form-label" for="soloTask">Solo Task:</label>
-                    <div class="col-sm-10">
+                    <label class="col-sm-3 col-form-label" for="soloTask">Solo Task:</label>
+                    <div class="col-sm-3">
                         <input class="form-check-input" th:field="*{soloTask}" type="checkbox"
                                id="soloTask"/>
+                    </div>
+                    <label class="col-sm-3 col-form-label" for="shouldScore">Should Score:</label>
+                    <div class="col-sm-3">
+                        <input class="form-check-input" th:field="*{shouldScore}" type="checkbox"
+                               id="shouldScore"/>
                     </div>
                 </div>
             </div>

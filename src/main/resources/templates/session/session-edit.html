@@ -444,7 +444,7 @@
                 $("#taskExecutionType").change(teamExecSetup);
                 $("#teamCreationMethod").change(teamCreationSetup);
                 teamCreationSetup();
-
+                teamExecSetup();
                 $( "#saveSession" ).submit(function( event ) {
                     var valid = true;
 
@@ -454,7 +454,7 @@
                         var trig = $(this).data("trigger");
                         if(trig){
                             if($(this).is(':checked')){
-                                console.log(':input[data-number="'+trig+'"]');
+
                                 var numberVar = $(':input[data-number="'+trig+'"]').val();
                                 if((numberVar=="" )||(parseInt(numberVar)<5)){
                                    $(':input[data-number="'+trig+'"]').addClass("is-invalid");

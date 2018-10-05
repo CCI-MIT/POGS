@@ -28,6 +28,7 @@ public class TaskBean {
     private Long chatScriptId;
 
     private Long taskConfigurationId;
+    private Boolean shouldScore;
 
 
 
@@ -242,5 +243,13 @@ public class TaskBean {
 
     public void setPrimerVideoAutoplayMute(Boolean primerVideoAutoplayMute) {
         this.primerVideoAutoplayMute = primerVideoAutoplayMute;
+    }
+
+    public Boolean getShouldScore() {
+        return shouldScore;
+    }
+
+    public void setShouldScore(Boolean shouldScore) {
+        this.shouldScore = shouldScore;
     }
 }

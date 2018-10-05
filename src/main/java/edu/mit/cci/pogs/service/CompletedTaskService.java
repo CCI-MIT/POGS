@@ -60,11 +60,11 @@ public class CompletedTaskService {
         if (tpp.getScoring() == null) {
             return;
         }
+        List<TaskExecutionAttribute> teas = taskExecutionAttributeDao
+                .listByTaskConfigurationId(thtc.getTaskConfigurationId());
         if (tpp.getScoring().getScoringType().equals(ScoringType.indexedAnswerOneAnswerKey)) {
-            //get index answers
 
-            List<TaskExecutionAttribute> teas = taskExecutionAttributeDao
-                    .listByTaskConfigurationId(thtc.getTaskConfigurationId());
+
             TaskExecutionAttribute answerKey = null;
             for (TaskExecutionAttribute tea : teas) {
                 if (tea.getAttributeName().contains(tpp.getScoring().getAnswerKeyPrefix())) {
@@ -109,7 +109,8 @@ public class CompletedTaskService {
                     .listByAttributePrefix(tpp.getScoring().getAnswerSheetPrefix(),
                             ct.getId());
 
-            Double score = getScoreFromExternalService(tpp.getScoring().getUrl(),completedTaskAttributeList);
+
+            Double score = getScoreFromExternalService(tpp,teas,completedTaskAttributeList);
             if (score != null) {
                 saveOrUpdateCompletedTaskScore(ct, score);
             }
@@ -126,14 +127,20 @@ public class CompletedTaskService {
         }
     }
 
-    private Double getScoreFromExternalService(String url , List<CompletedTaskAttribute> attributes) {
+    private Double getScoreFromExternalService(TaskPluginProperties tp ,
+                                               List<TaskExecutionAttribute> teas ,
+                                               List<CompletedTaskAttribute> attributes) {
         Double score = new Double(0);
         try {
 
             CloseableHttpClient client = HttpClients.createDefault();
-            HttpPost httpPost = new HttpPost(url);
+            HttpPost httpPost = new HttpPost(tp.getScoring().getUrl());
 
             List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("pluginName", tp.getName()));
+            for(TaskExecutionAttribute tea: teas){
+                params.add(new BasicNameValuePair(tea.getAttributeName(), tea.getStringValue()));
+            }
             for(CompletedTaskAttribute cta : attributes) {
                 params.add(new BasicNameValuePair(cta.getAttributeName(), cta.getStringValue()));
             }
@@ -151,8 +158,10 @@ public class CompletedTaskService {
                 result.append(line);
             }
             JSONObject jo = new JSONObject(result);
-            String scoreStr = jo.getString("score");
-            score = new Double(scoreStr);
+            if(jo.has("score")) {
+                String scoreStr = jo.getString("score");
+                score = new Double(scoreStr);
+            }
 
             client.close();
         } catch (IOException exeption) {

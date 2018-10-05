@@ -5,4 +5,4 @@ scoring:
     scoringType : indexedAnswerOneAnswerKey
     answerKeyPrefix: answerSheet
     answerKeyFormat: CSV
-    answerSheetPrefix: sudokuAnswer_
+    answerSheetPrefix: survey_

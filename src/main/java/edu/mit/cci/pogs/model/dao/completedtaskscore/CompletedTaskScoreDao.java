@@ -5,4 +5,5 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 
 public interface CompletedTaskScoreDao extends Dao<CompletedTaskScore, Long> {
     CompletedTaskScore getByCompletedTaskId(Long completedTaskScoreId);
+    void deleteByCompletedTaskId(Long completedTaskId);
 }

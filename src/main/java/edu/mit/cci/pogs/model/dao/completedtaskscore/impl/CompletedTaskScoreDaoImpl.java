@@ -39,7 +39,11 @@ public class CompletedTaskScoreDaoImpl extends AbstractDao<CompletedTaskScore, L
                 return record.into(CompletedTaskScore.class);
             }
 
-        }
-
+    }
+    public void deleteByCompletedTaskId(Long completedTaskId) {
+        dslContext.delete(COMPLETED_TASK_SCORE)
+                .where(COMPLETED_TASK_SCORE.COMPLETED_TASK_ID.eq(completedTaskId))
+                .execute();
+    }
 
 }

@@ -2,7 +2,6 @@ package edu.mit.cci.pogs.view.workspace;
 
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
-import org.jooq.tools.json.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
@@ -35,11 +34,11 @@ import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurat
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
@@ -69,6 +68,9 @@ public class WorkspaceController {
 
     @Autowired
     private CompletedTaskDao completedTaskDao;
+
+    @Autowired
+    private CompletedTaskScoreDao completedTaskScoreDao;
 
     @Autowired
     private EventLogDao eventLogDao;
@@ -680,6 +682,7 @@ public class WorkspaceController {
     @GetMapping("/done/{externalId}")
     public String done(@PathVariable("externalId") String externalId, Model model) {
         Subject su = workspaceService.getSubject(externalId);
+        
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/session_done");
 
     }

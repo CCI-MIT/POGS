@@ -125,6 +125,7 @@ public class SessionRunner implements Runnable {
     private boolean shouldRun;
 
     private List<Thread> chatRunners = new ArrayList<>();
+
     public void init() {
         _log.info("Configuring session: " + session.getSessionSuffix());
         shouldRun = true;
@@ -148,10 +149,10 @@ public class SessionRunner implements Runnable {
                 sessionHasStarted = true;
                 startSession();
             }
-            if(session.getSecondsRemainingForSession() < 0 ){
+            if (session.getSecondsRemainingForSession() < 0) {
                 shouldRun = false;
             }
-            if(session.getSessionSchedule()!=null) {
+            if (session.getSessionSchedule() != null) {
                 for (int i = 0; i < session.getSessionSchedule().size(); i++) {
                     SessionSchedule ss = session.getSessionSchedule().get(i);
                     _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
@@ -174,10 +175,10 @@ public class SessionRunner implements Runnable {
 
         }
         SessionRunner.removeSessionRunner(session.getId());
-        for(Thread th : this.chatRunners){
+        for (Thread th : this.chatRunners) {
             th.interrupt();
         }
-        _log.info("Exiting session runner for session" + session.getSessionSuffix() );
+        _log.info("Exiting session runner for session" + session.getSessionSuffix());
     }
 
 
@@ -198,7 +199,7 @@ public class SessionRunner implements Runnable {
                 //TODO:Handle before task , team and completed task creation
             }
 
-            if(session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
+            if (session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
                 session.randomizeTaskOrder();
             }
 
@@ -223,23 +224,24 @@ public class SessionRunner implements Runnable {
 
     }
 
-    private void scheduleTaskScoring(SessionWrapper session){
+    private void scheduleTaskScoring(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
-            if(task.getShouldScore()) {//task.shouldBeScored
+            if (task.getShouldScore()) {//task.shouldBeScored
                 ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                _log.debug("Added task scoring: " + task.getId() + " - " + csr);
                 csr.setSession(session);
                 csr.setTaskWrapper(task);
 
                 Thread thread = new Thread(csr);
                 thread.start();
-                chatRunners.add(thread);
+                //chatRunners.add(thread);
             }
         }
     }
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
-            if(task.getChatScriptId() != null ) {
+            if (task.getChatScriptId() != null) {
                 //create new script scheduler
                 ChatScriptRunner csr = (ChatScriptRunner) context.getBean("chatScriptRunner");
                 csr.setSession(session);
@@ -256,7 +258,7 @@ public class SessionRunner implements Runnable {
     private void setupStartingTimesMultiTask(SessionWrapper session, RoundWrapper round, RoundWrapper prevRound) {
 
 
-        Long now = new Date().getTime() + 1000*20;
+        Long now = new Date().getTime() + 1000 * 20;
         session.setSessionStartDate(new Timestamp(now));
 
         Long taskStartTime = session.getSessionStartDate().getTime() + session.getIntroAndSetupTime();
@@ -281,7 +283,7 @@ public class SessionRunner implements Runnable {
 
         //if firstRound
         if (prevRound == null) {
-            Long now = new Date().getTime() + 1000*5;
+            Long now = new Date().getTime() + 1000 * 20;
             session.setSessionStartDate(new Timestamp(now));
             round.setRoundStartTimestamp(session.getSessionStartDate().getTime() + session.getIntroAndSetupTime());
         } else {
@@ -364,25 +366,25 @@ public class SessionRunner implements Runnable {
                 String lines[] = matrix.split("\r\n");
                 int checkedInSubjects = checkedInWaitingSubjectList.keySet().size();
                 String[] matrixLineConfig = null;
-                for(String line: lines){
-                    if(Integer.parseInt(line.substring(0,1)) == checkedInSubjects){
+                for (String line : lines) {
+                    if (Integer.parseInt(line.substring(0, 1)) == checkedInSubjects) {
                         matrixLineConfig = line.split(",");
                     }
                 }
-                if(matrixLineConfig!= null){
+                if (matrixLineConfig != null) {
                     List<List<Subject>> subjects = new ArrayList<>();
                     List<Subject> subjectsLeft;
                     List<Subject> checkedSubsNotInGroups = new ArrayList<>();
                     checkedSubsNotInGroups.addAll(this.checkedInWaitingSubjectList.values());
                     Collections.shuffle(checkedSubsNotInGroups);
-                    for(int i = 1; i< matrixLineConfig.length; i++){
+                    for (int i = 1; i < matrixLineConfig.length; i++) {
                         Integer total = Integer.parseInt(matrixLineConfig[i]);
                         subjectsLeft = new ArrayList<>();
                         subjectsLeft.addAll(checkedSubsNotInGroups);
 
                         List<Subject> currentTeam = new ArrayList<>();
-                        for(Subject subject: subjectsLeft){
-                            if(currentTeam.size()!=total){
+                        for (Subject subject : subjectsLeft) {
+                            if (currentTeam.size() != total) {
                                 checkedSubsNotInGroups.remove(subject);
                                 currentTeam.add(subject);
                             }
@@ -419,10 +421,11 @@ public class SessionRunner implements Runnable {
     }
 
     private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
+
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
             Color[] colors = ColorUtils.generateVisuallyDistinctColors(
-                    ((subjectList.size()>10)?(subjectList.size()):(10)),
+                    ((subjectList.size() > 10) ? (subjectList.size()) : (10)),
                     ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
 
             for (int i = 0; i < subjectList.size(); i++) {
@@ -436,6 +439,14 @@ public class SessionRunner implements Runnable {
     }
 
     private void addColorSubjectAttribute(Subject su1, String attributeName, Color color) {
+        List<SubjectAttribute> attributeList = subjectAttributeDao.listBySubjectId(su1.getId());
+        if (attributeList != null && attributeList.size() > 0) {
+            for (SubjectAttribute sa : attributeList) {
+                if(sa.getAttributeName().equals(ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)){
+                    return;
+                }
+            }
+        }
         Subject su = su1;
         SubjectAttribute sa = new SubjectAttribute();
         sa.setAttributeName(attributeName);
@@ -514,7 +525,7 @@ public class SessionRunner implements Runnable {
     private void setupRounds(SessionWrapper sessionz) {
         List<Round> rounds = roundDao.listBySessionId(sessionz.getId());
 
-        if (rounds!=null && rounds.size() == 0) {
+        if (rounds != null && rounds.size() == 0) {
             if (sessionz.getRoundsEnabled()) {
                 for (int i = 0; i < sessionz.getNumberOfRounds(); i++) {
                     createRound(i + 1, sessionz.getId());
