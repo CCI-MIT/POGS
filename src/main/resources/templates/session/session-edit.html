@@ -255,14 +255,14 @@
             <div class="container">
             <div class="form-check form-check-inline">
 
-                        <input class="form-check-input" th:field="*{scoreboardEnabled}" type="checkbox" id="scoreboardEnabled" disabled/>
+                        <input class="form-check-input" th:field="*{scoreboardEnabled}" type="checkbox" id="scoreboardEnabled"/>
                         <label class="col-form-label" for="scoreboardEnabled">Scoreboard Enabled</label>
 
             </div>
              <div class="form-check form-check-inline">
 
                         <label class="col-form-label" for="scoreboardDisplayType">Scoreboard Display Type:</label>
-                        <select class="custom-select" th:field="*{scoreboardDisplayType}" id="scoreboardDisplayType" disabled>
+                        <select class="custom-select" th:field="*{scoreboardDisplayType}" id="scoreboardDisplayType" >
                             <option
                                     th:each="rg: ${scoreboardDisplayTypes}"
                                     th:value="${rg.id}"
@@ -271,7 +271,7 @@
 
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" th:field="*{scoreboardUseDisplayNames}" type="checkbox" disabled id="scoreboardUseDisplayNames" />
+                    <input class="form-check-input" th:field="*{scoreboardUseDisplayNames}" type="checkbox"  id="scoreboardUseDisplayNames" />
                     <label class="col-form-label" for="scoreboardUseDisplayNames">Use Display Names</label>
                 </div>
             </div>

@@ -2,8 +2,8 @@ package edu.mit.cci.pogs.model.dao.session;
 
 public enum ScoreboardDisplayType {
 
-    DISPLAY_TASK('T',"Show scoreboard at end of each task"),
-    DISPLAY_ROUND('R',"Show scoreboard at end of each round"),
+    //DISPLAY_TASK('T',"Show scoreboard at end of each task"),
+   //DISPLAY_ROUND('R',"Show scoreboard at end of each round"),
     DISPLAY_SESSION('S',"Show scoreboard at end of session");
 
     private Character scoreboardDisplayTypeChar;

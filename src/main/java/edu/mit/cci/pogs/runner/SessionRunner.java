@@ -429,6 +429,17 @@ public class SessionRunner implements Runnable {
                     ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
 
             for (int i = 0; i < subjectList.size(); i++) {
+
+                List<SubjectAttribute> attributeList = subjectAttributeDao.listBySubjectId(
+                        subjectList.get(i).getId());
+                if (attributeList != null && attributeList.size() > 0) {
+                    for (SubjectAttribute sa : attributeList) {
+                        if(sa.getAttributeName().equals(ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)){
+                            return;
+                        }
+                    }
+                }
+
                 addColorSubjectAttribute(subjectList.get(i),
                         ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME, colors[i]);
                 addColorSubjectAttribute(subjectList.get(i),
@@ -439,14 +450,7 @@ public class SessionRunner implements Runnable {
     }
 
     private void addColorSubjectAttribute(Subject su1, String attributeName, Color color) {
-        List<SubjectAttribute> attributeList = subjectAttributeDao.listBySubjectId(su1.getId());
-        if (attributeList != null && attributeList.size() > 0) {
-            for (SubjectAttribute sa : attributeList) {
-                if(sa.getAttributeName().equals(ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)){
-                    return;
-                }
-            }
-        }
+
         Subject su = su1;
         SubjectAttribute sa = new SubjectAttribute();
         sa.setAttributeName(attributeName);

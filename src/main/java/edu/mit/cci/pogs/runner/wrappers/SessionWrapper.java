@@ -79,7 +79,7 @@ public class SessionWrapper extends Session {
         if (roundSize != 0) {
             return sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize;
         }
-        return 0l;
+        return -1l;
     }
 
     public Long getSecondsRemainingForCurrentUrl() {

@@ -16,7 +16,48 @@
             <div id="countdown"></div>
             <div th:remove="tag" th:utext="${pogsSession.donePageText}"></div>
         </div>
+        <div class="waiting_message" th:if="${showScore}">
+        <div class="h-100">Scoreboard </div>
+                <table class="table table-striped" >
+                    <thead>
+                        <tr>
+                            <th> Task </th>
+                            <th:block th:each="teamWrapper : ${teamWrappers}">
+                                <th th:if="${showSubjectName}">
+                                    <span th:each="subj : ${teamWrappers.subjects}" th:text="${subj.subjectDisplayName}" th:class="${subj.subjectExternalId + '_color badge'}"></span>
+                                </th>
+                                <th th:if="${ not showSubjectName}" th:id="${teamWrapper.team.id + '_team'}" th:text="${'#' + teamWrapper.team.id}"></th>
+                            </th:block>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <th:block th:each=" tsw : ${taskScoreWrappers}">
+                            <tr>
+                                <td th:text="${tsw.taskWrapper.taskName}"></td>
+                               <td  th:each="ts : ${tsw.teamScore}" th:text="${#numbers.formatDecimal(ts, 0, 'DEFAULT', 2, 'DEFAULT')}"></td>
+                            </tr>
+                        </th:block>
+                    </tbody>
+                </table>
+                <script>
+                $(function (){
+                    let teamIndex = parseInt('[(${subjectsTeamIndex})]') + 2;
+                    $("td:nth-child("+teamIndex+")").css("background-color","gray");
 
+                    let leng = $("td:nth-child("+teamIndex+")").length -1;
+                    let ref = $($("td:nth-child("+teamIndex+")")[leng]);
+
+                    ref.popover({
+                       content: "This is your team!",
+                       html: true,
+                       placement: "bottom",
+                       animation: true,
+                       trigger: "hover",  container: 'body'
+                    });
+                    ref.popover('show');
+                });
+                </script>
+        </div>
         <script>
 
             $(function () {
@@ -33,6 +74,9 @@
                                hasCollaboration:false,
                                hasChat: false
                            });
+
+
+
 
 
             });

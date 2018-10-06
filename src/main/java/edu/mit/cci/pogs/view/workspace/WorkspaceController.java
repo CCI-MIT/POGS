@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
@@ -21,6 +23,7 @@ import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
+import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -35,6 +38,7 @@ import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
@@ -46,10 +50,13 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TaskScoreWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
 import edu.mit.cci.pogs.utils.ColorUtils;
@@ -122,7 +129,7 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "Your session has ended!");
             return "workspace/error";
         }
-        if(sr.getSession().isTooLate()){
+        if (sr.getSession().isTooLate()) {
             model.addAttribute("errorMessage", "You are too late, your session has already passed!");
             return "workspace/error";
         }
@@ -267,7 +274,8 @@ public class WorkspaceController {
         }
         return configurationArray;
     }
-    private Subject generateFakeSubject(String subjectExternalId){
+
+    private Subject generateFakeSubject(String subjectExternalId) {
         Subject su = new Subject();
         su.setSubjectExternalId(subjectExternalId);
         su.setSubjectDisplayName(subjectExternalId);
@@ -276,8 +284,8 @@ public class WorkspaceController {
 
     @GetMapping("/task/{taskId}/t/{subjectExternalId}")
     public String taskConfigTest(@PathVariable("taskId") Long taskId,
-                           @PathVariable("subjectExternalId") String subjectExternalId,
-                           Model model) {
+                                 @PathVariable("subjectExternalId") String subjectExternalId,
+                                 Model model) {
 
         Task task = taskDao.get(taskId);
         TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
@@ -309,7 +317,7 @@ public class WorkspaceController {
             ja.add("su03");
             ja.add("su04");
 
-            model.addAttribute("subjectCanTalkTo",ja);
+            model.addAttribute("subjectCanTalkTo", ja);
 
             model.addAttribute("hasCollaborationTodoListEnabled",
                     task.getCollaborationTodoListEnabled());
@@ -331,11 +339,11 @@ public class WorkspaceController {
             fakeTaskList.add(tw);
             model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
 
-            model.addAttribute("lastTask","");
+            model.addAttribute("lastTask", "");
 
             model.addAttribute("communicationType", cc);
             model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
-                .NO_CHAT.getId().toString()) ? (true) : (false)));
+                    .NO_CHAT.getId().toString()) ? (true) : (false)));
 
         }
 
@@ -344,10 +352,10 @@ public class WorkspaceController {
 
     @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
     public String taskWorkPluginTest(
-                           @PathVariable("taskPlugin") String taskPlugin,
-                           @PathVariable("pluginConfig") String pluginConfig,
-                           @PathVariable("subjectExternalId") String subjectExternalId,
-                           Model model) {
+            @PathVariable("taskPlugin") String taskPlugin,
+            @PathVariable("pluginConfig") String pluginConfig,
+            @PathVariable("subjectExternalId") String subjectExternalId,
+            Model model) {
         TaskPlugin pl = TaskPlugin.getTaskPlugin(taskPlugin);
         if (pl != null) {
             //get task configurations
@@ -386,7 +394,7 @@ public class WorkspaceController {
             fakeTaskList.add(tw);
             model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
 
-            model.addAttribute("lastTask","");
+            model.addAttribute("lastTask", "");
 
 
         }
@@ -396,10 +404,10 @@ public class WorkspaceController {
 
     private JSONArray getFakeTeamatesJSONObject() {
         List<Subject> teammates = new ArrayList<>();
-        teammates.add(generateFakeSubject( "su01"));
-        teammates.add(generateFakeSubject( "su02"));
-        teammates.add(generateFakeSubject( "su03"));
-        teammates.add(generateFakeSubject( "su04"));
+        teammates.add(generateFakeSubject("su01"));
+        teammates.add(generateFakeSubject("su02"));
+        teammates.add(generateFakeSubject("su03"));
+        teammates.add(generateFakeSubject("su04"));
 
         JSONArray ja = new JSONArray();
         Color[] colors = ColorUtils.generateVisuallyDistinctColors(
@@ -420,14 +428,14 @@ public class WorkspaceController {
             att.put("stringValue",
                     String.format("#%02x%02x%02x", color.getRed(),
                             color.getGreen(), color.getBlue())
-                    );
+            );
             subjectAttributes.add(att);
 
             att = new JSONObject();
 
             color = ColorUtils.generateFontColorBasedOnBackgroundColor(colors[colorIndex]);
             att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME);
-            att.put("stringValue",String.format("#%02x%02x%02x", color.getRed(),
+            att.put("stringValue", String.format("#%02x%02x%02x", color.getRed(),
                     color.getGreen(), color.getBlue()));
             colorIndex++;
 
@@ -435,12 +443,12 @@ public class WorkspaceController {
 
             att = new JSONObject();
             att.put("attributeName", "age");
-            att.put("stringValue","13");
+            att.put("stringValue", "13");
             subjectAttributes.add(att);
 
             att = new JSONObject();
             att.put("attributeName", "education");
-            att.put("stringValue","Graduate");
+            att.put("stringValue", "Graduate");
             subjectAttributes.add(att);
 
 
@@ -530,18 +538,18 @@ public class WorkspaceController {
                     model.addAttribute("hasTabs", false);
                 }
 
-                if(sessionWrapper.getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())){
-                    model.addAttribute("lastTask","");
+                if (sessionWrapper.getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())) {
+                    model.addAttribute("lastTask", "");
                 } else {
                     TaskWrapper lastTask = null;
-                    for(int i =0; i< sessionWrapper.getTaskList().size(); i++){
+                    for (int i = 0; i < sessionWrapper.getTaskList().size(); i++) {
                         TaskWrapper tw = sessionWrapper.getTaskList().get(i);
 
-                        if(tw.getId() == task.getId()){
-                            if(i== 0){
-                                model.addAttribute("lastTask","");
-                            } else{
-                                model.addAttribute("lastTask",sessionWrapper.getTaskList().get(i-1).getTaskName());
+                        if (tw.getId() == task.getId()) {
+                            if (i == 0) {
+                                model.addAttribute("lastTask", "");
+                            } else {
+                                model.addAttribute("lastTask", sessionWrapper.getTaskList().get(i - 1).getTaskName());
                             }
                         }
                     }
@@ -597,7 +605,7 @@ public class WorkspaceController {
                         round.getId(),
                         team.getId(),
                         task.getId());
-                if(completedTask == null) {
+                if (completedTask == null) {
                     completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
                 }
 
@@ -636,10 +644,10 @@ public class WorkspaceController {
 
     private JSONArray getJsonTaskList(List<TaskWrapper> taskList) {
         JSONArray ja = new JSONArray();
-        for(TaskWrapper tw: taskList){
+        for (TaskWrapper tw : taskList) {
             JSONObject jo = new JSONObject();
-            jo.put("taskName",tw.getTaskName());
-            jo.put("id",tw.getId());
+            jo.put("taskName", tw.getTaskName());
+            jo.put("id", tw.getId());
             ja.add(jo);
         }
         return ja;
@@ -682,8 +690,70 @@ public class WorkspaceController {
     @GetMapping("/done/{externalId}")
     public String done(@PathVariable("externalId") String externalId, Model model) {
         Subject su = workspaceService.getSubject(externalId);
-        
-        return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/session_done");
+        SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+
+        if (sr != null) {
+
+            if (sr.getSession().getScoreboardDisplayType().equals(ScoreboardDisplayType.
+                    DISPLAY_SESSION.getId().toString())) {
+
+                List<TeamWrapper> teamWrappers = sr.getSession()
+                        .getSessionRounds().get(0).getRoundTeams();
+
+                List<TaskScoreWrapper> taskScoreWrappers = new ArrayList<>();
+
+                for (TaskWrapper tw : sr.getSession().getTaskList()) {
+
+                    if (tw.getShouldScore()) {
+                        //get all scores in the team's order
+                        TaskScoreWrapper tsw = new TaskScoreWrapper();
+                        tsw.setTaskWrapper(tw);
+                        tsw.setTeamScore(new ArrayList<>());
+
+                        Map<Long, Double> teamScore = new HashMap<>();
+                        for (TeamWrapper tew : teamWrappers) {
+                            teamScore.put(tew.getTeam().getId(), 0d);
+                        }
+
+                        for (CompletedTask ct : tw.getCompletedTasks()) {
+                            CompletedTaskScore cts = completedTaskScoreDao
+                                    .getByCompletedTaskId(ct.getId());
+                            if (ct.getSubjectId() == null) {
+                                teamScore.put(ct.getTeamId(), cts.getTotalScore());
+                            } else {
+                                if (ct.getSubjectId().equals(su.getId())) {
+                                    teamScore.put(ct.getTeamId(), cts.getTotalScore());
+                                }
+                            }
+                        }
+                        for (TeamWrapper tew : teamWrappers) {
+                            tsw.getTeamScore().add(teamScore.get(tew.getTeam().getId()));
+                        }
+
+                        taskScoreWrappers.add(tsw);
+
+                    }
+                }
+                int subjectsTeam = 0;
+                for(int i =0 ; i < teamWrappers.size(); i++) {
+                    for(Subject sub : teamWrappers.get(i).getSubjects()){
+                        if(sub.getId() == su.getId()){
+                            subjectsTeam = i;
+                        }
+                    }
+                }
+                model.addAttribute("subjectsTeamIndex", subjectsTeam);
+                model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
+                model.addAttribute("showScore", true);
+                model.addAttribute("taskScoreWrappers", taskScoreWrappers);
+                model.addAttribute("teamWrappers", teamWrappers);
+
+            } else {
+                model.addAttribute("showScore", false);
+            }
+        }
+        return checkExternalIdAndSessionRunningAndForward(su, model,
+                "workspace/session_done");
 
     }
 
