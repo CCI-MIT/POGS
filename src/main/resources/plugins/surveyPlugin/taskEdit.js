@@ -163,7 +163,7 @@ class SurveyTaskEdit {
             let newTR = "<tr><th><input type='text' value='row "+(num_of_rows+1)+"'/> </th>";
 
             for(let i = 0; i < columns.length; i++){
-                newTR+= '<td><input type="radio" name="answer'+questionNum+'_'+num_of_rows+'" value="'+this.escapeValueStringsInQuotes(columns[i])+'"/></td>';
+                newTR+= '<td><input type="radio" name="answer'+questionNum+'_'+num_of_rows+'" value="'+(columns[i])+'"/></td>';
             }
             newTR += "</tr>";
 
@@ -173,7 +173,7 @@ class SurveyTaskEdit {
             // $(".remove-radio-choice").click(function () {
             //     ($(this).parent()).remove();
             // });
-        }.bind(this));
+        });
 
 
         $(".remove-radio-choice").click(function () { //setup removeRadio Button
