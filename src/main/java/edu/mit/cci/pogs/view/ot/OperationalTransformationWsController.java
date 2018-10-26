@@ -8,7 +8,6 @@ import edu.mit.cci.pogs.messages.TaskAttributeMessageContent;
 import edu.mit.cci.pogs.ot.OperationService;
 import edu.mit.cci.pogs.ot.api.Operation;
 import edu.mit.cci.pogs.ot.dto.OperationDto;
-import edu.mit.cci.pogs.utils.DateUtils;
 import edu.mit.cci.pogs.view.workspace.WorkspaceTaskWSController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -19,7 +18,6 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Controller;
 
 import java.io.IOException;
-import java.util.Date;
 
 @Controller
 public class OperationalTransformationWsController {
@@ -58,17 +56,38 @@ public class OperationalTransformationWsController {
         final OperationDto operationDto = operationService.processOperation(
                 operation.getPadId(), operation, true).toDto();
 
+
+        String currentText = operationService.getState(operation.getPadId()).getText();
+
+
+
         final TaskAttributeMessageContent messageContent =
                 new TaskAttributeMessageContent("operation", true);
         messageContent.setAttributeStringValue(objectMapper.writeValueAsString(operationDto));
+        messageContent.setMustCreateNewAttribute(true);
+        messageContent.setBroadcastableAttribute(true);
+
         final TaskAttributeMessage message = new TaskAttributeMessage(MessageType.TASK_ATTRIBUTE,
                 messageContent, pogsMessage.getSender(), null,
                 pogsMessage.getCompletedTaskId(), pogsMessage.getSessionId());
 
 
+
 //        messagingTemplate.convertAndSend("/pogsapp/task.saveAttribute", message);
 //        return message;
         //TODO: workaround because the sending doesn't seem to work
-        workspaceTaskWSController.getLoggableAttribute(message);
+        workspaceTaskWSController.saveTaskAttribute(message);
+
+        final TaskAttributeMessageContent fullTextContent =
+                new TaskAttributeMessageContent("fullText", true);
+        fullTextContent.setBroadcastableAttribute(false);
+        fullTextContent.setMustCreateNewAttribute(false);
+
+        fullTextContent.setAttributeStringValue(currentText);
+        final TaskAttributeMessage fullTextMessage = new TaskAttributeMessage(MessageType.TASK_ATTRIBUTE,
+                fullTextContent, pogsMessage.getSender(), null,
+                pogsMessage.getCompletedTaskId(), pogsMessage.getSessionId());
+
+        workspaceTaskWSController.saveTaskAttribute(fullTextMessage);
     }
 }

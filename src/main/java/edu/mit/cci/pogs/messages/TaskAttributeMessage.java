@@ -22,8 +22,23 @@ public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageConten
     }
 
     @JsonIgnore
+    public Boolean getBroadcastableAttribute() {
+        return content.getBroadcastableAttribute();
+    }
+
+    @JsonIgnore
+    public Boolean getMustCreateNewAttribute() {
+        return content.getMustCreateNewAttribute();
+    }
+
+    @JsonIgnore
     public String getAttributeName() {
         return content.getAttributeName();
+    }
+
+    @JsonIgnore
+    public String getExtraData() {
+        return content.getExtraData();
     }
 
     @JsonIgnore

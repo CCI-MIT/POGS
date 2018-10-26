@@ -7,10 +7,14 @@ public class TaskAttributeMessageContent {
     private String attributeStringValue;
     private Double attributeDoubleValue;
     private Long attributeIntegerValue;
+    private String extraData;
     private Boolean loggableAttribute;
+    private Boolean mustCreateNewAttribute;
+    private Boolean broadcastableAttribute;
 
     public TaskAttributeMessageContent() {
-
+        mustCreateNewAttribute = false;
+        broadcastableAttribute = true;
     }
 
     public TaskAttributeMessageContent(String attributeName, Boolean loggableAttribute) {
@@ -56,6 +60,30 @@ public class TaskAttributeMessageContent {
 
     public void setLoggableAttribute(Boolean loggableAttribute) {
         this.loggableAttribute = loggableAttribute;
+    }
+
+    public Boolean getMustCreateNewAttribute() {
+        return mustCreateNewAttribute;
+    }
+
+    public void setMustCreateNewAttribute(Boolean mustCreateNewAttribute) {
+        this.mustCreateNewAttribute = mustCreateNewAttribute;
+    }
+
+    public Boolean getBroadcastableAttribute() {
+        return broadcastableAttribute;
+    }
+
+    public void setBroadcastableAttribute(Boolean broadcastableAttribute) {
+        this.broadcastableAttribute = broadcastableAttribute;
+    }
+
+    public String getExtraData() {
+        return extraData;
+    }
+
+    public void setExtraData(String extraData) {
+        this.extraData = extraData;
     }
 
     public JSONObject toJSON(){

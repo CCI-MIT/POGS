@@ -84,13 +84,16 @@ class PogsPlugin {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
     saveCompletedTaskAttribute(attributeName, stringValue, floatValue, intValue,
-                                          loggable) {
+                                          loggable, extraData) {
         var messageContent = {
             attributeName: attributeName,
             attributeStringValue: stringValue,
             attributeDoubleValue: floatValue,
             attributeIntegerValue: intValue,
-            loggableAttribute: loggable
+            loggableAttribute: loggable,
+            mustCreateNewAttribute: false,
+            broadcastableAttribute: true,
+            extraData: extraData
         };
 
         this.pogsRef.sendMessage("/pogsapp/task.saveAttribute", "TASK_ATTRIBUTE", messageContent,

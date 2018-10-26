@@ -36,7 +36,7 @@ public class WorkspaceTaskWSController {
     private SubjectDao subjectDao;
 
     @MessageMapping("/task.saveAttribute")
-    public void getLoggableAttribute(@Payload TaskAttributeMessage taskAttributeMessage) {
+    public void saveTaskAttribute(@Payload TaskAttributeMessage taskAttributeMessage) {
         if(taskAttributeMessage.getType().equals(PogsMessage.MessageType.TASK_ATTRIBUTE)) {
             String externalId = taskAttributeMessage.getSender();
             Long completedTaskId = Long.parseLong(taskAttributeMessage.getCompletedTaskId());
@@ -55,7 +55,9 @@ public class WorkspaceTaskWSController {
                             taskAttributeMessage.getAttributeStringValue(),
                             taskAttributeMessage.getAttributeDoubleValue(),
                             taskAttributeMessage.getAttributeIntegerValue(),
-                            Long.parseLong(taskAttributeMessage.getCompletedTaskId())
+                            Long.parseLong(taskAttributeMessage.getCompletedTaskId()),
+                            taskAttributeMessage.getExtraData(),
+                            taskAttributeMessage.getMustCreateNewAttribute()
                     );
                     Subject sender = subjectDao.getByExternalId(taskAttributeMessage.getSender());
                     if (sender != null) {
@@ -77,8 +79,9 @@ public class WorkspaceTaskWSController {
 
             }
 
-
-            messagingTemplate.convertAndSend("/topic/public/task/"+completedTaskId + "/work", taskAttributeMessage);
+            if(taskAttributeMessage.getBroadcastableAttribute()) {
+                messagingTemplate.convertAndSend("/topic/public/task/" + completedTaskId + "/work", taskAttributeMessage);
+            }
         }
     }
 }

@@ -24,9 +24,9 @@
                             <th> Task </th>
                             <th:block th:each="teamWrapper : ${teamWrappers}">
                                 <th th:if="${showSubjectName}">
-                                    <span th:each="subj : ${teamWrappers.subjects}" th:text="${subj.subjectDisplayName}" th:class="${subj.subjectExternalId + '_color badge'}"></span>
+                                    <span th:each="subj : ${teamWrapper.subjects}" th:text="${subj.subjectDisplayName}" th:class="${subj.subjectExternalId + '_color badge'}"></span>
                                 </th>
-                                <th th:if="${ not showSubjectName}" th:id="${teamWrapper.team.id + '_team'}" th:text="${'#' + teamWrapper.team.id}"></th>
+                                <th th:if="${ not showSubjectName}" th:id="${teamWrapper.team.id + '_team'}"></th>
                             </th:block>
                         </tr>
                     </thead>

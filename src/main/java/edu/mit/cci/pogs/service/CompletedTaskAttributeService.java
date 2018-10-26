@@ -13,16 +13,17 @@ public class CompletedTaskAttributeService {
     private CompletedTaskAttributeDao completedTaskAttributeDao;
 
     public void createOrUpdate(String attributeName, String stringValue, Double doubleValue,
-                               Long integerValue, Long completedTaskId) {
+                               Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute) {
 
         CompletedTaskAttribute cta = completedTaskAttributeDao
                 .getByAttributeNameCompletedTaskId(attributeName, completedTaskId);
-        if(cta == null) {
+        if(cta == null || mustCreateNewAttribute) {
             cta = new CompletedTaskAttribute();
             cta.setAttributeName(attributeName);
             cta.setCompletedTaskId(completedTaskId);
         }
 
+        cta.setExtraData(extraData);
         cta.setStringValue(stringValue);
         cta.setDoubleValue(doubleValue);
         cta.setIntegerValue(integerValue);
