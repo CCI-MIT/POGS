@@ -31,7 +31,7 @@ public class ApplicationStartup {
         File file = null;
         try {
             file = resource.getFile();
-
+            System.out.println("Plugin dir: " + file.getAbsoluteFile().getAbsolutePath());
         } catch (IOException e) {
             String pathToPlugins = env.getProperty("plugin.dir");
             System.out.println("Plugin dir: " + pathToPlugins);
