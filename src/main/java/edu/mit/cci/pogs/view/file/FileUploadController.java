@@ -34,10 +34,17 @@ public class FileUploadController {
     @Autowired
     private FileEntryDao fileEntryDao;
 
+    @Autowired
+    private Environment env;
+
     private ImageResponse uploadImage(MultipartFile file, HttpServletRequest request) {
 
         try {
-            String path = request.getSession().getServletContext().getRealPath("/");
+
+            String path = env.getProperty("images.dir");
+            if (path == null) {
+                path = request.getSession().getServletContext().getRealPath("/");
+            }
 
             byte[] bytes = file.getBytes();
 
@@ -51,7 +58,7 @@ public class FileUploadController {
 
             fileEntry = fileEntryDao.create(fileEntry);
 
-            String finalPath = path + "../fileEntries/" + File.separator;
+            String finalPath = path + "/fileEntries/" + File.separator;
             File folder = new File(finalPath);
             if (!folder.exists()) {
                 folder.mkdirs();
@@ -92,8 +99,12 @@ public class FileUploadController {
                            @PathVariable long fileEntryId)
             throws IOException {
 
-        String path = request.getSession().getServletContext().getRealPath("/");
-        String finalPath = path + "../fileEntries/" + File.separator;
+        String path = env.getProperty("images.dir");
+        if (path == null) {
+            path = request.getSession().getServletContext().getRealPath("/");
+        }
+        
+        String finalPath = path + "/fileEntries" + File.separator;
 
         FileEntry fileEntry = fileEntryDao.get(fileEntryId);
 

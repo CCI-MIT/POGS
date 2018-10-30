@@ -398,7 +398,7 @@
                         ['insert', ['picture','link','video','table','codeview']]
                       ],
                       callbacks: {
-                          onImageUpload: function(files,editorRef) {
+                          onImageUpload: function(files) {
                         console.log("Send file called success override: " + this);
                         for(let i=0; i < files.length; i++) {
                             sendFile(files[0],this);
