@@ -34,6 +34,7 @@ public class ApplicationStartup {
 
         } catch (IOException e) {
             String pathToPlugins = env.getProperty("plugin.dir");
+            System.out.println("Plugin dir: " + pathToPlugins);
             file = new File(pathToPlugins);
         }
         String[] plugins = file.list();

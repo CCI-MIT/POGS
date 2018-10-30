@@ -103,7 +103,7 @@ public class FileUploadController {
         if (path == null) {
             path = request.getSession().getServletContext().getRealPath("/");
         }
-        
+
         String finalPath = path + "/fileEntries" + File.separator;
 
         FileEntry fileEntry = fileEntryDao.get(fileEntryId);
