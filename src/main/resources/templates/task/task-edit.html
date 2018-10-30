@@ -322,9 +322,33 @@
                         ['fontsize', ['fontsize']],
                         ['color', ['color']],
                         ['insert', ['picture','link','video','table','codeview']]
-                      ]
+                      ],
+                        onImageUpload: function(files) {
+                            for(let i=0; i < files.length; i++) {
+                                sendFile(files[i],this);
+                            }
+
+                        }
+
                     }
                 );
+
+                function sendFile(file,editor) {
+                                    data = new FormData();
+                                    data.append("file", file);
+                                    $.ajax({
+                                        data: data,
+                                        type: "POST",
+                                        url: "/image/upload",
+                                        cache: false,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function(url) {
+                                                editor.insertImage('insertImage', url);
+                                        }
+                                    });
+                }
+
                 $('#researchGroups')
                     .bootstrapDualListbox({
                                               selectedListLabel: "Chosen groups",

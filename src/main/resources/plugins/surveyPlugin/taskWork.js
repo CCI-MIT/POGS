@@ -3,11 +3,14 @@ const SURVEY_CONST = {
     INPUT_FIELD: "InputField",
     RADIO_FIELD: "RadioField",
     SELECT_FIELD: "SelectField",
+    CHECKBOX_FIELD: "CheckBoxField",
     CHECKBOX_FIELD_SELECT: "checkboxSelect",
     CHECKBOX_FIELD_UNSELECT: "checkboxSelect",
 };
 const SURVEY_TRANSIENT = {
-    CLICK_RADIO_NOT_LOG : "clickInRadio"
+    CLICK_RADIO_NOT_LOG : "clickInRadio",
+    FOCUS_IN_CELL: "focusInCell",
+    CLICK_CHECKBOX_NOT_LOG : "clickInCheckbox"
 }
 const SURVEY_FIELDS = {
     TEXT_FIELD : "text",
@@ -65,26 +68,26 @@ class InputField extends Field {
         $('#surveyForm').append(str);
     }
     setupHooks(){
-        $('#question'+this.index).on('focusin', this.handleTextOnClick.bind(this));
-        $('#question'+this.index).on('focusout', this.handleTextOnBlur.bind(this));
+        $('#answer'+this.index + '').on('focusin', this.handleTextOnClick.bind(this));
+        $('#answer'+this.index + '').on('change', this.handleTextOnBlur.bind(this));
     }
     handleTextOnClick(event){
         var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         if(!isNaN(cellIndex)) {
-            this.getPogsPlugin().saveCompletedTaskAttribute('focusInCell'+this.index,
+            this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_TRANSIENT.FOCUS_IN_CELL+this.index,
                                                        "", 0.0,
                                                        cellIndex, false);
         }
     }
     handleTextOnBlur(event){
         var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        console.log("cell reference " + cellIndex);
+        //console.log("cell reference " + cellIndex);
         if(!isNaN(cellIndex)) {
-            console.log($(event.target))
+           // console.log($(event.target))
             var valueTyped = $(event.target).val().replace(/\r?\n?/g, '').trim();
-            console.log(valueTyped);
+           // console.log(valueTyped);
             if(valueTyped != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME, + cellIndex,
+                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                            valueTyped, 0.0,
                                                            0, true, SURVEY_CONST.INPUT_FIELD);
             }
@@ -93,7 +96,7 @@ class InputField extends Field {
     broadcastReceived(message){
         let attrName = message.content.attributeName;
 
-        if ((attrName.indexOf("focusInCell")> -1)) {
+        if ((attrName.indexOf(SURVEY_TRANSIENT.FOCUS_IN_CELL)> -1)) {
             // handle on focus - add class for bg change
             var cell = message.content.attributeIntegerValue;
             if($("#answer" + cell).attr('type') == "text" && !($("#answer" + cell).is( ":focus" ))){ // sync text field when selected
@@ -149,11 +152,11 @@ class RadioField extends Field {
         $('#surveyForm').append(str);
     }
     setupHooks(){
-        $('answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
+        $('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
     }
     handleRadioOnClick(event){
-        var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        console.log("answer " + cellIndex);
+        let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
+        //console.log("answer " + cellIndex);
         if(!isNaN(cellIndex)) {
             // console.log($(event.target))
             var valueTyped = $(event.target).attr('value'); // value of radio button
@@ -177,9 +180,9 @@ class RadioField extends Field {
 class RadioTableField extends Field {
     constructor(surveyRefence,jsoninfo){
         super(surveyRefence,jsoninfo);
-        console.log("RadioTableField - Constructor");
+        //console.log("RadioTableField - Constructor");
         this.index = this.registerListenerAndGetFieldId(this);
-        console.log("RadioTableField index field " + this.index);
+        //console.log("RadioTableField index field " + this.index);
         this.setupHTML();
         this.setupHooks();
     }
@@ -228,13 +231,13 @@ class RadioTableField extends Field {
         //console.log('#answer'+this.index+' input');
 
         $('#answer'+this.index+' input').on('focusin', this.handleFocusIn.bind(this));
-        $('#answer'+this.index+' input').on('focusout', this.handleFocusOut.bind(this));
+        $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
     }
     handleFocusIn(event){
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         let subIndex = parseInt($(event.target).data( "cell-reference-subindex"));
 
-        console.log("Sending clickInRadio handleFocusIn subIndex: " + subIndex);
+        //console.log("Sending clickInRadio handleFocusIn subIndex: " + subIndex);
 
         //sends the click to all but does not save in the database. Save all values on focus out.
         if(!isNaN(subIndex)) {
@@ -248,7 +251,7 @@ class RadioTableField extends Field {
 
         let subIndex = parseInt($(event.target).data( "cell-reference-subindex"));
 
-        console.log("Sending all answers handleFocusOut subindex: " + subIndex);
+        //console.log("Sending all answers handleFocusOut subindex: " + subIndex);
 
         let answer = [];
         let answerz = $('#answer'+this.index+' input');
@@ -283,27 +286,27 @@ class RadioTableField extends Field {
             // handle on focus - add class for bg change
 
             let cell = parseInt(message.content.attributeIntegerValue);
-            console.log("Click In Radio received: " + cell);
-            console.log("This index value: " + this.index);
+            //console.log("Click In Radio received: " + cell);
+            //console.log("This index value: " + this.index);
 
             let allInputs = $('#answer'+this.index+' input');
             for(let k = 0 ; k < allInputs.length; k++){
-                console.log("Data field for input: " + $(allInputs[k]).data( "cell-reference-subindex"))
+                //console.log("Data field for input: " + $(allInputs[k]).data( "cell-reference-subindex"))
                 if(parseInt($(allInputs[k]).data( "cell-reference-subindex")) == cell){
                     $(allInputs[k]).prop("checked", true);
                 }
             }
 
         }else {
-            let anwsers = message.content.attributeStringValue;
+            let anwsers = JSON.parse(message.content.attributeStringValue);
 
-            console.log("Save attribute received " + attrName)
-            console.log("This.index " + this.index)
-            console.log(anwsers);
+            //console.log("Save attribute received " + attrName)
+            //console.log("This.index " + this.index)
+            //console.log(anwsers);
 
             let allInputs = $('#answer'+this.index+' input');
             for(let k = 0 ; k < allInputs.length; k++){
-                if($(allInputs[k]).data( "cell-reference-subindex") == anwsers[k]){
+                if($(allInputs[k]).val() == anwsers[k]){
                     $(allInputs[k]).prop("checked", true);
                 }
             }
@@ -335,14 +338,14 @@ class SelectField extends Field {
         $('#surveyForm').append(str);
     }
     setupHooks(){
-        $("#surveyForm select").each(function() {
-            $(this).on('change', this.handleSelectOnChange.bind(this));
-        });
+        $("#answer"+this.index).on('change', this.handleSelectOnChange.bind(this))
     }
     handleSelectOnChange(event) {
-        var target = $(event.target);
-        var cellIndex = parseInt(target.data( "cell-reference-index"));
-        var option = target.val();
+        let target = $(event.target);
+
+        let cellIndex = parseInt(target.data( "cell-reference-index"));
+        //console.log("Select change + " + cellIndex);
+        let option = target.val();
         if(!isNaN(cellIndex) && option != null) {
             this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                        option, 0.0,
@@ -366,6 +369,7 @@ class SelectField extends Field {
 class CheckboxField extends Field {
     constructor(surveyRefence,jsoninfo){
         super(surveyRefence,jsoninfo);
+        this.index = this.registerListenerAndGetFieldId(this);
         this.setupHTML();
         this.setupHooks()
     }
@@ -382,30 +386,51 @@ class CheckboxField extends Field {
         $.each(this.jsonInfo.value, function(j, choice){
             str += '<div class="form-check form-inline row">'
             str += '<label class="form-check-label text-dark">'
-            str += '<input type="checkbox" class="form-check-input" name="answer'+this.index+'" value="'+choice+'" data-cell-reference-index="'+this.index+'">' + choice
+            str += '<input type="checkbox" class="form-check-input" name="answer'+this.index+'" value="'+choice+'" data-cell-reference-index="'+this.index+'" data-cell-reference-subindex="'+j+'">' + choice
             str += '</label> </div>'
-        });
+        }.bind(this));
         str += '</div></div> <br>'
         $('#surveyForm').append(str);
     }
     setupHooks(){
-        $('#answer'+this.index+' input').on('change',this.handleCheckboxOnClick.bind(this));
+        //$('#answer'+this.index+' input').on('change',this.handleCheckboxOnClick.bind(this));
+        $('#answer'+this.index+' input').on('click', this.handleFocusIn.bind(this));
+        $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
     }
-    handleCheckboxOnClick(event) {
-        console.log("checkbox clicked");
+    handleFocusIn(event) {
+        //console.log("checkbox clicked");
         let target = $(event.target);
-        let questionIndex = parseInt(target.data( "cell-reference-index"));
+        let questionIndex = parseInt(target.data("cell-reference-index"));
+        let subIndex = parseInt(target.data( "cell-reference-subindex"));
         let option = target.val();
         if(!isNaN(questionIndex) && option != null) {
-            if(target.is(":checked")) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + questionIndex,
-                                                           option, 0.0,
-                                                           0, true, SURVEY_CONST.CHECKBOX_FIELD_SELECT);
+            //console.log("sending check clicked: " + subIndex);
+            this.getPogsPlugin().saveCompletedTaskAttribute((SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG +""+ questionIndex),
+                                                            subIndex, 0.0,
+                                                       0, false,target.is(":checked") );
+            //this is because the value is not yet set in the item when event is called, so the opposite will be real value
+        }
+    }
+    handleFocusOut(event){
+        // get all data from all inputs and compose final answer.
+        let answer = [];
+        let answerz = $('#answer'+this.index+' input');
+        let target = $(event.target);
+        let cellIndex = parseInt(target.data("cell-reference-index"));
+        for(let i = 0; i < answerz.length; i ++) {
+            if($(answerz[i]).is(':checked')) {
+                answer.push($(answerz[i]).val());
+            } else {
+                answer.push("");
             }
-            else {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.CHECKBOX_FIELD_UNSELECT + questionIndex,
-                                                           option, 0.0,
-                                                           0, false);
+        }
+        //console.log("sending check answer: " + cellIndex);
+        if(!isNaN(cellIndex)) {
+            // console.log($(event.target))
+            if(answer != null) {
+                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                                                                JSON.stringify(answer), 0.0,
+                                                                0, true, SURVEY_CONST.CHECKBOX_FIELD);
             }
         }
     }
@@ -413,14 +438,30 @@ class CheckboxField extends Field {
         let attrName = message.content.attributeName;
 
         if(attrName.indexOf(SURVEY_CONST.FIELD_NAME ) != -1) {
-            var question_number = attrName.replace(SURVEY_CONST.FIELD_NAME , "");
-            $("#answer" + question_number).find("input[value='"+message.content.attributeStringValue+"']")
-                .prop("checked", true);
+            let fieldAnswers = JSON.parse(message.content.attributeStringValue);
+            //console.log("Received checkbox answer: " + attrName);
+            let answerz = $('#answer'+this.index+' input');
+            for(let i= 0; i < fieldAnswers.length; i++){
+                //console.log("Answer: " + fieldAnswers[i]);
+                if(fieldAnswers[i] == ""){
+                    $(answerz[i]).prop("checked", false);
+                }else{
+                    $(answerz[i]).prop("checked", true);
+                }
+
+            }
         }
-        if(attrName.indexOf(SURVEY_CONST.CHECKBOX_FIELD_UNSELECT) != -1) {
-            var question_number = attrName.replace(SURVEY_CONST.CHECKBOX_FIELD_UNSELECT, "");
-            $("#answer" + question_number).find("input[value='"+message.content.attributeStringValue+"']")
-                .prop("checked", false);
+        if(attrName.indexOf(SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG) != -1) {
+            let subIndex = parseInt(message.content.attributeStringValue);
+            let checkedOfNot = (message.content.extraData === 'true');
+            //console.log("Received check click : " + subIndex + " - " + checkedOfNot)
+            let answerz = $('#answer'+this.index+' input');
+            for(let i= 0; i < answerz.length; i++){
+                let targ = $(answerz[i]);
+                if(parseInt(targ.data( "cell-reference-subindex")) == subIndex){
+                    targ.prop("checked", checkedOfNot);
+                }
+            }
         }
     }
 }
@@ -531,13 +572,13 @@ class Survey {
     registerListenerAndGetFieldId(fieldImpl){
 
         let field = this.globalFieldIndex;
-        console.log("Field: --------" + this.globalFieldIndex);
+        //console.log("Field: --------" + this.globalFieldIndex);
         this.fields[field] = fieldImpl;
         this.globalFieldIndex = this.globalFieldIndex + 1;
         return field;
     }
     setupSurvey(surveyBluePrint){
-    console.log("starting survey setup...");
+    console.info("starting survey setup...");
         /*
             JSON format
             [
@@ -566,9 +607,9 @@ class Survey {
 
         var str = '';
         $.each(surveyValues,function(i,e){
-            console.log("Before method: " + e)
+
             e = this.resolveVariablesForNetworkQuestions(e);
-            console.log(e.type);
+
             if(e.type == "text"){ // setup text question
                 this.fields.push(new InputField(this,e));
             }
@@ -587,7 +628,7 @@ class Survey {
                 this.fields.push(new RadioTableField(this,e));
             }
 
-            console.log(i + '----'+ JSON.stringify(e));
+            //console.log(i + '----'+ JSON.stringify(e));
         }.bind(this));
 
     }
@@ -596,7 +637,9 @@ class Survey {
         let attrName = message.content.attributeName;
         let index = attrName
             .replace(SURVEY_CONST.FIELD_NAME, "")
-            .replace(SURVEY_TRANSIENT.CLICK_RADIO_NOT_LOG,"");
+            .replace(SURVEY_TRANSIENT.CLICK_RADIO_NOT_LOG,"")
+            .replace(SURVEY_TRANSIENT.FOCUS_IN_CELL,"")
+            .replace(SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG,"");
 
         if(this.fields.length > index) {
             if(message.sender != this.pogsPlugin.subjectId) {
@@ -609,7 +652,7 @@ class Survey {
 
 var surveyPlugin = pogs.createPlugin('surveyTaskPlugin',function(){
 
-    console.log("Survey Plugin Loaded");
+    console.info("Survey Plugin Loaded");
 
     var survey = new Survey(this);
     // get config attributes from task plugin
