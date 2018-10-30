@@ -323,31 +323,32 @@
                         ['color', ['color']],
                         ['insert', ['picture','link','video','table','codeview']]
                       ],
-                        onImageUpload: function(files) {
-                            for(let i=0; i < files.length; i++) {
-                                sendFile(files[i],this);
+                         callbacks: {
+                             onImageUpload: function(files,editorRef) {
+                           console.log("Send file called success override: " + this);
+                           for(let i=0; i < files.length; i++) {
+                               sendFile(files[0],this);
                             }
-
                         }
-
                     }
                 );
 
-                function sendFile(file,editor) {
-                                    data = new FormData();
-                                    data.append("file", file);
-                                    $.ajax({
-                                        data: data,
-                                        type: "POST",
-                                        url: "/image/upload",
-                                        cache: false,
-                                        contentType: false,
-                                        processData: false,
-                                        success: function(url) {
-                                                editor.insertImage('insertImage', url);
-                                        }
-                                    });
-                }
+               function sendFile(file,editor) {
+                                   console.log("Send file method");
+                                   data = new FormData();
+                                   data.append("file", file);
+                                   $.ajax({
+                                       data: data,
+                                       type: "POST",
+                                       url: "/images/upload?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+                                       cache: false,
+                                       contentType: false,
+                                       processData: false,
+                                       success: function(url) {
+                                               $(editor).summernote('insertImage', url);
+                                       }
+                                   });
+                               }
 
                 $('#researchGroups')
                     .bootstrapDualListbox({
