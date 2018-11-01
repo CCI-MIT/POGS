@@ -539,7 +539,7 @@ class Survey {
         if(!surveyItem.value){
             return surveyItem;
         }
-        
+
         if (surveyItem.value.constructor === Array) {
             console.log("value is array");
             if (surveyItem.value !== undefined && surveyItem.value.length > 0) {

@@ -15,12 +15,20 @@ public class CompletedTaskAttributeService {
     public void createOrUpdate(String attributeName, String stringValue, Double doubleValue,
                                Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute) {
 
-        CompletedTaskAttribute cta = completedTaskAttributeDao
-                .getByAttributeNameCompletedTaskId(attributeName, completedTaskId);
-        if(cta == null || mustCreateNewAttribute) {
+        CompletedTaskAttribute cta;
+        if(mustCreateNewAttribute){
             cta = new CompletedTaskAttribute();
             cta.setAttributeName(attributeName);
             cta.setCompletedTaskId(completedTaskId);
+        }
+        else {
+            cta = completedTaskAttributeDao
+                    .getByAttributeNameCompletedTaskId(attributeName, completedTaskId);
+            if (cta == null) {
+                cta = new CompletedTaskAttribute();
+                cta.setAttributeName(attributeName);
+                cta.setCompletedTaskId(completedTaskId);
+            }
         }
 
         cta.setExtraData(extraData);
