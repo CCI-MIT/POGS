@@ -84,6 +84,10 @@ public class TaskService {
         tk.setSubjectCommunicationId(value.getSubjectCommunicationId());
         tk.setChatScriptId(value.getChatScriptId());
         tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
+        tk.setShouldScore(value.getShouldScore());
+        if(tk.getShouldScore()==null){
+            tk.setShouldScore(false);
+        }
         if(tk.getInteractionTime()==null){
             tk.setInteractionTime(0);
         }

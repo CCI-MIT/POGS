@@ -28,13 +28,12 @@ public class ApplicationStartup {
     @PostConstruct
     public void afterPropertiesSet() throws Exception {
         Resource resource = new ClassPathResource("plugins");
-        File file = null;
+        File file;
         try {
             file = resource.getFile();
-            System.out.println("Plugin dir: " + file.getAbsoluteFile().getAbsolutePath());
         } catch (IOException e) {
             String pathToPlugins = env.getProperty("plugin.dir");
-            System.out.println("Plugin dir: " + pathToPlugins);
+
             file = new File(pathToPlugins);
         }
         String[] plugins = file.list();

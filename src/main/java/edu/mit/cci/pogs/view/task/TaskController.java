@@ -108,6 +108,7 @@ public class TaskController {
     @GetMapping("/create")
     public String createTask(Model model) {
         TaskBean tb = new TaskBean();
+        tb.setShouldScore(false);
 
         tb.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());

@@ -535,21 +535,25 @@ class Survey {
                         surveyItem.question.replace( new RegExp( allVariables[i] ,'gi'), replacer);
                 }
             }
-        } else {
-
+        }
+        if(!surveyItem.value){
+            return surveyItem;
+        }
+        
+        if (surveyItem.value.constructor === Array) {
+            console.log("value is array");
             if (surveyItem.value !== undefined && surveyItem.value.length > 0) {
                 for (var i = 0; i < surveyItem.value.length; i++) {
 
+                    if (surveyItem.value[i].match(new RegExp(regex, 'gi'))) {
 
-                    if (surveyItem.value[i].match(new RegExp(regex,'gi'))) {
-
-                        for(var j = 0; j < allVariables.length; j++) {
+                        for (var j = 0; j < allVariables.length; j++) {
                             if (surveyItem.value[i].match(new RegExp(allVariables[j], 'gi'))) {
 
                                 if (replacements[i].constructor === Array) {
                                     surveyItem.value = [];
 
-                                    for(var k =0 ; k < replacements[j].length; k ++){
+                                    for (var k = 0; k < replacements[j].length; k++) {
                                         surveyItem.value.push(replacements[j][k]);
                                     }
                                     return surveyItem;
@@ -557,6 +561,58 @@ class Survey {
                                     surveyItem.value[i] =
                                         surveyItem.value.replace(new RegExp(allVariables[j], 'gi'),
                                                                  replacements[j]);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        } else {
+
+            if (surveyItem.value.constructor === Object) {
+                console.log("value is object");
+                for (let i = 0; i < surveyItem.value.columns.length; i++) {
+
+                    if (surveyItem.value.columns[i].match(new RegExp(regex, 'gi'))) {
+
+                        for (let j = 0; j < allVariables.length; j++) {
+                            if (surveyItem.value.columns[i].match(new RegExp(allVariables[j], 'gi'))) {
+
+                                if (replacements[i].constructor === Array) {
+                                    surveyItem.value.columns = [];
+
+                                    for (let k = 0; k < replacements[j].length; k++) {
+                                        surveyItem.value.columns.push(replacements[j][k]);
+                                    }
+                                    return surveyItem;
+                                } else {
+                                    surveyItem.value.columns[i] =
+                                        surveyItem.value.columns.replace(new RegExp(allVariables[j], 'gi'),
+                                                                 replacements[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+                for (let i = 0; i < surveyItem.value.rows.length; i++) {
+
+                    if (surveyItem.value.rows[i].match(new RegExp(regex, 'gi'))) {
+
+                        for (let j = 0; j < allVariables.length; j++) {
+                            if (surveyItem.value.rows[i].match(new RegExp(allVariables[j], 'gi'))) {
+
+                                if (replacements[i].constructor === Array) {
+                                    surveyItem.value.rows = [];
+
+                                    for (let k = 0; k < replacements[j].length; k++) {
+                                        surveyItem.value.rows.push(replacements[j][k]);
+                                    }
+                                    return surveyItem;
+                                } else {
+                                    surveyItem.value.rows[i] =
+                                        surveyItem.value.rows.replace(new RegExp(allVariables[j], 'gi'),
+                                                                         replacements[j]);
                                 }
                             }
                         }
@@ -607,7 +663,7 @@ class Survey {
 
         var str = '';
         $.each(surveyValues,function(i,e){
-
+            console.log(e);
             e = this.resolveVariablesForNetworkQuestions(e);
 
             if(e.type == "text"){ // setup text question

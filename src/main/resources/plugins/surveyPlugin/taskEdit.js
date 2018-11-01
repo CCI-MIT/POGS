@@ -103,11 +103,11 @@ class SurveyTaskEdit {
             str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
         }
 
-        str += '<div id="answer'+question_number+'"><table class="flex-table"><thead><th></th>'
+        str += '<div id="answer'+question_number+'" class="table-container"><table class="flex-table"><thead><th></th>'
         //add button and choices field
         $.each(choices.columns,function(i){
 
-            str += '<th><input type="text" class="mandatory" value="'+choices.columns[i]+'"></th>';
+            str += '<th><button type="button" class="btn btn-danger btn-sm remove-radio-column" data-col-index="'+i+'"> X </button><input type="text" class="mandatory" value="'+choices.columns[i]+'"></th>';
         });
         str += '<th class="btn_column"><button type="button" class="btn btn-secondary btn-sm add-column-choice'+question_number+'" id="addColumnChoice'+question_number+'">+</button></th>'
         str += '</thead>';
@@ -115,16 +115,16 @@ class SurveyTaskEdit {
 
         $.each(choices.rows,function(i){
             str += '<tr>'
-                   + '<th class="row-header"><input type="text" class="mandatory" value="'+choices.rows[i]+'"></th>';
+                   + '<th class="row-header"><button type="button" class="btn btn-danger btn-sm remove-radio-row"> X </button><input type="text" style="width:110px" class="mandatory" value="'+choices.rows[i]+'"></th>';
 
             for(let j =0 ; j < choices.columns.length; j ++) {
                 str += '<td>';
-                str += '<input type= "radio" class="col-sm-1" name="answer' + question_number + '_'+ i +'" value="'+choices.columns[j]+'">';
+                str += '<input type= "radio" class="" name="answer' + question_number + '_'+ j +'" value="'+choices.columns[j]+'">' ;
                 str += '</td>';
             }
             str +=  '</tr>';
         }.bind(this));
-        str+= '<tr class="btn_row"><td colspan="'+choices.columns.length+'"><button type="button" class="btn btn-secondary btn-sm add-row-choice'+question_number+'" id="addRowChoice'+question_number+'">+</button></td>'
+        str+= '<tr class="btn_row"><td style="text-align: left" colspan="'+choices.columns.length+'"><button type="button" class="btn btn-secondary btn-sm add-row-choice'+question_number+'" id="addRowChoice'+question_number+'">+</button></td>'
 
         str += '</tbody></table><small id="" class="form-text text-muted">If it applies provide the right answer by clicking in the right radio button field</small>';
         str += '</div> '
@@ -137,19 +137,28 @@ class SurveyTaskEdit {
                columns.push(input.value);
             });
             let questionNum = $(this).attr('id').match(/\d+/);
-            let newColTH = '<th><input type="text" value="col '+(columns.length +1)+'"/></th>';
+            let newColTH = '<th><button type="button" class="btn btn-danger btn-sm remove-radio-column" data-col-index="'+(columns.length)+'"> X </button><input type="text" value="col '+(columns.length +1)+'"/></th>';
             $(newColTH).insertBefore("#answer"+questionNum + ' .btn_column');
+
             $("#answer"+questionNum + ' tbody tr').each(function(i){
                 if(!$(this).hasClass("btn_row")) {
                     $(this).append(
-                        '<td><input class="col-sm-1" type="radio"  '
-                        + 'name="answer'+questionNum+'_'+i+'" value="col '+(columns.length+1)+'"></td>')
+                        '<td><input class="" type="radio"  '
+                        + 'name="answer'+questionNum+'_'+(columns.length)+'" value="col '+(columns.length+1)+'"></td>');
+
                 }
             });
 
-            // $(".remove-radio-choice").click(function () {
-            //     ($(this).parent()).remove();
-            // });
+            $(".remove-radio-column").unbind().click(function () { //setup removeRadio Button
+                let colIndex = $(this).data("col-index");
+                ($(this).parent()).remove();//remove its th
+                $("#answer"+question_number+" input[type=radio]").each(function(i,k){
+                    if($(k).attr("name") == "answer"+question_number+"_"+colIndex ) {
+                        $($(k).parent()).remove();
+                    }
+                });
+
+            });
         });
 
         $(".add-row-choice" + question_number).click(function () { //setup addRadioChoice Button
@@ -160,24 +169,34 @@ class SurveyTaskEdit {
                 columns.push(input.value);
             });
 
-            let newTR = "<tr><th><input type='text' value='row "+(num_of_rows+1)+"'/> </th>";
+            let newTR = "<tr><th><button type='button' class='btn btn-danger btn-sm remove-radio-row' > X </button><input type='text' style='width:110px' value='row "+(num_of_rows+1)+"'/> </th>";
 
             for(let i = 0; i < columns.length; i++){
-                newTR+= '<td><input type="radio" name="answer'+questionNum+'_'+num_of_rows+'" value="'+(columns[i])+'"/></td>';
+                newTR+= '<td><input type="radio" name="answer'+questionNum+'_'+i+'" value="'+(columns[i])+'"/></td>';
             }
             newTR += "</tr>";
 
             $(newTR).insertBefore("#answer"+questionNum + ' .btn_row ');
 
 
-            // $(".remove-radio-choice").click(function () {
-            //     ($(this).parent()).remove();
-            // });
+            $(".remove-radio-row").unbind().click(function () { //setup removeRadio Button
+                $(($(this).parent())).parent().remove();
+            });
         });
 
 
-        $(".remove-radio-choice").click(function () { //setup removeRadio Button
-            ($(this).parent()).remove();
+        $(".remove-radio-column").click(function () { //setup removeRadio Button
+            let colIndex = $(this).data("col-index");
+            ($(this).parent()).remove();//remove its th
+            $("#answer"+question_number+" input[type=radio]").each(function(i,k){
+                if($(k).attr("name") == "answer"+question_number+"_"+colIndex ) {
+                    $($(k).parent()).remove();
+                }
+            });
+
+        });
+        $(".remove-radio-row").click(function () { //setup removeRadio Button
+            $(($(this).parent())).parent().remove();
         });
 
         $("#removeQuestion"+question_number).click(function () { //setup removeQuestion Button
@@ -495,16 +514,26 @@ class SurveyTaskEdit {
                 }
                 this.addRadioTableQuestion(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value);
                 console.log("bluePrint[i].value.columns.length : " + bluePrint[i].value.columns.length)
-                for(let k = 0 ; k < answerSheet[i].length; k++) {
-                    if(answerSheet[i][k]!= "") {
-                        let row = Math.floor((k) / bluePrint[i].value.columns.length);
-                        let inputs = $('#question_set' + question_number + ' tbody tr:nth-child('+(row + 1)+') input[type="radio"]');
-                        console.log('#question_set' + question_number + ' tbody tr:nth-child('+(row + 1)+') input[type="radio"]');
-                        console.log("inputs.length: " + inputs.length);
-                        for (let j = 0; j < inputs.length; j++) {
-                            console.log("$(inputs[j]).val() : " + $(inputs[j]).val() +" - answerSheet[i][k]" + answerSheet[i][k]);
-                            if($(inputs[j]).val() == answerSheet[i][k]){
-                                $(inputs[j]).prop("checked", true);
+                console.log(answerSheet[i] + "answerSheet[i]");
+                if(answerSheet[i]) {
+                    console.log(answerSheet[i]);
+                    for (let k = 0; k < answerSheet[i].length; k++) {
+                        console.log(answerSheet[i][k]);
+                        if (answerSheet[i][k] != "") {
+                            let row = Math.floor((k) / bluePrint[i].value.columns.length);
+                            let inputs = $(
+                                '#question_set' + question_number + ' tbody tr:nth-child(' + (row
+                                + 1) + ') input[type="radio"]');
+                            console.log(
+                                '#question_set' + question_number + ' tbody tr:nth-child(' + (row
+                                + 1) + ') input[type="radio"]');
+                            console.log("inputs.length: " + inputs.length);
+                            for (let j = 0; j < inputs.length; j++) {
+                                console.log("$(inputs[j]).val() : " + $(inputs[j]).val()
+                                            + " - answerSheet[i][k]" + answerSheet[i][k]);
+                                if ($(inputs[j]).val() == answerSheet[i][k]) {
+                                    $(inputs[j]).prop("checked", true);
+                                }
                             }
                         }
                     }
@@ -604,8 +633,10 @@ class SurveyTaskEdit {
                         answer.push("");
                     }
                 }
-
                 answerSheet.push(answer);
+
+            }else if($(this).attr('data-question-type') == "introduction") {
+                answerSheet.push("");
             }
 
         });
