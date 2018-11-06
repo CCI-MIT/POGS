@@ -30,7 +30,7 @@ public class StudyDaoImpl extends AbstractDao<Study, Long, StudyRecord> implemen
 
     public List<Study> listStudiesWithUserGroup(Long userId){
 
-        final SelectQuery<Record> query = dslContext.select(STUDY.fields())
+        final SelectQuery<Record> query = dslContext.selectDistinct(STUDY.fields())
                 .from(STUDY)
                 .join(STUDY_HAS_RESEARCH_GROUP).on(STUDY_HAS_RESEARCH_GROUP.STUDY_ID.eq(STUDY.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(STUDY_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
