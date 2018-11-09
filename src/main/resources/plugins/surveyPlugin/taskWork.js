@@ -39,7 +39,7 @@ class Field {
         }
         if(message.sender != this.getPogsPlugin().getSubjectId()) {
             if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD) > -1)) {
-                setTimeout(function(){this.removeSubjectInteraction(message.sender)}.bind(this),2500);
+                this.removeSubjectInteraction(message.sender);
             }
         }
 
@@ -100,8 +100,8 @@ class Field {
         }
     }
     setupHooks(){
-        $('#surveyField_'+this.index ).on('mouseover',this.handleOnMouseOverField.bind(this))
-        $('#surveyField_'+this.index ).on('mouseout',this.handleOnMouseOutOfField.bind(this))
+        $('#surveyField_'+this.index ).on('mouseenter',this.handleOnMouseOverField.bind(this))
+        $('#surveyField_'+this.index ).on('mouseleave',this.handleOnMouseOutOfField.bind(this))
     }
 }
 

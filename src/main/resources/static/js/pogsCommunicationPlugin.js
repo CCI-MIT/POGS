@@ -414,10 +414,10 @@ class MatrixChatManager extends GroupChatManager {
     addNotification(chatName) {
         //check if there is a notification badge already
 
-        if($("#"+chatName  + " .badge").length > 0 ){
-            var totalNot = parseInt($("#"+chatName  + " .badge").text());
+        if($("#"+chatName  + " .notification").length > 0 ){
+            var totalNot = parseInt($("#"+chatName  + " .notification").text());
             totalNot ++;
-            $("#"+chatName  + " .badge").text(totalNot);
+            $("#"+chatName  + " .notification").text(totalNot);
         }else{
             $("#"+chatName).append('<span class="notification badge badge-danger">1</span>\n');
         }

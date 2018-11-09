@@ -478,7 +478,9 @@ public class WorkspaceController {
             for (SubjectCommunication sc : subjectCommunications) {
                 Subject subject = subjectDao.get(sc.getToSubjectId());
                 if (sc.getAllowed()) {
-                    allowedToTalkTo.add(subject.getSubjectExternalId());
+                    if(sc.getToSubjectId()!= sc.getFromSubjectId()) {
+                        allowedToTalkTo.add(subject.getSubjectExternalId());
+                    }
                 }
             }
         }
