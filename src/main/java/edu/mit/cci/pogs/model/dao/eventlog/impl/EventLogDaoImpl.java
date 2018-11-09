@@ -51,6 +51,11 @@ public class EventLogDaoImpl extends AbstractDao<EventLog, Long, EventLogRecord>
                 .where(EVENT_LOG.COMPLETED_TASK_ID.eq(completedTaskId))
                 .execute();
     }
- 
+
+    public List<EventLog> listLogsBySessionId(Long sessionId){
+        final SelectQuery<Record> query = dslContext.select().from(EVENT_LOG).
+                where(EVENT_LOG.SESSION_ID.eq(sessionId)).getQuery();
+        return query.fetchInto(EventLog.class);
+    }
 }
  

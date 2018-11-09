@@ -13,5 +13,7 @@ public interface EventLogDao extends Dao<EventLog, Long> {
     void deleteByCompletedTaskId(Long completedTaskId);
 
     List<EventLog> listLogsUntil(Long completedTaskId, Date date);
+
+    List<EventLog> listLogsBySessionId(Long sessionId);
 }
  
