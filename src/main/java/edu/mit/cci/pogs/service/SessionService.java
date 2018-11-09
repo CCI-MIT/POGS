@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -292,6 +293,7 @@ public class SessionService {
         }
 
         session.setStatus(SessionStatus.NOTSTARTED.getId().toString());
+        session.setSessionStartDate(new Timestamp(session.getSessionStartDate().getTime() - 1000*60*10));
         sessionDao.update(session);
 
     }

@@ -10,7 +10,9 @@ const SURVEY_CONST = {
 const SURVEY_TRANSIENT = {
     CLICK_RADIO_NOT_LOG : "clickInRadio",
     FOCUS_IN_CELL: "focusInCell",
-    CLICK_CHECKBOX_NOT_LOG : "clickInCheckbox"
+    CLICK_CHECKBOX_NOT_LOG : "clickInCheckbox",
+    MOUSE_OVER_FIELD: "mouseOverField",
+    MOUSE_OUT_OF_FIELD: "mouseOutOfField"
 }
 const SURVEY_FIELDS = {
     TEXT_FIELD : "text",
@@ -24,8 +26,23 @@ class Field {
     constructor(surveyRefence,jsoninfo){
         this.surveyRefence = surveyRefence;
         this.jsonInfo = jsoninfo;
+        this.finalAnswerSubject = null;
+
     }
     broadcastReceived(message){
+        let attrName = message.content.attributeName;
+
+        if(message.sender != this.getPogsPlugin().getSubjectId()) {
+            if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OVER_FIELD) > -1)) {
+                this.addSubjectInteraction(message.sender)
+            }
+        }
+        if(message.sender != this.getPogsPlugin().getSubjectId()) {
+            if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD) > -1)) {
+                setTimeout(function(){this.removeSubjectInteraction(message.sender)}.bind(this),2500);
+            }
+        }
+
 
     }
     getPogsPlugin(){
@@ -33,6 +50,58 @@ class Field {
     }
     registerListenerAndGetFieldId(ref){
        return this.surveyRefence.registerListenerAndGetFieldId(ref);
+    }
+    getInteractionIndicatorHTML(){
+        return '<small class="interaction-indicator form-text " style="font-size: 60%;text-align: left">Working on this field:<span class="subjectpool"></span> </small>'
+               + '<small class="finalanswer-indicator form-text " style="font-size: 60%;text-align: left">Latest answer :<span class="finalsubjectanswer"></span> </small>'
+    }
+    setFinalAnswer(subjectId){
+        this.finalAnswerSubject = subjectId;
+        let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
+        $("#surveyField_" + this.index + " .finalsubjectanswer").empty();
+
+        $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+          + '</span>')
+            .appendTo("#surveyField_" + this.index + " .finalsubjectanswer");
+
+        $("#surveyField_" + this.index + " .finalanswer-indicator").addClass('text-muted');
+    }
+    handleOnMouseOverField(event){
+            this.getPogsPlugin()
+                .saveCompletedTaskAttribute(SURVEY_TRANSIENT.MOUSE_OVER_FIELD+this.index,
+                                                            "", 0.0,
+                                                            this.index, false);
+    }
+    handleOnMouseOutOfField(event){
+        this.getPogsPlugin()
+            .saveCompletedTaskAttribute(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD+this.index,
+                                                        "", 0.0,
+                                                        this.index, false);
+    }
+    addSubjectInteraction(subjectId){
+        let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
+        if($("#surveyField_"+this.index+" .subjectpool ."+sub.externalId+'_color').length == 0) {
+
+            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+              + '</span>')
+                .appendTo("#surveyField_" + this.index + " .subjectpool");
+            $("#surveyField_" + this.index + " .interaction-indicator").addClass("text-muted");
+
+        }
+    }
+    removeSubjectInteraction(subjectId){
+        let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
+        if($("#surveyField_"+this.index+" .subjectpool ."+sub.externalId+'_color').length>=0) {
+
+            $("#surveyField_"+this.index+" .subjectpool ."+sub.externalId+'_color').remove();
+        }
+        if($("#surveyField_"+this.index+" .subjectpool .badge").length ==0){
+            $("#surveyField_" + this.index + " .interaction-indicator").removeClass("text-muted");
+        }
+    }
+    setupHooks(){
+        $('#surveyField_'+this.index ).on('mouseover',this.handleOnMouseOverField.bind(this))
+        $('#surveyField_'+this.index ).on('mouseout',this.handleOnMouseOutOfField.bind(this))
     }
 }
 
@@ -47,6 +116,7 @@ class VideoInformation {
     }
 }
 
+
 class InputField extends Field {
     constructor(surveyRefence,jsoninfo){
         super(surveyRefence,jsoninfo);
@@ -59,17 +129,21 @@ class InputField extends Field {
         let str = "";
 
 
-        str += '<div class="form-group" style="min-width: 300px;">';
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">';
         str += '<label for="answer'+this.index+'" id="question'+this.index+'" class="text-left text-dark row">'+ this.jsonInfo.question +'</label>'
         if(this.jsonInfo.video_url){
            str += new VideoInformation(this.jsonInfo.video_url).getHTML();
         }
-        str += '<input type="text" class="form-control row" id="answer'+this.index+'" data-cell-reference-index="'+this.index+'" placeholder="'+this.jsonInfo.placeholder+'"></div> <br>'
+        str += '<input type="text" class="form-control row" id="answer'+this.index+'" data-cell-reference-index="'+this.index+'" placeholder="'+this.jsonInfo.placeholder+'">';
+        str += this.getInteractionIndicatorHTML();
+        str += '</div> <br>';
         $('#surveyForm').append(str);
     }
     setupHooks(){
+        super.setupHooks();
         $('#answer'+this.index + '').on('focusin', this.handleTextOnClick.bind(this));
         $('#answer'+this.index + '').on('change', this.handleTextOnBlur.bind(this));
+
     }
     handleTextOnClick(event){
         var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
@@ -94,6 +168,8 @@ class InputField extends Field {
         }
     }
     broadcastReceived(message){
+        super.broadcastReceived(message);
+
         let attrName = message.content.attributeName;
 
         if ((attrName.indexOf(SURVEY_TRANSIENT.FOCUS_IN_CELL)> -1)) {
@@ -108,13 +184,10 @@ class InputField extends Field {
 
         if (attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1) {
             var cell = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
+
             if($("#answer" + cell).attr('type') == "text"){ // sync text field
                 $("#answer" + cell).val(message.content.attributeStringValue);
-                $("#answer" + cell)
-                    .delay(1000).queue(function (next) {
-                    $(this).removeClass(message.sender+"_color focusOpacity");
-                    next();
-                });
+                this.setFinalAnswer(message.sender);
             }
 
         }
@@ -131,7 +204,7 @@ class RadioField extends Field {
     }
     setupHTML(){
         let str = "";
-        str += '<div class="form-group" style="min-width: 300px;">'
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">'
         str += '<label id="question'+this.index+'" class="text-left text-dark row">'+ this.jsonInfo.question +'</label>'
 
         if(this.jsonInfo.video_url){
@@ -147,11 +220,14 @@ class RadioField extends Field {
 
         }.bind(this));
 
-        str += ' </div> </div> <br>';
+        str += ' </div> ';
+        str += this.getInteractionIndicatorHTML();
+        str+= '</div> <br>';
 
         $('#surveyForm').append(str);
     }
     setupHooks(){
+        super.setupHooks();
         $('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
     }
     handleRadioOnClick(event){
@@ -169,10 +245,12 @@ class RadioField extends Field {
         }
     }
     broadcastReceived(message){
+        super.broadcastReceived(message);
         let attrName = message.content.attributeName;
         if(attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1){ //sync radio button
             var question_number = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
             var radioButtons = $("#answer"+question_number).find("input[value='"+message.content.attributeStringValue+"']").prop("checked",true);
+            this.setFinalAnswer(message.sender);
         }
     }
 }
@@ -188,7 +266,7 @@ class RadioTableField extends Field {
     }
     setupHTML(){
         let str = "";
-        str += '<div class="form-group" style="min-width: 300px;">'
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">'
         str += '<label id="question'+this.index+'" class="text-left text-dark row">'+ this.jsonInfo.question +'</label>'
 
         if(this.jsonInfo.video_url){
@@ -221,7 +299,9 @@ class RadioTableField extends Field {
             str +=  '</tr>';
         }.bind(this));
 
-        str += '</tbody></table></div>';
+        str += '</tbody></table>';
+        str += this.getInteractionIndicatorHTML();
+        str += '</div>';
 
 
         $('#surveyForm').append(str);
@@ -229,7 +309,7 @@ class RadioTableField extends Field {
     setupHooks(){
         //$('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
         //console.log('#answer'+this.index+' input');
-
+        super.setupHooks();
         $('#answer'+this.index+' input').on('focusin', this.handleFocusIn.bind(this));
         $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
     }
@@ -280,6 +360,7 @@ class RadioTableField extends Field {
         }
     }
     broadcastReceived(message){
+        super.broadcastReceived(message);
         let attrName = message.content.attributeName;
 
         if(attrName.indexOf(SURVEY_TRANSIENT.CLICK_RADIO_NOT_LOG) != -1){
@@ -296,6 +377,7 @@ class RadioTableField extends Field {
                     $(allInputs[k]).prop("checked", true);
                 }
             }
+            this.setFinalAnswer(message.sender);
 
         }else {
             let anwsers = JSON.parse(message.content.attributeStringValue);
@@ -323,7 +405,7 @@ class SelectField extends Field {
     }
     setupHTML(){
         let str = "";
-        str += '<div class="form-group" style="min-width: 300px;">'
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">'
         str += '<label for="answer'+this.index+'" id="question'+this.index+'" class="text-left text-dark row">'+this.jsonInfo.question+'</label>'
 
         if(this.jsonInfo.video_url){
@@ -334,10 +416,13 @@ class SelectField extends Field {
         $.each(this.jsonInfo.value, function(j, option) {
             str += '<option value="'+option+'">'+option+'</option>'
         });
-        str += '</select></div> <br>'
+        str += '</select>';
+        str += this.getInteractionIndicatorHTML();
+        str += '</div> <br>'
         $('#surveyForm').append(str);
     }
     setupHooks(){
+        super.setupHooks();
         $("#answer"+this.index).on('change', this.handleSelectOnChange.bind(this))
     }
     handleSelectOnChange(event) {
@@ -353,15 +438,12 @@ class SelectField extends Field {
         }
     }
     broadcastReceived(message){
+        super.broadcastReceived(message);
         let attrName = message.content.attributeName;
         if (attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1) {
             var cell = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
-            $("#answer" + cell).val(message.content.attributeStringValue)
-                .addClass(message.sender+"_color focusOpacity")
-                .delay(1000).queue(function (next) {
-                $(this).removeClass(message.sender+"_color focusOpacity");
-                next();
-            });
+            $("#answer" + cell).val(message.content.attributeStringValue);
+            this.setFinalAnswer(message.sender);
         }
     }
 }
@@ -375,7 +457,7 @@ class CheckboxField extends Field {
     }
     setupHTML(){
         let str = "";
-        str += '<div class="form-group" style="min-width: 300px;">'
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">'
         str += '<label id="question'+this.index+'" class="text-left text-dark row">'+ this.jsonInfo.question +'</label>'
 
         if(this.jsonInfo.video_url){
@@ -389,10 +471,13 @@ class CheckboxField extends Field {
             str += '<input type="checkbox" class="form-check-input" name="answer'+this.index+'" value="'+choice+'" data-cell-reference-index="'+this.index+'" data-cell-reference-subindex="'+j+'">' + choice
             str += '</label> </div>'
         }.bind(this));
-        str += '</div></div> <br>'
+        str += '</div>';
+        str += this.getInteractionIndicatorHTML();
+        str += '</div> <br>'
         $('#surveyForm').append(str);
     }
     setupHooks(){
+        super.setupHooks();
         //$('#answer'+this.index+' input').on('change',this.handleCheckboxOnClick.bind(this));
         $('#answer'+this.index+' input').on('click', this.handleFocusIn.bind(this));
         $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
@@ -435,6 +520,7 @@ class CheckboxField extends Field {
         }
     }
     broadcastReceived(message) {
+        super.broadcastReceived(message);
         let attrName = message.content.attributeName;
 
         if(attrName.indexOf(SURVEY_CONST.FIELD_NAME ) != -1) {
@@ -462,6 +548,7 @@ class CheckboxField extends Field {
                     targ.prop("checked", checkedOfNot);
                 }
             }
+            this.setFinalAnswer(message.sender);
         }
     }
 }
@@ -695,7 +782,9 @@ class Survey {
             .replace(SURVEY_CONST.FIELD_NAME, "")
             .replace(SURVEY_TRANSIENT.CLICK_RADIO_NOT_LOG,"")
             .replace(SURVEY_TRANSIENT.FOCUS_IN_CELL,"")
-            .replace(SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG,"");
+            .replace(SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG,"")
+            .replace(SURVEY_TRANSIENT.MOUSE_OVER_FIELD,"")
+            .replace(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD,"");
 
         if(this.fields.length > index) {
             if(message.sender != this.pogsPlugin.subjectId) {

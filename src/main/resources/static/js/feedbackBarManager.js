@@ -17,7 +17,7 @@ class FeedbackBarManager {
 
     }
     onFeedbackMessageReceived(message) {
-        console.log( message.content)
+
         if (message.content.collaborationType != COLLABORATION_TYPE.FEEDBACK_BAR) {
             return;
         }

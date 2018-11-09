@@ -34,9 +34,9 @@ class SudokuGame {
             if (attrName == "focusInCell") {
 
                 $("#sudoku_cell" + message.content.attributeIntegerValue)
-                    .addClass(message.sender+"_color focusOpacity") //get subject backgroud COLOR sudoku__gametable-cell--error
+                    .addClass(message.sender+"_color ") //get subject backgroud COLOR sudoku__gametable-cell--error
                     .delay(1000).queue(function (next) {
-                    $(this).removeClass(message.sender+"_color focusOpacity");
+                    $(this).removeClass(message.sender+"_color");
                     next();
                 });
             } else {

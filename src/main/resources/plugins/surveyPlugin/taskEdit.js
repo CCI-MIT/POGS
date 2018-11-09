@@ -72,7 +72,8 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class="form-control col-sm-8 mandatory" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'">  <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>';
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8 video-input" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         //add answer field
@@ -100,7 +101,8 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8 mandatory" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label video-input">Video url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         str += '<div id="answer'+question_number+'" class="table-container"><table class="flex-table"><thead><th></th>'
@@ -215,7 +217,9 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> '
+                   + '<input class="form-control col-sm-8 video-input" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         str += '<div id="answer'+question_number+'">'
@@ -267,7 +271,8 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8 mandatory" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8 video-input" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         //add button and choices field
@@ -320,7 +325,8 @@ class SurveyTaskEdit {
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
         if(withVideo){ //add field for video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8 video-input" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         //add button and choices field
@@ -405,7 +411,8 @@ class SurveyTaskEdit {
         // str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class="form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'">  <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>';
 
         if(withVideo){ // add video url
-            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video_url: </label> <input class="form-control col-sm-8" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'"></div>';
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> <input class="form-control col-sm-8 video-input" type="text" id="video_url' + question_number + '" placeholder = "Put video url" value="'+video_url+'">'
+                   + '<small id="" class="form-text text-muted">The youtube URL will automatically be changed to the format: https://youtube.com/embed/VIDEOID</small></div>';
         }
 
         str += '</div>';
@@ -431,8 +438,34 @@ class SurveyTaskEdit {
                     ['color', ['color']],
                     ['insert', ['picture','link','video','table','codeview']]
                 ]
+                ,
+                callbacks: {
+                    onImageUpload: function(files) {
+
+                        for(let i=0; i < files.length; i++) {
+                            sendFile(files[0],this);
+                        }
+                    }
+                }
             }
         );
+
+        function sendFile(file,editor) {
+            //console.log("Send file method");
+            let data = new FormData();
+            data.append("file", file);
+            $.ajax({
+                       data: data,
+                       type: "POST",
+                       url: "/images/upload?"+csrfParamName+"="+csrfToken,
+                       cache: false,
+                       contentType: false,
+                       processData: false,
+                       success: function(url) {
+                           $(editor).summernote('insertImage', url);
+                       }
+                   });
+        }
     }
 
     escapeValueStringsInQuotes(string) {
@@ -654,6 +687,11 @@ class SurveyTaskEdit {
             }
         });
 
+        let ret = this.validateAndChangeVideoURL();
+        if( (typeof ret === 'string') || (ret instanceof String)){
+            return ret;
+        }
+
         let attr = this.setupAttributesFromHtml();
         console.log("Attributes before creating ");
         console.log(attr);
@@ -662,6 +700,43 @@ class SurveyTaskEdit {
 
     }
 
+    validateAndChangeVideoURL(){
+
+        let videoField = $(".video-input");
+
+        for(let i= 0; i < videoField.length; i ++) {
+            let field = $(videoField[i]);
+            if(!validateYoutubeURL(field.val())){
+                return "Invalid video URL!"
+            }
+            if(field.val().indexOf('youtube') != -1) {
+                let videoId = getId(field.val());
+                field.val('//www.youtube.com/embed/' + videoId);
+            }
+
+        }
+    }
+
+}
+
+function validateYoutubeURL(url){
+    if(url == ""){
+        return false;
+    }
+    let regExp = /^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+/;
+    return url.match(regExp);
+
+}
+function getId(url) {
+
+    var regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    var match = url.match(regExp);
+
+    if (match && match[2].length == 11) {
+        return match[2];
+    } else {
+        return 'error';
+    }
 }
 pogsTaskConfigEditor.register(new SurveyTaskEdit());
 

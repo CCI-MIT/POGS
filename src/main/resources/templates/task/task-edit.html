@@ -336,7 +336,7 @@
 
                function sendFile(file,editor) {
                                    console.log("Send file method");
-                                   data = new FormData();
+                                   let data = new FormData();
                                    data.append("file", file);
                                    $.ajax({
                                        data: data,

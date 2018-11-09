@@ -149,9 +149,6 @@ public class SessionRunner implements Runnable {
                 sessionHasStarted = true;
                 startSession();
             }
-            if (session.getSecondsRemainingForSession() < 0) {
-                shouldRun = false;
-            }
             if (session.getSessionSchedule() != null) {
                 for (int i = 0; i < session.getSessionSchedule().size(); i++) {
                     SessionSchedule ss = session.getSessionSchedule().get(i);
@@ -171,6 +168,9 @@ public class SessionRunner implements Runnable {
 
 
                 }
+            }
+            if (session.getSecondsRemainingForSession() < 0) {
+                shouldRun = false;
             }
 
         }
