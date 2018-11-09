@@ -141,18 +141,18 @@ class InputField extends Field {
     }
     setupHooks(){
         super.setupHooks();
-        $('#answer'+this.index + '').on('focusin', this.handleTextOnClick.bind(this));
+        //$('#answer'+this.index + '').on('focusin', this.handleTextOnClick.bind(this));
         $('#answer'+this.index + '').on('change', this.handleTextOnBlur.bind(this));
 
     }
-    handleTextOnClick(event){
-        var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        if(!isNaN(cellIndex)) {
-            this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_TRANSIENT.FOCUS_IN_CELL+this.index,
-                                                       "", 0.0,
-                                                       cellIndex, false);
-        }
-    }
+    // handleTextOnClick(event){
+    //     var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
+    //     if(!isNaN(cellIndex)) {
+    //         this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_TRANSIENT.FOCUS_IN_CELL+this.index,
+    //                                                    "", 0.0,
+    //                                                    cellIndex, false);
+    //     }
+    // }
     handleTextOnBlur(event){
         var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         //console.log("cell reference " + cellIndex);
@@ -171,15 +171,6 @@ class InputField extends Field {
         super.broadcastReceived(message);
 
         let attrName = message.content.attributeName;
-
-        if ((attrName.indexOf(SURVEY_TRANSIENT.FOCUS_IN_CELL)> -1)) {
-            // handle on focus - add class for bg change
-            var cell = message.content.attributeIntegerValue;
-            if($("#answer" + cell).attr('type') == "text" && !($("#answer" + cell).is( ":focus" ))){ // sync text field when selected
-                $("#answer" + cell)
-                    .addClass(message.sender+"_color focusOpacity") //get subject backgroud COLOR
-            }
-        }
 
 
         if (attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1) {
