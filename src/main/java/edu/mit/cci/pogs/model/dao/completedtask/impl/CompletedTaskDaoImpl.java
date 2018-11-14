@@ -82,5 +82,10 @@ public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, Compl
                 .execute();
     }
 
+    public List<CompletedTask> listByCompletedTaskIds(List<Long> completedTaskIds){
+        final SelectQuery<Record> query = dslContext.select()
+                .from(COMPLETED_TASK).where(COMPLETED_TASK.ID.in(completedTaskIds)).getQuery();
+        return query.fetchInto(CompletedTask.class);
+    }
 }
  

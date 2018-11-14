@@ -11,6 +11,8 @@ import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.records.CompletedTaskScoreRecord;
 
+import java.util.List;
+
 import static edu.mit.cci.pogs.model.jooq.Tables.COMPLETED_TASK_SCORE;
 
 @Repository
@@ -46,4 +48,9 @@ public class CompletedTaskScoreDaoImpl extends AbstractDao<CompletedTaskScore, L
                 .execute();
     }
 
+    public List<CompletedTaskScore> listByCompletedTasksIds(List<Long> completedTaskIds){
+        final SelectQuery<Record> query = dslContext.select()
+                .from(COMPLETED_TASK_SCORE).where(COMPLETED_TASK_SCORE.COMPLETED_TASK_ID.in(completedTaskIds)).getQuery();
+        return query.fetchInto(CompletedTaskScore.class);
+    }
 }
