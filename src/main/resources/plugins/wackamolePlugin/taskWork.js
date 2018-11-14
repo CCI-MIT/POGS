@@ -151,6 +151,7 @@ class Wackamole {
             }
             else if (attrName == 'targetHit') {
                 self.totalHitOnTarget++;
+                $("#teamScore").text(self.totalHitOnTarget);
                 //TODO:
                 $("#whack_cell" + cell)
                     .addClass("hit_color")
@@ -221,6 +222,8 @@ class Wackamole {
                 if ($("#whack_cell" + cell).hasClass("hasMole")) {
                     self.totalHitOnTarget++;
                     self.playerHitOnTarget++;
+                    $("#score").text(self.playerHitOnTarget);
+                    $("#teamScore").text(self.totalHitOnTarget);
                     // broadcast target hit because broadcast cell click broadcast has delay
                     // and mole might disappear when cell click broadcast is received
                     self.pogsPlugin.saveCompletedTaskAttribute('targetHit',
@@ -353,6 +356,29 @@ class Wackamole {
                 console.log("Number of clicks: " + self.numberOfClicks);
                 console.log("Player hitOnTarget: " + self.playerHitOnTarget);
                 console.log("total hitOnTarget: " + self.totalHitOnTarget);
+
+
+                self.pogsPlugin.saveCompletedTaskAttribute('teamScoreRound' + self.multiplayerRound,
+                                                           "", 0.0,
+                                                           self.totalHitOnTarget, true,"");
+
+                self.pogsPlugin.saveCompletedTaskAttribute('totalTargetsAppearedRound' + self.multiplayerRound,
+                                                           "", 0.0,
+                                                           self.totalTarget, true,"");
+
+                self.pogsPlugin.saveCompletedTaskAttribute('subjectScoreRound' + self.multiplayerRound,
+                                                           "", 0.0,
+                                                           self.playerHitOnTarget, true,self.subjectId);
+
+                self.pogsPlugin.saveCompletedTaskAttribute('subjectNumberOfClicksRound' + self.multiplayerRound,
+                                                           "", 0.0,
+                                                           self.numberOfClicks, true,self.subjectId);
+
+                $("#score").text(self.playerHitOnTarget);
+                $("#teamScore").text(self.totalHitOnTarget);
+
+                //TODO: Save variables using ROUND ID
+
                 clearInterval(x);
                 document.getElementById("roundTimeRemain").innerHTML = "GameOver";
                 $(".whack_gametable-cell").find('.fa-optin-monster').remove();
