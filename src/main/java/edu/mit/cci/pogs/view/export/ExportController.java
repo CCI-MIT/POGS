@@ -8,6 +8,8 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,9 +23,7 @@ import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import static edu.mit.cci.pogs.constants.ApplicationConstants.SESSION;
-import static edu.mit.cci.pogs.constants.ApplicationConstants.SESSION_ID;
-import static edu.mit.cci.pogs.constants.ApplicationConstants.STUDY;
+import static edu.mit.cci.pogs.constants.ApplicationConstants.*;
 
 @RestController
 public class ExportController {
@@ -67,6 +67,83 @@ public class ExportController {
                 eventLogList.addAll(eventLogDao.listLogsBySessionId(session.getId()));
             getAllData(response,studyId,eventLogList,STUDY);
         }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/admin/export/subjectcontribution/{studyId}")
+    public void getSubjectContribution(HttpServletResponse response, @PathVariable("studyId") Long studyId){
+        StringBuilder val = new StringBuilder();
+        val.append("Session Name,Task Name,Team Id,Number of Subjects,Task Group Name,Subject External Ids," +
+                "Communication Count,Task Attribute Count,Collaboration Edit Count");
+        val.append("\n");
+        //get all sessions
+        List<Session> sessionInStudy = sessionDao.listByStudyId(studyId);
+
+        for (Session session:sessionInStudy){
+            List<EventLog> eventLogList = eventLogDao.listLogsBySessionId(session.getId());
+            Set<Long> completedTaskIds = new HashSet<>();
+            for (EventLog eventLog:eventLogList){
+                completedTaskIds.add(eventLog.getCompletedTaskId());
+            }
+            //get completed tasks
+            List<CompletedTask> completedTasks = new ArrayList<>();
+            completedTasks = completedTaskDao.listByCompletedTaskIds(new ArrayList<>(completedTaskIds));
+            //get team ids
+            Set<Long> teamIds = new HashSet<>();
+            for (CompletedTask completedTask:completedTasks)
+                teamIds.add(completedTask.getTeamId());
+
+            for (Long completedTaskId:completedTaskIds){
+                for (Long teamId:teamIds){
+                    val.append(session.getSessionSuffix()+",");
+                    val.append(completedTaskId+",");
+                    val.append(teamId+",");
+                    List<Long> subjectIds = new ArrayList<>();
+                    subjectIds = completedTaskDao.listSubjectIds(teamId);
+                    val.append(subjectIds.size()+",");
+                    StringBuilder subjects = new StringBuilder();
+                    subjects.append("[");
+                    StringBuilder communication = new StringBuilder();
+                    communication.append("[");
+                    StringBuilder collaboration = new StringBuilder();
+                    collaboration.append("[");
+                    StringBuilder taskAttribute = new StringBuilder();
+                    taskAttribute.append("[");
+                    for (Long subjectId:subjectIds){
+                        subjects.append(subjectId + ",");
+                        communication.append(eventLogDao.getCountOfSubjectContribution
+                                (subjectId,completedTaskId,COMMUNICATION_MESSAGE)+",");
+                        collaboration.append(eventLogDao.getCountOfSubjectContribution
+                                (subjectId,completedTaskId,COLLABORATION_MESSAGE)+",");
+                        taskAttribute.append(eventLogDao.getCountOfSubjectContribution
+                                (subjectId,completedTaskId,TASK_ATTRIBUTE)+",");
+                    }
+                    //TODO add task group name - Where is it available?
+                    val.append(subjects+"],");
+                    val.append(communication+"],");
+                    val.append(collaboration+"],");
+                    val.append(taskAttribute+"],");
+                    val.append("\n");
+                }
+            }
+            val.append("\n");
+        }
+
+        String fileName = "SubjectContribution_"+String.valueOf(studyId)+"_" + LocalDateTime.now() + ".csv";
+        fileName = fileName.replaceAll(":","_");
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment; filename=Subject Contribution Report " + new Date().toString()  + ".zip");
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter
+                    (new FileOutputStream(fileName), "UTF-8"));
+            writer.print(String.valueOf(val));
+            writer.close();
+            File file1 = new File(fileName);
+            filesToZip(response,file1);
+            file1.delete();
+            response.flushBuffer();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -140,7 +217,7 @@ public class ExportController {
                     completedTaskIds.add(eventLog.getCompletedTaskId());
 //            Build a map of completed task id and session id for study
             Map<Long, Long> taskSessionMap = new HashMap<>();
-            if (type=="Study"){
+            if (type==STUDY){
                   for (EventLog eventLog:eventLogList)
                       taskSessionMap.put(eventLog.getCompletedTaskId(),eventLog.getSessionId());
             }
