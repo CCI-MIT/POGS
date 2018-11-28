@@ -148,6 +148,59 @@ public class ExportController {
         }
     }
 
+    @GetMapping("/admin/export/taskscore/{studyId}")
+    public void getTaskScoreData(HttpServletResponse response, @PathVariable("studyId") Long studyId){
+        StringBuilder val = new StringBuilder();
+        val.append("Session Name, Team Id, Task1, Task2, Task3, Task4");
+        val.append("\n");
+
+        //for all sessions
+        List<Session> sessionInStudy = sessionDao.listByStudyId(studyId);
+
+        for (Session session:sessionInStudy){
+            List<EventLog> eventLogList = eventLogDao.listLogsBySessionId(session.getId());
+            Set<Long> completedTaskIds = new HashSet<>();
+            for (EventLog eventLog:eventLogList){
+                completedTaskIds.add(eventLog.getCompletedTaskId());
+            }
+            //get completed tasks
+            List<CompletedTask> completedTasks = new ArrayList<>();
+            completedTasks = completedTaskDao.listByCompletedTaskIds(new ArrayList<>(completedTaskIds));
+            //get team ids
+            Set<Long> teamIds = new HashSet<>();
+            for (CompletedTask completedTask:completedTasks)
+                teamIds.add(completedTask.getTeamId());
+
+            for (Long teamId:teamIds){
+                val.append(session.getSessionSuffix()+",");
+                val.append(teamId+",");
+                StringBuilder scores = new StringBuilder();
+
+                for (Long completedTaskId:completedTaskIds) {
+                    scores.append(String.valueOf(completedTaskScoreDao.getScore(completedTaskId))+",");
+                }
+
+                val.append("\n");
+            }
+        }
+
+        String fileName = "TaskScores_"+String.valueOf(studyId)+"_" + LocalDateTime.now() + ".csv";
+        fileName = fileName.replaceAll(":","_");
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition", "attachment; filename=Task Scores Report " + new Date().toString()  + ".zip");
+            PrintWriter writer = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"));
+            writer.print(String.valueOf(val));
+            writer.close();
+            File file1 = new File(fileName);
+            filesToZip(response,file1);
+            file1.delete();
+            response.flushBuffer();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     private <T> String writeDataToCSV(Field[] attributes,List<T> list, Map<Long,Long>... taskSessionMap)
             throws IllegalAccessException{
         boolean isMapPresent = false;

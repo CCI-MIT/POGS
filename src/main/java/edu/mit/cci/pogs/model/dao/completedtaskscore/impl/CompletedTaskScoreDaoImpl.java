@@ -1,8 +1,6 @@
 package edu.mit.cci.pogs.model.dao.completedtaskscore.impl;
 
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.SelectQuery;
+import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -52,5 +50,11 @@ public class CompletedTaskScoreDaoImpl extends AbstractDao<CompletedTaskScore, L
         final SelectQuery<Record> query = dslContext.select()
                 .from(COMPLETED_TASK_SCORE).where(COMPLETED_TASK_SCORE.COMPLETED_TASK_ID.in(completedTaskIds)).getQuery();
         return query.fetchInto(CompletedTaskScore.class);
+    }
+
+    public Double getScore(Long completedTaskID)
+    {
+        final SelectConditionStep<Record1<Double>> query = dslContext.select(COMPLETED_TASK_SCORE.TOTAL_SCORE).from(COMPLETED_TASK_SCORE).where(COMPLETED_TASK_SCORE.COMPLETED_TASK_ID.eq(completedTaskID));
+        return query.fetchOne(0, Double.class);
     }
 }

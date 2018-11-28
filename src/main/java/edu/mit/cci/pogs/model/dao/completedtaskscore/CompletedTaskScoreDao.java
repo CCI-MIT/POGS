@@ -9,4 +9,5 @@ public interface CompletedTaskScoreDao extends Dao<CompletedTaskScore, Long> {
     CompletedTaskScore getByCompletedTaskId(Long completedTaskScoreId);
     void deleteByCompletedTaskId(Long completedTaskId);
     List<CompletedTaskScore> listByCompletedTasksIds(List<Long> completedTaskIds);
+    Double getScore(Long completedTaskID);
 }
