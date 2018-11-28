@@ -1,0 +1,1 @@
+update `session` set session_schedule_type = 'S';

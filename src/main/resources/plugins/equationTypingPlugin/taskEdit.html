@@ -1,0 +1,66 @@
+
+<div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label" for="taskText">Task Text:</label>
+        <div class="col-sm-9">
+            <textarea class="form-control htmleditor" id="taskText" rows="3"></textarea>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label" for="totalSum">Total sum:</label>
+        <div class="col-sm-9">
+            <input type="number" id="totalSum"/>
+            <small id="" class="form-text text-muted">This is the final sum that each line must be equal to.</small>
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label" for="shouldReuseMembers">Should reuse members:</label>
+        <div class="col-sm-9">
+            <input type="checkbox" id="shouldReuseMembers"/>
+            <small id="" class="form-text text-muted">If checked the numbers used on the first line will be checked against the .</small>
+        </div>
+    </div>
+    <script>
+            $(function () {
+                    $(".htmleditor").summernote(
+                                {
+                                height: 200,
+                                toolbar: [
+                                    // [groupName, [list of button]]
+                                    ['para', ['style','ul', 'ol', 'paragraph']],
+                                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                                    ['font', ['strikethrough', 'superscript', 'subscript']],
+                                    ['fontsize', ['fontsize']],
+                                    ['color', ['color']],
+                                    ['insert', ['picture','link','video','table','codeview']]
+                                  ],
+                                  callbacks: {
+                                      onImageUpload: function(files) {
+                                    console.log("Send file called success override: " + this);
+                                    for(let i=0; i < files.length; i++) {
+                                        sendFile(files[0],this);
+                                     }
+                                 }
+                                }
+                             });
+
+                            function sendFile(file,editor) {
+                                console.log("Send file method");
+                                data = new FormData();
+                                data.append("file", file);
+                                $.ajax({
+                                    data: data,
+                                    type: "POST",
+                                    url: "/images/upload?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+                                    cache: false,
+                                    contentType: false,
+                                    processData: false,
+                                    success: function(url) {
+                                            $(editor).summernote('insertImage', url);
+                                    }
+                                });
+                            };
+
+                    });
+            </script>
+</div>

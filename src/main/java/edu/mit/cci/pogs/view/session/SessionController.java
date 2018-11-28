@@ -92,6 +92,12 @@ public class SessionController {
         return taskGroupDao.list();
     }
 
+    @ModelAttribute("sessionScheduleType")
+    public List<SessionScheduleType> getSessionScheduleType() {
+
+        return Arrays.asList(SessionScheduleType.values());
+    }
+
     @ModelAttribute("teamCreationMethods")
     public List<TeamCreationMethod> getTeamCreationMethods() {
         return Arrays.asList(TeamCreationMethod.values());

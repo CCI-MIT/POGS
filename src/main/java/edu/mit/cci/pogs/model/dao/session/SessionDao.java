@@ -12,5 +12,7 @@ public interface SessionDao extends Dao<Session, Long> {
     List<Session> listByStudyId(Long conditionId);
 
     List<Session> listStartsIn(long initWindow);
+
+    List<Session> listPerpetualCurrentlyAccpeting(long initWindow);
 }
  

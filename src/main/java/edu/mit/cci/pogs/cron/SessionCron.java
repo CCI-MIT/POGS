@@ -13,6 +13,7 @@ import java.util.Map;
 import edu.mit.cci.pogs.messages.FeedbackMessage;
 import edu.mit.cci.pogs.messages.FlowBroadcastMessage;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 
@@ -39,12 +40,13 @@ public class SessionCron {
     public void checkForSessionInitialization() {
         _log.debug("Checking for sessions to be configured...");
         sessionService.initializeSessionRunners();
+        sessionService.initializePerpetualSessionRunners();
 
     }
 
     @Scheduled(fixedRate = RATE, initialDelay = RATE)
     public void sendSessionFlowBroadCastMessages(){
-        for(SessionRunner runner : SessionRunner.getLiveRunners()){
+        for(SessionRunner runner : SessionRunnerManager.getLiveRunners()){
             FlowBroadcastMessage pogsMessage = new FlowBroadcastMessage(runner.getSession());
 
             messagingTemplate.convertAndSend(pogsMessage.getSpecificPublicTopic(), pogsMessage);
@@ -54,7 +56,7 @@ public class SessionCron {
 
     @Scheduled(fixedRate = 1000, initialDelay = 1000)
     public void sendFeedbackStatistics(){
-        for(SessionRunner runner : SessionRunner.getLiveRunners()){
+        for(SessionRunner runner : SessionRunnerManager.getLiveRunners()){
             RoundWrapper rw = runner.getSession().getCurrentRound();
             if(rw!=null){ //only start sending the feedback after the round is setup
                 Map<Long, Map<String, Integer>> allFeedbacksForSession = runner.getSession().getFeedbackCounter();

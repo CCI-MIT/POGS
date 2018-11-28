@@ -118,6 +118,13 @@ public class TaskPlugin {
 
     }
 
+    public String getTaskPrimerJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskPrimer.js");
+    }
+    public String getTaskScoreJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskScore.js");
+    }
+
     public String getTaskEditJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskEdit.js");
     }
@@ -128,6 +135,9 @@ public class TaskPlugin {
 
     public String getTaskWorkHtmlContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.html");
+    }
+    public String getTaskPrimerHtmlContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskPrimer.html");
     }
 
     public String getTaskWorkJsContent() {

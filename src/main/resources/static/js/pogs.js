@@ -49,7 +49,7 @@ class Pogs {
 
 
         var rule  = '';
-        for (let i = 0; i < subjectColorMap.length; i++){
+        for (let i = 0; i < subjectColorMap.length; i++) {
             rule += `.${subjectColorMap[i].externalId}_color, `
                 + `[data-author=subject-${subjectColorMap[i].externalId}] {`
                 + `background-color: ${subjectColorMap[i].backgroundColor};`
@@ -80,6 +80,8 @@ class Pogs {
         this.lastTask = config.lastTask;
         this.sessionName = config.sessionName;
         this.chatBotName = config.chatBotName;
+        this.sessionIsPerpetual = ((config.sessionIsPerpetual)?(config.sessionIsPerpetual):(false));
+
         this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
@@ -278,6 +280,10 @@ class Pogs {
             var finalDate = (new Date().getTime() + parseInt(
                 message.content.secondsRemainingCurrentUrl));
             this.countDown.updateCountDownDate(finalDate)
+        }
+
+        if(this.sessionIsPerpetual){
+            location.reload();
         }
 
     }

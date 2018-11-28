@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.session.impl;
  
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.records.SessionRecord;
@@ -44,17 +45,31 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
         return query.fetchInto(Session.class);
     }
 
+    public List<Session> listPerpetualCurrentlyAccpeting(long initWindow) {
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SESSION).getQuery();
+        Timestamp timestamp = new Timestamp(new Date().getTime() + initWindow);
+        query.addConditions(SESSION.PERPETUAL_END_DATE.greaterThan(timestamp));
+        query.addConditions(SESSION.PERPETUAL_START_DATE.lessThan(new Timestamp(new Date().getTime())));
+        query.addConditions(SESSION.STATUS.eq(SessionStatus.NOTSTARTED.getId().toString()));
+        query.addConditions(SESSION.SESSION_SCHEDULE_TYPE.eq(SessionScheduleType.PERPETUAL.getId().toString()));
+        query.addOrderBy(SESSION.PERPETUAL_START_DATE);
+        return query.fetchInto(Session.class);
+    }
+
     public List<Session> listStartsIn(long initWindow) {
 
         final SelectQuery<Record> query = dslContext.select()
-            .from(SESSION).getQuery();
+                .from(SESSION).getQuery();
         Timestamp timestamp = new Timestamp(new Date().getTime() + initWindow);
         query.addConditions(SESSION.SESSION_START_DATE.lessThan(timestamp));
         query.addConditions(SESSION.SESSION_START_DATE.greaterThan(new Timestamp(new Date().getTime())));
         query.addConditions(SESSION.STATUS.eq(SessionStatus.NOTSTARTED.getId().toString()));
+        query.addConditions(SESSION.SESSION_SCHEDULE_TYPE.eq(SessionScheduleType.SCHEDULED_DATE.getId().toString()));
         query.addOrderBy(SESSION.SESSION_START_DATE);
         return query.fetchInto(Session.class);
-}
+    }
 
 
 }

@@ -38,12 +38,118 @@
                 <fieldset class="form-group row">
                     <legend class="col-form-legend col-sm-2">Session config</legend>
                     <div class="container">
-                        <div class="row">
+                        <div class="row ">
                             <div class="col">
                                 <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label" for="sessionStartDate">Session Start Date:</label>
+                                    <label class="col-sm-5 col-form-label" for="sessionScheduleType">Session schedule type:</label>
+                                    <div class="col-sm-7">
 
-                                    <div class="col-sm-9">
+                                        <select class="custom-select" th:field="*{sessionScheduleType}" id="sessionScheduleType">
+                                            <option
+                                                    th:each="rg: ${sessionScheduleType}"
+                                                    th:value="${rg.id}"
+                                                    th:text="${rg.description}" ></option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col">
+
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label" for="sessionSuffix">Suffix:</label>
+
+                                    <div class="input-group col-sm-7">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text" id="sessionSuffix3" th:text="${study.studySessionPrefix}"></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="sessionSuffix" aria-describedby="sessionSuffix3" th:field="*{sessionSuffix}"/>
+                                    </div>
+                                    <div class="invalid-feedback" id="sessionSuffixError">Please provida a valid suffix use numbers and letters only</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row perpetualSessionType" style="display: none">
+                            <div class="col">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label" for="perpetualStartDate">Perpetual start date:</label>
+
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <div class="input-group date" id="x" data-target-input="nearest">
+                                                <input type="text" autocomplete="off" class="form-control" data-target="#perpetualStartDate1" id="perpetualStartDate" th:field="*{perpetualStartDate}"/>
+                                                <div class="input-group-append" data-target="#perpetualStartDate1" data-toggle="perpetualStartDate">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        $(function () {
+                                            jQuery.datetimepicker.setLocale('en');
+                                            jQuery('#perpetualStartDate').datetimepicker(
+                                                {
+                                                    step:5,
+                                                    format:'m/d/Y H:i'});
+                                        });
+                                    </script>
+
+
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="form-group row">
+                                    <label class="col-sm-4 col-form-label" for="perpetualEndDate">Perpetual end date:</label>
+
+                                    <div class="col-sm-8">
+                                        <div class="form-group">
+                                            <div class="input-group date" id="x" data-target-input="nearest">
+                                                <input type="text" autocomplete="off" class="form-control" data-target="#perpetualEndDate1" id="perpetualEndDate" th:field="*{perpetualEndDate}"/>
+                                                <div class="input-group-append" data-target="#perpetualEndDate1" data-toggle="perpetualEndDate">
+                                                    <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <script type="text/javascript">
+                                        $(function () {
+                                            jQuery.datetimepicker.setLocale('en');
+                                            jQuery('#perpetualEndDate').datetimepicker(
+                                                {
+                                                    step:5,
+                                                    format:'m/d/Y H:i'});
+                                        });
+                                    </script>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row perpetualSessionType" style="display: none">
+                            <div class="col">
+                                <div class="row">
+                                    <label class="col-sm-4 col-form-label" for="perpetualSubjectsPrefix">Subject prefix:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control" type="text" id="perpetualSubjectsPrefix" th:field="*{perpetualSubjectsPrefix}"/>
+                                        <div class="invalid-feedback">Please provide a subject prefix.</div>
+                                    </div>
+                                </div>
+                             </div>
+                             <div class="col">
+                                <div class="row">
+                                    <label class="col-sm-4 col-form-label" for="perpetualSubjectsNumber">Number of subjects to start session:</label>
+                                    <div class="col-sm-8">
+                                        <input class="form-control " type="number"  min="0" step="1"  id="perpetualSubjectsNumber" th:field="*{perpetualSubjectsNumber}"/>
+                                        <div class="invalid-feedback">Please provide a minimal number of subjects to start a session.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row scheduledSessionType" style="display: none">
+                            <div class="col">
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label" for="sessionStartDate">Session Start Date:</label>
+
+                                    <div class="col-sm-7">
                                         <div class="form-group">
                                             <div class="input-group date" id="x" data-target-input="nearest">
                                                 <input type="text" autocomplete="off" class="form-control" data-target="#sessionStartDate1" id="sessionStartDate" th:field="*{sessionStartDate}"/>
@@ -67,17 +173,7 @@
                                 </div>
                             </div>
                             <div class="col">
-
-                                <div class="form-group row">
-                                    <label class="col-sm-3 col-form-label" for="sessionSuffix">Suffix:</label>
-
-                                    <div class="input-group col-sm-9">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text" id="sessionSuffix3" th:text="${study.studySessionPrefix}"></span>
-                                        </div>
-                                        <input type="text" class="form-control" id="sessionSuffix" aria-describedby="sessionSuffix3" th:field="*{sessionSuffix}"/>
-                                    </div>
-                                    <div class="invalid-feedback" id="sessionSuffixError">Please provida a valid suffix use numbers and letters only</div>
+                                <div class="col-sm-12">
                                 </div>
                             </div>
                         </div>
@@ -373,6 +469,17 @@
             }
             $(function() {
 
+                function setupSchedule(){
+                    var ex = $("#sessionScheduleType").val();
+                                        if(ex == "P"){
+                                            $(".perpetualSessionType").show();
+                                            $(".scheduledSessionType").hide();
+                                        }else{
+                                            $(".perpetualSessionType").hide();
+                                            $(".scheduledSessionType").show();
+                                        }
+                }
+
                 function checkboxOnClickOnLoad(){
                                     var trigg = $(this).data("trigger");
                                     if($(this).is(':checked')){
@@ -465,10 +572,12 @@
 
 
                 }
+                $("#sessionScheduleType").change(setupSchedule);
                 $("#taskExecutionType").change(teamExecSetup);
                 $("#teamCreationMethod").change(teamCreationSetup);
                 teamCreationSetup();
                 teamExecSetup();
+                setupSchedule();
                 $( "#saveSession" ).submit(function( event ) {
                     var valid = true;
 

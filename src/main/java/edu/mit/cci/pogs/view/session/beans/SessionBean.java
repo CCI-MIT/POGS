@@ -44,6 +44,12 @@ public class SessionBean {
     private String teamCreationMethod;
     private String teamCreationMatrix;
 
+    private String    sessionScheduleType;
+    private Timestamp perpetualStartDate;
+    private Timestamp perpetualEndDate;
+    private Integer   perpetualSubjectsNumber;
+    private String    perpetualSubjectsPrefix;
+
     private Integer   fixedInteractionTime;
 
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
@@ -91,7 +97,52 @@ public class SessionBean {
         this.teamMaxSize = value.getTeamMaxSize();
         this.teamCreationMethod = value.getTeamCreationMethod();
         this.teamCreationMatrix = value.getTeamCreationMatrix();
-        fixedInteractionTime = value.getFixedInteractionTime();
+        this.fixedInteractionTime = value.getFixedInteractionTime();
+        this.sessionScheduleType = value.getSessionScheduleType();
+        this.perpetualStartDate = value.getPerpetualStartDate();
+        this.perpetualEndDate = value.getPerpetualEndDate();
+        this.perpetualSubjectsNumber = value.getPerpetualSubjectsNumber();
+        this.perpetualSubjectsPrefix = value.getPerpetualSubjectsPrefix();
+    }
+
+    public String getSessionScheduleType() {
+        return sessionScheduleType;
+    }
+
+    public void setSessionScheduleType(String sessionScheduleType) {
+        this.sessionScheduleType = sessionScheduleType;
+    }
+
+    public Timestamp getPerpetualStartDate() {
+        return perpetualStartDate;
+    }
+
+    public void setPerpetualStartDate(Timestamp perpetualStartDate) {
+        this.perpetualStartDate = perpetualStartDate;
+    }
+
+    public Timestamp getPerpetualEndDate() {
+        return perpetualEndDate;
+    }
+
+    public void setPerpetualEndDate(Timestamp perpetualEndDate) {
+        this.perpetualEndDate = perpetualEndDate;
+    }
+
+    public Integer getPerpetualSubjectsNumber() {
+        return perpetualSubjectsNumber;
+    }
+
+    public void setPerpetualSubjectsNumber(Integer perpetualSubjectsNumber) {
+        this.perpetualSubjectsNumber = perpetualSubjectsNumber;
+    }
+
+    public String getPerpetualSubjectsPrefix() {
+        return perpetualSubjectsPrefix;
+    }
+
+    public void setPerpetualSubjectsPrefix(String perpetualSubjectsPrefix) {
+        this.perpetualSubjectsPrefix = perpetualSubjectsPrefix;
     }
 
     public Long getId() {

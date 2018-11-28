@@ -37,6 +37,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.VotingPool;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.VotingPoolOption;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.VotingPoolVote;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.service.TodoEntryService;
 import edu.mit.cci.pogs.service.VotingService;
@@ -104,7 +105,7 @@ public class WorkspaceCollaborationWSController {
 
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
-        SessionRunner sessionWrapper = SessionRunner.getSessionRunner(sessionId);
+        SessionRunner sessionWrapper = SessionRunnerManager.getSessionRunner(sessionId);
         Subject subject = subjectDao.getByExternalId(pogsMessage.getSender());
 
         CollaborationMessage.VotingPoolType todoType =
@@ -201,7 +202,7 @@ public class WorkspaceCollaborationWSController {
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
 
-        SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
+        SessionRunner sessionRunner = SessionRunnerManager.getSessionRunner(sessionId);
 
         TodoListCollaborationMessage allTodoEntriesMessage = new TodoListCollaborationMessage();
         allTodoEntriesMessage.setType(PogsMessage.MessageType.COLLABORATION_MESSAGE);

@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.messages;
 
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 
 public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageContent> {
@@ -19,6 +20,8 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
         this.content.setSecondsRemainingCurrentUrl(sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
         this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());
         this.content.setSecondsRemainingForCurrentRound(sessionWrapper.getSecondsRemainingForCurrentRound().toString());
+
+
 
         //System.out.println("nextUrl:" + this.content.getNextUrl());
         //System.out.println("secondsRemainingCurrentUrl:" + this.content.getSecondsRemainingCurrentUrl());

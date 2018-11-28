@@ -6,6 +6,7 @@ import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -14,9 +15,11 @@ import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -50,11 +54,10 @@ public class SessionService {
 
     private static final Logger _log = LoggerFactory.getLogger(SessionService.class);
 
-    public static final long WAITING_ROOM_OPEN_INIT_WINDOW = 15*60_000;//15 mins
+    public static final long WAITING_ROOM_OPEN_INIT_WINDOW = 15 * 60_000;//15 mins
 
     @Autowired
     private ApplicationContext context;
-
 
 
     @Autowired
@@ -71,7 +74,7 @@ public class SessionService {
                           TodoEntryService todoEntryService,
                           VotingService votingService,
                           CompletedTaskScoreDao completedTaskScoreDao
-                          ) {
+    ) {
         this.todoEntryService = todoEntryService;
         this.votingService = votingService;
         this.sessionHasTaskGroupDao = sessionHasTaskGroupDao;
@@ -82,30 +85,54 @@ public class SessionService {
         this.teamHasSubjectDao = teamHasSubjectDao;
         this.teamDao = teamDao;
         this.roundDao = roundDao;
-        this.eventLogDao =  eventLogDao;
+        this.eventLogDao = eventLogDao;
         this.subjectCommunicationService = subjectCommunicationService;
         this.subjectAttributeDao = subjectAttributeDao;
-        this.completedTaskScoreDao =completedTaskScoreDao;
+        this.completedTaskScoreDao = completedTaskScoreDao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
         return sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(sessionid);
     }
 
-    public void initializeSessionRunners(){
+    public void initializeSessionRunners() {
         List<Session> sessions = getSessionsToBeInitialized();
-        for(Session s: sessions){
-            //place to create the new session runner thread
-            _log.debug(" Session runner starting: " + s.getSessionSuffix());
-            SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
-            sessionRunner.setSession(s);
-            SessionRunner.addSessionRunner(s.getId(),sessionRunner);
-            sessionRunner.run();
+        initiateThreadsForSessions(sessions);
 
+    }
+
+    public Session getPerpetualSessionForSubject(String externalId) {
+        List<Session> sessions = sessionDao.listPerpetualCurrentlyAccpeting(WAITING_ROOM_OPEN_INIT_WINDOW);
+        for (Session s : sessions) {
+            if (externalId.startsWith(s.getPerpetualSubjectsPrefix())) {
+
+                return s;
+            }
+        }
+        return null;
+    }
+
+    public void initializePerpetualSessionRunners() {
+        List<Session> sessions = sessionDao.listPerpetualCurrentlyAccpeting(WAITING_ROOM_OPEN_INIT_WINDOW);
+        initiateThreadsForSessions(sessions);
+    }
+
+    private void initiateThreadsForSessions(List<Session> sessions) {
+        for (Session s : sessions) {
+
+            if (SessionRunnerManager.getSessionRunner(s.getId()) == null) {
+                _log.debug(" Session runner starting: PREFIX(" + s.getSessionSuffix()+") - ID(" + s.getId() + ")");
+                SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
+                sessionRunner.setSession(s);
+                SessionRunnerManager.addSessionRunner(s.getId(), sessionRunner);
+                Thread thread = new Thread(sessionRunner);
+                thread.start();
+            }
 
         }
     }
-    public List<Session> getSessionsToBeInitialized(){
+
+    public List<Session> getSessionsToBeInitialized() {
         return sessionDao.listStartsIn(WAITING_ROOM_OPEN_INIT_WINDOW);
     }
 
@@ -149,22 +176,28 @@ public class SessionService {
         session.setTeamCreationMatrix(sessionBean.getTeamCreationMatrix());
         session.setFixedInteractionTime(sessionBean.getFixedInteractionTime());
 
-        if(session.getRosterTime()==null){
+        session.setSessionScheduleType(sessionBean.getSessionScheduleType());
+        session.setPerpetualStartDate(sessionBean.getPerpetualStartDate());
+        session.setPerpetualEndDate(sessionBean.getPerpetualEndDate());
+        session.setPerpetualSubjectsNumber(sessionBean.getPerpetualSubjectsNumber());
+        session.setPerpetualSubjectsPrefix(sessionBean.getPerpetualSubjectsPrefix());
+
+        if (session.getRosterTime() == null) {
             session.setRosterTime(0);
         }
-        if(session.getIntroTime()==null){
+        if (session.getIntroTime() == null) {
             session.setIntroTime(0);
         }
-        if(session.getDonePageTime()==null){
+        if (session.getDonePageTime() == null) {
             session.setDonePageTime(0);
         }
-        if(session.getWaitingRoomTime()==null){
+        if (session.getWaitingRoomTime() == null) {
             session.setWaitingRoomTime(0);
         }
-        if(session.getFixedInteractionTime()==null){
+        if (session.getFixedInteractionTime() == null) {
             session.setFixedInteractionTime(0);
         }
-        if(session.getDisplayNameChangeTime()==null){
+        if (session.getDisplayNameChangeTime() == null) {
             session.setDisplayNameChangeTime(0);
         }
 
@@ -175,10 +208,63 @@ public class SessionService {
         } else {
             sessionDao.update(session);
             createOrUpdateSessionHasTaskGroups(sessionBean);
-            SessionRunner.removeSessionRunner(session.getId());
+            SessionRunnerManager.removeSessionRunner(session.getId());
         }
 
         return session;
+    }
+
+    public Session clonePerpetualSession(Session session) {
+        Session clonedNonPerpetualSession = new Session();
+
+
+        clonedNonPerpetualSession.setSessionSuffix(session.getSessionSuffix());
+        clonedNonPerpetualSession.setSessionStartDate(new Timestamp(new Date().getTime() + 1000 * 60 * 1));
+        clonedNonPerpetualSession.setStatus(SessionStatus.NOTSTARTED.getId().toString());
+        clonedNonPerpetualSession.setWaitingRoomTime(session.getWaitingRoomTime());
+        clonedNonPerpetualSession.setIntroPageEnabled(session.getIntroPageEnabled());
+        clonedNonPerpetualSession.setIntroText(session.getIntroText());
+        clonedNonPerpetualSession.setIntroTime(session.getIntroTime());
+        clonedNonPerpetualSession.setDisplayNameChangePageEnabled(session.getDisplayNameChangePageEnabled());
+        clonedNonPerpetualSession.setDisplayNameChangeTime(session.getDisplayNameChangeTime());
+        clonedNonPerpetualSession.setRosterPageEnabled(session.getRosterPageEnabled());
+        clonedNonPerpetualSession.setRosterTime(session.getRosterTime());
+        clonedNonPerpetualSession.setDonePageEnabled(session.getDonePageEnabled());
+        clonedNonPerpetualSession.setDonePageText(session.getDonePageText());
+        clonedNonPerpetualSession.setDonePageTime(session.getDonePageTime());
+        clonedNonPerpetualSession.setDoneRedirectUrl(session.getDoneRedirectUrl());
+        clonedNonPerpetualSession.setCouldNotAssignToTeamMessage(session.getCouldNotAssignToTeamMessage());
+        clonedNonPerpetualSession.setTaskExecutionType(session.getTaskExecutionType());
+        clonedNonPerpetualSession.setRoundsEnabled(session.getRoundsEnabled());
+        clonedNonPerpetualSession.setNumberOfRounds(session.getNumberOfRounds());
+        clonedNonPerpetualSession.setCommunicationType(session.getCommunicationType());
+        clonedNonPerpetualSession.setChatBotName(session.getChatBotName());
+        clonedNonPerpetualSession.setScoreboardEnabled(session.getScoreboardEnabled());
+        clonedNonPerpetualSession.setScoreboardDisplayType(session.getScoreboardDisplayType());
+        clonedNonPerpetualSession.setScoreboardUseDisplayNames(session.getScoreboardUseDisplayNames());
+        clonedNonPerpetualSession.setCollaborationTodoListEnabled(session.getCollaborationTodoListEnabled());
+        clonedNonPerpetualSession.setCollaborationFeedbackWidgetEnabled(session.getCollaborationFeedbackWidgetEnabled());
+        clonedNonPerpetualSession.setCollaborationVotingWidgetEnabled(session.getCollaborationVotingWidgetEnabled());
+        clonedNonPerpetualSession.setTeamCreationMoment(session.getTeamCreationMoment());
+        clonedNonPerpetualSession.setTeamCreationType(session.getTeamCreationType());
+        clonedNonPerpetualSession.setTeamMinSize(session.getTeamMinSize());
+        clonedNonPerpetualSession.setTeamMaxSize(session.getTeamMaxSize());
+        clonedNonPerpetualSession.setTeamCreationMethod(session.getTeamCreationMethod());
+        clonedNonPerpetualSession.setTeamCreationMatrix(session.getTeamCreationMatrix());
+        clonedNonPerpetualSession.setFixedInteractionTime(session.getFixedInteractionTime());
+        clonedNonPerpetualSession.setStudyId(session.getStudyId());
+        clonedNonPerpetualSession.setSessionScheduleType(SessionScheduleType.SCHEDULED_DATE.getId().toString());
+        clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
+        List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
+
+        for (SessionHasTaskGroup shtg : taskGroup) {
+            SessionHasTaskGroup newShtg = new SessionHasTaskGroup();
+            newShtg.setSessionId(clonedNonPerpetualSession.getId());
+            newShtg.setTaskGroupId(shtg.getTaskGroupId());
+            sessionHasTaskGroupDao.create(newShtg);
+        }
+
+        return clonedNonPerpetualSession;
     }
 
     private void createOrUpdateSessionHasTaskGroups(SessionBean studyBean) {
@@ -236,13 +322,13 @@ public class SessionService {
         List<SubjectBean> subjectList = subjectsBean.getSubjectList();
         for (SubjectBean subject : subjectList) {
             subject.setSessionId(subjectsBean.getSessionId());
-            if(subject.getId()!=null){
+            if (subject.getId() != null) {
                 subjectDao.update(subject);
-            }else{
+            } else {
                 subjectDao.create(subject);
             }
             List<SubjectAttribute> subjectAttributes = subject.getSubjectAttributes();
-            if (subjectAttributes!=null) {
+            if (subjectAttributes != null) {
                 for (SubjectAttribute subjectAttribute : subjectAttributes) {
                     subjectAttribute.setSubjectId(subject.getId());
                     if (subjectAttribute.getId() != null) {
@@ -260,11 +346,11 @@ public class SessionService {
     public void resetSession(Session session) {
 
         List<Round> roundList = roundDao.listBySessionId(session.getId());
-        for(Round r: roundList) {
+        for (Round r : roundList) {
             List<Team> teamList = teamDao.listByRoundId(r.getId());
 
             List<CompletedTask> completedTasks = completedTaskDao.listByRoundId(r.getId());
-            for(CompletedTask ct: completedTasks) {
+            for (CompletedTask ct : completedTasks) {
 
                 todoEntryService.deleteTodoEntryByCompletedTaskId(ct.getId());
                 votingService.deleteVotingPoolByCompletedTaskId(ct.getId());
@@ -274,10 +360,10 @@ public class SessionService {
             }
             completedTaskDao.deleteByRoundId(r.getId());
 
-            for(Team team: teamList) {
-                List<TeamHasSubject>  teamHasSubjects = teamHasSubjectDao.listByTeamId(team.getId());
+            for (Team team : teamList) {
+                List<TeamHasSubject> teamHasSubjects = teamHasSubjectDao.listByTeamId(team.getId());
                 teamHasSubjectDao.deleteByTeamId(team.getId());
-                for(TeamHasSubject ths: teamHasSubjects){
+                for (TeamHasSubject ths : teamHasSubjects) {
                     subjectAttributeDao.deleteBySubjectId(ths.getSubjectId());
                 }
 
@@ -287,13 +373,13 @@ public class SessionService {
         }
         roundDao.deleteBySessionId(session.getId());
 
-        SessionRunner sr = SessionRunner.getSessionRunner(session.getId());
-        if(sr!=null){
-            SessionRunner.removeSessionRunner(session.getId());
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(session.getId());
+        if (sr != null) {
+            SessionRunnerManager.removeSessionRunner(session.getId());
         }
 
         session.setStatus(SessionStatus.NOTSTARTED.getId().toString());
-        session.setSessionStartDate(new Timestamp(session.getSessionStartDate().getTime() - 1000*60*10));
+        session.setSessionStartDate(new Timestamp(session.getSessionStartDate().getTime() - 1000 * 60 * 10));
         sessionDao.update(session);
 
     }

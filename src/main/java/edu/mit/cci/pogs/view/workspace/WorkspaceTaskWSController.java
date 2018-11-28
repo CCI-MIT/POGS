@@ -17,6 +17,7 @@ import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
 
@@ -41,7 +42,7 @@ public class WorkspaceTaskWSController {
             String externalId = taskAttributeMessage.getSender();
             Long completedTaskId = Long.parseLong(taskAttributeMessage.getCompletedTaskId());
             Long sessionId = Long.parseLong(taskAttributeMessage.getSessionId());
-            SessionRunner sr = SessionRunner.getSessionRunner(sessionId);
+            SessionRunner sr = SessionRunnerManager.getSessionRunner(sessionId);
 
 
             if(sr!=null) {

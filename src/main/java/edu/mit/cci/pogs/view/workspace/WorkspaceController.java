@@ -24,6 +24,7 @@ import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -41,6 +42,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
@@ -52,11 +54,13 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskScoreWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
+import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
 import edu.mit.cci.pogs.utils.ColorUtils;
@@ -112,15 +116,28 @@ public class WorkspaceController {
     @Autowired
     private TaskConfigurationDao taskConfigurationDao;
 
+    @Autowired
+    private SessionService sessionService;
+
     @PostMapping("/check_in")
     public String register(@RequestParam("externalId") String externalId, Model model) {
 
-        Subject su = workspaceService.getSubject(externalId);
-        if (su == null) {
-            model.addAttribute("errorMessage", "This id was not recognized.");
-            return "workspace/error";
+        Subject su;
+        //check if subject is from perpetual session.
+        Session session = sessionService.getPerpetualSessionForSubject(externalId);
+        if (session != null) {
+            su = new Subject();
+            su.setSubjectExternalId(externalId);
+            su.setSessionId(session.getId());
+        } else {
+
+            su = workspaceService.getSubject(externalId);
+            if (su == null) {
+                model.addAttribute("errorMessage", "This id was not recognized.");
+                return "workspace/error";
+            }
         }
-        SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr == null) {
             model.addAttribute("errorMessage", "Too early.");
             return "workspace/error";
@@ -133,6 +150,7 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "You are too late, your session has already passed!");
             return "workspace/error";
         }
+
         sr.subjectCheckIn(su);
         return "redirect:/waiting_room/" + su.getSubjectExternalId();
     }
@@ -140,6 +158,20 @@ public class WorkspaceController {
     @GetMapping("/waiting_room/{externalId}")
     public String waitingRoom(@PathVariable("externalId") String externalId, Model model) {
         Subject su = workspaceService.getSubject(externalId);
+        if(su == null) {
+            Session session = sessionService.getPerpetualSessionForSubject(externalId);
+
+            if (session != null) {
+                su = new Subject();
+                su.setSubjectExternalId(externalId);
+                su.setSessionId(session.getId());
+            } else {
+                model.addAttribute("errorMessage", "There was an error and your session has ended!");
+                return "workspace/error";
+            }
+        }
+
+
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/waiting_room");
     }
 
@@ -147,10 +179,13 @@ public class WorkspaceController {
 
         if (su != null) {
 
-            SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+            SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
             if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
                 model.addAttribute("subject", su);
                 model.addAttribute("pogsSession", sr.getSession());
+                model.addAttribute("pogsSessionPerpetual", (sr.getSession().getSessionScheduleType().equals(
+                        SessionScheduleType.PERPETUAL.getId().toString())));
+
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
                 return forwardString;
@@ -216,7 +251,7 @@ public class WorkspaceController {
         if (su == null) {
             return handleErrorMessage("There was an error and your session has ended!", model);
         }
-        SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
             if (task != null) {
                 model.addAttribute("task", task);
@@ -256,6 +291,19 @@ public class WorkspaceController {
         Task task = taskDao.get(taskId);
         Subject su = workspaceService.getSubject(subjectExternalId);
 
+        TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+
+        model.addAttribute("taskCss", pl.getTaskCSSContent());
+        model.addAttribute("taskPrimerJs", pl.getTaskPrimerJsContent());
+        model.addAttribute("taskPrimerHtml", pl.getTaskPrimerHtmlContent());
+
+        TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
+                .getByTaskId(task.getId());
+        List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
+                .listByTaskConfigurationId(configuration.getTaskConfigurationId());
+
+        model.addAttribute("taskConfigurationAttributes",
+                attributesToJsonArray(taskExecutionAttributes));
         return checkSubjectSessionTaskAndForward(su, task, "workspace/task_primer", model);
 
     }
@@ -478,7 +526,7 @@ public class WorkspaceController {
             for (SubjectCommunication sc : subjectCommunications) {
                 Subject subject = subjectDao.get(sc.getToSubjectId());
                 if (sc.getAllowed()) {
-                    if(sc.getToSubjectId()!= sc.getFromSubjectId()) {
+                    if (sc.getToSubjectId() != sc.getFromSubjectId()) {
                         allowedToTalkTo.add(subject.getSubjectExternalId());
                     }
                 }
@@ -523,7 +571,7 @@ public class WorkspaceController {
                 model.addAttribute("taskConfigurationAttributes",
                         attributesToJsonArray(taskExecutionAttributes));
 
-                SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+                SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
                 SessionWrapper sessionWrapper = sr.getSession();
 
                 if (sr == null) {
@@ -602,6 +650,9 @@ public class WorkspaceController {
                     if (team == null) {
                         team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), null, null);
                     }
+                }
+                if(team == null){
+                    return handleErrorMessage(sessionWrapper.getCouldNotAssignToTeamMessage(), model);
                 }
                 CompletedTask completedTask = completedTaskDao.getByRoundIdTaskIdTeamId(
                         round.getId(),
@@ -692,7 +743,7 @@ public class WorkspaceController {
     @GetMapping("/done/{externalId}")
     public String done(@PathVariable("externalId") String externalId, Model model) {
         Subject su = workspaceService.getSubject(externalId);
-        SessionRunner sr = SessionRunner.getSessionRunner(su.getSessionId());
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
 
         if (sr != null) {
 
@@ -720,11 +771,13 @@ public class WorkspaceController {
                         for (CompletedTask ct : tw.getCompletedTasks()) {
                             CompletedTaskScore cts = completedTaskScoreDao
                                     .getByCompletedTaskId(ct.getId());
-                            if (ct.getSubjectId() == null) {
-                                teamScore.put(ct.getTeamId(), cts.getTotalScore());
-                            } else {
-                                if (ct.getSubjectId().equals(su.getId())) {
+                            if(cts!=null) {
+                                if (ct.getSubjectId() == null) {
                                     teamScore.put(ct.getTeamId(), cts.getTotalScore());
+                                } else {
+                                    if (ct.getSubjectId().equals(su.getId())) {
+                                        teamScore.put(ct.getTeamId(), cts.getTotalScore());
+                                    }
                                 }
                             }
                         }
@@ -737,9 +790,9 @@ public class WorkspaceController {
                     }
                 }
                 int subjectsTeam = 0;
-                for(int i =0 ; i < teamWrappers.size(); i++) {
-                    for(Subject sub : teamWrappers.get(i).getSubjects()){
-                        if(sub.getId() == su.getId()){
+                for (int i = 0; i < teamWrappers.size(); i++) {
+                    for (Subject sub : teamWrappers.get(i).getSubjects()) {
+                        if (sub.getId() == su.getId()) {
                             subjectsTeam = i;
                         }
                     }

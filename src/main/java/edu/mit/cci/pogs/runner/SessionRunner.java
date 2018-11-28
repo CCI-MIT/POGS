@@ -3,7 +3,9 @@ package edu.mit.cci.pogs.runner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -14,6 +16,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -22,10 +25,12 @@ import edu.mit.cci.pogs.model.dao.chatentry.ChatEntryDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationMethod;
 import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
+import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
@@ -46,49 +51,34 @@ import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
+import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.service.TaskGroupService;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
 
 @Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SessionRunner implements Runnable {
 
 
-    private static Map<Long, SessionRunner> liveRunners = new HashMap<>();
+
 
     private boolean sessionHasStarted = false;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionRunner.class);
 
-    public static Collection<SessionRunner> getLiveRunners() {
-        return liveRunners.values();
-    }
 
-    public static SessionRunner getSessionRunner(Long sessionId) {
-        return liveRunners.get(sessionId);
-    }
-
-    public static void addSessionRunner(Long sessionId, SessionRunner sessionRunner) {
-        if (liveRunners.get(sessionId) == null) {
-            liveRunners.put(sessionId, sessionRunner);
-        }
-    }
-
-    public static void removeSessionRunner(Long sessionId) {
-        if (liveRunners.get(sessionId) != null) {
-            liveRunners.get(sessionId).setShouldRun(false);
-            liveRunners.remove(sessionId);
-        }
-    }
 
     private SessionWrapper session;
 
 
     private List<Subject> subjectList;
 
-    private Map<String, Subject> checkedInWaitingSubjectList;
+    private Map<String, Subject> checkedInWaitingSubjectList = new HashMap<>();
 
-    private Map<Long, Subject> checkedInWaitingSubjectListById;
+    private Map<Long, Subject> checkedInWaitingSubjectListById = new HashMap<>();
+
+    private Map<Long, List<Subject>> sessionsRelatedToPerpetual = new HashMap<>();
 
     @Autowired
     private SessionDao sessionDao;
@@ -117,7 +107,13 @@ public class SessionRunner implements Runnable {
     private ChatEntryDao chatEntryDao;
 
     @Autowired
+    private SubjectDao subjectDao;
+
+    @Autowired
     private CompletedTaskDao completedTaskDao;
+
+    @Autowired
+    private SubjectCommunicationService subjectCommunicationService;
 
     @Autowired
     private ApplicationContext context;
@@ -174,7 +170,7 @@ public class SessionRunner implements Runnable {
             }
 
         }
-        SessionRunner.removeSessionRunner(session.getId());
+        SessionRunnerManager.removeSessionRunner(session.getId());
         for (Thread th : this.chatRunners) {
             th.interrupt();
         }
@@ -434,7 +430,7 @@ public class SessionRunner implements Runnable {
                         subjectList.get(i).getId());
                 if (attributeList != null && attributeList.size() > 0) {
                     for (SubjectAttribute sa : attributeList) {
-                        if(sa.getAttributeName().equals(ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)){
+                        if (sa.getAttributeName().equals(ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)) {
                             return;
                         }
                     }
@@ -522,8 +518,6 @@ public class SessionRunner implements Runnable {
 
     private void setupSubjectList(SessionWrapper session) {
         subjectList = sessionService.listSubjectsBySessionId(session.getId());
-        checkedInWaitingSubjectList = new HashMap<>();
-        checkedInWaitingSubjectListById = new HashMap<>();
     }
 
     private void setupRounds(SessionWrapper sessionz) {
@@ -595,8 +589,78 @@ public class SessionRunner implements Runnable {
 
     @Override
     public void run() {
-        init();
-        runSession();
+        if (session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+            runPerpetual();
+        } else {
+            init();
+            runSession();
+        }
+    }
+
+    public void runPerpetual() {
+        shouldRun = true;
+        checkedInWaitingSubjectList = new HashMap<>();
+        checkedInWaitingSubjectListById = new HashMap<>();
+        sessionsRelatedToPerpetual = new HashMap<>();
+        while (shouldRun) {
+
+            if((checkedInWaitingSubjectList.size() > 0 )) {
+                if ((checkedInWaitingSubjectList.keySet().size() >= session.getPerpetualSubjectsNumber())) {
+                    synchronized (checkedInWaitingSubjectList) {
+                        Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
+                        List<Subject> subjectsInNewSession = new ArrayList<>();
+                        Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
+                        int subjsInNewSession = 0;
+                        List<Subject> subjectsNotForThisSession = new ArrayList<>();
+
+                        while (it.hasNext()) {
+                            if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
+                                Subject su = new Subject();
+                                String externalId = it.next();
+                                su.setSessionId(newSpawnedSession.getId());
+                                su.setSubjectExternalId(externalId);
+                                su.setSubjectDisplayName(externalId);
+                                su = subjectDao.create(su);
+
+                                subjectsInNewSession.add(su);
+
+                                subjsInNewSession++;
+                            } else {
+                                subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
+                            }
+                        }
+                        sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
+
+                        subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
+
+                        checkedInWaitingSubjectList = new HashMap<>();
+                        for (Subject ext : subjectsNotForThisSession) {
+                            checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
+                        }
+
+                    }
+                }
+            }
+            if (session.getSecondsRemainingForSession() < 0) {
+                shouldRun = false;
+            }
+            List<Long> sessionsMigratedToRightCheckinList = new ArrayList<>();
+            for (Long sessionId : sessionsRelatedToPerpetual.keySet()) {
+                SessionRunner sr = SessionRunnerManager.getSessionRunner(sessionId);
+
+                if (sr != null) {
+                    for (Subject s : sessionsRelatedToPerpetual.get(sessionId)) {
+                        sr.subjectCheckIn(s);
+                        _log.debug("Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
+
+                    }
+                    sessionsMigratedToRightCheckinList.add(sessionId);
+                }
+            }
+            for (Long sess : sessionsMigratedToRightCheckinList) {
+                sessionsRelatedToPerpetual.remove(sess);
+            }
+        }
     }
 
     public Map<String, Subject> getAllCheckedInSubjects() {

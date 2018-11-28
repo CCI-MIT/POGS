@@ -19,6 +19,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
@@ -37,7 +38,7 @@ public class DashboardController {
         List<Study> studiesUserIsAllowedToSee = studyDao.listStudiesWithUserGroup(
                 AuthUserDetailsService.getLoggedInUser());
 
-        Collection<SessionRunner> liveSessionRunners = SessionRunner.getLiveRunners();
+        Collection<SessionRunner> liveSessionRunners = SessionRunnerManager.getLiveRunners();
         List<SessionWrapper> liveSessionsResearcherCanSee = new ArrayList<>();
 
         for (SessionRunner sr : liveSessionRunners) {
@@ -55,7 +56,7 @@ public class DashboardController {
     @GetMapping("/admin/dashboard/sessions/{sessionId}")
     public String dashboardForSession(@PathVariable("sessionId") Long sessionId, Model model) {
         //get all schedules and completed tasks for session
-        SessionRunner sessionRunner = SessionRunner.getSessionRunner(sessionId);
+        SessionRunner sessionRunner = SessionRunnerManager.getSessionRunner(sessionId);
 
         List<RoundWrapper> rw = sessionRunner.getSession().getSessionRounds();
         if(rw!=null && rw.size() > 0) {

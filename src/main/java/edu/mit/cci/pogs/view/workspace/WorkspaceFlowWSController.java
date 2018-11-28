@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import edu.mit.cci.pogs.messages.PogsMessage;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.service.WorkspaceService;
 
 @Controller
@@ -24,7 +25,7 @@ public class WorkspaceFlowWSController {
             Subject subject = workspaceService.getSubject(externalId);
 
             if (subject != null) {
-                SessionRunner sr = SessionRunner.getSessionRunner(subject.getSessionId());
+                SessionRunner sr = SessionRunnerManager.getSessionRunner(subject.getSessionId());
                 if (sr != null) {
                     sr.subjectCheckIn(subject);
                 }

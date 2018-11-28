@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
@@ -32,7 +33,7 @@ public class SessionWrapper extends Session {
 
     private List<TaskWrapper> taskList;
 
-    private Map<Long,Map<String,Integer>> feedbackCounter;
+    private Map<Long, Map<String, Integer>> feedbackCounter;
 
     public RoundWrapper getCurrentRound() {
         for (RoundWrapper rw : sessionRounds) {
@@ -59,22 +60,26 @@ public class SessionWrapper extends Session {
         return feedbackCounter;
     }
 
-    public void addSubjectContribution(Long completedTaskId, String subjectExternalId, Integer contribution){
-        Map<String,Integer> map =this.feedbackCounter.get(completedTaskId);
-        if(map== null){
+    public void addSubjectContribution(Long completedTaskId, String subjectExternalId, Integer contribution) {
+        Map<String, Integer> map = this.feedbackCounter.get(completedTaskId);
+        if (map == null) {
             map = new HashMap<>();
         }
         Integer currentCount = map.get(subjectExternalId);
-        if(currentCount == null){
+        if (currentCount == null) {
             currentCount = 0;
         }
         currentCount = currentCount + contribution;
         map.put(subjectExternalId, currentCount);
-        this.feedbackCounter.put(completedTaskId,map);
+        this.feedbackCounter.put(completedTaskId, map);
 
     }
+
     public Long getSecondsRemainingForSession() {
 
+        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+            return 20 * 1000l;
+        }
         Integer roundSize = this.sessionRounds.size();
 
         if (roundSize != 0) {
@@ -88,6 +93,11 @@ public class SessionWrapper extends Session {
         //if (!this.isTaskExecutionModeSequential()) {
         //    return 0l;
         // }
+
+        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+
+            return (new Date().getTime() + 1000 * 60 * 5);
+        }
         if (this.sessionSchedule == null) {
             return getTimeToStart();
         }
@@ -99,6 +109,10 @@ public class SessionWrapper extends Session {
 
 
     public Long getSecondsRemainingForCurrentRound() {
+        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+
+            return (new Date().getTime() + 1000 * 60 * 5);
+        }
         if (this.getTimeToStart() > 0) {
             return 0l;
         }
@@ -109,16 +123,26 @@ public class SessionWrapper extends Session {
             return (rw.getRoundStartTimestamp() + rw.getTotalRoundTime()) - DateUtils.now();
         }
     }
+
     public String getCurrentUrl() {
         Integer sessionScheduleIndex = getSessionScheduleIndex();
 
-        if(this.sessionSchedule == null || this.sessionSchedule.size() == 0){
+        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+            return "/waiting_room";
+        }
+
+        if (this.sessionSchedule == null || this.sessionSchedule.size() == 0) {
             return "/waiting_room";
         }
         return this.sessionSchedule.get(sessionScheduleIndex).getUrl();
 
     }
+
     public String getNextUrl() {
+
+        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+            return "";
+        }
 
         if (this.sessionSchedule == null || this.sessionSchedule.size() == 0) {
             return "/intro";
@@ -141,7 +165,8 @@ public class SessionWrapper extends Session {
     public void setTaskList(List<TaskWrapper> taskList) {
         this.taskList = taskList;
     }
-    public void randomizeTaskOrder(){
+
+    public void randomizeTaskOrder() {
         Collections.shuffle(this.taskList);
     }
 
@@ -164,7 +189,9 @@ public class SessionWrapper extends Session {
 
 
     public boolean isTooLate() {
-
+        if(this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())){
+            return false;
+        }
         return DateUtils.now() > this.getSessionStartDate().getTime();
     }
 
@@ -311,7 +338,7 @@ public class SessionWrapper extends Session {
                 }
             } else {
                 if (ss.getUrl().endsWith("/done")) {
-                    long doneTime  = ss.getEndTimestamp() - ss.getStartTimestamp();
+                    long doneTime = ss.getEndTimestamp() - ss.getStartTimestamp();
                     ss.setStartTimestamp(taskFinalTimestamp);
                     ss.setEndTimestamp(taskFinalTimestamp + doneTime);
                 }
@@ -340,13 +367,13 @@ public class SessionWrapper extends Session {
 
     public Integer getSessionScheduleIndex() {
         Long now = DateUtils.now();
-        if(this.sessionSchedule== null) return 0;
+        if (this.sessionSchedule == null) return 0;
         for (int i = 0; i < this.sessionSchedule.size(); i++) {
             SessionSchedule ss = this.sessionSchedule.get(i);
             if (ss.isHappeningNow(now)) {
                 return i;
             }
         }
-        return this.sessionSchedule.size()-1;
+        return this.sessionSchedule.size() - 1;
     }
 }

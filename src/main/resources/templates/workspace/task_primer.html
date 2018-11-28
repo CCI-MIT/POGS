@@ -16,7 +16,14 @@
             <div id="countdown"></div>
             <div th:remove="tag" th:utext="${task.primerText}"></div>
         </div>
+    <style  th:inline="text" th:if="${taskCss != null}">
 
+        /*<![CDATA[*/
+        [(${taskCss})]
+
+        /*]]>*/
+    </style>
+    <div class="task_work" th:remove="tag" th:if="${taskPrimerHtml != null}" th:utext="${taskPrimerHtml}" ></div>
         <script>
 
             $(function () {
@@ -29,6 +36,7 @@
                                subjectId: '[(${subject.subjectExternalId})]',
                                secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
                                nextUrl : '[(${nextUrl})]',
+                               taskConfigurationAttributes: [(${taskConfigurationAttributes})],
                                completedTaskId: null,
                                hasCollaboration:false,
                                hasChat: false
@@ -39,6 +47,13 @@
 
 
         </script>
+        <script th:inline="text">
+                /*<![CDATA[*/
+
+                [(${taskPrimerJs})]
+
+                /*]]>*/
+         </script>
     </div>
 </div>
 </body>
