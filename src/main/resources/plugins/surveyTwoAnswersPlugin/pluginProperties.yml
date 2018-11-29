@@ -1,0 +1,8 @@
+name: surveyTwoAnswersPlugin
+description: A survey plugin override to allow two ansers to the same field
+
+scoring:
+    scoringType : indexedAnswerOneAnswerKey
+    answerKeyPrefix: answerSheet
+    answerKeyFormat: CSV
+    answerSheetPrefix: survey_

@@ -1,0 +1,3 @@
+
+pogsTaskConfigEditor.register(new SurveyTaskEdit());
+
