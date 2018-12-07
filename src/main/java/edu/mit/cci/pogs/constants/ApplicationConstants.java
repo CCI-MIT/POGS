@@ -9,4 +9,10 @@ public final class ApplicationConstants {
     public static final String STUDY = "Study";
 
     public static final String SESSION_ID = "Session Id";
+
+    public static final String COMMUNICATION_MESSAGE = "COMMUNICATION_MESSAGE";
+
+    public static final String COLLABORATION_MESSAGE = "COLLABORATION_MESSAGE";
+
+    public static final String TASK_ATTRIBUTE = "TASK_ATTRIBUTE";
 }
