@@ -42,6 +42,30 @@ class MemoryGridTaskEdit {
 
         $("#gridTable").empty();
 
+            let headerRow = $('<tr/>');
+            for (let j = 0; j < bluePrint.colsSize; j++) {
+                let td = $('<th/>');
+                let color = "#000000";
+                if(bluePrint.columnColors) {
+                    color = bluePrint.columnColors[j];
+                }
+                td.append(
+                    '      <div class="col-12 input-group colorField" id="colorField' + j + '" >\n'
+                    + '        <input class="form-control" type="text" value="'
+                    + color + '" >\n'
+                    + '        <span class="input-group-append">\n'
+                    + '         <span class="input-group-text colorpicker-input-addon"><i></i></span>\n'
+                    + '      </span>'
+                    + '      </div>\n');
+
+                headerRow.append(td);
+            }
+            $("#gridTable").append(headerRow);
+
+
+        for (let j = 0; j < bluePrint.colsSize; j++) {
+            $('#colorField' + j).colorpicker({format: 'auto'});
+        }
 
         $("#taskText").val(bluePrint.taskText);
 
@@ -53,6 +77,7 @@ class MemoryGridTaskEdit {
                 let td = $('<td/>');
                 td.append(
                     $('<input/>', {
+                        'class' : 'wordsInput',
                         'cell-reference-index': total,
                         value: answerSheet[total]
                     })
@@ -71,11 +96,17 @@ class MemoryGridTaskEdit {
         bluePrint.colsSize = parseInt($("#gridTable").data('colsSize'));
         bluePrint.rowsSize = parseInt($("#gridTable").data('rowsSize'));
 
+        bluePrint.columnColors = [];
+
+        for(let i = 0; i < (bluePrint.colsSize);i ++){
+            bluePrint.columnColors.push($("#colorField"+ i + " input").val());
+        }
+
 
         bluePrint.taskText = $("#taskText").val();
 
         for (let i = 0; i < (bluePrint.rowsSize * bluePrint.colsSize) ; i ++ ){
-            let currCel = $("#gridTable input")[i];
+            let currCel = $("#gridTable .wordsInput")[i];
             let cellData = $(currCel).val();
             answerSheet.push(cellData);
         }

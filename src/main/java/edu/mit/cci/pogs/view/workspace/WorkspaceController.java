@@ -11,11 +11,21 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.script.Bindings;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
@@ -568,8 +578,7 @@ public class WorkspaceController {
                 model.addAttribute("task", new TaskWrapper(task));
                 model.addAttribute("round", new RoundWrapper(round));
 
-                model.addAttribute("taskConfigurationAttributes",
-                        attributesToJsonArray(taskExecutionAttributes));
+
 
                 SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
                 SessionWrapper sessionWrapper = sr.getSession();
@@ -662,19 +671,10 @@ public class WorkspaceController {
                     completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
                 }
 
-                List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                        round.getId(), task.getId());
+                List<Subject> teammates = getTeamMates(task, su, round);
 
-                if (teammates == null || teammates.size() == 0) {
-                    teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                            round.getId(), null);
-                }
-                if (teammates == null || teammates.size() == 0) {
-                    teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                            null, null);
-                }
+                JSONArray teamMates = getTeamatesJSONObject(teammates);
 
-                model.addAttribute("teammates", getTeamatesJSONObject(teammates));
                 model.addAttribute("completedTask", completedTask);
 
 
@@ -686,6 +686,20 @@ public class WorkspaceController {
 
                 model.addAttribute("eventsUntilNow", allLogs);
 
+                //check if plugin has javascript before work file.
+                //run the code with the variables.
+
+
+
+                JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
+
+
+                model.addAttribute("teammates", teamMates);
+
+                model.addAttribute("taskConfigurationAttributes",taskConfigurationAttributes);
+
+
+
             } else {
                 return handleErrorMessage("There was an error and your session has ended!", model);
             }
@@ -693,6 +707,62 @@ public class WorkspaceController {
         }
 
         return "workspace/task_work";
+    }
+
+    private void runTaskBeforeWorkScript(TaskPlugin pl){
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+
+        // Set JavaScript variables
+        Bindings vars = new SimpleBindings();
+        vars.put("demoVar", "value set in ScriptDemo.java");
+        vars.put("strBuf", new StringBuffer("string buffer"));
+
+        // Run DemoScript.js
+        Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
+                pl.getTaskBeforeWorkJsContent().getBytes()));
+
+        try {
+            try {
+                engine.eval(scriptReader, vars);
+
+            } catch (ScriptException se) {
+                //plugin script failed.
+
+            } finally {
+                scriptReader.close();
+            }
+        }catch (IOException io){
+            //ignore
+        }
+
+        // Get JavaScript variables
+        Object demoVar = vars.get("demoVar");
+        System.out.println("[Java] demoVar: " + demoVar);
+        System.out.println("    Java object: " + demoVar.getClass().getName());
+        System.out.println();
+        Object strBuf = vars.get("strBuf");
+        System.out.println("[Java] strBuf: " + strBuf);
+        System.out.println("    Java object: " + strBuf.getClass().getName());
+        System.out.println();
+        Object newVar = vars.get("newVar");
+        System.out.println("[Java] newVar: " + newVar);
+        System.out.println("    Java object: " + newVar.getClass().getName());
+        System.out.println();
+    }
+    private List<Subject> getTeamMates(Task task, Subject su, Round round) {
+        List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
+                round.getId(), task.getId());
+
+        if (teammates == null || teammates.size() == 0) {
+            teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
+                    round.getId(), null);
+        }
+        if (teammates == null || teammates.size() == 0) {
+            teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
+                    null, null);
+        }
+        return teammates;
     }
 
     private JSONArray getJsonTaskList(List<TaskWrapper> taskList) {

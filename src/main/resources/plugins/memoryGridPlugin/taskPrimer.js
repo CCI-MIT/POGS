@@ -23,6 +23,8 @@ class MemoryGridTaskPrimer{
             for(let j = 0 ; j< parseInt(gridBluePrint.colsSize); j++) {
                 let td = $('<td/>',{
                     'id': 'gridCell' + total,
+                    'style': 'background-color: ' + gridBluePrint.columnColors[j] + ';color:' +
+                             generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';',
                     text: answerSheet[total]
                 });
 
@@ -71,3 +73,22 @@ let memoryGridTaskPrimerPlugin = pogs.createPlugin('memoryGridTaskPrimerPlugin',
 
 
 });
+
+function generateFontColorBasedOnBackgroundColor(colorz) {
+    let color = parseColor(colorz);
+    let r = color[0];
+    let g = color[1];
+    let b = color[2];
+    let yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? "#000000" : "#FFFFFF";
+}
+function parseColor(input) {
+    let  m = input.match(/^#([0-9a-f]{6})$/i)[1];
+    if( m) {
+        return [
+            parseInt(m.substr(0,2),16),
+            parseInt(m.substr(2,2),16),
+            parseInt(m.substr(4,2),16)
+        ];
+    }
+}

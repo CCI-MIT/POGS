@@ -140,6 +140,9 @@ public class TaskPlugin {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskPrimer.html");
     }
 
+    public String getTaskBeforeWorkJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskBeforeWork.js");
+    }
     public String getTaskWorkJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.js");
     }

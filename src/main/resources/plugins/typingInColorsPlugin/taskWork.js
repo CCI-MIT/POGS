@@ -71,7 +71,9 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         else css.appendChild(document.createTextNode(rule)); // Support for the rest
         document.getElementsByTagName("head")[0].appendChild(css); // Specifies where to place the css
 
-
+        if(this.subjectsColors.length == this.availableColors.length) {
+            $("button").attr("disabled", true);
+        }
 
     }
     sendAssignedColorToSelf(colorIndex){
