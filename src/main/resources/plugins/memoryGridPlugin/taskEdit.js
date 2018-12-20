@@ -21,7 +21,7 @@ class MemoryGridTaskEdit {
             createOrUpdateAttribute("gridBluePrint",gridBluePrint.stringValue,null,null,this.taskConfigId,0, gridBluePrint.id);
             createOrUpdateAttribute("answerSheet",answerSheet.stringValue,null,null,this.taskConfigId,1, answerSheet.id);
         }
-
+        setupHTMLFieldEditors();
 
         $("#createGrid").click(function () {
 
@@ -68,6 +68,10 @@ class MemoryGridTaskEdit {
         }
 
         $("#taskText").val(bluePrint.taskText);
+        $("#colorsInPrimer").attr("checked",bluePrint.colorsInPrimer);
+        $("#colorsInTask").attr("checked",bluePrint.colorsInTask);
+        $("#headersInPrimer").attr("checked",bluePrint.headersInPrimer);
+        $("#headersInTask").attr("checked",bluePrint.headersInTask);
 
         let total = 0;
         for(let i=0;i<bluePrint.rowsSize;i++){
@@ -104,6 +108,10 @@ class MemoryGridTaskEdit {
 
 
         bluePrint.taskText = $("#taskText").val();
+        bluePrint.colorsInPrimer = $("#colorsInPrimer").is(":checked");
+        bluePrint.colorsInTask = $("#colorsInTask").is(":checked");
+        bluePrint.headersInPrimer = $("#headersInPrimer").is(":checked");
+        bluePrint.headersInTask = $("#headersInTask").is(":checked");
 
         for (let i = 0; i < (bluePrint.rowsSize * bluePrint.colsSize) ; i ++ ){
             let currCel = $("#gridTable .wordsInput")[i];

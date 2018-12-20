@@ -15,6 +15,12 @@ body{
     color: white;
 }
 
+#gridTable th {
+    border: 2px solid #444;
+    text-align: center;
+    color: black;
+}
+
 
 @keyframes fadein {
     from {color: white;}

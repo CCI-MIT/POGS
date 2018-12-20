@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.script.Bindings;
+import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
@@ -168,7 +169,7 @@ public class WorkspaceController {
     @GetMapping("/waiting_room/{externalId}")
     public String waitingRoom(@PathVariable("externalId") String externalId, Model model) {
         Subject su = workspaceService.getSubject(externalId);
-        if(su == null) {
+        if (su == null) {
             Session session = sessionService.getPerpetualSessionForSubject(externalId);
 
             if (session != null) {
@@ -355,8 +356,8 @@ public class WorkspaceController {
                     .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
             model.addAttribute("task", new TaskWrapper(task));
-            model.addAttribute("taskConfigurationAttributes",
-                    attributesToJsonArray(taskExecutionAttributes));
+            JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
+            model.addAttribute("taskConfigurationAttributes", taskConfigurationAttributes);
 
             JSONArray allLogs = new JSONArray();
             model.addAttribute("eventsUntilNow", allLogs);
@@ -367,7 +368,8 @@ public class WorkspaceController {
             model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
             model.addAttribute("subject", generateFakeSubject(subjectExternalId));
-            model.addAttribute("teammates", getFakeTeamatesJSONObject());
+            JSONArray teammates = getFakeTeamatesJSONObject();
+            model.addAttribute("teammates", teammates);
 
             JSONArray ja = new JSONArray();
             ja.add("su01");
@@ -402,6 +404,10 @@ public class WorkspaceController {
             model.addAttribute("communicationType", cc);
             model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
                     .NO_CHAT.getId().toString()) ? (true) : (false)));
+
+            if (pl.getTaskBeforeWorkJsContent() != null) {
+                runTaskBeforeWorkScript(pl, teammates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
+            }
 
         }
 
@@ -579,7 +585,6 @@ public class WorkspaceController {
                 model.addAttribute("round", new RoundWrapper(round));
 
 
-
                 SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
                 SessionWrapper sessionWrapper = sr.getSession();
 
@@ -660,7 +665,7 @@ public class WorkspaceController {
                         team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), null, null);
                     }
                 }
-                if(team == null){
+                if (team == null) {
                     return handleErrorMessage(sessionWrapper.getCouldNotAssignToTeamMessage(), model);
                 }
                 CompletedTask completedTask = completedTaskDao.getByRoundIdTaskIdTeamId(
@@ -671,7 +676,7 @@ public class WorkspaceController {
                     completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
                 }
 
-                List<Subject> teammates = getTeamMates(task, su, round);
+                List<Subject> teammates = teamService.getTeamMates(task, su, round);
 
                 JSONArray teamMates = getTeamatesJSONObject(teammates);
 
@@ -690,14 +695,16 @@ public class WorkspaceController {
                 //run the code with the variables.
 
 
-
                 JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
 
+                if (pl.getTaskBeforeWorkJsContent() != null) {
+                    if(!hasAlreadyRunBeforeTask(taskExecutionAttributes))
+                    runTaskBeforeWorkScript(pl, teamMates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
+                }
 
                 model.addAttribute("teammates", teamMates);
 
-                model.addAttribute("taskConfigurationAttributes",taskConfigurationAttributes);
-
+                model.addAttribute("taskConfigurationAttributes", taskConfigurationAttributes);
 
 
             } else {
@@ -709,61 +716,95 @@ public class WorkspaceController {
         return "workspace/task_work";
     }
 
-    private void runTaskBeforeWorkScript(TaskPlugin pl){
+    private boolean hasAlreadyRunBeforeTask(List<TaskExecutionAttribute> taskExecutionAttributes) {
+        for(TaskExecutionAttribute tea: taskExecutionAttributes){
+            if(tea.getAttributeName().equals("beforeWorkDone")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    //TODO: Migrate this logic to an external scheduler before the task runs.
+    private void runTaskBeforeWorkScript(TaskPlugin pl, JSONArray teamMates, JSONArray taskAttr, Long taskConfigurationId) {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName("JavaScript");
 
         // Set JavaScript variables
-        Bindings vars = new SimpleBindings();
-        vars.put("demoVar", "value set in ScriptDemo.java");
-        vars.put("strBuf", new StringBuffer("string buffer"));
+        engine.put("attributesToAdd", "abc");
 
-        // Run DemoScript.js
+        Bindings vars = new SimpleBindings();
+        engine.put("teammates", teamMates.toString());
+        engine.put("taskConfigurationAttributes", taskAttr.toString());
+
         Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
                 pl.getTaskBeforeWorkJsContent().getBytes()));
 
+
         try {
             try {
-                engine.eval(scriptReader, vars);
+                engine.eval(scriptReader);
+
+                String attributesToAddJson = (String) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("attributesToAdd");
+
+                if (attributesToAddJson != null) {
+                    org.json.JSONArray array = new org.json.JSONArray(attributesToAddJson);
+                    if (array != null) {
+                        for (int i = 0; i < array.length(); i++) {
+                            org.json.JSONObject jo = array.getJSONObject(i);
+                            TaskExecutionAttribute tea = new TaskExecutionAttribute();
+                            tea.setAttributeName(jo.getString("attributeName"));
+                            tea.setTaskConfigurationId(taskConfigurationId);
+                            if (jo.has("stringValue")) {
+                                tea.setStringValue(jo.getString("stringValue"));
+                            }
+                            if (jo.has("integerValue")) {
+                                tea.setIntegerValue(jo.getLong("integerValue"));
+                            }
+                            if (jo.has("doubleValue")) {
+                                tea.setDoubleValue(jo.getDouble("doubleValue"));
+                            }
+                            boolean alreadyExist = false;
+                            //TODO: migrate logic to taskExecutionService
+                            List<TaskExecutionAttribute> list = taskExecutionAttributeDao.listByTaskConfigurationId(taskConfigurationId);
+                            for (TaskExecutionAttribute teaz : list) {
+                                if (teaz.getAttributeName().equals(tea.getAttributeName())) {
+                                    teaz.setStringValue(tea.getStringValue());
+                                    teaz.setIntegerValue(tea.getIntegerValue());
+                                    teaz.setDoubleValue(tea.getDoubleValue());
+                                    taskExecutionAttributeDao.update(teaz);
+                                    alreadyExist = true;
+                                }
+                            }
+                            if (!alreadyExist) {
+                                taskExecutionAttributeDao.create(tea);
+                            }
+                        }
+                    }
+                }
+                TaskExecutionAttribute tea = new TaskExecutionAttribute();
+                tea.setTaskConfigurationId(taskConfigurationId);
+                tea.setAttributeName("beforeWorkDone");
+                tea.setStringValue("true");
+
 
             } catch (ScriptException se) {
                 //plugin script failed.
+                System.out.println(se);
+                se.printStackTrace();
+
 
             } finally {
                 scriptReader.close();
             }
-        }catch (IOException io){
+        } catch (IOException io) {
             //ignore
+            io.printStackTrace();
         }
 
-        // Get JavaScript variables
-        Object demoVar = vars.get("demoVar");
-        System.out.println("[Java] demoVar: " + demoVar);
-        System.out.println("    Java object: " + demoVar.getClass().getName());
-        System.out.println();
-        Object strBuf = vars.get("strBuf");
-        System.out.println("[Java] strBuf: " + strBuf);
-        System.out.println("    Java object: " + strBuf.getClass().getName());
-        System.out.println();
-        Object newVar = vars.get("newVar");
-        System.out.println("[Java] newVar: " + newVar);
-        System.out.println("    Java object: " + newVar.getClass().getName());
-        System.out.println();
-    }
-    private List<Subject> getTeamMates(Task task, Subject su, Round round) {
-        List<Subject> teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                round.getId(), task.getId());
 
-        if (teammates == null || teammates.size() == 0) {
-            teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                    round.getId(), null);
-        }
-        if (teammates == null || teammates.size() == 0) {
-            teammates = teamService.getTeamSubjects(su.getId(), su.getSessionId(),
-                    null, null);
-        }
-        return teammates;
     }
+
 
     private JSONArray getJsonTaskList(List<TaskWrapper> taskList) {
         JSONArray ja = new JSONArray();
@@ -841,7 +882,7 @@ public class WorkspaceController {
                         for (CompletedTask ct : tw.getCompletedTasks()) {
                             CompletedTaskScore cts = completedTaskScoreDao
                                     .getByCompletedTaskId(ct.getId());
-                            if(cts!=null) {
+                            if (cts != null) {
                                 if (ct.getSubjectId() == null) {
                                     teamScore.put(ct.getTeamId(), cts.getTotalScore());
                                 } else {

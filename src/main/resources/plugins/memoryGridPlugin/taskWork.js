@@ -1,84 +1,111 @@
 class MemoryGridTask {
     constructor(pogsPlugin) {
         this.pogsPlugin = pogsPlugin;
-        this.subjectsHasColumn = [];
+        this.subjectsHasColumns = [];
         this.colorHasSubjects = [];
     }
     setupGrid(gridBluePrint){
 
         console.log("setup grid blueprint: " + gridBluePrint.rowsSize + " - " + gridBluePrint.colsSize);
-
-        if(gridBluePrint.columnColors){
-
-            let allSubjectsHaveAtLeastOneColor = false;
-            let allColorsHaveAtLeastOneSubject = false;
-
-
-            for(let k = 0 ; k < gridBluePrint.columnColors.length; k ++){
-                this.colorHasSubjects[k] = [];
-            }
-            for(let k = 0; k < this.pogsPlugin.getTeammates().length; k ++){
-                this.subjectsHasColumn[k] = [];
-            }
-
-            while(!allColorsHaveAtLeastOneSubject && !allSubjectsHaveAtLeastOneColor) {
-
-                for(let k = 0 ; k < this.subjectsHasColumn.length; k ++){
-                    if(this.subjectsHasColumn[k].length == 0){
-                        allSubjectsHaveAtLeastOneColor = false;
-                    }
-                }
-
-                if(!allSubjectsHaveAtLeastOneColor) {
-                    for (let i = 0; i < this.pogsPlugin.getTeammates().length; i++) {
-                        if(this.subjectsHasColumn[i].length == 0 ) {
-                            let x = Math.floor(
-                                Math.random() * gridBluePrint.columnColors.length);
-                            this.subjectsHasColumn[i].push(x);
-                            this.colorHasSubjects[x].push(i);
-                        }
-                    }
-                }
-                for(let k = 0 ; k < this.colorHasSubjects.length; k ++){
-                    if(this.colorHasSubjects[k].length == 0){
-                        allColorsHaveAtLeastOneSubject = false;
-                    }
-                }
-                if(!allColorsHaveAtLeastOneSubject) {
-                    for( let i=0; i < gridBluePrint.columnColors; i ++){
-                        if(this.colorHasSubjects[i].length == 0 ){
-                            let x = Math.floor(
-                                Math.random() * gridBluePrint.columnColors.length);
-                            this.subjectsHasColumn[x].push(i);
-                            this.colorHasSubjects[i].push(x);
-                        }
-                    }
-                }
-
-            }
+        let teamMates = this.pogsPlugin.getTeammates();
+        let columnsUserCanChange = [];
+        for (let j = 0; j < gridBluePrint.colsSize; j++) {
+            columnsUserCanChange[j] = true;
         }
+        let colorsInTask = gridBluePrint.colorsInTask;
+        let headersInTask = gridBluePrint.headersInTask;
 
+        let letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J','K', 'L', 'M', 'N', 'O', 'P',
+                      'Q', 'R', 'S', 'T', 'U', 'W', 'V', 'X', 'Y', 'Z'];
+        if(gridBluePrint.columnColors) {
 
+            this.subjectsHasColumns = JSON.parse(this.pogsPlugin.getStringAttribute("subjectsHasColumns"));
+            this.colorHasSubjects = JSON.parse(this.pogsPlugin.getStringAttribute("colorHasSubjects"));
+
+            let tableRow = $('<tr/>');
+            let tdz = $('<td/>',{text:' - '});
+
+            if(headersInTask){
+                tableRow.append(tdz);
+            }
+            for (let j = 0; j < gridBluePrint.colsSize; j++) {
+                let td = $('<th/>');
+                let divHeader = $('<div/>', {style: "font-color: black"});
+                let divSubj = $('<div/>');
+                for (let k = 0; k < this.colorHasSubjects[j].length; k++) {
+
+                    let sub = teamMates[this.colorHasSubjects[j][k]];
+                    if(sub.externalId == this.pogsPlugin.getSubjectId()){
+                        $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+                          + '(you)</span>').appendTo(divSubj);
+                        columnsUserCanChange[j] = false;
+                    }else {
+
+                        $('<span class="badge ' + sub.externalId + '_color username">'
+                          + sub.displayName
+                          + '</span>').appendTo(divSubj);
+                    }
+                }
+                if(headersInTask){
+                    divHeader.append(letter[j]);
+                    td.append(divHeader);
+                }
+                td.append(divSubj);
+                tableRow.append(td);
+
+            }
+            $("#gridTable").append(tableRow);
+        }
         let total = 0;
         for(let i=0;i<gridBluePrint.rowsSize;i++){
             let tableRow = $('<tr/>');
 
+            if(headersInTask){
+                let td = $('<th/>', {text: (i+1)});
+                tableRow.append(td);
+            }
             for(let j = 0 ; j< gridBluePrint.colsSize; j++) {
+
+
                 let td = $('<td/>',
                            {
                                id: 'cell_'+total
                            });
-                td.append(
-                    $('<input/>', {
-                        'data-cell-reference-index': total,
-                        'style': 'background-color: ' + gridBluePrint.columnColors[j] + ';color:' +
-                                 generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';'
-                    })
-                );
+                if(!columnsUserCanChange[j]) {
+                    td.append(
+                        $('<input/>', {
+                            'data-cell-reference-index': total,
+                            'style':((!colorsInTask)?(''):( 'background-color: ' + gridBluePrint.columnColors[j]
+                                     + ';color:' +
+                                     generateFontColorBasedOnBackgroundColor(
+                                         gridBluePrint.columnColors[j]) + ';'))
+                        })
+                    );
+                } else {
+                    td.append(
+                        $('<input/>', {
+                            'data-cell-reference-index': total,
+                            'disabled': 'disabled',
+                            'style': ((!colorsInTask)?(''): ('background-color: ' + gridBluePrint.columnColors[j]
+                                     + ';color:' +
+                                     generateFontColorBasedOnBackgroundColor(
+                                         gridBluePrint.columnColors[j]) + ';'))
+                        })
+                    );
+
+
+                }
                 total++;
                 td.append(
                     $('<div/>', {
                         'class': 'workingOn'
+                    })
+                );
+                td.append(
+                    $('<div/>', {
+                        'style': 'color:black;font-size:10px',
+                         text: ((!columnsUserCanChange[j])?(''):('You cannot edit this field!')),
+                        'class': 'cantEdit'
                     })
                 );
                 tableRow.append(td);

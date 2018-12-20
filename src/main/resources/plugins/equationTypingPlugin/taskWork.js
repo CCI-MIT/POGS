@@ -1,35 +1,139 @@
-class PogsOtEquationClient extends ot.AbstractOtClient {
-    constructor(pogsPlugin, padElementId, bluePrint) {
-        const padId = "pad-for-task-" + pogsPlugin.getCompletedTaskId();
-        const clientId = "subject-" + pogsPlugin.getSubjectId();
-        super(padId, clientId, padElementId);
-        log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
-
-        this._pogsPlugin = pogsPlugin;
+class EquationTypingTaskPlugin{
+    constructor(pogsPlugin) {
+        this.pogsPlugin = pogsPlugin;
+        this.gridOrder = null;
+        this.orderIndex = -1;
+        this.totalFieldIndex = -1;
+        this.teamMates = this.pogsPlugin.getTeammates();
+    }
+    setup(bluePrint,gridOrder) {
 
         if(bluePrint.taskText) {
             $("#taskText").html(bluePrint.taskText);
         }
-
-        pogsPlugin.subscribeTaskAttributeBroadcast(function(message) {
-            log.debug('Task attribute received: ' + message.content.attributeName);
-            let attrName = message.content.attributeName;
-            if (attrName == "operation") {
-                log.debug('Operation received: ' + message.content.attributeStringValue);
-                this.receiveOperation(JSON.parse(message.content.attributeStringValue));
-            }
-        }.bind(this));
+        this.gridOrder = gridOrder;
+        this.createNextFieldAndWhoShouldBeAbleToEdit();
     }
-
-    sendOperation(operation) {
-        if (log.getLevel() <= log.levels.DEBUG) {
-            log.debug("Sending operation: " + JSON.stringify(operation));
+    createNextFieldAndWhoShouldBeAbleToEdit(){
+        this.orderIndex++;
+        this.totalFieldIndex++;
+        if(this.orderIndex == this.teamMates.length){
+            this.orderIndex = 0;
         }
-        this._pogsPlugin.sendOperation(operation);
+
+        let div = $('<div/>', {
+            'id': 'cell_' + this.orderIndex
+        });
+
+
+
+        let sub = this.teamMates[this.orderIndex];
+
+        let inp = null;
+        if(sub.externalId == this.pogsPlugin.getSubjectId()) {
+            inp = $('<input/>', {
+                'id': 'inputEquation_' + this.totalFieldIndex,
+                'data-cell-reference-index': this.totalFieldIndex
+            });
+        } else {
+            inp = $('<input/>', {
+                'id': 'inputEquation_' + this.totalFieldIndex,
+                'disabled': 'disabled',
+                'data-cell-reference-index': this.totalFieldIndex
+            });
+        }
+        let btn  = $('<input/>', {
+            "class": "btn btn-info",
+            text: "Done"
+        });
+
+        div.append(inp);
+        div.append(btn);
+
+        let workOn = $('<div/>', {
+            'class': 'workingOn'
+        });
+
+
+
+        if(sub.externalId == this.pogsPlugin.getSubjectId()){
+            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+              + '(you)</span>').appendTo(workOn);
+            $('<span style="font-size:10px;color:black;"> turn to answer</span>').appendTo(workOn);
+        }else {
+            $('<span class="badge ' + sub.externalId + '_color username">'
+              + sub.displayName
+              + '</span>').appendTo(workOn);
+
+            $('<span style="font-size:10px;color:black;"> turn to answer</span>').appendTo(workOn);
+        }
+        div.append(workOn);
+
+        $("#textInputPad").append(div);
+        this.setupHooks();
+
+    }
+    setupHooks(){
+        $("input").unbind().on('keyup', this.handleOnClick.bind(this));
+
+        $("input").unbind().on('change', this.handleOnBlur.bind(this));
+
+
+    }
+    handleOnClick(event){
+
+        var cellIndex = parseInt($(event.target).data( "cell-reference-index"));
+
+        if(!isNaN(cellIndex)) {
+            let valueTyped = $(event.target).val();
+            this.pogsPlugin.saveCompletedTaskAttribute('typedInField',
+                                                       valueTyped, 0.0,
+                                                       cellIndex, false);
+        }
+    }
+    handleOnBlur(event){
+
+
+        let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
+
+        if(!isNaN(cellIndex)) {
+
+            let valueTyped = $(event.target).val();
+
+            if(valueTyped != null) {
+                this.pogsPlugin.saveCompletedTaskAttribute('equationAnswer' + cellIndex,
+                                                           valueTyped, 0.0,
+                                                           0, true, '');
+            }
+        }
+    }
+    broadcastReceived(message) {
+        let attrName = message.content.attributeName;
+
+        if (attrName == "typedInField") {
+            let index = message.content.attributeIntegerValue;
+            //do nothing/
+            $('#cell_' + index + ' input').val(message.content.attributeStringValue);
+        } else {
+            let index = attrName.replace('equationAnswer', '');
+            $('#cell_' + index + ' input').val(message.content.attributeStringValue);
+
+            if(this.totalFieldIndex == index) {
+                this.createNextFieldAndWhoShouldBeAbleToEdit();
+            }
+        }
     }
 }
 
-const typingPlugin = pogs.createPlugin('typingPlugin', function() {
-    const otClient = new PogsOtEquationClient(this, 'padContent',$.parseJSON(this.getStringAttribute("gridBluePrint")));
-});
 
+
+
+var equationTypingTaskPlugin = pogs.createPlugin('equationTypingTaskPlugin',function(){
+
+    let equationTypingTaskPlugin = new EquationTypingTaskPlugin(this);
+    // get config attributes from task plugin
+    equationTypingTaskPlugin.setup($.parseJSON(this.getStringAttribute("gridBluePrint")),
+                                   $.parseJSON(this.getStringAttribute("gridOrder")));
+    this.subscribeTaskAttributeBroadcast(equationTypingTaskPlugin.broadcastReceived.bind(equationTypingTaskPlugin))
+
+});

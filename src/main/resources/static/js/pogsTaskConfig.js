@@ -8,8 +8,8 @@ class PogsTaskConfigEditor {
 
     }
     beforeSubmitSetup() {
-        console.log('is this working?');
-        console.log('Submit buttons:' + $('form button[type=submit]').length)
+        //console.log('is this working?');
+        //console.log('Submit buttons:' + $('form button[type=submit]').length)
         $(document)
             .on('click', 'form button[type=submit]', function(e) {
 
@@ -98,4 +98,45 @@ function createOrUpdateAttribute(attributeName, stringValue, intValue, doubleVal
                               value: doubleValue
                           }).appendTo('#taskConfigForm');
     }
+}
+function setupHTMLFieldEditors(){
+
+    $(".htmleditor").summernote(
+        {
+            height: 200,
+            toolbar: [
+                // [groupName, [list of button]]
+                ['para', ['style','ul', 'ol', 'paragraph']],
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontsize', ['fontsize']],
+                ['color', ['color']],
+                ['insert', ['picture','link','video','table','codeview']]
+            ],
+            callbacks: {
+                onImageUpload: function(files) {
+                    console.log("Send file called success override: " + this);
+                    for(let i=0; i < files.length; i++) {
+                        sendFile(files[0],this);
+                    }
+                }
+            }
+        });
+
+    function sendFile(file,editor) {
+        console.log("Send file method");
+        data = new FormData();
+        data.append("file", file);
+        $.ajax({
+                   data: data,
+                   type: "POST",
+                   url: "/images/upload?[(${_csrf.parameterName})]=[(${_csrf.token})]",
+                   cache: false,
+                   contentType: false,
+                   processData: false,
+                   success: function(url) {
+                       $(editor).summernote('insertImage', url);
+                   }
+               });
+    };
 }

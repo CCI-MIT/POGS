@@ -1,30 +1,53 @@
 class MemoryGridTaskPrimer{
     constructor(pogsPlugin) {
         this.pogsPlugin = pogsPlugin;
-        console.log('MemoryGridTaskPrimer constructor');
+
     }
     setupGrid(gridBluePrint, answerSheet){
         if(gridBluePrint.taskText) {
             $("#taskPrimerInfo").html(gridBluePrint.taskText);
 
         }
-        console.log(" gridBluePrint.rowsSize: " + gridBluePrint.rowsSize);
-        console.log(" gridBluePrint.colsSize: " + gridBluePrint.colsSize);
+
+
+        let colorsInPrime = gridBluePrint.colorsInPrimer;
+
+        let headersInPrimer = gridBluePrint.headersInPrimer;
+
+
         let total = 0;
         let allOptions = gridBluePrint.rowsSize * gridBluePrint.colsSize;
         let appearingOrder =[];
-        let itemsShouldAppear = 3
+        let itemsShouldAppear = 3;
         for(let j=0;j< (allOptions/itemsShouldAppear); j++){
             appearingOrder[j] = [];
         }
+        let letter = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J','K', 'L', 'M', 'N', 'O', 'P',
+        'Q', 'R', 'S', 'T', 'U', 'W', 'V', 'X', 'Y', 'Z'];
+        if(headersInPrimer){
+            let tableRow = $('<tr/>');
+             let tdz = $('<td/>', {text: '-'});
+            tableRow.append(tdz);
+
+            for(let j = 0 ; j< parseInt(gridBluePrint.colsSize); j++) {
+                let td = $('<th/>', {text: letter[j]});
+                tableRow.append(td);
+            }
+            $("#gridTable").append(tableRow);
+        }
         for(let i=0;i< parseInt(gridBluePrint.rowsSize);i++){
             let tableRow = $('<tr/>');
+            if(headersInPrimer){
+                let td = $('<th/>', {text: (i+1),
+                    scope: "row"});
+                tableRow.append(td);
+            }
 
             for(let j = 0 ; j< parseInt(gridBluePrint.colsSize); j++) {
                 let td = $('<td/>',{
                     'id': 'gridCell' + total,
-                    'style': 'background-color: ' + gridBluePrint.columnColors[j] + ';color:' +
-                             generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';',
+                    'style': ((!colorsInPrime)?(''):('background-color: ' + gridBluePrint.columnColors[j] + ';color:' +
+                             generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';')),
                     text: answerSheet[total]
                 });
 

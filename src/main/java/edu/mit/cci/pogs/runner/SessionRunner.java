@@ -33,6 +33,7 @@ import edu.mit.cci.pogs.model.dao.session.TeamCreationTime;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
+import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
@@ -234,6 +235,7 @@ public class SessionRunner implements Runnable {
             }
         }
     }
+
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
