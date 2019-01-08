@@ -270,18 +270,18 @@
                                     </div>
                                 </div>
                                 <div class="form-group row hideable" data-hide="done">
-                                    <label class="col-sm-3 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
-                                    <div class="col-sm-9">
-                                        <input class="form-control" type="text" id="doneRedirectUrl" th:field="*{doneRedirectUrl}"/>
-                                        <div class="invalid-feedback">Please provide a valid URL.</div>
-                                    </div>
-                                </div>
-                                <div class="form-group row hideable" data-hide="done">
                                     <label class="col-sm-3 col-form-label" for="donePageTime">Done Page Time:</label>
                                     <div class="col-sm-9">
                                         <input class="form-control" type="number" data-number="done" min="0" step="1" id="donePageTime" th:field="*{donePageTime}"/>
                                         <small id="donePageTimeHelp" class="form-text text-muted">In seconds</small>
                                         <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label" for="doneRedirectUrl">Done Redirect Url:</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-control" type="text" id="doneRedirectUrl" th:field="*{doneRedirectUrl}"/>
+                                        <div class="invalid-feedback">Please provide a valid URL.</div>
                                     </div>
                                 </div>
                             </div>
@@ -440,6 +440,7 @@
                     <label class="col-sm-3 col-form-label" for="couldNotAssignToTeamMessage">Could Not Assign To Team Message:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" id="couldNotAssignToTeamMessage" th:field="*{couldNotAssignToTeamMessage}"/>
+                        <div class="invalid-feedback">Please provide a message.</div>
                     </div>
                 </div>
 
@@ -507,7 +508,7 @@
                       callbacks: {
                           onImageUpload: function(files) {
                         console.log("Send file called success override: " + this);
-                        for(let i=0; i < files.length; i++) {
+                        for(var i=0; i < files.length; i++) {
                             sendFile(files[0],this);
                          }
                      }
@@ -578,8 +579,11 @@
                 teamCreationSetup();
                 teamExecSetup();
                 setupSchedule();
+
                 $( "#saveSession" ).submit(function( event ) {
+                    console.log("Hello all");
                     var valid = true;
+
 
                     //time checking not empty or zero
                     $(":checkbox").each(function(){
@@ -638,8 +642,11 @@
                                 $("#fixedInteractionTime").addClass("is-invalid");
                                 valid = false;
                             }
+                        } else {
+                            var date = $("#sessionStartDate").val();
+                            $("#perpetualStartDate").val(date);
+                            $("#perpetualEndDate").val(date);
                         }
-
 
                     if(!valid){
                         event.preventDefault();

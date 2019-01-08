@@ -201,6 +201,11 @@ public class SessionService {
             session.setDisplayNameChangeTime(0);
         }
 
+        if(sessionBean.getSessionScheduleType().equals(SessionScheduleType.SCHEDULED_DATE.getId())){
+            session.setPerpetualStartDate(null);
+            session.setPerpetualEndDate(null);
+        }
+
         if (sessionBean.getId() == null) {
             session = sessionDao.create(session);
             sessionBean.setId(session.getId());
