@@ -278,7 +278,7 @@ class SurveyTaskEdit {
 
             } else if(bluePrint[i].type == "radio"){
 
-                this.fieldList.push(new RadioFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i]));
+                this.fieldList.push(new RadioFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i],bluePrint[i].orientation));
 
 
 

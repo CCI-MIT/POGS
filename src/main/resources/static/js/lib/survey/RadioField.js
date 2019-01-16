@@ -15,13 +15,31 @@ class RadioField extends Field {
         }
 
         str += '<div id="answer'+this.index+'">'
-        $.each(this.jsonInfo.value,function(j, choice){ // setup radio question
-            str += '<div class="form-check form-inline row">'
-            str += '  <label class="form-check-label text-left text-dark">'
-            str += '    <input type="radio" class="form-check-input" name="answer'+this.index+'" value="'+choice+'" data-cell-reference-index="'+this.index+'">' + choice
-            str += '  </label> </div>'
+        if(this.jsonInfo.orientation == "vertical") {
+            $.each(this.jsonInfo.value, function (j, choice) { // setup radio question
+                str += '<div class="form-check form-inline row">'
+                str += '  <label class="form-check-label text-left text-dark">'
+                str +=
+                    '    <input type="radio" class="form-check-input" name="answer' + this.index
+                    + '" value="' + choice + '" data-cell-reference-index="' + this.index + '">'
+                    + choice
+                str += '  </label> </div>'
 
-        }.bind(this));
+            }.bind(this));
+        } else {
+            str += '<div class="form-check form-inline row">'
+            $.each(this.jsonInfo.value, function (j, choice) { // setup radio question
+
+                str += '  <label class="form-check-label text-left text-dark" style="margin-right: 10px;">'
+                str +=
+                    '    <input type="radio" class="form-check-input" name="answer' + this.index
+                    + '" value="' + choice + '" data-cell-reference-index="' + this.index + '">'
+                    + choice
+                str += '  </label>'
+
+            }.bind(this));
+            str += '</div>';
+        }
 
         str += ' </div> ';
         str += this.getInteractionIndicatorHTML();
@@ -61,13 +79,15 @@ class RadioFieldEdit {
 
     //addRadioQuestion
     //this.fieldList.push(new RadioFieldEdit(
-    constructor(question_number, question, withVideo, video_url, choices,answer){
+    constructor(question_number, question, withVideo, video_url, choices,answer, orientation){
             let str = "";
             this.questionNumber = question_number;
             str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "radio" >'
 
             //add question field
             str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
+            str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Options orientation: </label>';
+            str += '<select class="form-control row col-sm-4" id="orientation' + question_number +'" ><option value="vertical">Vertical</option><option value="horizontal">Horizontal</option></select></div>';
 
             if(withVideo){ //add field for video url
                 str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Video url: </label> '
@@ -124,6 +144,9 @@ class RadioFieldEdit {
                     }
                 }
             }
+            if(orientation) {
+                $("#orientation" + question_number).val(orientation);
+            }
 
     }
     composeFieldFromHTML(){
@@ -138,6 +161,8 @@ class RadioFieldEdit {
         if($("#placeholder"+this.questionNumber)){ // if question contains placeholder add it
             question_set["placeholder"] = $("#placeholder"+this.questionNumber).val();
         }
+        question_set["orientation"]= $("#orientation" + this.questionNumber).val();
+        console.log($("#orientation" + this.questionNumber).val());
 
         let choices = [];
         $.each($("#answer"+this.questionNumber).find("input[type=text]"),function(j,input){
