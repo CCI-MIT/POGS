@@ -7,20 +7,20 @@ class JeopardyRadioField extends JeopardyField {
         //______
 
 
-        this.questionJson = [{
+        this.questionJson = {
             "ID":1
             ,"question":"On the verge of going bust in 1997, it was saved by a $150M investment by rival Microsoft"
             ,"Answer":"Apple"
             ,"value":["HP", "Google", "Dell", "Apple"]
             ,"Category":"Science and Technology"
-            ,"Level":"Medium"
-        },{"ID":2
-            ,"question":"On the verge of going bust in 1997, it was saved by a $150M investment by rival Microsoft"
-            ,"Answer":"Apple"
-            ,"value":["HP", "Google", "Dell", "Apple"]
-            ,"Category":"Science and Technology"
-            ,"Level":"Medium"
-    }];
+            ,"Level":"Medium"};
+    //     },{"ID":2
+    //         ,"question":"On the verge of going bust in 1997, it was saved by a $150M investment by rival Microsoft"
+    //         ,"Answer":"Apple"
+    //         ,"value":["HP", "Google", "Dell", "Apple"]
+    //         ,"Category":"Science and Technology"
+    //         ,"Level":"Medium"
+    // }
 
         this.localPogsPlugin = this.getPogsPlugin();
         var teammates = this.localPogsPlugin.getTeammates();
@@ -59,6 +59,14 @@ class JeopardyRadioField extends JeopardyField {
         }.bind(this));
 
         str += ' </div> ';
+        str+= '<div class="text-center" id="submitAnswer">\n' +
+'                    <p>Please click the button below when you are ready</p>\n' +
+'                    <br>\n' +
+'                        <div class="form-group form-inline form-row justify-content-center">\n' +
+'                            <button type="button" class="btn btn-light" id="submitButton">Submit Answer</button>\n' +
+'                        </div>\n' +
+            ' </div>'
+        $("submitAnswer").bind(this);
         str += this.getInteractionIndicatorHTML();
         str+= '</div> <br>';
 
@@ -66,15 +74,17 @@ class JeopardyRadioField extends JeopardyField {
     }
     setupHooks(){
         super.setupHooks();
-        $('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
+        $('#submitButton').on('click',this.handleSubmitOnClick.bind(this));
     }
-    handleRadioOnClick(event){
-        let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        //console.log("answer " + cellIndex);
+    handleSubmitOnClick(event){
+        console.log("event.target "+ $(event.target))
+        let cellIndex = parseInt($(event.target).data("data-cell-reference-index"));
+        //let cellIndex = $('input[name="answer"]:checked').val();
+        console.log("answer " + cellIndex);
         if(!isNaN(cellIndex)) {
-            // console.log($(event.target))
+            console.log($(event.target))
             var valueTyped = $(event.target).attr('value'); // value of radio button
-            // console.log("Typed Value: " + valueTyped);
+            console.log("Typed Value: " + valueTyped);
             if(valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                     valueTyped, 0.0,
