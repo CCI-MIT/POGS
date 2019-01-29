@@ -1,28 +1,9 @@
-var teammatez = JSON.parse(teammates);
-
-var subjectOrder = [];
-var alreadyIn = false;
-while(subjectOrder.length != teammatez.length ){
-
-    var x = Math.floor(
-        Math.random() * teammatez.length);
-    alreadyIn = false;
-    for(var k=0; k < subjectOrder.length; k++){
-        if(x == subjectOrder[k]){
-            alreadyIn = true;
-        }
-    }
-    if(!alreadyIn){
-        subjectOrder.push(x);
-    }
-}
-//Picking random questions for the game
 var questions = [];
 var usedQuestions = [];
 
 for (var i = 0; i<4; i++){
     questions[i] = [];
-    for (var j = 0; j<20; ){
+    for (var j = 0; j<10; ){
         var q = Math.floor(Math.random() * 300) + 1;
         var alreadyUsed = false;
         for (var k=0;k<usedQuestions.length;k++){
@@ -37,7 +18,6 @@ for (var i = 0; i<4; i++){
     }
 }
 
-attributesToAddz = [{"attributeName": "gridOrder", "stringValue":JSON.stringify(subjectOrder) },
-                   {"attributeName": "questionBluePrint", "stringValue":JSON.stringify(questions) }]
+attributesToAddz = [{"attributeName": "questionBluePrint", "stringValue":JSON.stringify(questions) }]
 
 attributesToAdd = JSON.stringify(attributesToAddz);
