@@ -11,19 +11,21 @@ class JeopardyRadioField extends JeopardyField {
         }
         console.log(this.result);
         this.questionNumber = 0;
+        var probabilities = jeopardyJson;
+        this.prob;
         this.localPogsPlugin = this.getPogsPlugin();
         var teammates = this.localPogsPlugin.getTeammates();
         var currentId = this.localPogsPlugin.getSubjectId();
         for (var i = 0; i < teammates.length; i++) {
-            if (currentId == teammates[i]) {
+            if (currentId == teammates[i].displayName) {
                 if (i == 0)
-                    this.prob = parseFloat(this.probabilities.prob1);
+                    this.prob = parseFloat(probabilities.prob1);
                 else if (i == 1)
-                    this.prob = parseFloat(this.probabilities.prob2);
+                    this.prob = parseFloat(probabilities.prob2);
                 else if (i == 2)
-                    this.prob = parseFloat(this.probabilities.prob3);
+                    this.prob = parseFloat(probabilities.prob3);
                 else
-                    this.prob = parseFloat(this.probabilities.prob4);
+                    this.prob = parseFloat(probabilities.prob4);
             }
         }
         this.setupHTML();
