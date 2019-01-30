@@ -14,13 +14,6 @@ class JeopardyRadioField extends JeopardyField {
             ,"value":["HP", "Google", "Dell", "Apple"]
             ,"Category":"Science and Technology"
             ,"Level":"Medium"};
-    //     },{"ID":2
-    //         ,"question":"On the verge of going bust in 1997, it was saved by a $150M investment by rival Microsoft"
-    //         ,"Answer":"Apple"
-    //         ,"value":["HP", "Google", "Dell", "Apple"]
-    //         ,"Category":"Science and Technology"
-    //         ,"Level":"Medium"
-    // }
 
         this.localPogsPlugin = this.getPogsPlugin();
         var teammates = this.localPogsPlugin.getTeammates();
@@ -58,14 +51,13 @@ class JeopardyRadioField extends JeopardyField {
 
         }.bind(this));
 
-        str += ' </div> ';
         str+= '<div class="text-center" id="submitAnswer">\n' +
-'                    <p>Please click the button below when you are ready</p>\n' +
 '                    <br>\n' +
 '                        <div class="form-group form-inline form-row justify-content-center">\n' +
 '                            <button type="button" class="btn btn-light" id="submitButton">Submit Answer</button>\n' +
 '                        </div>\n' +
-            ' </div>'
+            ' </div>';
+        str += ' </div> ';
         $("submitAnswer").bind(this);
         str += this.getInteractionIndicatorHTML();
         str+= '</div> <br>';
@@ -74,11 +66,11 @@ class JeopardyRadioField extends JeopardyField {
     }
     setupHooks(){
         super.setupHooks();
-        $('#submitButton').on('click',this.handleSubmitOnClick.bind(this));
+        $('#submitAnswer').on('click',this.handleSubmitOnClick.bind(this));
     }
     handleSubmitOnClick(event){
         console.log("event.target "+ $(event.target))
-        let cellIndex = parseInt($(event.target).data("data-cell-reference-index"));
+        let cellIndex = parseInt($(event.target).data("cell-reference-index"));
         //let cellIndex = $('input[name="answer"]:checked').val();
         console.log("answer " + cellIndex);
         if(!isNaN(cellIndex)) {
@@ -86,17 +78,17 @@ class JeopardyRadioField extends JeopardyField {
             var valueTyped = $(event.target).attr('value'); // value of radio button
             console.log("Typed Value: " + valueTyped);
             if(valueTyped != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     valueTyped, 0.0,
-                    0, true, SURVEY_CONST.RADIO_FIELD);
+                    0, true, JEOPARDY_CONST.RADIO_FIELD);
             }
         }
     }
     broadcastReceived(message){
         super.broadcastReceived(message);
         let attrName = message.content.attributeName;
-        if(attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1){ //sync radio button
-            var question_number = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
+        if(attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1){ //sync radio button
+            var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
             var radioButtons = $("#answer"+question_number).find("input[value='"+message.content.attributeStringValue+"']").prop("checked",true);
             this.setFinalAnswer(message.sender);
             //Show next questions

@@ -1,3 +1,14 @@
+const JEOPARDY_CONST = {
+    FIELD_NAME: "jeopardyAnswer",
+    RADIO_FIELD: "RadioField"
+};
+
+const JEOPARDY_TRANSIENT = {
+    CLICK_RADIO_NOT_LOG : "clickInRadio",
+    FOCUS_IN_CELL: "focusInCell",
+    MOUSE_OVER_FIELD: "mouseOverField",
+    MOUSE_OUT_OF_FIELD: "mouseOutOfField"
+}
 class JeopardyField {
     constructor(jeopardyReference,questionJson,probabilityJson){
         this.jeopardyReference = jeopardyReference;

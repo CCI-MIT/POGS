@@ -29,12 +29,11 @@ class Jeopardy {
     broadcastReceived(message){
         let attrName = message.content.attributeName;
         let index = attrName
-            .replace(SURVEY_CONST.FIELD_NAME, "")
-            .replace(SURVEY_TRANSIENT.CLICK_RADIO_NOT_LOG,"")
-            .replace(SURVEY_TRANSIENT.FOCUS_IN_CELL,"")
-            .replace(SURVEY_TRANSIENT.CLICK_CHECKBOX_NOT_LOG,"")
-            .replace(SURVEY_TRANSIENT.MOUSE_OVER_FIELD,"")
-            .replace(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD,"");
+            .replace(JEOPARDY_CONST.FIELD_NAME, "")
+            .replace(JEOPARDY_TRANSIENT.CLICK_RADIO_NOT_LOG,"")
+            .replace(JEOPARDY_TRANSIENT.FOCUS_IN_CELL,"")
+            .replace(JEOPARDY_TRANSIENT.MOUSE_OVER_FIELD,"")
+            .replace(JEOPARDY_TRANSIENT.MOUSE_OUT_OF_FIELD,"");
 
         if(this.fields.length > index) {
             if(message.sender != this.pogsPlugin.subjectId) {
