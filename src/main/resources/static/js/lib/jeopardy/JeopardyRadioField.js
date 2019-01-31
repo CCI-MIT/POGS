@@ -34,6 +34,7 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHTML() {
         let str = "";
+        str += '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>';
         str += '<div class="form-group" id="jeopardyField_' + this.index + '" style="min-width: 300px;">'
         // let question = result.values();
         str += '<label id="question' + this.index + '" class="text-left text-dark row">' + this.result[this.questionNumber].question + '</label>'
@@ -60,7 +61,6 @@ class JeopardyRadioField extends JeopardyField {
         str += '<div class="form-group" id="jeopardyField_' + this.index + '" style="min-width: 300px;">'
         str += '<div class="row"> ';
         str += '<div class="text-center text-dark col-4" id="askMachine">\n' +
-            '      <p>Click the button below to ask the Machine. Remember that asking the machine subtracts one point from your score.</p>\n' +
             '      <br>\n' +
             '           <div class="form-group form-inline form-row justify-content-center">\n' +
             '               <button type="button" class="btn btn-default" id="askMachineButton">Ask Machine</button>\n' +
@@ -110,6 +110,8 @@ class JeopardyRadioField extends JeopardyField {
             // console.log($(event.target))
             // var valueTyped = $(event.target).attr('value'); // value of radio button
             let valueTyped = $('input[name="answer"]:checked').val();
+            if (valueTyped===undefined)
+                valueTyped = "Not Answered";
             console.log("Typed Value: " + valueTyped);
             if (valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
@@ -144,5 +146,22 @@ class JeopardyRadioField extends JeopardyField {
         }
         return arr;
     }
-
 }
+var stopTime = (new Date().getTime() / 1000) + 12;
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+    var startTime = new Date().getTime() / 1000;
+
+    // Find the distance between now and the count down date
+    var distance = Math.floor(stopTime - startTime);
+
+    // Output the result in an element with id="demo"
+    document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
+
+    // If the count down is over, write some text
+    if (distance < 0) {
+        clearInterval(x);
+        document.getElementById("submitAnswer").click();
+    }
+}, 1000);

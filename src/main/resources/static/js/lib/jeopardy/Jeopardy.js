@@ -25,7 +25,7 @@ class Jeopardy {
         var jeopardyJson = $.parseJSON(jeopardyBluePrint);
         this.fields.push(new JeopardyRadioField(this,questionJson,jeopardyJson));
     }
-//Unedited
+
     broadcastReceived(message){
         let attrName = message.content.attributeName;
         let index = attrName
@@ -34,7 +34,8 @@ class Jeopardy {
             .replace(JEOPARDY_TRANSIENT.FOCUS_IN_CELL,"")
             .replace(JEOPARDY_TRANSIENT.MOUSE_OVER_FIELD,"")
             .replace(JEOPARDY_TRANSIENT.MOUSE_OUT_OF_FIELD,"");
-
+        if (index==-1)
+            index = 0;
         if(this.fields.length > index) {
             if(message.sender != this.pogsPlugin.subjectId) {
                 this.fields[index].broadcastReceived(message);
@@ -43,7 +44,7 @@ class Jeopardy {
     }
 
 }
-
+//unedited
 class SurveyTaskEdit {
 
     init(taskConfigId, currentAttributes) {
