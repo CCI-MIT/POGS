@@ -2185,7 +2185,7 @@ this.questions =  [
     },
     {
         "ID":274
-        ,"question":"Where do the Flinstones live?"
+        ,"question":"Where do the Flintstones live?"
         ,"Answer":"BedRock"
         ,"value":["BedRock", "Burbank", "Kirrin", "Crystal Cove"]
         ,"Category":"Literature and Media"
