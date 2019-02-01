@@ -78,6 +78,7 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHooks() {
         super.setupHooks();
+        $('#submitButton').on('click', this.handleRadioOnClick.bind(this));
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
     }
@@ -85,11 +86,11 @@ class JeopardyRadioField extends JeopardyField {
     handleAskMachineOnClick(event) {
         let machSuggestion = "";
         let randInt = Math.random();
-        console.log(this.result[0]);
+        console.log(this.result[this.questionNumber]);
         if (randInt <= this.prob)
-            machSuggestion += this.result[0].Answer;
+            machSuggestion += this.result[this.questionNumber].Answer;
         else {
-            let nonAnswers = this.removeA(this.result[0].value, this.result[0].Answer);
+            let nonAnswers = this.removeA(this.result[this.questionNumber].value, this.result[this.questionNumber].Answer);
             machSuggestion += nonAnswers[Math.floor(Math.random() * 3)];
         }
         console.log(machSuggestion);
@@ -105,14 +106,36 @@ class JeopardyRadioField extends JeopardyField {
     }
 
     handleSubmitOnClick(event) {
+        //clear machine's answer
+        var element = document.getElementById("machSuggestion");
+        if (element) {
+            element.innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
+
+            let cellIndex = $('input[name="answer"]:checked').index();
+            // console.log("answer " + cellIndex);
+            if (!isNaN(cellIndex)) {
+                let valueTyped = $('input[name="answer"]:checked').val();
+                if (valueTyped === undefined)
+                    valueTyped = "Not Answered";
+                console.log("Typed Value: " + valueTyped);
+                if (valueTyped != null) {
+                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                        valueTyped, 0.0,
+                        0, true, JEOPARDY_CONST.RADIO_FIELD);
+                }
+            }
+        }
+    }
+
+    handleRadioOnClick(event) {
         let cellIndex = $('input[name="answer"]:checked').index();
+        // let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         console.log("answer " + cellIndex);
-        if (!isNaN(cellIndex)) {
-            let valueTyped = $('input[name="answer"]:checked').val();
-            if (valueTyped === undefined)
-                valueTyped = "Not Answered";
-            console.log("Typed Value: " + valueTyped);
-            if (valueTyped != null) {
+        if(!isNaN(cellIndex)) {
+            console.log($(event.target));
+            var valueTyped = $(event.target).attr('value'); // value of radio button
+            // console.log("Typed Value: " + valueTyped);
+            if(valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     valueTyped, 0.0,
                     0, true, JEOPARDY_CONST.RADIO_FIELD);
