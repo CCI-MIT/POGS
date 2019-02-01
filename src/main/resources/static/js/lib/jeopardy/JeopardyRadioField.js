@@ -10,7 +10,7 @@ class JeopardyRadioField extends JeopardyField {
             }
         }
         this.str = "";
-        console.log(this.result);
+        this.stopTime = (new Date().getTime() / 1000) + 8;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
         this.prob;
@@ -32,6 +32,7 @@ class JeopardyRadioField extends JeopardyField {
         this.setupHTML();
         $('#jeopardyForm').append(this.str);
         this.setupHooks();
+        setInterval(this.timer.bind(this),1000);
     }
 
     setupHTML() {
@@ -128,7 +129,7 @@ class JeopardyRadioField extends JeopardyField {
             // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
             this.setFinalAnswer(message.sender);
             this.questionNumber++;
-
+            this.stopTime = (new Date().getTime() / 1000) + 8;
             console.log("Next question number " + this.questionNumber);
 
             var questionEl = document.getElementById("question-answer-machine");
@@ -171,16 +172,15 @@ class JeopardyRadioField extends JeopardyField {
         }
         return arr;
     }
-}
 
-var stopTime = (new Date().getTime() / 1000) + 12;
-
-var x = setInterval(function () {
-    var startTime = new Date().getTime() / 1000;
-    var distance = Math.floor(stopTime - startTime);
-    document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
-    if (distance < 0) {
-        clearInterval(x);
-        document.getElementById("submitAnswer").click();
+    timer(){
+        var startTime = new Date().getTime() / 1000;
+        console.log("TIME "+this.stopTime);
+        var distance = Math.floor(this.stopTime - startTime);
+        document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
+        if (distance < 0) {
+            // clearInterval(x);
+            document.getElementById("submitAnswer").click();
+        }
     }
-}, 1000);
+}
