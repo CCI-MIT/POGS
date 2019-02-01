@@ -78,7 +78,6 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHooks() {
         super.setupHooks();
-        $('#submitButton').on('click', this.handleRadioOnClick.bind(this));
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
     }
@@ -106,23 +105,17 @@ class JeopardyRadioField extends JeopardyField {
     }
 
     handleSubmitOnClick(event) {
-        //clear machine's answer
-        var element = document.getElementById("machSuggestion");
-        if (element) {
-            element.innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
-
-            let cellIndex = $('input[name="answer"]:checked').index();
-            // console.log("answer " + cellIndex);
-            if (!isNaN(cellIndex)) {
-                let valueTyped = $('input[name="answer"]:checked').val();
-                if (valueTyped === undefined)
-                    valueTyped = "Not Answered";
-                console.log("Typed Value: " + valueTyped);
-                if (valueTyped != null) {
-                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
-                        valueTyped, 0.0,
-                        0, true, JEOPARDY_CONST.RADIO_FIELD);
-                }
+        let cellIndex = $('input[name="answer"]:checked').index();
+        // console.log("answer " + cellIndex);
+        if (!isNaN(cellIndex)) {
+            let valueTyped = $('input[name="answer"]:checked').val();
+            if (valueTyped === undefined)
+                valueTyped = "Not Answered";
+            console.log("Typed Value: " + valueTyped);
+            if (valueTyped != null) {
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                    valueTyped, 0.0,
+                    0, true, JEOPARDY_CONST.RADIO_FIELD);
             }
         }
     }
@@ -147,42 +140,47 @@ class JeopardyRadioField extends JeopardyField {
         super.broadcastReceived(message);
         let attrName = message.content.attributeName;
 
-        if (attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) { //sync radio button
-            var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
-            // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
-            this.setFinalAnswer(message.sender);
-            this.questionNumber++;
-            this.stopTime = (new Date().getTime() / 1000) + 122;
-            console.log("Next question number " + this.questionNumber);
-
-            var questionEl = document.getElementById("question-answer-machine");
-            if (questionEl) {
-                console.log("next");
-                if (this.questionNumber === 40) {
-                    this.str = '<div id = "thankYou"> ' +
-                        '<p class = "text-dark"> End of Experiment</p>' +
-                        ' </div>';
-                    $('#jeopardyForm').append(this.str);
-                }
-                else if ((this.questionNumber + 1) % 10 === 0) {
-                    this.str = '<div id = "roundTransition"> ' +
-                        '<p class = "text-dark"> Going to the next round...</p>' +
-                        ' </div>';
-                    questionEl.innerHTML = this.str;
-                    // this.sleep(50000);
-                    // this.setupHTML();
-                    // questionEl.innerHTML = this.str;
-                    // this.setupHooks();
-                }
-                else {
-                    this.setupHTML();
-                    questionEl.innerHTML = this.str;
-                    this.setupHooks();
-                }
-            }
-            //End of round give a message
-            //End of task -> Thanks
+        var element = document.getElementById("machSuggestion");
+        if (element) {
+            element.innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
         }
+
+            if (attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) { //sync radio button
+                var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
+                // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
+                this.setFinalAnswer(message.sender);
+                this.questionNumber++;
+                this.stopTime = (new Date().getTime() / 1000) + 122;
+                console.log("Next question number " + this.questionNumber);
+
+                var questionEl = document.getElementById("question-answer-machine");
+                if (questionEl) {
+                    console.log("next");
+                    if (this.questionNumber === 40) {
+                        this.str = '<div id = "thankYou"> ' +
+                            '<p class = "text-dark"> End of Experiment</p>' +
+                            ' </div>';
+                        $('#jeopardyForm').append(this.str);
+                    }
+                    else if ((this.questionNumber + 1) % 10 === 0) {
+                        this.str = '<div id = "roundTransition"> ' +
+                            '<p class = "text-dark"> Going to the next round...</p>' +
+                            ' </div>';
+                        questionEl.innerHTML = this.str;
+                        // this.sleep(50000);
+                        // this.setupHTML();
+                        // questionEl.innerHTML = this.str;
+                        // this.setupHooks();
+                    }
+                    else {
+                        this.setupHTML();
+                        questionEl.innerHTML = this.str;
+                        this.setupHooks();
+                    }
+                }
+                //End of round give a message
+                //End of task -> Thanks
+            }
     }
 
     removeA(arr) {
