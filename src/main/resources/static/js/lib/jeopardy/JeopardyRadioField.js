@@ -10,7 +10,7 @@ class JeopardyRadioField extends JeopardyField {
             }
         }
         this.str = "";
-        this.stopTime = (new Date().getTime() / 1000) + 8;
+        this.stopTime = (new Date().getTime() / 1000) + 122;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
         this.prob;
@@ -129,7 +129,7 @@ class JeopardyRadioField extends JeopardyField {
             // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
             this.setFinalAnswer(message.sender);
             this.questionNumber++;
-            this.stopTime = (new Date().getTime() / 1000) + 8;
+            this.stopTime = (new Date().getTime() / 1000) + 122;
             console.log("Next question number " + this.questionNumber);
 
             var questionEl = document.getElementById("question-answer-machine");
