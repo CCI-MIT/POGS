@@ -1,6 +1,7 @@
 const JEOPARDY_CONST = {
     FIELD_NAME: "jeopardyAnswer",
-    RADIO_FIELD: "RadioField"
+    RADIO_FIELD: "RadioField",
+    SUBMIT_FIELD: "SubmitButtonField"
 };
 
 const JEOPARDY_TRANSIENT = {
@@ -21,12 +22,12 @@ class JeopardyField {
         let attrName = message.content.attributeName;
 
         if(message.sender != this.getPogsPlugin().getSubjectId()) {
-            if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OVER_FIELD) > -1)) {
+            if ((attrName.indexOf(JEOPARDY_TRANSIENT.MOUSE_OVER_FIELD) > -1)) {
                 this.addSubjectInteraction(message.sender)
             }
         }
         if(message.sender != this.getPogsPlugin().getSubjectId()) {
-            if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD) > -1)) {
+            if ((attrName.indexOf(JEOPARDY_TRANSIENT.MOUSE_OUT_OF_FIELD) > -1)) {
                 this.removeSubjectInteraction(message.sender);
             }
         }
