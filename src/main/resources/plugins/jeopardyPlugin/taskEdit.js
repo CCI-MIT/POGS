@@ -12,7 +12,7 @@ class JeopardyTaskEdit {
 
         if(jeopardyBluePrint!=null){
             this.setupHtmlFromAttributeString($.parseJSON(jeopardyBluePrint.stringValue));
-            createOrUpdateAttribute("gridBluePrint",$.parseJSON(jeopardyBluePrint.stringValue),null,null,this.taskConfigId,0, jeopardyBluePrint.id);
+            createOrUpdateAttribute("jeopardyBluePrint",$.parseJSON(jeopardyBluePrint.stringValue),null,null,this.taskConfigId,0, jeopardyBluePrint.id);
         }
         setupHTMLFieldEditors()
     }
