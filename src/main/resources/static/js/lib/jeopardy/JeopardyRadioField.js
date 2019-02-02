@@ -10,6 +10,7 @@ class JeopardyRadioField extends JeopardyField {
             }
         }
         this.str = "";
+        this.score = 0;
         this.stopTime = (new Date().getTime() / 1000) + 122;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
@@ -38,6 +39,7 @@ class JeopardyRadioField extends JeopardyField {
     setupHTML() {
         this.str = '<div id = "question-answer-machine">';
         this.str += '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>';
+        this.str += '<div><p id = "jeopardyScore" class="text-right text-dark row"></p></div>';
         this.str += '<div class="form-group" id="jeopardyField_' + this.index + '" style="min-width: 300px;">'
 
         // let question = result.values();
@@ -85,6 +87,7 @@ class JeopardyRadioField extends JeopardyField {
 
     handleAskMachineOnClick(event) {
         let machSuggestion = "";
+        this.score = this.score - 1;
         let randInt = Math.random();
         console.log(this.result[this.questionNumber]);
         if (randInt <= this.prob)
@@ -93,30 +96,42 @@ class JeopardyRadioField extends JeopardyField {
             let nonAnswers = this.removeA(this.result[this.questionNumber].value, this.result[this.questionNumber].Answer);
             machSuggestion += nonAnswers[Math.floor(Math.random() * 3)];
         }
-        console.log(machSuggestion);
+        console.log("Machine suggestion "+machSuggestion);
+
+        this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
+            "Probability-"+this.prob, 0.0, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+
         let machStr = "";
         machStr += '<div class="text-center text-dark col-4" id="machSuggestion">\n' +
             machSuggestion + '</div>';
         var element = document.getElementById("machSuggestion");
         if (element) {
-            element.innerHTML = machStr;
+            document.getElementById("machSuggestion").innerHTML = machStr;
         }
-        else
+        else{
             $('#jeopardyForm').append(machStr);
+        }
     }
 
     handleSubmitOnClick(event) {
         let cellIndex = $('input[name="answer"]:checked').index();
-        // console.log("answer " + cellIndex);
         if (!isNaN(cellIndex)) {
             let valueTyped = $('input[name="answer"]:checked').val();
-            if (valueTyped === undefined)
+            if(valueTyped == this.result[this.questionNumber].Answer)
+                this.score = this.score + 2;
+            else if (valueTyped === undefined)
+            {
                 valueTyped = "Not Answered";
+                this.score = this.score -2;
+            } else
+            {
+                this.score = this.score -2;
+            }
             console.log("Typed Value: " + valueTyped);
             if (valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     valueTyped, 0.0,
-                    0, true, JEOPARDY_CONST.SUBMIT_FIELD);
+                    this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
             }
         }
     }
@@ -130,7 +145,7 @@ class JeopardyRadioField extends JeopardyField {
             if(this.selectedValue != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     this.selectedValue, 0.0,
-                    0, true, JEOPARDY_CONST.RADIO_FIELD);
+                    this.score, true, JEOPARDY_CONST.RADIO_FIELD);
             }
         }
     }
@@ -140,12 +155,13 @@ class JeopardyRadioField extends JeopardyField {
         let attrName = message.content.attributeName;
         let buttonType = message.content.extraData;
 
-        var element = document.getElementById("machSuggestion");
-        if (element) {
-            element.innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
-        }
+        if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.SUBMIT_FIELD)) {
 
-        if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.SUBMIT_FIELD)) { //sync submit button
+            if (document.getElementById("machSuggestion")) {
+                document.getElementById("machSuggestion").innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
+            }
+
+            //sync submit button
             console.log("Submit button message ");
             console.log(message);
             var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
@@ -184,19 +200,26 @@ class JeopardyRadioField extends JeopardyField {
                 }
                 else {
                     this.setupHTML();
+                    this.score = message.content.attributeIntegerValue;
+                    let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">'+this.score +' points</p></div>'
                     questionEl.innerHTML = this.str;
+                    document.getElementById(("jeopardyScore")).innerHTML = updateScore;
                     this.setupHooks();
                 }
             }
             //End of round give a message
             //End of task -> Thanks
-        }
-
-        if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.RADIO_FIELD)){
+        } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.RADIO_FIELD)){
             var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
             var radioButtons = $("#answer"+question_number).find("input[value='"+message.content.attributeStringValue+"']").prop("checked",true);
             this.setFinalAnswer(message.sender);
             // console.log("Radio button clicked "+ this.selectedValue);
+        }
+        else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.ASK_MACHINE)){
+            console.log("Score is "+this.score);
+            this.score = message.content.attributeIntegerValue;
+            let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">'+this.score +' points</p></div>';
+            document.getElementById(("jeopardyScore")).innerHTML = updateScore;
         }
     }
 

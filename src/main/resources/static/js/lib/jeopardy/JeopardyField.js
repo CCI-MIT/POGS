@@ -1,7 +1,8 @@
 const JEOPARDY_CONST = {
     FIELD_NAME: "jeopardyAnswer",
     RADIO_FIELD: "RadioField",
-    SUBMIT_FIELD: "SubmitButtonField"
+    SUBMIT_FIELD: "SubmitButtonField",
+    ASK_MACHINE: "AskedMachine"
 };
 
 const JEOPARDY_TRANSIENT = {
