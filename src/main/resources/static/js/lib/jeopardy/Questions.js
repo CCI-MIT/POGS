@@ -9,11 +9,11 @@ this.questions =  [
     },
     {
         "ID":2
-        ,"question":"Consumers that eat both plants and animals are"
-        ,"Answer":"Omnivores"
-        ,"value":["Carnivores", "Omnivores", "Tertiary consumers", "Herbivores"]
+        ,"question":"Which is the largest species of dolphin?"
+        ,"Answer":"Killer Whale"
+        ,"value":["Bottlenose", "Killer Whale", "Striped", "Spinner"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":3
@@ -49,11 +49,11 @@ this.questions =  [
     },
     {
         "ID":7
-        ,"question":"The first man to walk on Moon"
-        ,"Answer":"Neil A. Armstrong"
-        ,"value":["Edwin E. Adrin Jr.", "Major Yuri Gagarin", "Edward White", "Neil A. Armstrong"]
+        ,"question":"What is the height of the tallest mountain on Earth?"
+        ,"Answer":"8848 meters"
+        ,"value":["8848 meters", "8884 meters", "8488 meters", "8484 meters"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Hard"
     },
     {
         "ID":8
@@ -91,7 +91,7 @@ this.questions =  [
         "ID":12
         ,"question":"How often, approximately, is Halley's Comet visible from Earth (in years)"
         ,"Answer":"75"
-        ,"value":["25", "140", "300", "75"]
+        ,"value":["25", "72", "50", "75"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },
@@ -219,7 +219,7 @@ this.questions =  [
         "ID":28
         ,"question":"Who was the first American to go into space in 1966?"
         ,"Answer":"Alan Shephard"
-        ,"value":["John Glenn", "Scott Carpenter", "Alan Shephard", "Wally Schirra"]
+        ,"value":["John Glenn", "Scott Carpenter", "Alan Shephard", "Neil Armstrong"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },
@@ -307,7 +307,7 @@ this.questions =  [
         "ID":39
         ,"question":"Who designed the ‘first’ small computer for home use?"
         ,"Answer":"John Blankenbaker"
-        ,"value":["Steve Wozniak", "Chuck Peddle", "John Blankenbaker", "Steve Leininger"]
+        ,"value":["Steve Wozniak", "Steve Jobs", "John Blankenbaker", "Steve Leininger"]
         ,"Category":"Science and Technology"
         ,"Level":"Hard"
     },
@@ -347,7 +347,7 @@ this.questions =  [
         "ID":44
         ,"question":"The only species of cat that lives and hunts in groups is"
         ,"Answer":"lion"
-        ,"value":["leopard", "lion", "Tiger", "jaguar"]
+        ,"value":["leopard", "lion", "tiger", "jaguar"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },
@@ -441,19 +441,19 @@ this.questions =  [
     },
     {
         "ID":56
-        ,"question":"What is Tesla Motors, an American automotive company, known for producing?"
-        ,"Answer":"Electric Cars"
-        ,"value":["Motorcycles", "Electric Cars", "Tractor Trailers", "Hover Boards"]
+        ,"question":"What is the origin of the word \"spam\" in the context of email spam?"
+        ,"Answer":"A Monty Python skit from the 70s"
+        ,"value":["It's an acronym for \"spontaneously persistent advertising message\"", "A Monty Python skit from the 70s", "Poor developers sick of eating the same meal", "SPAM meat was the first product to be \"spammed\" via email"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Hard"
     },
     {
         "ID":57
-        ,"question":"Which company created the iPad?"
-        ,"Answer":"Apple"
-        ,"value":["Apple", "Sony", "Dell", "HP"]
+        ,"question":"What was the first web browser?"
+        ,"Answer":"WorldWideWeb"
+        ,"value":["Internet Explorer", "WorldWideWeb", "Netscape Navigator", "Alta Vista"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":58
@@ -481,15 +481,15 @@ this.questions =  [
     },
     {
         "ID":61
-        ,"question":"Which of the following is not a primary colour"
-        ,"Answer":"Yellow"
-        ,"value":["Red", "Yellow", "Blue", "Green "]
+        ,"question":"What is Google's Android mascot unofficially known as?"
+        ,"Answer":"Bugdroid"
+        ,"value":["Dandroid", "AutomaTom", "Bugdroid", "Android"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":62
-        ,"question":"Which blood cells are called 'Soldiers' of the body"
+        ,"question":"Which blood cells are called 'Soldiers' of the body?"
         ,"Answer":"White Blood Cells"
         ,"value":["White Blood Cells", "Platelets", "None of them", "Red Blood Cells"]
         ,"Category":"Science and Technology"
@@ -537,15 +537,15 @@ this.questions =  [
     },
     {
         "ID":68
-        ,"question":"The energy of food is measured in"
-        ,"Answer":"Calories"
-        ,"value":["Celsius", "Kelvin", "Hertz", "Calories"]
+        ,"question":"What does the 'P' in Android P (9th version) stand for?"
+        ,"Answer":"Pie"
+        ,"value":["Popsicle", "Peppermint", "Pop-Tart", "Pie"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":69
-        ,"question":"Name an instrument which is used to measure the Density of milk?"
+        ,"question":"Name an instrument which is used to measure the density of milk?"
         ,"Answer":"Lactometer"
         ,"value":["Hydrometer", "Lactometer", "Hygrometer", "Barometer"]
         ,"Category":"Science and Technology"
@@ -611,13 +611,13 @@ this.questions =  [
         "ID":77
         ,"question":"What is laughing gas?"
         ,"Answer":"Nitrous Oxide"
-        ,"value":["Carbon monoxide", "Nitrous Oxide", "Hydrogen peroxide", "Sulphur dioxide"]
+        ,"value":["Nitrous Dioxide", "Nitrous Oxide", "Hydrogen peroxide", "Sulphur dioxide"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },
     {
         "ID":78
-        ,"question":"how many teaspoons in a tablespoon"
+        ,"question":"How many teaspoons make up a tablespoon?"
         ,"Answer":"3"
         ,"value":["2", "4", "5", "3"]
         ,"Category":"Science and Technology"
@@ -641,25 +641,25 @@ this.questions =  [
     },
     {
         "ID":81
-        ,"question":"Pollen grains in plants are produced in"
-        ,"Answer":"Flower"
-        ,"value":["Flower", "Fruit", "Roots", "Stem"]
+        ,"question":"How far is the moon from the Earth?"
+        ,"Answer":"376600 km"
+        ,"value":["376000 km", "376600 km", "376000 km", "3766000 km"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },
     {
         "ID":82
-        ,"question":"Alcohol first impairs your"
-        ,"Answer":"judgement"
-        ,"value":["heart", "judgement", "hearing skills", "colour recognition"]
+        ,"question":"The first 5MB hard drive weighed approximately how many pounds?"
+        ,"Answer":"Over a ton"
+        ,"value":["250 pounds", "50 pounds", "25 pounds", "Over a ton"]
         ,"Category":"Science and Technology"
         ,"Level":"Easy"
     },
     {
         "ID":83
-        ,"question":"What is the principle carbohydrate of milk?"
-        ,"Answer":"Lactose"
-        ,"value":["Fructose", "Sucrose", "Galactose", "Lactose"]
+        ,"question":"The largest National Park in the US is"
+        ,"Answer":"Denali National Park"
+        ,"value":["Denali National Park", "Death Valley National Park", "Yellowstone National Park", "Yosemite National Park"]
         ,"Category":"Science and Technology"
         ,"Level":"Easy"
     },
@@ -673,11 +673,11 @@ this.questions =  [
     },
     {
         "ID":85
-        ,"question":"A push or pull on an object is called"
-        ,"Answer":"Force"
-        ,"value":["Weight", "Opposition", "Force", "Energy"]
+        ,"question":"How many Nobel Laureates does UCSB have?"
+        ,"Answer":"6"
+        ,"value":["6", "4", "5", "7"]
         ,"Category":"Science and Technology"
-        ,"Level":"Easy"
+        ,"Level":"Hard"
     },
     {
         "ID":86
@@ -793,11 +793,11 @@ this.questions =  [
     },
     {
         "ID":100
-        ,"question":""
-        ,"Answer":""
-        ,"value":["", "", "", ""]
-        ,"Category":""
-        ,"Level":""
+        ,"question":"What is the closest star to the Earth other than the Sun?"
+        ,"Answer":"Proximus Centauri"
+        ,"value":["Sirius", "Proximus Centauri", "Procyon", "Epsilon Eridani"]
+        ,"Category":"Science and Technology"
+        ,"Level":"Medium"
     },
     {
         "ID":101
@@ -1107,7 +1107,7 @@ this.questions =  [
         "ID":139
         ,"question":"The first Easter baskets were given to imitate these."
         ,"Answer":"Bird's nest"
-        ,"value":["Bird's nest", "Knitting basket", "Bucket\n", "Picnic basket"]
+        ,"value":["Bird's nest", "Knitting basket", "Bucket", "Picnic basket"]
         ,"Category":"History and Mythology"
         ,"Level":"Medium"
     },
@@ -1161,11 +1161,11 @@ this.questions =  [
     },
     {
         "ID":146
-        ,"question":"Columbus discovered America in this year"
-        ,"Answer":"1492"
-        ,"value":["1592", "1776", "1476", "1492"]
+        ,"question":"Who said the following statement 'Because it's there.'"
+        ,"Answer":"George Mallory"
+        ,"value":["Ed Viesturs", "George Mallory", "Conrad Anker", "Sir Edmund Hillary"]
         ,"Category":"History and Mythology"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":147
@@ -1242,7 +1242,7 @@ this.questions =  [
     {
         "ID":156
         ,"question":"What were the first names of the famous explorers Lewis and Clark?"
-        ,"Answer":"Clark and Lewis"
+        ,"Answer":"Meriwether and William"
         ,"value":["John and Lincoln", "Benjamin and Samuel", "Clark and Lewis", "Meriwether and William"]
         ,"Category":"History and Mythology"
         ,"Level":"Hard"
@@ -1601,11 +1601,11 @@ this.questions =  [
     },
     {
         "ID":201
-        ,"question":""
-        ,"Answer":""
-        ,"value":["", "", "", ""]
-        ,"Category":""
-        ,"Level":""
+        ,"question":"The first episode the TV sitcom Friends was aired on"
+        ,"Answer":"22nd September, 1994"
+        ,"value":["15th August, 1994", "7th September, 1994", "1st August, 1994", "22nd September, 1994"]
+        ,"Category":"Literature and Media"
+        ,"Level":"Medium"
     },
     {
         "ID":202
@@ -1665,9 +1665,9 @@ this.questions =  [
     },
     {
         "ID":209
-        ,"question":"This is the first Harry Potter book"
-        ,"Answer":"HP and the Philosopher's Stone"
-        ,"value":["HP and the Chamber of Secrets", "HP and the Goblet of Fire", "HP and the Philosopher's Stone", "HP and the God of small things"]
+        ,"question":"In the famous Harry Potter series, who freed Dobby the elf?"
+        ,"Answer":"Harry Potter"
+        ,"value":["Lucius Malfoy", "Harry Potter", "Draco Malfoy", "Dumbledore"]
         ,"Category":"Literature and Media"
         ,"Level":"Easy"
     },
@@ -1683,7 +1683,7 @@ this.questions =  [
         "ID":211
         ,"question":"You can attend a Yabuki performance in this country"
         ,"Answer":"Japan"
-        ,"value":["Yemen", "Yugoslavia", "Java", "Japan"]
+        ,"value":["Korea", "China", "Malaysia", "Japan"]
         ,"Category":"Literature and Media"
         ,"Level":"Hard"
     },
@@ -1833,7 +1833,7 @@ this.questions =  [
     },
     {
         "ID":230
-        ,"question":"This film did not win Best Picture"
+        ,"question":"This film did not win Best Picture at the Oscars."
         ,"Answer":"Saving Private Ryan"
         ,"value":["Rocky", "Saving Private Ryan", "Amadeus", "The Silence of the Lambs"]
         ,"Category":"Literature and Media"
@@ -2009,11 +2009,11 @@ this.questions =  [
     },
     {
         "ID":252
-        ,"question":"How many seasons of the hit US comedy ‘Friends’ were made?"
-        ,"Answer":"10"
-        ,"value":["9", "11", "12", "10"]
+        ,"question":"Which movie won Best Picture at the Oscars in 2017?"
+        ,"Answer":"Moonlight"
+        ,"value":["Moonlight", "Spotlight", "Arrival", "La La Land"]
         ,"Category":"Literature and Media"
-        ,"Level":"Easy"
+        ,"Level":"Medium"
     },
     {
         "ID":253
@@ -2025,9 +2025,9 @@ this.questions =  [
     },
     {
         "ID":254
-        ,"question":"In the film version of ‘Fifty Shades of Grey’, due to be released in 2015, which actor plays the role of Christian Grey?"
-        ,"Answer":"Jamie Dornan"
-        ,"value":["Aidan Turner", "Henry Cavill", "Cillian Murphy", "Jamie Dornan"]
+        ,"question":"Who created Miss Marple?"
+        ,"Answer":"Agatha Christie"
+        ,"value":["Jeffrey Archer", "Sidney Sheldon", "Enid Blyton", "Agatha Christie"]
         ,"Category":"Literature and Media"
         ,"Level":"Medium"
     },
@@ -2290,8 +2290,8 @@ this.questions =  [
     {
         "ID":287
         ,"question":"Which athlete makes the most money?"
-        ,"Answer":"Tiger Woods"
-        ,"value":["Michael Jordan", "Tiger Woods", "Alex Rodriguiz", "Peyton Manning"]
+        ,"Answer":"Ion Tiriac"
+        ,"value":["Michael Jordan", "Tiger Woods", "Cristiano Ronaldo", "Ion Tiriac"]
         ,"Category":"Literature and Media"
         ,"Level":"Medium"
     },

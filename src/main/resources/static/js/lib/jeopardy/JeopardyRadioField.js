@@ -99,7 +99,7 @@ class JeopardyRadioField extends JeopardyField {
         console.log("Machine suggestion "+machSuggestion);
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
-            "Probability-"+this.prob, 0.0, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+            "AskMachine", 0.0, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
 
         let machStr = "";
         machStr += '<div class="text-center text-dark col-4" id="machSuggestion">\n' +
@@ -178,7 +178,8 @@ class JeopardyRadioField extends JeopardyField {
                     this.str = '<div id = "thankYou"> ' +
                         '<p class = "text-dark"> End of Experiment</p>' +
                         ' </div>';
-                    $('#jeopardyForm').append(this.str);
+                    questionEl.innerHTML = this.str;
+                    // $('#jeopardyForm').append(this.str);
                 }
                 else if (this.questionNumber % 10 === 0) {
                     console.log("round transition");
