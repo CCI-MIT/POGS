@@ -643,7 +643,7 @@ this.questions =  [
         "ID":81
         ,"question":"How far is the moon from the Earth?"
         ,"Answer":"376600 km"
-        ,"value":["376000 km", "376600 km", "376000 km", "3766000 km"]
+        ,"value":["376000 km", "376600 km", "3760000 km", "3766000 km"]
         ,"Category":"Science and Technology"
         ,"Level":"Medium"
     },

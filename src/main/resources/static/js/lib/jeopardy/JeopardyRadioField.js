@@ -99,7 +99,7 @@ class JeopardyRadioField extends JeopardyField {
         console.log("Machine suggestion "+machSuggestion);
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
-            "AskMachine", 0.0, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+            "AskMachine", this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
 
         let machStr = "";
         machStr += '<div class="text-center text-dark col-4" id="machSuggestion">\n' +
@@ -130,8 +130,7 @@ class JeopardyRadioField extends JeopardyField {
             console.log("Typed Value: " + valueTyped);
             if (valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
-                    valueTyped, 0.0,
-                    this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
+                    valueTyped, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
             }
         }
     }
@@ -144,8 +143,7 @@ class JeopardyRadioField extends JeopardyField {
             console.log("Value of button clicked: " + this.selectedValue);
             if(this.selectedValue != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
-                    this.selectedValue, 0.0,
-                    this.score, true, JEOPARDY_CONST.RADIO_FIELD);
+                    this.selectedValue, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.RADIO_FIELD);
             }
         }
     }
