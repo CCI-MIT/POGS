@@ -9,6 +9,7 @@ import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
+import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
@@ -16,6 +17,7 @@ import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
+import edu.mit.cci.pogs.utils.DateUtils;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
@@ -47,6 +49,7 @@ public class SessionService {
     private final SubjectCommunicationService subjectCommunicationService;
     private final SubjectAttributeDao subjectAttributeDao;
     private final CompletedTaskScoreDao completedTaskScoreDao;
+    private final StudyDao studyDao;
 
     private final TodoEntryService todoEntryService;
 
@@ -67,6 +70,7 @@ public class SessionService {
                           CompletedTaskAttributeDao completedTaskAttributeDao,
                           TeamHasSubjectDao teamHasSubjectDao,
                           TeamDao teamDao,
+                          StudyDao studyDao,
                           RoundDao roundDao,
                           EventLogDao eventLogDao,
                           SubjectCommunicationService subjectCommunicationService,
@@ -89,6 +93,7 @@ public class SessionService {
         this.subjectCommunicationService = subjectCommunicationService;
         this.subjectAttributeDao = subjectAttributeDao;
         this.completedTaskScoreDao = completedTaskScoreDao;
+        this.studyDao = studyDao;
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -100,13 +105,17 @@ public class SessionService {
         initiateThreadsForSessions(sessions);
 
     }
+    public Session getSessionByFullName(String fullName){
+        return sessionDao.getSessionByFullName(fullName);
+    }
 
     public Session getPerpetualSessionForSubject(String externalId) {
         List<Session> sessions = sessionDao.listPerpetualCurrentlyAccpeting(WAITING_ROOM_OPEN_INIT_WINDOW);
         for (Session s : sessions) {
-            if (externalId.startsWith(s.getPerpetualSubjectsPrefix())) {
-
-                return s;
+            if(s.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+                if (externalId.startsWith(s.getPerpetualSubjectsPrefix())) {
+                    return s;
+                }
             }
         }
         return null;
@@ -121,7 +130,7 @@ public class SessionService {
         for (Session s : sessions) {
 
             if (SessionRunnerManager.getSessionRunner(s.getId()) == null) {
-                _log.debug(" Session runner starting: PREFIX(" + s.getSessionSuffix()+") - ID(" + s.getId() + ")");
+                _log.debug(" Session runner starting: PREFIX(" + s.getFullSessionName()+") - ID(" + s.getId() + ")");
                 SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
                 sessionRunner.setSession(s);
                 SessionRunnerManager.addSessionRunner(s.getId(), sessionRunner);
@@ -181,6 +190,9 @@ public class SessionService {
         session.setPerpetualEndDate(sessionBean.getPerpetualEndDate());
         session.setPerpetualSubjectsNumber(sessionBean.getPerpetualSubjectsNumber());
         session.setPerpetualSubjectsPrefix(sessionBean.getPerpetualSubjectsPrefix());
+        session.setDoneUrlParameter(sessionBean.getDoneUrlParameter());
+        Study study = studyDao.get(sessionBean.getStudyId());
+        session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
 
         if (session.getRosterTime() == null) {
             session.setRosterTime(0);
@@ -258,6 +270,8 @@ public class SessionService {
         clonedNonPerpetualSession.setTeamCreationMatrix(session.getTeamCreationMatrix());
         clonedNonPerpetualSession.setFixedInteractionTime(session.getFixedInteractionTime());
         clonedNonPerpetualSession.setStudyId(session.getStudyId());
+        clonedNonPerpetualSession.setParentSessionId(session.getId());
+        clonedNonPerpetualSession.setFullSessionName(session.getFullSessionName()+"_" + DateUtils.now());
         clonedNonPerpetualSession.setSessionScheduleType(SessionScheduleType.SCHEDULED_DATE.getId().toString());
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());

@@ -126,13 +126,22 @@
                         </div>
                         <div class="row perpetualSessionType" style="display: none">
                             <div class="col">
-                                <div class="row">
+
+
+                                <div class="row" id="subjectPerpetualPrefix">
                                     <label class="col-sm-4 col-form-label" for="perpetualSubjectsPrefix">Subject prefix:</label>
                                     <div class="col-sm-8">
                                         <input class="form-control" type="text" id="perpetualSubjectsPrefix" th:field="*{perpetualSubjectsPrefix}"/>
                                         <div class="invalid-feedback">Please provide a subject prefix.</div>
                                     </div>
                                 </div>
+                                <div class="row" id="landingPageUrl" style="display:none">
+                                    <label class="col-sm-12 col-form-label" for="perpetualSubjectsPrefix" >
+                                    Session landing page url: <b>sessions/<span th:text="${study.studySessionPrefix}"></span><span id="sessionSuffixURL" th:text="*{sessionSuffix}"></span></b>
+                                    </label>
+                                </div>
+
+
                              </div>
                              <div class="col">
                                 <div class="row">
@@ -284,6 +293,13 @@
                                         <div class="invalid-feedback">Please provide a valid URL.</div>
                                     </div>
                                 </div>
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label" for="sessiontosession">Session to session done redirection:</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-check-input" th:field="*{doneUrlParameter}"  type="checkbox" id="sessiontosession" />
+                                    </div>
+                                </div>
+
                             </div>
                         </fieldset>
                     </div>
@@ -432,7 +448,7 @@
                     <label class="col-sm-3 col-form-label" for="teamMinSize">Team size:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="number" id="teamMinSize" th:field="*{teamMinSize}"/>
-                        <div class="invalid-feedback">Please provide a valid team size greater or equal to 2.</div>
+                        <div class="invalid-feedback">Please provide a valid team size greater or equal to 1.</div>
                     </div>
                 </div>
 
@@ -466,7 +482,7 @@
                 return (regexp.test(value));
             }
             function validateUrl(value) {
-              return /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i.test(value);
+              return /\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))/i.test(value);
             }
             $(function() {
 
@@ -475,7 +491,17 @@
                                         if(ex == "P"){
                                             $(".perpetualSessionType").show();
                                             $(".scheduledSessionType").hide();
-                                        }else{
+                                            $("#subjectPerpetualPrefix").show();
+                                            $("#landingPageUrl").hide();
+                                        }
+                                        if(ex == "Q"){
+                                            $(".perpetualSessionType").show();
+                                            $(".scheduledSessionType").hide();
+                                            $("#subjectPerpetualPrefix").hide();
+                                            $("#landingPageUrl").show();
+                                         }
+                                        if(ex=="S"){
+
                                             $(".perpetualSessionType").hide();
                                             $(".scheduledSessionType").show();
                                         }
@@ -576,12 +602,15 @@
                 $("#sessionScheduleType").change(setupSchedule);
                 $("#taskExecutionType").change(teamExecSetup);
                 $("#teamCreationMethod").change(teamCreationSetup);
+                $("#sessionSuffix").change(function(){
+                    $("#sessionSuffixURL").text($("#sessionSuffix").val())
+                })
                 teamCreationSetup();
                 teamExecSetup();
                 setupSchedule();
 
                 $( "#saveSession" ).submit(function( event ) {
-                    console.log("Hello all");
+
                     var valid = true;
 
 
@@ -613,7 +642,7 @@
                             //hide matrix
                             //show team size
                             var teamSize = $("#teamMinSize").val();
-                            if(teamSize == "" || parseInt(teamSize) <= 1){
+                            if(teamSize == "" || parseInt(teamSize) <= 0){
                                 $("#teamMinSize").addClass("is-invalid");
                                 valid = false;
                             }
@@ -642,7 +671,17 @@
                                 $("#fixedInteractionTime").addClass("is-invalid");
                                 valid = false;
                             }
-                        } else {
+                        }
+                        var ex2 = $("#sessionScheduleType").val();
+                        if(ex2 == "P"){
+                            var date = $("#perpetualStartDate").val();
+                            $("#sessionStartDate").val(date)
+                        }
+                        if(ex2 == "Q"){
+                            var date = $("#perpetualStartDate").val();
+                            $("#sessionStartDate").val(date)
+                        }
+                        if(ex2 == "S"){
                             var date = $("#sessionStartDate").val();
                             $("#perpetualStartDate").val(date);
                             $("#perpetualEndDate").val(date);

@@ -142,7 +142,7 @@ public class SessionRunner implements Runnable {
 
             if ((allSubjectsAreWaiting() || sessionIsReadyToStart())
                     && !sessionHasStarted) {
-                _log.info("Starting session: " + session.getSessionSuffix());
+                _log.info("Starting session: " + session.getFullSessionName());
                 sessionHasStarted = true;
                 startSession();
             }
@@ -591,7 +591,8 @@ public class SessionRunner implements Runnable {
 
     @Override
     public void run() {
-        if (session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())
+        || session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString())) {
             runPerpetual();
         } else {
             init();
@@ -617,12 +618,19 @@ public class SessionRunner implements Runnable {
 
                         while (it.hasNext()) {
                             if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
-                                Subject su = new Subject();
                                 String externalId = it.next();
-                                su.setSessionId(newSpawnedSession.getId());
-                                su.setSubjectExternalId(externalId);
-                                su.setSubjectDisplayName(externalId);
-                                su = subjectDao.create(su);
+                                Subject su = subjectDao.getByExternalId(externalId);
+                                if(su== null) {
+                                    su = new Subject();
+
+                                    su.setSessionId(newSpawnedSession.getId());
+                                    su.setSubjectExternalId(externalId);
+                                    su.setSubjectDisplayName(externalId);
+                                    su = subjectDao.create(su);
+                                } else {
+                                    su.setSessionId(newSpawnedSession.getId());
+                                    subjectDao.update(su);
+                                }
 
                                 subjectsInNewSession.add(su);
 

@@ -81,7 +81,7 @@ class Pogs {
         this.sessionName = config.sessionName;
         this.chatBotName = config.chatBotName;
         this.sessionIsPerpetual = ((config.sessionIsPerpetual)?(config.sessionIsPerpetual):(false));
-
+        this.doneUrlParameter = config.doneUrlParameter;
         this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
@@ -274,8 +274,12 @@ class Pogs {
 
         if((message.content.currentUrl + "/" +this.subjectId == window.location.pathname)) {
             this.nextUrl = message.content.nextUrl;
-            if (message.content.nextUrl.indexOf("http") == -1) {
+            if ((message.content.nextUrl.indexOf("http") == -1)&&(message.content.nextUrl.indexOf("https"))) {
                 this.nextUrl = this.nextUrl + '/' + this.subjectId;
+            }else {
+                if(this.doneUrlParameter) {
+                    this.nextUrl = this.nextUrl + '?externalId=' + this.subjectId;
+                }
             }
             var finalDate = (new Date().getTime() + parseInt(
                 message.content.secondsRemainingCurrentUrl));
