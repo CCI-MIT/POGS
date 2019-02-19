@@ -1,0 +1,8 @@
+name: jeopardyPlugin
+description: This task has multiple choice questions where if you don't know the answer,
+you can ask the machine for hint. This hint could be the correct answer at certain probability and using the hint leads to penalty.
+
+scoring:
+    scoringType : indexedAnswerOneAnswerKey
+    url: http://localhost:8080/letscoretypingtext
+    answerSheetPrefix: jeopardy_
