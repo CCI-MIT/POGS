@@ -53,7 +53,10 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
         query.addConditions(SESSION.PERPETUAL_END_DATE.greaterThan(timestamp));
         query.addConditions(SESSION.PERPETUAL_START_DATE.lessThan(new Timestamp(new Date().getTime())));
         query.addConditions(SESSION.STATUS.eq(SessionStatus.NOTSTARTED.getId().toString()));
-        query.addConditions(SESSION.SESSION_SCHEDULE_TYPE.eq(SessionScheduleType.PERPETUAL.getId().toString()));
+        query.addConditions(SESSION
+                .SESSION_SCHEDULE_TYPE.eq(SessionScheduleType.PERPETUAL.getId().toString()).or(
+                SESSION.SESSION_SCHEDULE_TYPE.eq(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString())
+        ));
         query.addOrderBy(SESSION.PERPETUAL_START_DATE);
         return query.fetchInto(Session.class);
     }
@@ -71,6 +74,19 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
         return query.fetchInto(Session.class);
     }
 
+    public Session getSessionByFullName(String fullName) {
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SESSION).getQuery();
+
+        query.addConditions(SESSION.FULL_SESSION_NAME.eq(fullName));
+        query.addOrderBy(SESSION.PERPETUAL_START_DATE);
+        List<Session> ret = query.fetchInto(Session.class);
+        if(ret!=null && !ret.isEmpty()){
+            return ret.get(0);
+        }
+        return null;
+    }
 
 }
  

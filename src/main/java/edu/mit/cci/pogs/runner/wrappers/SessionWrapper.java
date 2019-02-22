@@ -77,7 +77,7 @@ public class SessionWrapper extends Session {
 
     public Long getSecondsRemainingForSession() {
 
-        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (isSessionPerpetual()) {
             return 20 * 1000l;
         }
         Integer roundSize = this.sessionRounds.size();
@@ -94,7 +94,7 @@ public class SessionWrapper extends Session {
         //    return 0l;
         // }
 
-        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (isSessionPerpetual()) {
 
             return (new Date().getTime() + 1000 * 60 * 5);
         }
@@ -107,9 +107,13 @@ public class SessionWrapper extends Session {
 
     }
 
+    public Boolean isSessionPerpetual(){
+        return this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())||
+                this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString());
+    }
 
     public Long getSecondsRemainingForCurrentRound() {
-        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (isSessionPerpetual()) {
 
             return (new Date().getTime() + 1000 * 60 * 5);
         }
@@ -127,7 +131,7 @@ public class SessionWrapper extends Session {
     public String getCurrentUrl() {
         Integer sessionScheduleIndex = getSessionScheduleIndex();
 
-        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (isSessionPerpetual()) {
             return "/waiting_room";
         }
 
@@ -140,7 +144,7 @@ public class SessionWrapper extends Session {
 
     public String getNextUrl() {
 
-        if (this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+        if (isSessionPerpetual()) {
             return "";
         }
 
@@ -189,7 +193,7 @@ public class SessionWrapper extends Session {
 
 
     public boolean isTooLate() {
-        if(this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())){
+        if(isSessionPerpetual()){
             return false;
         }
         return DateUtils.now() > this.getSessionStartDate().getTime();
