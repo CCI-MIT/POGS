@@ -8,6 +8,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.awt.*;
@@ -75,6 +77,7 @@ import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
 import edu.mit.cci.pogs.utils.ColorUtils;
+import edu.mit.cci.pogs.utils.DateUtils;
 
 @Controller
 public class WorkspaceController {
@@ -130,7 +133,60 @@ public class WorkspaceController {
     @Autowired
     private SessionService sessionService;
 
-    @PostMapping("/check_in")
+    @GetMapping("/sessions/{sessionId}")
+    public String landingPageLogin(@PathVariable("sessionId") String sessionId,
+                                   @RequestParam(name = "externalId", required = false) String externalId,
+                                   Model model) {
+
+        Session session = sessionService.getSessionByFullName(sessionId);
+        if (session == null) {
+            model.addAttribute("errorMessage", "This session url was not recognized.");
+            return "workspace/error";
+        }
+
+        Long now = DateUtils.now();
+        if (session.getPerpetualStartDate().getTime() > now ||
+                session.getPerpetualEndDate().getTime() < now) {
+            model.addAttribute("errorMessage", "Too late, this session expired.");
+            return "workspace/error";
+        }
+
+
+        Subject su = new Subject();
+        List<SubjectAttribute> allSubAttr = null;
+        if (externalId != null) {
+            Subject ref = subjectDao.getByExternalId(externalId);
+            if (ref != null) {
+                su.setPreviousSessionSubject(ref.getId());
+                allSubAttr = subjectAttributeDao.listBySubjectId(ref.getId());
+            }
+
+
+        }
+        String newSubjectExtId = session.getFullSessionName() + "_" + now;
+        su.setSubjectExternalId(newSubjectExtId);
+        su.setSubjectDisplayName(newSubjectExtId);
+        su.setSessionId(session.getId());
+
+        su = subjectDao.create(su);
+
+        if (allSubAttr != null) {
+            for (SubjectAttribute sa : allSubAttr) {
+                SubjectAttribute subjectAttribute = new SubjectAttribute();
+                subjectAttribute.setSubjectId(su.getId());
+                subjectAttribute.setAttributeName(sa.getAttributeName());
+                subjectAttribute.setStringValue(sa.getStringValue());
+                subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                subjectAttribute.setRealValue(sa.getRealValue());
+                subjectAttribute.setLatest(true);
+            }
+        }
+
+        return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
+    }
+
+
+    @RequestMapping(value="/check_in", method = {RequestMethod.GET, RequestMethod.POST})
     public String register(@RequestParam("externalId") String externalId, Model model) {
 
         Subject su;
@@ -194,8 +250,7 @@ public class WorkspaceController {
             if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
                 model.addAttribute("subject", su);
                 model.addAttribute("pogsSession", sr.getSession());
-                model.addAttribute("pogsSessionPerpetual", (sr.getSession().getSessionScheduleType().equals(
-                        SessionScheduleType.PERPETUAL.getId().toString())));
+                model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
 
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
@@ -698,8 +753,8 @@ public class WorkspaceController {
                 JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
 
                 if (pl.getTaskBeforeWorkJsContent() != null) {
-                    if(!hasAlreadyRunBeforeTask(taskExecutionAttributes))
-                    runTaskBeforeWorkScript(pl, teamMates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
+                    if (!hasAlreadyRunBeforeTask(taskExecutionAttributes))
+                        runTaskBeforeWorkScript(pl, teamMates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
                 }
 
                 model.addAttribute("teammates", teamMates);
@@ -717,8 +772,8 @@ public class WorkspaceController {
     }
 
     private boolean hasAlreadyRunBeforeTask(List<TaskExecutionAttribute> taskExecutionAttributes) {
-        for(TaskExecutionAttribute tea: taskExecutionAttributes){
-            if(tea.getAttributeName().equals("beforeWorkDone")){
+        for (TaskExecutionAttribute tea : taskExecutionAttributes) {
+            if (tea.getAttributeName().equals("beforeWorkDone")) {
                 return true;
             }
         }

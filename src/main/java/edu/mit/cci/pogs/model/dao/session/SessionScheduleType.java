@@ -3,7 +3,8 @@ package edu.mit.cci.pogs.model.dao.session;
 
 public enum SessionScheduleType {
     SCHEDULED_DATE('S', "Scheduled to a specific date"),
-    PERPETUAL('P', "Perpetual for a period of time");
+    PERPETUAL_LANDING_PAGE('Q', "Perpetual for a period of time with landing page"),
+    PERPETUAL('P', "Perpetual for a period of time with subject prefix");
 
     private Character typeChar;
     private String description;

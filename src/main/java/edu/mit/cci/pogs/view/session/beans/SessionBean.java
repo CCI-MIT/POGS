@@ -52,6 +52,8 @@ public class SessionBean {
 
     private Integer   fixedInteractionTime;
 
+    private Boolean doneUrlParameter;
+
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
 
 
@@ -103,6 +105,7 @@ public class SessionBean {
         this.perpetualEndDate = value.getPerpetualEndDate();
         this.perpetualSubjectsNumber = value.getPerpetualSubjectsNumber();
         this.perpetualSubjectsPrefix = value.getPerpetualSubjectsPrefix();
+        this.doneUrlParameter = value.getDoneUrlParameter();
     }
 
     public String getSessionScheduleType() {
@@ -449,5 +452,13 @@ public class SessionBean {
 
     public void setFixedInteractionTime(Integer fixedInteractionTime) {
         this.fixedInteractionTime = fixedInteractionTime;
+    }
+
+    public Boolean getDoneUrlParameter() {
+        return doneUrlParameter;
+    }
+
+    public void setDoneUrlParameter(Boolean doneUrlParameter) {
+        this.doneUrlParameter = doneUrlParameter;
     }
 }
