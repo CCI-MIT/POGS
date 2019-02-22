@@ -99,7 +99,7 @@ class JeopardyRadioField extends JeopardyField {
         console.log("Machine suggestion "+machSuggestion);
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
-            "AskMachine", this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+            "AskMachine: "+machSuggestion, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
 
         let machStr = "";
         machStr += '<div class="text-center text-dark col-4" id="machSuggestion">\n' +
