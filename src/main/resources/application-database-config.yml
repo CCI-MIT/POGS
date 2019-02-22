@@ -3,4 +3,4 @@ database:
   schema: pogs
   url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
   username: root
-  password: s4l1n4s
+  password: 1234
