@@ -23,4 +23,4 @@ while(subjectOrder.length != teammatez.length ){
 attributesToAddz = [{"attributeName": "gridOrder",
     "stringValue":JSON.stringify(subjectOrder) }]
 
-attributesToAdd = JSON.stringify(attributesToAddz);
+completedTaskAttributesToAdd = JSON.stringify(attributesToAddz);

@@ -133,7 +133,7 @@ var equationTypingTaskPlugin = pogs.createPlugin('equationTypingTaskPlugin',func
     let equationTypingTaskPlugin = new EquationTypingTaskPlugin(this);
     // get config attributes from task plugin
     equationTypingTaskPlugin.setup($.parseJSON(this.getStringAttribute("gridBluePrint")),
-                                   $.parseJSON(this.getStringAttribute("gridOrder")));
+                                   $.parseJSON(this.getCompletedTaskStringAttribute("gridOrder")));
     this.subscribeTaskAttributeBroadcast(equationTypingTaskPlugin.broadcastReceived.bind(equationTypingTaskPlugin))
 
 });

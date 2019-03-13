@@ -19,8 +19,8 @@ class MemoryGridTask {
                       'Q', 'R', 'S', 'T', 'U', 'W', 'V', 'X', 'Y', 'Z'];
         if(gridBluePrint.columnColors) {
 
-            this.subjectsHasColumns = JSON.parse(this.pogsPlugin.getStringAttribute("subjectsHasColumns"));
-            this.colorHasSubjects = JSON.parse(this.pogsPlugin.getStringAttribute("colorHasSubjects"));
+            this.subjectsHasColumns = JSON.parse(this.pogsPlugin.getCompletedTaskStringAttribute("subjectsHasColumns"));
+            this.colorHasSubjects = JSON.parse(this.pogsPlugin.getCompletedTaskStringAttribute("colorHasSubjects"));
 
             let tableRow = $('<tr/>');
             let tdz = $('<td/>',{text:' - '});

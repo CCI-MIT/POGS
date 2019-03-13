@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.service;
 
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurat
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
+import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.view.task.bean.TaskBean;
 
 @Service
@@ -38,15 +41,15 @@ public class TaskService {
 
 
     private static void updateVideoPrimerUrl(Task tk) {
-        if (tk.getPrimerPageEnabled()&& tk.getPrimerVideoAutoplayMute()) {
+        if (tk.getPrimerPageEnabled() && tk.getPrimerVideoAutoplayMute()) {
             String primerContent = tk.getPrimerText();
             Pattern p = Pattern.compile("(?:https?://)?(?:www.)?(?:youtube.com|youtu.be|vimeo.com)/(?:watch\\?v=)?([^\\s|^\"])+");
             Matcher urlMatcher = p.matcher(primerContent);
-            if(urlMatcher.find()){
+            if (urlMatcher.find()) {
                 String url = urlMatcher.group(0);
                 String oldUrl = url;
 
-                if(!url.contains("autoplay=1")) {
+                if (!url.contains("autoplay=1")) {
                     if (!url.contains("?")) {
                         url += "?autoplay=1&mute=1";
                     } else {
@@ -85,16 +88,16 @@ public class TaskService {
         tk.setChatScriptId(value.getChatScriptId());
         tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
         tk.setShouldScore(value.getShouldScore());
-        if(tk.getShouldScore()==null){
+        if (tk.getShouldScore() == null) {
             tk.setShouldScore(false);
         }
-        if(tk.getInteractionTime()==null){
+        if (tk.getInteractionTime() == null) {
             tk.setInteractionTime(0);
         }
-        if(tk.getIntroTime()==null){
+        if (tk.getIntroTime() == null) {
             tk.setIntroTime(0);
         }
-        if(tk.getPrimerTime() == null){
+        if (tk.getPrimerTime() == null) {
             tk.setPrimerTime(0);
         }
         updateVideoPrimerUrl(tk);
@@ -172,5 +175,30 @@ public class TaskService {
             taskHasResearchGroupDao.delete(toDel);
         }
 
+    }
+
+    public JSONArray getFakeJsonTaskList() {
+        List<TaskWrapper> fakeTaskList = new ArrayList<>();
+        TaskWrapper tw = new TaskWrapper();
+        tw.setTaskName("Task name");
+        tw.setId(01l);
+        fakeTaskList.add(tw);
+
+        tw = new TaskWrapper();
+        tw.setTaskName("Task name 2");
+        tw.setId(02l);
+        fakeTaskList.add(tw);
+        return getJsonTaskList(fakeTaskList);
+    }
+
+    public JSONArray getJsonTaskList(List<TaskWrapper> taskList) {
+        JSONArray ja = new JSONArray();
+        for (TaskWrapper tw : taskList) {
+            JSONObject jo = new JSONObject();
+            jo.put("taskName", tw.getTaskName());
+            jo.put("id", tw.getId());
+            ja.add(jo);
+        }
+        return ja;
     }
 }

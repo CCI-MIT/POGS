@@ -62,48 +62,48 @@ public class CompletedTaskService {
         }
         List<TaskExecutionAttribute> teas = taskExecutionAttributeDao
                 .listByTaskConfigurationId(thtc.getTaskConfigurationId());
-        if (tpp.getScoring().getScoringType().equals(ScoringType.indexedAnswerOneAnswerKey)) {
-
-
-            TaskExecutionAttribute answerKey = null;
-            for (TaskExecutionAttribute tea : teas) {
-                if (tea.getAttributeName().contains(tpp.getScoring().getAnswerKeyPrefix())) {
-                    answerKey = tea;
-                }
-            }
-            if (answerKey == null) {
-                return;
-            }
-            Double score = new Double(0);
-            List<CompletedTaskAttribute> completedTaskAttributeList = completedTaskAttributeDao
-                    .listByAttributePrefix(tpp.getScoring().getAnswerSheetPrefix(),
-                            ct.getId());
-            for (int i = 0; i < completedTaskAttributeList.size(); i++) {
-                CompletedTaskAttribute cta = completedTaskAttributeList.get(i);
-                String index = cta.getAttributeName().replace(
-                        tpp.getScoring().getAnswerSheetPrefix(), "");
-                int indexInt = Integer.parseInt(index);
-                if (tpp.getScoring().getAnswerKeyFormat().equals(AnswerKeyFormat.CSV)) {
-                    String[] answers = answerKey.getStringValue().split(",");
-                    if (answers[indexInt].equals(cta.getStringValue())) {
-                        score = score + 1;
-                    } else {
-                        score = score;
-                    }
-                } else {
-                    if (tpp.getScoring().getAnswerKeyFormat().equals(AnswerKeyFormat.JSONArray)) {
-                        JSONArray ja = new JSONArray(cta.getStringValue());
-                        String value = ja.getString(indexInt);
-                        if (value.equals(cta.getStringValue())) {
-                            score = score + 1;
-                        } else {
-                            score = score;
-                        }
-                    }
-                }
-            }
-            saveOrUpdateCompletedTaskScore(ct, score);
-        }
+//        if (tpp.getScoring().getScoringType().equals(ScoringType.indexedAnswerOneAnswerKey)) {
+//
+//
+//            TaskExecutionAttribute answerKey = null;
+//            for (TaskExecutionAttribute tea : teas) {
+//                if (tea.getAttributeName().contains(tpp.getScoring().getAnswerKeyPrefix())) {
+//                    answerKey = tea;
+//                }
+//            }
+//            if (answerKey == null) {
+//                return;
+//            }
+//            Double score = new Double(0);
+//            List<CompletedTaskAttribute> completedTaskAttributeList = completedTaskAttributeDao
+//                    .listByAttributePrefix(tpp.getScoring().getAnswerSheetPrefix(),
+//                            ct.getId());
+//            for (int i = 0; i < completedTaskAttributeList.size(); i++) {
+//                CompletedTaskAttribute cta = completedTaskAttributeList.get(i);
+//                String index = cta.getAttributeName().replace(
+//                        tpp.getScoring().getAnswerSheetPrefix(), "");
+//                int indexInt = Integer.parseInt(index);
+//                if (tpp.getScoring().getAnswerKeyFormat().equals(AnswerKeyFormat.CSV)) {
+//                    String[] answers = answerKey.getStringValue().split(",");
+//                    if (answers[indexInt].equals(cta.getStringValue())) {
+//                        score = score + 1;
+//                    } else {
+//                        score = score;
+//                    }
+//                } else {
+//                    if (tpp.getScoring().getAnswerKeyFormat().equals(AnswerKeyFormat.JSONArray)) {
+//                        JSONArray ja = new JSONArray(cta.getStringValue());
+//                        String value = ja.getString(indexInt);
+//                        if (value.equals(cta.getStringValue())) {
+//                            score = score + 1;
+//                        } else {
+//                            score = score;
+//                        }
+//                    }
+//                }
+//            }
+//            saveOrUpdateCompletedTaskScore(ct, score);
+//        }
         if (tpp.getScoring().getScoringType().equals(ScoringType.externalService)) {
             List<CompletedTaskAttribute> completedTaskAttributeList = completedTaskAttributeDao
                     .listByAttributePrefix(tpp.getScoring().getAnswerSheetPrefix(),

@@ -1,7 +1,6 @@
 package edu.mit.cci.pogs.view.workspace;
 
 import org.jooq.tools.json.JSONArray;
-import org.jooq.tools.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,23 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.awt.*;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.script.Bindings;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
@@ -37,7 +20,6 @@ import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
-import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -50,34 +32,30 @@ import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeD
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
-import edu.mit.cci.pogs.runner.wrappers.TaskScoreWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
+import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
+import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.SessionService;
+import edu.mit.cci.pogs.service.SubjectService;
+import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
+import edu.mit.cci.pogs.service.TaskScoreService;
+import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
-import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
+
 
 @Controller
 public class WorkspaceController {
@@ -89,22 +67,28 @@ public class WorkspaceController {
     private SubjectDao subjectDao;
 
     @Autowired
+    private SubjectService subjectService;
+
+    @Autowired
     private TaskDao taskDao;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private CompletedTaskDao completedTaskDao;
 
     @Autowired
-    private CompletedTaskScoreDao completedTaskScoreDao;
+    private TaskScoreService taskScoreService;
 
     @Autowired
-    private EventLogDao eventLogDao;
+    private EventLogService eventLogService;
 
     @Autowired
-    private TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
+    private TaskExecutionAttributeService taskExecutionAttributeService;
 
     @Autowired
-    private TaskExecutionAttributeDao taskExecutionAttributeDao;
+    private CompletedTaskAttributeService completedTaskAttributeService;
 
     @Autowired
     private SubjectAttributeDao subjectAttributeDao;
@@ -113,22 +97,7 @@ public class WorkspaceController {
     private TeamService teamService;
 
     @Autowired
-    private TeamDao teamDao;
-
-    @Autowired
     private RoundDao roundDao;
-
-    @Autowired
-    private SubjectHasChannelDao subjectHasChannelDao;
-
-    @Autowired
-    private ChatChannelDao chatChannelDao;
-
-    @Autowired
-    private SubjectCommunicationDao subjectCommunicationDao;
-
-    @Autowired
-    private TaskConfigurationDao taskConfigurationDao;
 
     @Autowired
     private SessionService sessionService;
@@ -137,6 +106,15 @@ public class WorkspaceController {
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
                                    @RequestParam(name = "externalId", required = false) String externalId,
                                    Model model) {
+        model.addAttribute("action", "/sessions/start/" + sessionId);
+        model.addAttribute("externalId", externalId);
+        return "/workspace/landing";
+    }
+
+    @GetMapping("/sessions/start/{sessionId}")
+    public String landingPageLoginPost(@PathVariable("sessionId") String sessionId,
+                                       @RequestParam(name = "externalId", required = false) String externalId,
+                                       Model model) {
 
         Session session = sessionService.getSessionByFullName(sessionId);
         if (session == null) {
@@ -186,7 +164,7 @@ public class WorkspaceController {
     }
 
 
-    @RequestMapping(value="/check_in", method = {RequestMethod.GET, RequestMethod.POST})
+    @RequestMapping(value = "/check_in", method = {RequestMethod.GET, RequestMethod.POST})
     public String register(@RequestParam("externalId") String externalId, Model model) {
 
         Subject su;
@@ -210,7 +188,7 @@ public class WorkspaceController {
             return "workspace/error";
         }
         if (sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
-            model.addAttribute("errorMessage", "Your session has ended!");
+            model.addAttribute("errorMessage", "Your session has ended!: " + su.getId() + " - " + su.getSessionId());
             return "workspace/error";
         }
         if (sr.getSession().isTooLate()) {
@@ -363,38 +341,14 @@ public class WorkspaceController {
         model.addAttribute("taskPrimerJs", pl.getTaskPrimerJsContent());
         model.addAttribute("taskPrimerHtml", pl.getTaskPrimerHtmlContent());
 
-        TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
-                .getByTaskId(task.getId());
-        List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
-                .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
         model.addAttribute("taskConfigurationAttributes",
-                attributesToJsonArray(taskExecutionAttributes));
+                        taskExecutionAttributeService.listExecutionAttributesAsJsonArray(
+                                task.getId()));
         return checkSubjectSessionTaskAndForward(su, task, "workspace/task_primer", model);
 
     }
 
-    private static JSONArray attributesToJsonArray(List<TaskExecutionAttribute> taskExecutionAttributes) {
-        JSONArray configurationArray = new JSONArray();
-        for (TaskExecutionAttribute tea : taskExecutionAttributes) {
-            JSONObject teaJson = new JSONObject();
-            teaJson.put("attributeName", tea.getAttributeName());
-            teaJson.put("stringValue", tea.getStringValue());
-            teaJson.put("doubleValue", tea.getDoubleValue());
-            teaJson.put("integerValue", tea.getIntegerValue());
-            configurationArray.add(teaJson);
-
-
-        }
-        return configurationArray;
-    }
-
-    private Subject generateFakeSubject(String subjectExternalId) {
-        Subject su = new Subject();
-        su.setSubjectExternalId(subjectExternalId);
-        su.setSubjectDisplayName(subjectExternalId);
-        return su;
-    }
 
     @GetMapping("/task/{taskId}/t/{subjectExternalId}")
     public String taskConfigTest(@PathVariable("taskId") Long taskId,
@@ -404,15 +358,10 @@ public class WorkspaceController {
         Task task = taskDao.get(taskId);
         TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
         if (pl != null) {
-            //get task configurations
-            TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
-                    .getByTaskId(task.getId());
-            List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
-                    .listByTaskConfigurationId(configuration.getTaskConfigurationId());
 
             model.addAttribute("task", new TaskWrapper(task));
-            JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
-            model.addAttribute("taskConfigurationAttributes", taskConfigurationAttributes);
+            model.addAttribute("taskConfigurationAttributes",
+                    taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));
 
             JSONArray allLogs = new JSONArray();
             model.addAttribute("eventsUntilNow", allLogs);
@@ -422,17 +371,11 @@ public class WorkspaceController {
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
             model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
-            model.addAttribute("subject", generateFakeSubject(subjectExternalId));
-            JSONArray teammates = getFakeTeamatesJSONObject();
-            model.addAttribute("teammates", teammates);
+            model.addAttribute("subject", teamService.generateFakeSubject(subjectExternalId));
+            model.addAttribute("teammates", teamService.getFakeTeamatesJSONObject());
 
-            JSONArray ja = new JSONArray();
-            ja.add("su01");
-            ja.add("su02");
-            ja.add("su03");
-            ja.add("su04");
 
-            model.addAttribute("subjectCanTalkTo", ja);
+            model.addAttribute("subjectCanTalkTo", teamService.getFakeSubjectCanTalkTo());
 
             model.addAttribute("hasCollaborationTodoListEnabled",
                     task.getCollaborationTodoListEnabled());
@@ -441,28 +384,19 @@ public class WorkspaceController {
             model.addAttribute("hasCollaborationVotingWidget",
                     task.getCollaborationVotingWidgetEnabled());
 
-            String cc = task.getCommunicationType();
-            List<TaskWrapper> fakeTaskList = new ArrayList<>();
-            TaskWrapper tw = new TaskWrapper();
-            tw.setTaskName("Task name");
-            tw.setId(01l);
-            fakeTaskList.add(tw);
-
-            tw = new TaskWrapper();
-            tw.setTaskName("Task name 2");
-            tw.setId(02l);
-            fakeTaskList.add(tw);
-            model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
-
+            model.addAttribute("allTasksList", taskService.getFakeJsonTaskList());
             model.addAttribute("lastTask", "");
+
+            String cc = task.getCommunicationType();
 
             model.addAttribute("communicationType", cc);
             model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
                     .NO_CHAT.getId().toString()) ? (true) : (false)));
 
-            if (pl.getTaskBeforeWorkJsContent() != null) {
-                runTaskBeforeWorkScript(pl, teammates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
-            }
+            //TODO: FIGURE OUT A WAY TO RUN THE CODE BEFORE.
+            //if (pl.getTaskBeforeWorkJsContent() != null) {
+            //    runTaskBeforeWorkScript(pl, teammates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
+            //}
 
         }
 
@@ -475,107 +409,32 @@ public class WorkspaceController {
             @PathVariable("pluginConfig") String pluginConfig,
             @PathVariable("subjectExternalId") String subjectExternalId,
             Model model) {
+
         TaskPlugin pl = TaskPlugin.getTaskPlugin(taskPlugin);
         if (pl != null) {
-            //get task configurations
-            TaskConfiguration tc = taskConfigurationDao.getByTaskPluginConfigurationName(pluginConfig);
-
-            List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
-                    .listByTaskConfigurationId(tc.getId());
-
 
             model.addAttribute("taskConfigurationAttributes",
-                    attributesToJsonArray(taskExecutionAttributes));
+                    taskExecutionAttributeService.listExecutionAttributesFromPluginConfigAsJsonArray(pluginConfig));
             //get task html & js from plugin file system
             model.addAttribute("taskCss", pl.getTaskCSSContent());
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
             model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
 
-            JSONArray allLogs = new JSONArray();
+            model.addAttribute("eventsUntilNow", new JSONArray());
+            model.addAttribute("subject", teamService.generateFakeSubject(subjectExternalId));
 
-            model.addAttribute("eventsUntilNow", allLogs);
+            model.addAttribute("teammates", teamService.getFakeTeamatesJSONObject());
 
-            model.addAttribute("subject", generateFakeSubject(subjectExternalId));
-
-
-            model.addAttribute("teammates", getFakeTeamatesJSONObject());
-
-            List<TaskWrapper> fakeTaskList = new ArrayList<>();
-            TaskWrapper tw = new TaskWrapper();
-            tw.setTaskName("Task name");
-            tw.setId(01l);
-            fakeTaskList.add(tw);
-
-            tw = new TaskWrapper();
-            tw.setTaskName("Task name 2");
-            tw.setId(02l);
-            fakeTaskList.add(tw);
-            model.addAttribute("allTasksList", getJsonTaskList(fakeTaskList));
+            model.addAttribute("allTasksList", taskService.getFakeJsonTaskList());
 
             model.addAttribute("lastTask", "");
-
 
         }
 
         return "workspace/task_workplugin";
     }
 
-    private JSONArray getFakeTeamatesJSONObject() {
-        List<Subject> teammates = new ArrayList<>();
-        teammates.add(generateFakeSubject("su01"));
-        teammates.add(generateFakeSubject("su02"));
-        teammates.add(generateFakeSubject("su03"));
-        teammates.add(generateFakeSubject("su04"));
-
-        JSONArray ja = new JSONArray();
-        Color[] colors = ColorUtils.generateVisuallyDistinctColors(
-                10,
-                ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
-        int colorIndex = 0;
-        for (Subject s : teammates) {
-            JSONObject subject = new JSONObject();
-            subject.put("externalId", s.getSubjectExternalId());
-            subject.put("displayName", s.getSubjectDisplayName());
-
-            JSONArray subjectAttributes = new JSONArray();
-
-            JSONObject att = new JSONObject();
-            Color color = colors[colorIndex];
-            att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME);
-
-            att.put("stringValue",
-                    String.format("#%02x%02x%02x", color.getRed(),
-                            color.getGreen(), color.getBlue())
-            );
-            subjectAttributes.add(att);
-
-            att = new JSONObject();
-
-            color = ColorUtils.generateFontColorBasedOnBackgroundColor(colors[colorIndex]);
-            att.put("attributeName", ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME);
-            att.put("stringValue", String.format("#%02x%02x%02x", color.getRed(),
-                    color.getGreen(), color.getBlue()));
-            colorIndex++;
-
-            subjectAttributes.add(att);
-
-            att = new JSONObject();
-            att.put("attributeName", "age");
-            att.put("stringValue", "13");
-            subjectAttributes.add(att);
-
-            att = new JSONObject();
-            att.put("attributeName", "education");
-            att.put("stringValue", "Graduate");
-            subjectAttributes.add(att);
-
-
-            subject.put("attributes", subjectAttributes);
-            ja.add(subject);
-        }
-        return ja;
-    }
 
     @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
     public String taskWork(@PathVariable("roundId") Long roundId,
@@ -589,42 +448,10 @@ public class WorkspaceController {
         Round round = roundDao.get(roundId);
 
 
-        List<SubjectCommunication> subjectCommunications =
-                subjectCommunicationDao.listByFromSubjectId(su.getId());
-
-        JSONArray allowedToTalkTo = new JSONArray();
-        if (subjectCommunications != null) {
-            for (SubjectCommunication sc : subjectCommunications) {
-                Subject subject = subjectDao.get(sc.getToSubjectId());
-                if (sc.getAllowed()) {
-                    if (sc.getToSubjectId() != sc.getFromSubjectId()) {
-                        allowedToTalkTo.add(subject.getSubjectExternalId());
-                    }
-                }
-            }
-        }
-        //get Channels user is allowed to talk to
-
-        List<SubjectHasChannel> subjectHasChannels = subjectHasChannelDao.listBySubjectId(su.getId());
-        JSONArray channelSubjectIsIn = new JSONArray();
-        if (subjectHasChannels != null) {
-            for (SubjectHasChannel shc : subjectHasChannels) {
-                ChatChannel chatChannel = chatChannelDao.get(shc.getChatChannelId());
-                channelSubjectIsIn.add(chatChannel.getChannelName());
-            }
-        }
-
 
         if (task != null && round != null) {
-            //get task plugin type task.getTaskPluginType()
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
             if (pl != null) {
-                //get task configurations
-                TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
-                        .getByTaskId(task.getId());
-                List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
-                        .listByTaskConfigurationId(configuration.getTaskConfigurationId());
-
 
                 //get task html & js from plugin file system
                 model.addAttribute("taskCss", pl.getTaskCSSContent());
@@ -632,8 +459,8 @@ public class WorkspaceController {
                 model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
                 model.addAttribute("subject", su);
-                model.addAttribute("subjectCanTalkTo", allowedToTalkTo);
-                model.addAttribute("channelSubjectIsIn", channelSubjectIsIn);
+                model.addAttribute("subjectCanTalkTo", subjectService.getSubjectsSubjectIsAllowedToTalkJson(su.getId()));
+                model.addAttribute("channelSubjectIsIn", subjectService.getChannelsSubjectIsIn(su.getId()));
 
 
                 model.addAttribute("task", new TaskWrapper(task));
@@ -673,7 +500,7 @@ public class WorkspaceController {
                         }
                     }
                 }
-                model.addAttribute("allTasksList", getJsonTaskList(sessionWrapper.getTaskList()));
+                model.addAttribute("allTasksList", taskService.getJsonTaskList(sessionWrapper.getTaskList()));
                 String cc = sessionWrapper.getCommunicationType();
                 if (task.getCommunicationType() != null || !task.getCommunicationType().equals(cc)) {
                     cc = task.getCommunicationType();
@@ -713,13 +540,8 @@ public class WorkspaceController {
                         sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
 
-                Team team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), round.getId(), task.getId());
-                if (team == null) {
-                    team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), round.getId(), null);
-                    if (team == null) {
-                        team = teamDao.getSubjectTeam(su.getId(), sessionWrapper.getId(), null, null);
-                    }
-                }
+                Team team = teamService.getTeamCascadeConfig(su.getId(), sessionWrapper.getId(), round.getId(), taskId);
+
                 if (team == null) {
                     return handleErrorMessage(sessionWrapper.getCouldNotAssignToTeamMessage(), model);
                 }
@@ -731,35 +553,18 @@ public class WorkspaceController {
                     completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
                 }
 
-                List<Subject> teammates = teamService.getTeamMates(task, su, round);
-
-                JSONArray teamMates = getTeamatesJSONObject(teammates);
 
                 model.addAttribute("completedTask", completedTask);
 
+                model.addAttribute("eventsUntilNow", eventLogService.getAllLogsUntilNow(completedTask.getId()));
 
-                List<EventLog> allLogsUntilNow = eventLogDao.listLogsUntil(completedTask.getId(), new Date());
-                JSONArray allLogs = new JSONArray();
-                for (EventLog el : allLogsUntilNow) {
-                    allLogs.add(getLogJson(el));
-                }
+                model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(task, su, round)));
 
-                model.addAttribute("eventsUntilNow", allLogs);
+                model.addAttribute("taskConfigurationAttributes",
+                        taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));
 
-                //check if plugin has javascript before work file.
-                //run the code with the variables.
-
-
-                JSONArray taskConfigurationAttributes = attributesToJsonArray(taskExecutionAttributes);
-
-                if (pl.getTaskBeforeWorkJsContent() != null) {
-                    if (!hasAlreadyRunBeforeTask(taskExecutionAttributes))
-                        runTaskBeforeWorkScript(pl, teamMates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
-                }
-
-                model.addAttribute("teammates", teamMates);
-
-                model.addAttribute("taskConfigurationAttributes", taskConfigurationAttributes);
+                model.addAttribute("completedTaskAttributes",
+                        completedTaskAttributeService.listCompletedTaskAttributesForCompletedTask(task.getId()));
 
 
             } else {
@@ -769,141 +574,6 @@ public class WorkspaceController {
         }
 
         return "workspace/task_work";
-    }
-
-    private boolean hasAlreadyRunBeforeTask(List<TaskExecutionAttribute> taskExecutionAttributes) {
-        for (TaskExecutionAttribute tea : taskExecutionAttributes) {
-            if (tea.getAttributeName().equals("beforeWorkDone")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    //TODO: Migrate this logic to an external scheduler before the task runs.
-    private void runTaskBeforeWorkScript(TaskPlugin pl, JSONArray teamMates, JSONArray taskAttr, Long taskConfigurationId) {
-        ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
-
-        // Set JavaScript variables
-        engine.put("attributesToAdd", "abc");
-
-        Bindings vars = new SimpleBindings();
-        engine.put("teammates", teamMates.toString());
-        engine.put("taskConfigurationAttributes", taskAttr.toString());
-
-        Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
-                pl.getTaskBeforeWorkJsContent().getBytes()));
-
-
-        try {
-            try {
-                engine.eval(scriptReader);
-
-                String attributesToAddJson = (String) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("attributesToAdd");
-
-                if (attributesToAddJson != null) {
-                    org.json.JSONArray array = new org.json.JSONArray(attributesToAddJson);
-                    if (array != null) {
-                        for (int i = 0; i < array.length(); i++) {
-                            org.json.JSONObject jo = array.getJSONObject(i);
-                            TaskExecutionAttribute tea = new TaskExecutionAttribute();
-                            tea.setAttributeName(jo.getString("attributeName"));
-                            tea.setTaskConfigurationId(taskConfigurationId);
-                            if (jo.has("stringValue")) {
-                                tea.setStringValue(jo.getString("stringValue"));
-                            }
-                            if (jo.has("integerValue")) {
-                                tea.setIntegerValue(jo.getLong("integerValue"));
-                            }
-                            if (jo.has("doubleValue")) {
-                                tea.setDoubleValue(jo.getDouble("doubleValue"));
-                            }
-                            boolean alreadyExist = false;
-                            //TODO: migrate logic to taskExecutionService
-                            List<TaskExecutionAttribute> list = taskExecutionAttributeDao.listByTaskConfigurationId(taskConfigurationId);
-                            for (TaskExecutionAttribute teaz : list) {
-                                if (teaz.getAttributeName().equals(tea.getAttributeName())) {
-                                    teaz.setStringValue(tea.getStringValue());
-                                    teaz.setIntegerValue(tea.getIntegerValue());
-                                    teaz.setDoubleValue(tea.getDoubleValue());
-                                    taskExecutionAttributeDao.update(teaz);
-                                    alreadyExist = true;
-                                }
-                            }
-                            if (!alreadyExist) {
-                                taskExecutionAttributeDao.create(tea);
-                            }
-                        }
-                    }
-                }
-                TaskExecutionAttribute tea = new TaskExecutionAttribute();
-                tea.setTaskConfigurationId(taskConfigurationId);
-                tea.setAttributeName("beforeWorkDone");
-                tea.setStringValue("true");
-
-
-            } catch (ScriptException se) {
-                //plugin script failed.
-                System.out.println(se);
-                se.printStackTrace();
-
-
-            } finally {
-                scriptReader.close();
-            }
-        } catch (IOException io) {
-            //ignore
-            io.printStackTrace();
-        }
-
-
-    }
-
-
-    private JSONArray getJsonTaskList(List<TaskWrapper> taskList) {
-        JSONArray ja = new JSONArray();
-        for (TaskWrapper tw : taskList) {
-            JSONObject jo = new JSONObject();
-            jo.put("taskName", tw.getTaskName());
-            jo.put("id", tw.getId());
-            ja.add(jo);
-        }
-        return ja;
-    }
-
-    private JSONObject getLogJson(EventLog el) {
-        JSONObject event = new JSONObject();
-        event.put("sender", el.getSender());
-        event.put("receiver", el.getReceiver());
-
-        event.put("content", el.getEventContent());
-        event.put("completedTaskId", el.getCompletedTaskId());
-        event.put("sessionId", el.getSessionId());
-        event.put("type", el.getEventType());
-        return event;
-    }
-
-    private JSONArray getTeamatesJSONObject(List<Subject> teammates) {
-        JSONArray ja = new JSONArray();
-        for (Subject s : teammates) {
-            JSONObject subject = new JSONObject();
-            subject.put("externalId", s.getSubjectExternalId());
-            subject.put("displayName", s.getSubjectDisplayName());
-            JSONArray subjectAttributes = new JSONArray();
-            List<SubjectAttribute> attributes = subjectAttributeDao.listBySubjectId(s.getId());
-            for (SubjectAttribute sa : attributes) {
-                JSONObject att = new JSONObject();
-                att.put("attributeName", sa.getAttributeName());
-                att.put("stringValue", sa.getStringValue());
-                att.put("integerValue", sa.getIntegerValue());
-                att.put("realValue", sa.getRealValue());
-                subjectAttributes.add(att);
-            }
-            subject.put("attributes", subjectAttributes);
-            ja.add(subject);
-        }
-        return ja;
     }
 
     @GetMapping("/done/{externalId}")
@@ -919,42 +589,7 @@ public class WorkspaceController {
                 List<TeamWrapper> teamWrappers = sr.getSession()
                         .getSessionRounds().get(0).getRoundTeams();
 
-                List<TaskScoreWrapper> taskScoreWrappers = new ArrayList<>();
 
-                for (TaskWrapper tw : sr.getSession().getTaskList()) {
-
-                    if (tw.getShouldScore()) {
-                        //get all scores in the team's order
-                        TaskScoreWrapper tsw = new TaskScoreWrapper();
-                        tsw.setTaskWrapper(tw);
-                        tsw.setTeamScore(new ArrayList<>());
-
-                        Map<Long, Double> teamScore = new HashMap<>();
-                        for (TeamWrapper tew : teamWrappers) {
-                            teamScore.put(tew.getTeam().getId(), 0d);
-                        }
-
-                        for (CompletedTask ct : tw.getCompletedTasks()) {
-                            CompletedTaskScore cts = completedTaskScoreDao
-                                    .getByCompletedTaskId(ct.getId());
-                            if (cts != null) {
-                                if (ct.getSubjectId() == null) {
-                                    teamScore.put(ct.getTeamId(), cts.getTotalScore());
-                                } else {
-                                    if (ct.getSubjectId().equals(su.getId())) {
-                                        teamScore.put(ct.getTeamId(), cts.getTotalScore());
-                                    }
-                                }
-                            }
-                        }
-                        for (TeamWrapper tew : teamWrappers) {
-                            tsw.getTeamScore().add(teamScore.get(tew.getTeam().getId()));
-                        }
-
-                        taskScoreWrappers.add(tsw);
-
-                    }
-                }
                 int subjectsTeam = 0;
                 for (int i = 0; i < teamWrappers.size(); i++) {
                     for (Subject sub : teamWrappers.get(i).getSubjects()) {
@@ -966,7 +601,8 @@ public class WorkspaceController {
                 model.addAttribute("subjectsTeamIndex", subjectsTeam);
                 model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
                 model.addAttribute("showScore", true);
-                model.addAttribute("taskScoreWrappers", taskScoreWrappers);
+                model.addAttribute("taskScoreWrappers", taskScoreService.getTaskScoreWrappers(
+                        sr.getSession().getTaskList(),teamWrappers, su.getId() ));
                 model.addAttribute("teamWrappers", teamWrappers);
 
             } else {

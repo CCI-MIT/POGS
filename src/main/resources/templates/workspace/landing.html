@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<!--/*@thymesVar id="errorMessage" type="java.lang.String"*/-->
+<!--/*@thymesVar id="action" type="java.lang.String"*/-->
+<!--/*@thymesVar id="externalId" type="java.lang.String"*/-->
+<div layout:fragment="content">
+    <div class="d-flex align-items-center flex-column justify-content-center h-100 " style="height: 100%">
+                    Redirecting ...
+
+        <form id="landingPage" th:action="${action}" method="">
+            <input type="hidden" name="externalId" th:value="${externalId}">
+        </form>
+        <script>
+          $(function(){
+              $("#landingPage").submit();
+          });
+        </script>
+    </div>
+</div>
+
+<div layout:fragment="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</div>
+</body>
+</html>

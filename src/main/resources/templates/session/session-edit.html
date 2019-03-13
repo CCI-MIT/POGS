@@ -65,7 +65,7 @@
                                         </div>
                                         <input type="text" class="form-control" id="sessionSuffix" aria-describedby="sessionSuffix3" th:field="*{sessionSuffix}"/>
                                     </div>
-                                    <div class="invalid-feedback" id="sessionSuffixError">Please provida a valid suffix use numbers and letters only</div>
+                                    <div class="invalid-feedback" id="sessionSuffixError">Please provide a valid suffix use numbers and letters only</div>
                                 </div>
                             </div>
                         </div>
@@ -126,8 +126,19 @@
                         </div>
                         <div class="row perpetualSessionType" style="display: none">
                             <div class="col">
+                                <div class="form-group row">
+                                    <label class="col-sm-5 col-form-label" for="sessionScheduleType">Condition to start :</label>
+                                    <div class="col-sm-7">
 
+                                        <select class="custom-select" th:field="*{scheduleConditionType}" id="sessionScheduleConditionType">
+                                            <option
+                                                    th:each="rg: ${sessionScheduleConditionType}"
+                                                    th:value="${rg.id}"
+                                                    th:text="${rg.description}" ></option>
+                                        </select>
 
+                                    </div>
+                                </div>
                                 <div class="row" id="subjectPerpetualPrefix">
                                     <label class="col-sm-4 col-form-label" for="perpetualSubjectsPrefix">Subject prefix:</label>
                                     <div class="col-sm-8">
@@ -144,11 +155,24 @@
 
                              </div>
                              <div class="col">
-                                <div class="row">
+                                <div class="row" id="numberOfPerpetualSubjects">
                                     <label class="col-sm-4 col-form-label" for="perpetualSubjectsNumber">Number of subjects to start session:</label>
                                     <div class="col-sm-8">
                                         <input class="form-control " type="number"  min="0" step="1"  id="perpetualSubjectsNumber" th:field="*{perpetualSubjectsNumber}"/>
                                         <div class="invalid-feedback">Please provide a minimal number of subjects to start a session.</div>
+                                    </div>
+                                </div>
+                                <div class="form-group row" id="perpetualScript" style="display: none">
+                                    <label class="col-sm-5 col-form-label" for="sessionScheduleType">Condition script to start session:</label>
+                                    <div class="col-sm-7">
+
+                                        <select class="custom-select" th:field="*{executableScriptId}" id="sessionScheduleConditionType">
+                                            <option
+                                                    th:each="rg: ${executableScripts}"
+                                                    th:value="${rg.id}"
+                                                    th:text="${rg.scriptName}" ></option>
+                                        </select>
+
                                     </div>
                                 </div>
                             </div>
@@ -485,6 +509,16 @@
               return /\b((http|https):\/\/?)[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|\/?))/i.test(value);
             }
             $(function() {
+                function setupScheduleCondition(){
+                    var ex = $("#sessionScheduleConditionType").val();
+                    if(ex == 'N') {
+                        $("#numberOfPerpetualSubjects").show();
+                        $("#perpetualScript").hide();
+                    } else{
+                        $("#perpetualScript").show();
+                        $("#numberOfPerpetualSubjects").hide();
+                    }
+                }
 
                 function setupSchedule(){
                     var ex = $("#sessionScheduleType").val();
@@ -499,11 +533,13 @@
                                             $(".scheduledSessionType").hide();
                                             $("#subjectPerpetualPrefix").hide();
                                             $("#landingPageUrl").show();
+                                            setupScheduleCondition();
                                          }
                                         if(ex=="S"){
 
                                             $(".perpetualSessionType").hide();
                                             $(".scheduledSessionType").show();
+                                            setupScheduleCondition();
                                         }
                 }
 
@@ -602,6 +638,9 @@
                 $("#sessionScheduleType").change(setupSchedule);
                 $("#taskExecutionType").change(teamExecSetup);
                 $("#teamCreationMethod").change(teamCreationSetup);
+
+                $("#sessionScheduleConditionType").change(setupScheduleCondition);
+
                 $("#sessionSuffix").change(function(){
                     $("#sessionSuffixURL").text($("#sessionSuffix").val())
                 })

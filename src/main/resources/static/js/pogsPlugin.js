@@ -137,6 +137,41 @@ class PogsPlugin {
             return false;
         }
     }
+
+    getCompletedTaskStringAttribute(attributeName) {
+
+        if (this.pogsRef.completedTaskAttributesMap.has(attributeName)) {
+            return String(
+                this.pogsRef.completedTaskAttributesMap.get(attributeName).stringValue);
+        } else {
+            return null;
+        }
+    }
+    getCompletedTaskFloatAttribute(attributeName) {
+        if (this.pogsRef.completedTaskAttributesMap.has(attributeName)) {
+            return parseFloat(
+                this.pogsRef.completedTaskAttributesMap.get(attributeName).doubleValue);
+        } else {
+            return null;
+        }
+    }
+
+    getCompletedTaskIntAttribute(attributeName) {
+        if (this.pogsRef.completedTaskAttributesMap.has(attributeName)) {
+            return parseInt(
+                this.pogsRef.completedTaskAttributesMap.get(attributeName).integerValue);
+        } else {
+            return null;
+        }
+    }
+    getCompletedTaskBooleanAttribute(attributeName) {
+        if (this.pogsRef.completedTaskAttributesMap.has(attributeName)) {
+            return parseInt(
+                this.pogsRef.completedTaskAttributesMap.get(attributeName).integerValue) == 1;
+        } else {
+            return false;
+        }
+    }
 }
 
 

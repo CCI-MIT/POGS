@@ -191,6 +191,9 @@ public class SessionService {
         session.setPerpetualSubjectsNumber(sessionBean.getPerpetualSubjectsNumber());
         session.setPerpetualSubjectsPrefix(sessionBean.getPerpetualSubjectsPrefix());
         session.setDoneUrlParameter(sessionBean.getDoneUrlParameter());
+        session.setScheduleConditionType(sessionBean.getScheduleConditionType());
+        session.setExecutableScriptId(sessionBean.getExecutableScriptId());
+
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
 
@@ -236,7 +239,7 @@ public class SessionService {
 
 
         clonedNonPerpetualSession.setSessionSuffix(session.getSessionSuffix());
-        clonedNonPerpetualSession.setSessionStartDate(new Timestamp(new Date().getTime() + 1000 * 60 * 1));
+        clonedNonPerpetualSession.setSessionStartDate(new Timestamp(new Date().getTime() + 500 * 60 ));
         clonedNonPerpetualSession.setStatus(SessionStatus.NOTSTARTED.getId().toString());
         clonedNonPerpetualSession.setWaitingRoomTime(session.getWaitingRoomTime());
         clonedNonPerpetualSession.setIntroPageEnabled(session.getIntroPageEnabled());
@@ -273,6 +276,7 @@ public class SessionService {
         clonedNonPerpetualSession.setParentSessionId(session.getId());
         clonedNonPerpetualSession.setFullSessionName(session.getFullSessionName()+"_" + DateUtils.now());
         clonedNonPerpetualSession.setSessionScheduleType(SessionScheduleType.SCHEDULED_DATE.getId().toString());
+        clonedNonPerpetualSession.setDoneUrlParameter(session.getDoneUrlParameter());
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
 

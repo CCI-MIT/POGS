@@ -58,6 +58,14 @@ public class TaskPlugin {
     }
 
 
+    public boolean isScriptType(){
+        return getTaskPluginProperties().getScoring().getScoreAttributeName()
+                .equals(ScoringType.script.getId().toString());
+    }
+    public boolean isExternalService(){
+        return getTaskPluginProperties().getScoring().getScoreAttributeName()
+                .equals(ScoringType.externalService.getId().toString());
+    }
     public String getTaskPluginName() {
         return taskPluginName;
     }
@@ -143,6 +151,10 @@ public class TaskPlugin {
     public String getTaskBeforeWorkJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskBeforeWork.js");
     }
+    public String getTaskAfterWorkJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskAfterWork.js");
+    }
+
     public String getTaskWorkJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.js");
     }

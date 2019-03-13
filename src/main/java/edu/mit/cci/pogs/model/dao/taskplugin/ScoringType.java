@@ -2,7 +2,7 @@ package edu.mit.cci.pogs.model.dao.taskplugin;
 
 public enum ScoringType {
 
-    indexedAnswerOneAnswerKey('S', "Answer key"),
+    script('S', "Script"),
     externalService('L', "External service"),
     scoreIsAttribute('A',"Score is an attribute");
 

@@ -110,6 +110,8 @@ class Pogs {
                                            parseInt(config.secondsRemainingCurrentUrl));
         this.taskConfigurationAttributes = config.taskConfigurationAttributes;
 
+        this.completedTaskAttributes = config.completedTaskAttributes;
+
         this.eventsUntilNow = config.eventsUntilNow;
         this.taskConfigurationAttributesMap = new Map();
         if(typeof(this.taskConfigurationAttributes) != "undefined") {
@@ -117,6 +119,14 @@ class Pogs {
                 this.taskConfigurationAttributesMap.set(
                     this.taskConfigurationAttributes[i].attributeName,
                     this.taskConfigurationAttributes[i]);
+            }
+        }
+        this.completedTaskAttributesMap = new Map();
+        if(typeof(this.completedTaskAttributes) != "undefined") {
+            for (var i = 0; i < this.completedTaskAttributes.length; i++) {
+                this.completedTaskAttributesMap.set(
+                    this.completedTaskAttributes[i].attributeName,
+                    this.completedTaskAttributes[i]);
             }
         }
 

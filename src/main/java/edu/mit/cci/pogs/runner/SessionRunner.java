@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.runner;
 
+import org.jooq.tools.json.JSONArray;
+import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,11 +25,21 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 
 import edu.mit.cci.pogs.model.dao.chatentry.ChatEntryDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
+import edu.mit.cci.pogs.model.dao.session.SessionScheduleConditionToStartType;
 import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
 import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
@@ -37,6 +52,7 @@ import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
@@ -54,6 +70,7 @@ import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.service.TaskGroupService;
+import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
 
@@ -115,6 +132,12 @@ public class SessionRunner implements Runnable {
 
     @Autowired
     private SubjectCommunicationService subjectCommunicationService;
+
+    @Autowired
+    private ExecutableScriptDao executableScriptDao;
+
+    @Autowired
+    private TeamService teamService;
 
     @Autowired
     private ApplicationContext context;
@@ -202,7 +225,7 @@ public class SessionRunner implements Runnable {
 
             session.createSessionSchedule();
             checkAndScheduleChatScripts(session);
-            scheduleTaskScoring(session);
+            scheduleTaskRelatedThreads(session);
 
         } else {
             if ((session.getTeamCreationMoment().equals(
@@ -214,27 +237,72 @@ public class SessionRunner implements Runnable {
                 createCompletedTasks(session, round, true);
                 session.createSessionSchedule();
                 checkAndScheduleChatScripts(session);
-                scheduleTaskScoring(session);
+                scheduleTaskRelatedThreads(session);
 
             }
         }
 
     }
 
+    private void scheduleTaskRelatedThreads(SessionWrapper session) {
+        scheduleTaskBeforeWork(session);
+        scheduleTaskAfterWork(session);
+        scheduleTaskScoring(session);
+    }
     private void scheduleTaskScoring(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
-            if (task.getShouldScore()) {//task.shouldBeScored
-                ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
-                _log.debug("Added task scoring: " + task.getId() + " - " + csr);
-                csr.setSession(session);
-                csr.setTaskWrapper(task);
+            if (task.getShouldScore()) {
+                TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+                if (pl != null) {
+                    ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                    _log.debug("Added task scoring: " + task.getId() + " - " + csr);
+                    csr.setSession(session);
+                    csr.setTaskWrapper(task);
+                    csr.setTaskPlugin(pl);
 
-                Thread thread = new Thread(csr);
-                thread.start();
-                //chatRunners.add(thread);
+                    Thread thread = new Thread(csr);
+                    thread.start();
+                }
             }
         }
     }
+    private void scheduleTaskBeforeWork(SessionWrapper session) {
+        for (TaskWrapper task : session.getTaskList()) {
+            TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+            if (pl != null) {
+                if (pl.getTaskBeforeWorkJsContent() != null) {
+                    TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
+                    _log.debug("Added task before work: " + task.getId() + " - " + csr);
+                    csr.setSession(session);
+                    csr.setTaskWrapper(task);
+                    csr.setTaskPlugin(pl);
+
+                    Thread thread = new Thread(csr);
+                    thread.start();
+                }
+
+            }
+        }
+    }
+    private void scheduleTaskAfterWork(SessionWrapper session) {
+        for (TaskWrapper task : session.getTaskList()) {
+            TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+            if (pl != null) {
+                if (pl.getTaskAfterWorkJsContent() != null) {
+                    TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
+                    _log.debug("Added task after work: " + task.getId() + " - " + csr);
+                    csr.setSession(session);
+                    csr.setTaskWrapper(task);
+                    csr.setTaskPlugin(pl);
+
+                    Thread thread = new Thread(csr);
+                    thread.start();
+                }
+
+            }
+        }
+    }
+
 
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
@@ -600,56 +668,144 @@ public class SessionRunner implements Runnable {
         }
     }
 
+    private String[] shouldSessionStartByConditionScript(Long scriptId, List<Subject> subjects) {
+        ScriptEngineManager manager = new ScriptEngineManager();
+        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        String[] subjectsToJoinSession = null;
+        ExecutableScript es = executableScriptDao.get(scriptId);
+        if(es!=null) {
+            // Set JavaScript variables
+            engine.put("subjects", teamService.getTeamatesJSONObject(subjects));
+
+            Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
+                    es.getScriptContent().getBytes()));
+
+            try {
+                engine.eval(scriptReader);
+
+                String subjectsFromScript = (String) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("subjectsToJoinSession");
+                Boolean shouldStart = new Boolean(((Boolean) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("shouldStart")));
+
+                if (subjectsFromScript != null && shouldStart != null ) {
+                    org.json.JSONArray array = new org.json.JSONArray(subjectsFromScript);
+                    subjectsToJoinSession = new String[array.length()];
+                    for(int i =0; i< array.length(); i++){
+                        subjectsToJoinSession[i] = array.getString(i);
+                    }
+
+                    return subjectsToJoinSession;
+                }
+            } catch (ScriptException e) {
+                return null;
+
+            }
+        }
+        return null;
+
+    }
+
     public void runPerpetual() {
         shouldRun = true;
         checkedInWaitingSubjectList = new HashMap<>();
         checkedInWaitingSubjectListById = new HashMap<>();
         sessionsRelatedToPerpetual = new HashMap<>();
+
         while (shouldRun) {
 
+
             if((checkedInWaitingSubjectList.size() > 0 )) {
-                if ((checkedInWaitingSubjectList.keySet().size() >= session.getPerpetualSubjectsNumber())) {
-                    synchronized (checkedInWaitingSubjectList) {
-                        Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
-                        List<Subject> subjectsInNewSession = new ArrayList<>();
-                        Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
-                        int subjsInNewSession = 0;
-                        List<Subject> subjectsNotForThisSession = new ArrayList<>();
+                if(session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
+                    if ((checkedInWaitingSubjectList.keySet().size() >= session.getPerpetualSubjectsNumber())) {
 
-                        while (it.hasNext()) {
-                            if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
-                                String externalId = it.next();
-                                Subject su = subjectDao.getByExternalId(externalId);
-                                if(su== null) {
-                                    su = new Subject();
+                        synchronized (checkedInWaitingSubjectList) {
+                            Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
+                            List<Subject> subjectsInNewSession = new ArrayList<>();
+                            Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
+                            int subjsInNewSession = 0;
+                            List<Subject> subjectsNotForThisSession = new ArrayList<>();
 
-                                    su.setSessionId(newSpawnedSession.getId());
-                                    su.setSubjectExternalId(externalId);
-                                    su.setSubjectDisplayName(externalId);
-                                    su = subjectDao.create(su);
+                            while (it.hasNext()) {
+                                if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
+                                    String externalId = it.next();
+                                    Subject su = subjectDao.getByExternalId(externalId);
+                                    if(su== null) {
+                                        su = new Subject();
+
+                                        su.setSessionId(newSpawnedSession.getId());
+                                        su.setSubjectExternalId(externalId);
+                                        su.setSubjectDisplayName(externalId);
+                                        su = subjectDao.create(su);
+                                    } else {
+                                        su.setSessionId(newSpawnedSession.getId());
+                                        subjectDao.update(su);
+                                    }
+
+                                    subjectsInNewSession.add(su);
+
+                                    subjsInNewSession++;
                                 } else {
-                                    su.setSessionId(newSpawnedSession.getId());
-                                    subjectDao.update(su);
+                                    subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
                                 }
-
-                                subjectsInNewSession.add(su);
-
-                                subjsInNewSession++;
-                            } else {
-                                subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
                             }
+                            sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
+
+                            subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
+
+                            checkedInWaitingSubjectList = new HashMap<>();
+                            for (Subject ext : subjectsNotForThisSession) {
+                                checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
+                            }
+
                         }
-                        sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
-
-                        subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
-
-                        checkedInWaitingSubjectList = new HashMap<>();
-                        for (Subject ext : subjectsNotForThisSession) {
-                            checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
-                        }
-
                     }
                 }
+                if(session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
+                    List<Subject> checkedInSubjects = checkedInWaitingSubjectList.values().stream().collect(Collectors.toList());
+                    String[] subjectsToJoin =  shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
+                    if(subjectsToJoin!=null) {
+                        for (String subjects : subjectsToJoin) {
+                            _log.debug("Subject to join: " + subjects);
+                        }
+                    }
+                    if(subjectsToJoin != null && subjectsToJoin.length > 0) {
+                        synchronized (checkedInWaitingSubjectList) {
+                            Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
+                            List<Subject> subjectsInNewSession = new ArrayList<>();
+                            List<Subject> subjectsNotForThisSession = new ArrayList<>();
+
+                            Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
+                            while (it.hasNext()) {
+                                String externalId = it.next();
+                                boolean subjectChosenForSession = false;
+                                for(String chosenExternalId: subjectsToJoin) {
+                                        if(chosenExternalId.equals(externalId)) {
+                                            Subject su = checkedInWaitingSubjectList.get(externalId);
+                                            if(su!=null) {
+                                                su.setSessionId(newSpawnedSession.getId());
+                                                subjectDao.update(su);
+                                                subjectsInNewSession.add(su);
+                                                subjectChosenForSession = true;
+                                                continue;
+                                            }
+                                        }
+                                }
+                                if(!subjectChosenForSession) {
+                                    subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
+                                }
+                            }
+                            sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
+
+                            subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
+
+                            checkedInWaitingSubjectList = new HashMap<>();
+                            for (Subject ext : subjectsNotForThisSession) {
+                                checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
+                            }
+
+                        }
+                    }
+                }
+
             }
             if (session.getSecondsRemainingForSession() < 0) {
                 shouldRun = false;

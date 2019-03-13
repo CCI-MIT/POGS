@@ -8,19 +8,15 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
 
-import edu.mit.cci.pogs.model.dao.taskplugin.ScoringConfiguration;
-import edu.mit.cci.pogs.model.dao.taskplugin.ScoringType;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
-import edu.mit.cci.pogs.service.CompletedTaskService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
 import edu.mit.cci.pogs.service.TeamService;
@@ -28,10 +24,7 @@ import edu.mit.cci.pogs.utils.DateUtils;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public class ScoringRunner extends AbstractJavascriptRunner implements Runnable {
-
-    @Autowired
-    private CompletedTaskService completedTaskService;
+public class TaskAfterWorkRunner extends AbstractJavascriptRunner implements Runnable {
 
     private TaskWrapper taskWrapper;
 
@@ -51,24 +44,19 @@ public class ScoringRunner extends AbstractJavascriptRunner implements Runnable 
     @Autowired
     private SubjectService subjectService;
 
-    private static final Logger _log = LoggerFactory.getLogger(ScoringRunner.class);
-
+    private static final Logger _log = LoggerFactory.getLogger(TaskBeforeWorkRunner.class);
 
     @Override
     public void run() {
         Long timeBeforeStarts = taskWrapper.getTaskEndTimestamp() - DateUtils.now();
         try {
             if (timeBeforeStarts > 0) {
-                System.out.println(" Time until score for Task id: " + taskWrapper.getId() + " is done: " + timeBeforeStarts);
+                System.out.println(" Time until task after work for Task id: " + taskWrapper.getId() + " is done: " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
             }
-            System.out.println(" Score is starting for Task id: " + taskWrapper.getId());
+            System.out.println(" Task after work is starting for Task id: " + taskWrapper.getId());
             for (CompletedTask ct : taskWrapper.getCompletedTasks()) {
-                if (this.taskPlugin.isScriptType()) {
-                    this.runScript(this.taskPlugin.getTaskScoreJsContent(), ct.getId());
-                } else {
-                  completedTaskService.scoreCompletedTask(ct,taskWrapper);
-                }
+                this.runScript(this.taskPlugin.getTaskAfterWorkJsContent(),ct.getId());
             }
 
         } catch (InterruptedException ie) {
@@ -112,11 +100,12 @@ public class ScoringRunner extends AbstractJavascriptRunner implements Runnable 
                 ScriptContext.ENGINE_SCOPE).get("completedTaskAttributesToAdd");
         completedTaskAttributeService.createCompletedTaskAttributesFromJsonString(
                 attributesToAddJson,this.getExternalReferenceId());
+
     }
 
     @Override
     public void handleScriptFailure(ScriptException se) {
-        _log.error("Before work script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
+        _log.error("After work script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
     }
 
     public TaskWrapper getTaskWrapper() {

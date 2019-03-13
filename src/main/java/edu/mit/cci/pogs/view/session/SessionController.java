@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
+import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
+import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.dao.session.*;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -31,17 +33,6 @@ import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
 import edu.mit.cci.pogs.view.session.beans.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 public class SessionController {
@@ -79,6 +70,9 @@ public class SessionController {
     @Autowired
     private SubjectAttributeDao subjectAttributeDao;
 
+    @Autowired
+    private ExecutableScriptDao executableScriptDao;
+
     private static final String DEFAULT_CONDITION_NAME = "";
 
     @InitBinder
@@ -92,10 +86,27 @@ public class SessionController {
         return taskGroupDao.list();
     }
 
+    @ModelAttribute("sessionScheduleConditionToStart")
+    public List<SessionScheduleConditionToStartType> getSessionScheduleConditionToStart() {
+
+        return Arrays.asList(SessionScheduleConditionToStartType.values());
+    }
+
     @ModelAttribute("sessionScheduleType")
     public List<SessionScheduleType> getSessionScheduleType() {
 
         return Arrays.asList(SessionScheduleType.values());
+    }
+
+    @ModelAttribute("executableScripts")
+    public List<ExecutableScript> getExecutableScripts() {
+        return executableScriptDao.listByScriptType(ScriptType.PERPETUAL_INIIT_CONDITION);
+    }
+
+    @ModelAttribute("sessionScheduleConditionType")
+    public List<SessionScheduleConditionToStartType> getSessionScheduleConditionToStartType() {
+
+        return Arrays.asList(SessionScheduleConditionToStartType.values());
     }
 
     @ModelAttribute("teamCreationMethods")

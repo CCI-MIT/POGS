@@ -73,5 +73,5 @@ if(gridBluePrint.columnColors){
     var attributesToAddz = [{"attributeName": "colorHasSubjects", "stringValue":JSON.stringify(colorHasSubjects) },
         {"attributeName": "subjectsHasColumns", "stringValue":JSON.stringify(subjectsHasColumn)}]
 
-    attributesToAdd = JSON.stringify(attributesToAddz);
+    completedTaskAttributesToAdd = JSON.stringify(attributesToAddz);
 }

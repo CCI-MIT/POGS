@@ -54,6 +54,9 @@ public class SessionBean {
 
     private Boolean doneUrlParameter;
 
+    private String    scheduleConditionType;
+    private Long      executableScriptId;
+
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
 
 
@@ -106,6 +109,24 @@ public class SessionBean {
         this.perpetualSubjectsNumber = value.getPerpetualSubjectsNumber();
         this.perpetualSubjectsPrefix = value.getPerpetualSubjectsPrefix();
         this.doneUrlParameter = value.getDoneUrlParameter();
+        this.scheduleConditionType = value.getScheduleConditionType();
+        this.executableScriptId = value.getExecutableScriptId();
+    }
+
+    public String getScheduleConditionType() {
+        return scheduleConditionType;
+    }
+
+    public void setScheduleConditionType(String scheduleConditionType) {
+        this.scheduleConditionType = scheduleConditionType;
+    }
+
+    public Long getExecutableScriptId() {
+        return executableScriptId;
+    }
+
+    public void setExecutableScriptId(Long executableScriptId) {
+        this.executableScriptId = executableScriptId;
     }
 
     public String getSessionScheduleType() {
