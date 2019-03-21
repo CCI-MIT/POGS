@@ -193,6 +193,7 @@ public class SessionService {
         session.setDoneUrlParameter(sessionBean.getDoneUrlParameter());
         session.setScheduleConditionType(sessionBean.getScheduleConditionType());
         session.setExecutableScriptId(sessionBean.getExecutableScriptId());
+        session.setSessionWideScriptId(sessionBean.getSessionWideScriptId());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());

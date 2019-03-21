@@ -39,4 +39,13 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
     }
 
+    @Override
+    public List<ExecutableScript> list() {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(EXECUTABLE_SCRIPT).getQuery();
+
+
+
+        return query.fetchInto(ExecutableScript.class);
+    }
 }

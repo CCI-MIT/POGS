@@ -489,6 +489,28 @@
 
         </fieldset>
 
+        <fieldset class="form-group row">
+                    <legend class="col-form-legend col-sm-8">Advanced - Session wide script </legend>
+                    <div class="container">
+                        <div class="form-group row col-sm-12" id="sessionWideScriptId">
+                            <label class="col-sm-5 col-form-label" for="sessionWideScriptIdSelect">Session wide script override:</label>
+                            <div class="col-sm-7">
+                                <select class="custom-select" th:field="*{sessionWideScriptId}" id="sessionWideScriptIdSelect">
+                                    <option th:if="${#lists.isEmpty(sessionWideExecutableScripts) }"
+                                                                         value=""  >No override</option>
+                                    <option
+                                       th:if="${not #lists.isEmpty(sessionWideExecutableScripts) }"
+                                            th:each="rg: ${sessionWideExecutableScripts}"
+                                            th:value="${rg.id}"
+                                            th:text="${rg.scriptName}" ></option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+        </fieldset>
+
+
         <!-- Begin research group field -->
         <fieldset class="form-group">
             <legend>Task groups</legend>

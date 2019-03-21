@@ -9,15 +9,17 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+
 public abstract class AbstractJavascriptRunner {
 
     private ScriptEngine engine;
 
-    private Long externalReferenceId;
+    private CompletedTask completedTask;
 
-    public void runScript(String code, Long externalReferenceId) {
+    public void runScript(String code, CompletedTask completedTask) {
 
-        this.externalReferenceId = externalReferenceId;
+        this.completedTask = completedTask;
 
         ScriptEngineManager manager = new ScriptEngineManager();
         engine = manager.getEngineByName("JavaScript");
@@ -68,11 +70,11 @@ public abstract class AbstractJavascriptRunner {
         this.engine = engine;
     }
 
-    public Long getExternalReferenceId() {
-        return externalReferenceId;
+    public CompletedTask getCompletedTask() {
+        return completedTask;
     }
 
-    public void setExternalReferenceId(Long externalReferenceId) {
-        this.externalReferenceId = externalReferenceId;
+    public void setCompletedTask(CompletedTask completedTask) {
+        this.completedTask = completedTask;
     }
 }

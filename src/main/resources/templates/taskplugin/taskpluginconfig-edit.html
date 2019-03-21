@@ -53,7 +53,82 @@
                         </div>
                     </div>
                 </div>
+                <div class="form-group row hiddable" >
+                    <label class="col-sm-3 col-form-label" for="introPageEnabled">Use override scripts:</label>
+                    <div class="col-sm-9">
+                        <input class="form-check-input" th:checked="*{(beforeWorkScriptId != null) or (afterWorkScriptId != null) or (scoreScriptId != null)}" type="checkbox" id="introPageEnabled" data-trigger="override" />
+                    </div>
+                </div>
+                <div class="form-group row hideable" data-hide="override">
+                    <label class="col-sm-6 col-form-label">Script to run before work:</label>
+                    <div class="col-sm-6">
+
+                        <select class="custom-select pluginConfigSelect" style=""
+                                th:field="*{beforeWorkScriptId}"
+                                name="">
+                                <option selected="selected" value="">Use default plugin code</option>
+                            <option
+                                    th:each="script: ${executableScripts}"
+                                    th:value="${script.id}"
+                                    th:if="${script.scriptType == 'B'}"
+                                    th:text="${script.scriptName}"></option>
+                        </select>
+
+                    </div>
+                 </div>
+                 <div class="form-group row hideable" data-hide="override">
+                     <label class="col-sm-6 col-form-label">Script to run after work:</label>
+                     <div class="col-sm-6">
+
+                         <select class="custom-select pluginConfigSelect" style=""
+                                 th:field="*{afterWorkScriptId}"
+                                 name="">
+                                 <option selected="selected"  value="">Use default plugin code</option>
+                             <option
+                                     th:each="script: ${executableScripts}"
+                                     th:value="${script.id}"
+                                     th:if="${script.scriptType == 'A'}"
+                                     th:text="${script.scriptName}"></option>
+                         </select>
+
+                     </div>
+                  </div>
+                  <div class="form-group row hideable" data-hide="override">
+                      <label class="col-sm-6 col-form-label">Script to score:</label>
+                      <div class="col-sm-6">
+
+                          <select class="custom-select pluginConfigSelect" style=""
+                                  th:field="*{scoreScriptId}"
+                                  name="">
+                                  <option selected="selected"  value="">Use default plugin code</option>
+                              <option
+                                      th:each="script: ${executableScripts}"
+                                      th:value="${script.id}"
+                                      th:if="${script.scriptType == 'S'}"
+                                      th:text="${script.scriptName}"></option>
+                          </select>
+
+                      </div>
+                   </div>
+
             </div>
+            <script>
+            function checkboxOnClickOnLoad(){
+               var trigg = $(this).data("trigger");
+               if($(this).is(':checked')){
+
+                   $(".hideable[data-hide='"+trigg+"']").show();
+               }else{
+
+                   $(".hideable[data-hide='"+trigg+"']").hide();
+                }
+                };
+                $(function(){
+
+                   $(":checkbox").click(checkboxOnClickOnLoad);
+                   $(":checkbox").each(checkboxOnClickOnLoad);
+                });
+            </script>
         </fieldset>
         <fieldset class="form-group row" style="border-style: solid;border-color: gray;border-width: 2px;">
             <legend class="col-form-legend col-sm-2" >Advanced</legend>
@@ -89,6 +164,8 @@
         </script>
         <script>
             $(function(){
+
+
 
                 pogsTaskConfigEditor.init({
                               taskConfigId: '[(${taskPluginConfigBean.id})]',

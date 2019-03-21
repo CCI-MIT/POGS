@@ -42,9 +42,30 @@ public class TeamService {
     private SubjectAttributeDao subjectAttributeDao;
 
 
+
+    public List<Subject> getTeamSubjectsFromCompletedTask(Long subjectId, Long teamId) {
+        if(teamId != null) {
+            Team team = teamDao.get(teamId);
+
+            List<Subject> ret = getSubjectsFromTeam(team);
+            return ret;
+        } else {
+            return getTeamSubjects(subjectId,null,null,null);
+
+        }
+
+
+    }
+
     public List<Subject> getTeamSubjects(Long subjectId, Long sessionId, Long roundId, Long taskId) {
 
         Team team = teamDao.getSubjectTeam(subjectId,sessionId,roundId,taskId);
+        List<Subject> ret = getSubjectsFromTeam(team);
+        if (ret != null) return ret;
+        return null;
+    }
+
+    private List<Subject> getSubjectsFromTeam(Team team) {
         if(team!=null) {
             List<Subject> ret = new ArrayList<>();
             for (TeamHasSubject teamHasSub : teamHasSubjectDao.listByTeamId(team.getId())) {
@@ -73,23 +94,28 @@ public class TeamService {
         return teammates;
     }
 
+
+    public JSONObject getSubjectJsonObject(Subject s) {
+        JSONObject subject = new JSONObject();
+        subject.put("externalId", s.getSubjectExternalId());
+        subject.put("displayName", s.getSubjectDisplayName());
+        JSONArray subjectAttributes = new JSONArray();
+        List<SubjectAttribute> attributes = subjectAttributeDao.listBySubjectId(s.getId());
+        for (SubjectAttribute sa : attributes) {
+            JSONObject att = new JSONObject();
+            att.put("attributeName", sa.getAttributeName());
+            att.put("stringValue", sa.getStringValue());
+            att.put("integerValue", sa.getIntegerValue());
+            att.put("realValue", sa.getRealValue());
+            subjectAttributes.put(att);
+        }
+        subject.put("attributes", subjectAttributes);
+        return subject;
+    }
     public JSONArray getTeamatesJSONObject(List<Subject> teammates) {
         JSONArray ja = new JSONArray();
         for (Subject s : teammates) {
-            JSONObject subject = new JSONObject();
-            subject.put("externalId", s.getSubjectExternalId());
-            subject.put("displayName", s.getSubjectDisplayName());
-            JSONArray subjectAttributes = new JSONArray();
-            List<SubjectAttribute> attributes = subjectAttributeDao.listBySubjectId(s.getId());
-            for (SubjectAttribute sa : attributes) {
-                JSONObject att = new JSONObject();
-                att.put("attributeName", sa.getAttributeName());
-                att.put("stringValue", sa.getStringValue());
-                att.put("integerValue", sa.getIntegerValue());
-                att.put("realValue", sa.getRealValue());
-                subjectAttributes.put(att);
-            }
-            subject.put("attributes", subjectAttributes);
+            JSONObject subject = getSubjectJsonObject(s);
             ja.put(subject);
         }
         return ja;

@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
-import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
-import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
-import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
@@ -24,14 +21,8 @@ import edu.mit.cci.pogs.model.dao.session.SessionStatus;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
-import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
-import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
-import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
-import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
-import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
-import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
@@ -157,6 +148,7 @@ public class WorkspaceController {
                 subjectAttribute.setIntegerValue(sa.getIntegerValue());
                 subjectAttribute.setRealValue(sa.getRealValue());
                 subjectAttribute.setLatest(true);
+                subjectAttributeDao.create(subjectAttribute);
             }
         }
 
@@ -564,7 +556,7 @@ public class WorkspaceController {
                         taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));
 
                 model.addAttribute("completedTaskAttributes",
-                        completedTaskAttributeService.listCompletedTaskAttributesForCompletedTask(task.getId()));
+                        completedTaskAttributeService.listCompletedTaskAttributesForCompletedTask(completedTask.getId()));
 
 
             } else {

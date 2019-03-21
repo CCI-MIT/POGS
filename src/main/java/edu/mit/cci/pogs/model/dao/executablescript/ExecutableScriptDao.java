@@ -9,4 +9,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 public interface ExecutableScriptDao  extends Dao<ExecutableScript, Long> {
 
     List<ExecutableScript> listByScriptType(ScriptType scriptType);
+
+    List<ExecutableScript> list();
+
 }

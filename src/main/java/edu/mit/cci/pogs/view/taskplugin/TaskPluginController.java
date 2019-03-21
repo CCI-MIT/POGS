@@ -9,11 +9,15 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
+import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
@@ -32,12 +36,30 @@ public class TaskPluginController {
     @Autowired
     private TaskExecutionAttributeDao taskExecutionAttributeDao;
 
+    @Autowired
+    private ExecutableScriptDao executableScriptDao;
+
     @GetMapping
     public String getTaskPlugins(Model model) {
 
         model.addAttribute("taskPluginsList", TaskPlugin.getAllTaskPlugins());
         return "taskplugin/taskplugin-list";
     }
+
+    @ModelAttribute("executableScripts")
+    public List<ExecutableScript> getExecutableScripts(){
+        List<ExecutableScript> taskConfigurationList = new ArrayList<>();
+        for(ScriptType st: getScriptTypes()){
+            taskConfigurationList.addAll(executableScriptDao.listByScriptType(st));
+        }
+        return taskConfigurationList;
+    }
+
+    @ModelAttribute("executableScriptTypes")
+    private List<ScriptType> getScriptTypes() {
+        return ScriptType.getAllScriptTypes();
+    }
+
 
     @GetMapping("{taskPluginName}")
     public String getTaskPlugin(@PathVariable("taskPluginName") String taskPluginName, Model model) {

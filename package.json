@@ -25,6 +25,7 @@
     "bootstrap-colorpicker": "^3.0.3",
     "bootstrap-duallistbox": "^3.0.6",
     "clipboard": "^1.7.1",
+    "codemirror": "^5.45.0",
     "countdownjs": "^2.0.0",
     "fast-diff": "^1.1.2",
     "font-awesome": "^4.7.0",

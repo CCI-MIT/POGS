@@ -11,9 +11,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
+import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskhasresearchgroup.TaskHasResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
@@ -25,13 +27,17 @@ public class TaskService {
     private final TaskDao taskDao;
     private final TaskHasResearchGroupDao taskHasResearchGroupDao;
     private final TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
+    private final TaskConfigurationDao taskConfigurationDao;
 
 
     @Autowired
-    public TaskService(TaskDao taskDao, TaskHasResearchGroupDao taskHasResearchGroupDao, TaskHasTaskConfigurationDao taskHasTaskConfigurationDao) {
+    public TaskService(TaskDao taskDao, TaskHasResearchGroupDao taskHasResearchGroupDao,
+                       TaskHasTaskConfigurationDao taskHasTaskConfigurationDao,
+                       TaskConfigurationDao taskConfigurationDao) {
         this.taskHasResearchGroupDao = taskHasResearchGroupDao;
         this.taskDao = taskDao;
         this.taskHasTaskConfigurationDao = taskHasTaskConfigurationDao;
+        this.taskConfigurationDao = taskConfigurationDao;
     }
 
     public List<TaskHasResearchGroup> listTaskHasResearchGroupByTaskId(Long taskId) {
@@ -175,6 +181,12 @@ public class TaskService {
             taskHasResearchGroupDao.delete(toDel);
         }
 
+    }
+    public TaskConfiguration getTaskConfiguration(Long taskId) {
+
+        TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
+                .getByTaskId(taskId);
+        return taskConfigurationDao.get(configuration.getTaskConfigurationId());
     }
 
     public JSONArray getFakeJsonTaskList() {

@@ -100,7 +100,12 @@ public class SessionController {
 
     @ModelAttribute("executableScripts")
     public List<ExecutableScript> getExecutableScripts() {
-        return executableScriptDao.listByScriptType(ScriptType.PERPETUAL_INIIT_CONDITION);
+        return executableScriptDao.listByScriptType(ScriptType.PERPETUAL_INIT_CONDITION);
+    }
+
+    @ModelAttribute("sessionWideExecutableScripts")
+    public List<ExecutableScript> getSessionWideExecutableScripts() {
+        return executableScriptDao.listByScriptType(ScriptType.SESSION_WIDE_OVERRIDE);
     }
 
     @ModelAttribute("sessionScheduleConditionType")

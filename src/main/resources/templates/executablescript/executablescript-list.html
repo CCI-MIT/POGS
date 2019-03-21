@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Executable Scripts</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/executablescripts">Executable Scripts</a></li>
+    </ol>
+    <h2>All Executable Scripts:</h2>
+
+    List only:
+    <br/>
+    <span class="badge badge-primary btn filterScriptType" style="margin: 4px"
+                                th:each="rg: ${scriptTypes}"
+                                th:id="${rg.id}"
+                                th:text="${rg.description}" ></span>
+    <br/>
+    <br/>
+
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/executablescripts/create" class="btn btn-outline-primary float-right">
+                    Create new Executable Script</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Script ID</th>
+            <th>Script name</th>
+            <th>Script Type</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <th:block th:each="executablescript : ${executablescriptsList}">
+            <tr th:class="${'exeScript tr_' + executablescript.scriptType}">
+                <td th:text="${executablescript.id}"></td>
+                <td><a th:text="${executablescript.scriptName}" th:href="${'/admin/executablescripts/'+ executablescript.id}"></a></td>
+                <!-- TODO: FOR TO TRANSLATE TYPE TO STRING in ENUM + hide with click on top -->
+                <td><a th:text="${executablescript.scriptType}" th:href="${'/admin/executablescripts/'+ executablescript.id}"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+    <Script>
+        $(function() {
+          $(".filterScriptType").click(function() {
+            var id = $(this).attr("id");
+            $(".filterScriptType").removeClass("badge-primary");
+            $(".filterScriptType").addClass("badge-secondary");
+            $(this).removeClass("badge-secondary");
+            $(this).addClass("badge-primary");
+
+            $(".exeScript").hide();
+            $(".tr_"+ id).show();
+          });
+        });
+</Script>
+</div>
+</body>
+</html>

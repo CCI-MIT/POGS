@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Executable Scripts </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/executablescripts">Executable scripts</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/executablescripts/' + executablescript.id}" th:text="${executablescript.scriptName}"></a></li>
+        <!--<li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>-->
+    </ol>
+    <h2 th:text="${executablescript.scriptName}"></h2>
+    <textarea id="scriptContent" th:text="${executablescript.scriptContent}"></textarea>
+    <script>
+        $(function(){
+
+         var editor = CodeMirror.fromTextArea(document.getElementById("scriptContent"), {
+            lineNumbers: true,
+             matchBrackets: true,
+             theme: 'darcula',
+             readOnly: true,
+              mode: 'javascript'
+          });
+
+         });
+      </script>
+      <br/>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/executablescripts/' + executablescript.id}+ '/edit'" class="btn btn-outline-primary float-right">
+                Edit executable script</a>
+        </div>
+    </div>
+    <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
+
+
+</div>
+</body>
+</html>

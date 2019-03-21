@@ -14,7 +14,6 @@ import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
 import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatChannel;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
@@ -77,7 +76,7 @@ public class SubjectService {
             if (array != null) {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject jo = array.getJSONObject(i);
-                    String extId = jo.getString("subjectExternalId");
+                    String extId = jo.getString("externalId");
                     Subject su = subjectDao.getByExternalId(extId);
 
                     if(su!=null) {
@@ -91,7 +90,7 @@ public class SubjectService {
                                 sa.setStringValue(att.getString("stringValue"));
                             }
                             if (att.has("integerValue")) {
-                                sa.setIntegerValue(att.getLong("integerValue"));
+                                sa.setIntegerValue(new Integer(att.getInt("integerValue")).longValue());
                             }
                             if (att.has("doubleValue")) {
                                 sa.setRealValue(att.getDouble("doubleValue"));

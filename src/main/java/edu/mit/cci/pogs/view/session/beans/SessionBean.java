@@ -59,6 +59,7 @@ public class SessionBean {
 
     private SessionHasTaskGroupRelationshipBean sessionHasTaskGroupRelationshipBean;
 
+    private Long      sessionWideScriptId;
 
 
 
@@ -111,6 +112,7 @@ public class SessionBean {
         this.doneUrlParameter = value.getDoneUrlParameter();
         this.scheduleConditionType = value.getScheduleConditionType();
         this.executableScriptId = value.getExecutableScriptId();
+        this.sessionWideScriptId = value.getSessionWideScriptId();
     }
 
     public String getScheduleConditionType() {
@@ -481,5 +483,13 @@ public class SessionBean {
 
     public void setDoneUrlParameter(Boolean doneUrlParameter) {
         this.doneUrlParameter = doneUrlParameter;
+    }
+
+    public Long getSessionWideScriptId() {
+        return sessionWideScriptId;
+    }
+
+    public void setSessionWideScriptId(Long sessionWideScriptId) {
+        this.sessionWideScriptId = sessionWideScriptId;
     }
 }

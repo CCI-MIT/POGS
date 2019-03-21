@@ -1,7 +1,5 @@
 package edu.mit.cci.pogs.runner;
 
-import org.jooq.tools.json.JSONArray;
-import org.jooq.tools.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import java.io.Reader;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,12 +24,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import javax.script.SimpleBindings;
 
 import edu.mit.cci.pogs.model.dao.chatentry.ChatEntryDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
@@ -59,6 +54,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TeamHasSubject;
@@ -70,6 +66,7 @@ import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.service.TaskGroupService;
+import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
@@ -138,6 +135,9 @@ public class SessionRunner implements Runnable {
 
     @Autowired
     private TeamService teamService;
+
+    @Autowired
+    private TaskService taskService;
 
     @Autowired
     private ApplicationContext context;
@@ -249,11 +249,14 @@ public class SessionRunner implements Runnable {
         scheduleTaskAfterWork(session);
         scheduleTaskScoring(session);
     }
+
+
     private void scheduleTaskScoring(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             if (task.getShouldScore()) {
                 TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
-                if (pl != null) {
+                TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
+                if (taskConfiguration.getScoreScriptId()!= null ||pl != null) {
                     ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
                     _log.debug("Added task scoring: " + task.getId() + " - " + csr);
                     csr.setSession(session);
@@ -269,8 +272,9 @@ public class SessionRunner implements Runnable {
     private void scheduleTaskBeforeWork(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+            TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
             if (pl != null) {
-                if (pl.getTaskBeforeWorkJsContent() != null) {
+                if (taskConfiguration.getBeforeWorkScriptId()!= null ||pl.getTaskBeforeWorkJsContent() != null) {
                     TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
                     _log.debug("Added task before work: " + task.getId() + " - " + csr);
                     csr.setSession(session);
@@ -287,8 +291,9 @@ public class SessionRunner implements Runnable {
     private void scheduleTaskAfterWork(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+            TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
             if (pl != null) {
-                if (pl.getTaskAfterWorkJsContent() != null) {
+                if (taskConfiguration.getAfterWorkScriptId()!= null || (pl.getTaskAfterWorkJsContent() != null)) {
                     TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
                     _log.debug("Added task after work: " + task.getId() + " - " + csr);
                     csr.setSession(session);
@@ -809,6 +814,9 @@ public class SessionRunner implements Runnable {
             }
             if (session.getSecondsRemainingForSession() < 0) {
                 shouldRun = false;
+            }
+            if(!sessionsRelatedToPerpetual.isEmpty()) {
+                sessionService.initializeSessionRunners();
             }
             List<Long> sessionsMigratedToRightCheckinList = new ArrayList<>();
             for (Long sessionId : sessionsRelatedToPerpetual.keySet()) {
