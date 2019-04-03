@@ -118,14 +118,14 @@ class JeopardyRadioField extends JeopardyField {
         if (!isNaN(cellIndex)) {
             let valueTyped = $('input[name="answer"]:checked').val();
             if(valueTyped == this.result[this.questionNumber].Answer)
-                this.score = this.score + 2;
+                this.score = this.score + 4;
             else if (valueTyped === undefined)
             {
                 valueTyped = "Not Answered";
-                this.score = this.score -2;
+                this.score = this.score;
             } else
             {
-                this.score = this.score -2;
+                this.score = this.score;
             }
             console.log("Typed Value: " + valueTyped);
             if (valueTyped != null) {
