@@ -47,6 +47,7 @@ class Field {
         this.finalAnswerSubject = null;
         this.index = null;
         this.secondAnswerField = null;
+        this.firstAnswerField = null;
         this.originalFieldAuthor = null;
 
     }
@@ -78,7 +79,8 @@ class Field {
     show(){
         $('#surveyField_' +this.index).show();
     }
-    setFieldHTMLAsSecondAnswer(){
+    setFieldHTMLAsSecondAnswer(firstAnswerField){
+        this.firstAnswerField = firstAnswerField;
         $('#surveyField_' +this.index).hide();
         $('#surveyField_' +this.index + ' .embed-responsive').remove();
         $('#question' +this.index).html('<small>Second answer:</small>');
@@ -145,6 +147,17 @@ class Field {
     setupHooks(){
         $('#surveyField_'+this.index ).on('mouseenter',this.handleOnMouseOverField.bind(this))
         $('#surveyField_'+this.index ).on('mouseleave',this.handleOnMouseOutOfField.bind(this))
+    }
+    saveCompletedTaskAttribute(attributeName, stringValue, doubleValue, intValue, loggable, fieldType){
+            console.log("Saving completed task attribute : " + fieldType);
+            var intVal = -1;
+            if(this.firstAnswerField!=null){
+                intVal = this.firstAnswerField.index;
+                console.log("Original field index: " + intVal)
+            }
+            this.getPogsPlugin().saveCompletedTaskAttribute(attributeName,
+                                                            stringValue, doubleValue,
+                                                            intVal, loggable, fieldType);
     }
 
 }

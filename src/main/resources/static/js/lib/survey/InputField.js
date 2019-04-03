@@ -36,7 +36,7 @@ class InputField extends Field {
             var valueTyped = $(event.target).val().replace(/\r?\n?/g, '').trim();
             // console.log(valueTyped);
             if(valueTyped != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                                 valueTyped, 0.0,
                                                                 0, true, SURVEY_CONST.INPUT_FIELD);
             }

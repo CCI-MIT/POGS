@@ -34,16 +34,26 @@ class Field {
 
         if(message.sender != this.getPogsPlugin().getSubjectId()) {
             if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OVER_FIELD) > -1)) {
-                this.addSubjectInteraction(message.sender)
+                if(!this.getPogsPlugin().isSoloTask()) {
+                    this.addSubjectInteraction(message.sender)
+                }
             }
         }
         if(message.sender != this.getPogsPlugin().getSubjectId()) {
             if ((attrName.indexOf(SURVEY_TRANSIENT.MOUSE_OUT_OF_FIELD) > -1)) {
-                this.removeSubjectInteraction(message.sender);
+                if(!this.getPogsPlugin().isSoloTask()) {
+                    this.removeSubjectInteraction(message.sender);
+                }
             }
         }
 
 
+    }
+    saveCompletedTaskAttribute(attributeName, stringValue, doubleValue, intValue, loggable, fieldType){
+
+        this.getPogsPlugin().saveCompletedTaskAttribute(attributeName,
+                                                        stringValue, doubleValue,
+                                                        -1, loggable, fieldType);
     }
     getPogsPlugin(){
         return this.surveyRefence.getPogsPlugin();
@@ -53,18 +63,20 @@ class Field {
     }
     getInteractionIndicatorHTML(){
         return '<small class="interaction-indicator form-text " style="font-size: 60%;text-align: left">Working on this field:<span class="subjectpool"></span> </small>'
-               + '<small class="finalanswer-indicator form-text " style="font-size: 60%;text-align: left">Latest answer :<span class="finalsubjectanswer"></span> </small>'
+               + '<small class="finalanswer-indicator form-text " style="font-size: 60%;text-align: left">Latest answer by :<span class="finalsubjectanswer"></span> </small>'
     }
     setFinalAnswer(subjectId){
-        this.finalAnswerSubject = subjectId;
-        let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
-        $("#surveyField_" + this.index + " .finalsubjectanswer").empty();
+        if(!this.getPogsPlugin().isSoloTask()) {
+            this.finalAnswerSubject = subjectId;
+            let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
+            $("#surveyField_" + this.index + " .finalsubjectanswer").empty();
 
-        $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
-          + '</span>')
-            .appendTo("#surveyField_" + this.index + " .finalsubjectanswer");
+            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+              + '</span>')
+                .appendTo("#surveyField_" + this.index + " .finalsubjectanswer");
 
-        $("#surveyField_" + this.index + " .finalanswer-indicator").addClass('text-muted');
+            $("#surveyField_" + this.index + " .finalanswer-indicator").addClass('text-muted');
+        }
     }
     handleOnMouseOverField(event){
         this.getPogsPlugin()

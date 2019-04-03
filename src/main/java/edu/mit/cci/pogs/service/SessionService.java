@@ -278,6 +278,7 @@ public class SessionService {
         clonedNonPerpetualSession.setFullSessionName(session.getFullSessionName()+"_" + DateUtils.now());
         clonedNonPerpetualSession.setSessionScheduleType(SessionScheduleType.SCHEDULED_DATE.getId().toString());
         clonedNonPerpetualSession.setDoneUrlParameter(session.getDoneUrlParameter());
+        clonedNonPerpetualSession.setSessionWideScriptId(session.getSessionWideScriptId());
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
 

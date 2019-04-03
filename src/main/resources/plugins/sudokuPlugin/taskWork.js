@@ -19,13 +19,39 @@ class SudokuGame {
                     $(this).on('focusin', self.handleOnClick.bind(self));
 
                     $(this).on('focusout', self.handleOnBlur.bind(self));
-
+                    $(this).on('keydown', self.handleKeydown.bind(self));
+                    $(this).text('');
                 } else {
                     $(this).text(gridBluePrintCells[cellIndex]);
                     $(this).attr("contenteditable", "false");
                 }
             }
         });
+
+    }
+    handleKeydown(theEvent){
+        console.log(theEvent);
+        console.log(theEvent.target);
+
+        let key = theEvent.keyCode || theEvent.which;
+        if(key == 9||key == 8 || key == 46){//backspace delete
+            return true;
+        }
+        console.log("THIS IS THE TARGET LENGTH: " +$(theEvent.target).text().length);
+        if($(theEvent.target).text().length>=1) {
+            theEvent.returnValue = false;
+            theEvent.preventDefault()
+            return false;
+        }
+
+        key = String.fromCharCode(key);
+        let regex = /[0-9]|\./;
+        if( !regex.test(key) ) {
+            theEvent.returnValue = false;
+            theEvent.preventDefault()
+            return false;
+        }
+        return true;
 
     }
     broadcastReceived(message){

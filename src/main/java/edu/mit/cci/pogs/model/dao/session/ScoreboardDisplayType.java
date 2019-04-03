@@ -4,6 +4,7 @@ public enum ScoreboardDisplayType {
 
     //DISPLAY_TASK('T',"Show scoreboard at end of each task"),
    //DISPLAY_ROUND('R',"Show scoreboard at end of each round"),
+    NO_DISPLAY_SESSION('N',"Do not display"),
     DISPLAY_SESSION('S',"Show scoreboard at end of session");
 
     private Character scoreboardDisplayTypeChar;

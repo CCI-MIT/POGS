@@ -94,6 +94,8 @@ let memoryGridTaskPrimerPlugin = pogs.createPlugin('memoryGridTaskPrimerPlugin',
     // get config attributes from task plugin
     memoryGridTaskPrimer.setupGrid($.parseJSON(this.getStringAttribute("gridBluePrint")),$.parseJSON(this.getStringAttribute("answerSheet")));
 
+    var elem = document.getElementById("gridTable");
+    elem.unselectable = "on"; // For IE and Opera
 
 });
 

@@ -6,7 +6,7 @@ class InformationField extends Field {
     }
     setupHTML(){
         let str = "";
-        str += '<div class="form-group" style="min-width: 300px;">';
+        str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">';
         str += '<label class="control-label text-dark text-left row question-intro">'+this.jsonInfo.question+'</label>';
 
         if(this.jsonInfo.video_url){

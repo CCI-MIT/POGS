@@ -2,5 +2,4 @@ name: wackamolePlugin
 description: A Wack-A-Mole game plugin
 
 scoring:
-    scoringType : scoreIsAttribute
-    scoreAttributeName: finalScore
+    scoringType : script

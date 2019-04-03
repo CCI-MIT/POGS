@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import edu.mit.cci.pogs.model.dao.session.ScoreboardDisplayType;
@@ -24,6 +25,7 @@ import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
@@ -45,6 +47,7 @@ import edu.mit.cci.pogs.service.TaskScoreService;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
+import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
 
 
@@ -92,6 +95,9 @@ public class WorkspaceController {
 
     @Autowired
     private SessionService sessionService;
+
+    @Autowired
+    private ExecutableScriptDao executableScriptDao;
 
     @GetMapping("/sessions/{sessionId}")
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
@@ -141,14 +147,19 @@ public class WorkspaceController {
 
         if (allSubAttr != null) {
             for (SubjectAttribute sa : allSubAttr) {
-                SubjectAttribute subjectAttribute = new SubjectAttribute();
-                subjectAttribute.setSubjectId(su.getId());
-                subjectAttribute.setAttributeName(sa.getAttributeName());
-                subjectAttribute.setStringValue(sa.getStringValue());
-                subjectAttribute.setIntegerValue(sa.getIntegerValue());
-                subjectAttribute.setRealValue(sa.getRealValue());
-                subjectAttribute.setLatest(true);
-                subjectAttributeDao.create(subjectAttribute);
+                if(!(sa.getAttributeName().equals(
+                        ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)
+                        || sa.getAttributeName().equals(
+                                ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME))) {
+                    SubjectAttribute subjectAttribute = new SubjectAttribute();
+                    subjectAttribute.setSubjectId(su.getId());
+                    subjectAttribute.setAttributeName(sa.getAttributeName());
+                    subjectAttribute.setStringValue(sa.getStringValue());
+                    subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                    subjectAttribute.setRealValue(sa.getRealValue());
+                    subjectAttribute.setLatest(true);
+                    subjectAttributeDao.create(subjectAttribute);
+                }
             }
         }
 
@@ -220,6 +231,12 @@ public class WorkspaceController {
             if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
                 model.addAttribute("subject", su);
                 model.addAttribute("pogsSession", sr.getSession());
+                if(sr.getSession().getSessionWideScriptId()!=null){
+                    ExecutableScript es = executableScriptDao.get(sr.getSession().getSessionWideScriptId());
+                    if(es!=null) {
+                        model.addAttribute("sessionWideScript", es.getScriptContent());
+                    }
+                }
                 model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
 
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
@@ -545,6 +562,13 @@ public class WorkspaceController {
                     completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
                 }
 
+
+                if(sr.getSession().getSessionWideScriptId()!=null){
+                    ExecutableScript es = executableScriptDao.get(sr.getSession().getSessionWideScriptId());
+                    if(es!=null) {
+                        model.addAttribute("sessionWideScript", es.getScriptContent());
+                    }
+                }
 
                 model.addAttribute("completedTask", completedTask);
 

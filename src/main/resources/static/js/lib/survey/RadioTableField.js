@@ -90,7 +90,7 @@ class RadioTableField extends Field {
 
         if(!isNaN(cellIndex)) {
             if(answer != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                                 JSON.stringify(answer), 0.0,
                                                                 0, true, SURVEY_CONST.RADIO_FIELD);
             }

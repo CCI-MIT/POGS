@@ -15,6 +15,7 @@ class SelectField extends Field {
         }
 
         str += '<select class="form-control row" id="answer'+this.index+'" data-cell-reference-index="'+this.index+'">'
+        str += '<option value="" disabled selected>Please select an option...</option>'
         $.each(this.jsonInfo.value, function(j, option) {
             str += '<option value="'+option+'">'+option+'</option>'
         });
@@ -34,7 +35,7 @@ class SelectField extends Field {
         //console.log("Select change + " + cellIndex);
         let option = target.val();
         if(!isNaN(cellIndex) && option != null) {
-            this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+            this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                             option, 0.0,
                                                             0, true, SURVEY_CONST.SELECT_FIELD);
         }
@@ -119,7 +120,7 @@ class SelectFieldEdit {
                         valueOfDeletedField) + "]")).remove();
                 }
                 ($(this).parent()).remove();
-            });
+            }.bind(this));
 
             $("#answerChoices" + questionNum).find("input").on("blur", function () {
                 $("#answer" + questionNum).empty();
@@ -130,8 +131,8 @@ class SelectFieldEdit {
                             + e.value + '</option>');
                     }
                 }.bind(this));
-            });
-        });
+            }.bind(this));
+        }.bind(this));
 
         $(".remove-select-choice").click(function () {
             var questionNum = $(this).parents("div[id*=question_set]").attr("id").match(/\d+/);
@@ -153,7 +154,7 @@ class SelectFieldEdit {
                         + e.value + '</option>');
                 }
             }.bind(this));
-        });
+        }.bind(this));
 
         $("#removeQuestion" + question_number).click(function () { //setup removeQuestion Button
             var question_set = "#question_set" + $(this).attr('id').match(/\d+/);

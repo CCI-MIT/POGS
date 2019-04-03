@@ -2,7 +2,4 @@ name: sudokuPlugin
 description: A sudoku grid like task implementation, the researcher can setup the grid size
 
 scoring:
-    scoringType : indexedAnswerOneAnswerKey
-    answerKeyPrefix: answerSheet
-    answerKeyFormat: CSV
-    answerSheetPrefix: sudokuAnswer_
+    scoringType : script

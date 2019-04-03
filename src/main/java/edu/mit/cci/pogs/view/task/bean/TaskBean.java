@@ -59,6 +59,8 @@ public class TaskBean {
         this.subjectCommunicationId = value.getSubjectCommunicationId();
         this.chatScriptId = value.getChatScriptId();
         this.primerVideoAutoplayMute = value.getPrimerVideoAutoplayMute();
+        this.shouldScore = value.getShouldScore();
+
     }
 
     public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {

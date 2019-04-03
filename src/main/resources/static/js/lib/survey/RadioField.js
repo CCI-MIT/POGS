@@ -59,7 +59,7 @@ class RadioField extends Field {
             var valueTyped = $(event.target).attr('value'); // value of radio button
             // console.log("Typed Value: " + valueTyped);
             if(valueTyped != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                                 valueTyped, 0.0,
                                                                 0, true, SURVEY_CONST.RADIO_FIELD);
             }

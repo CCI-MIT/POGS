@@ -7,11 +7,13 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.script.ScriptContext;
 import javax.script.ScriptException;
 
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
+import edu.mit.cci.pogs.service.CompletedTaskScoreService;
 import edu.mit.cci.pogs.service.CompletedTaskService;
 import edu.mit.cci.pogs.utils.DateUtils;
 
@@ -22,6 +24,9 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
 
     @Autowired
     private CompletedTaskService completedTaskService;
+
+    @Autowired
+    private CompletedTaskScoreService completedTaskScoreService;
 
     private static final Logger _log = LoggerFactory.getLogger(ScoringRunner.class);
 
@@ -34,13 +39,18 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
         taskConfiguration = taskService.getTaskConfiguration(taskWrapper.getId());
         try {
             if (timeBeforeStarts > 0) {
-                System.out.println(" Time until score for Task id: " + taskWrapper.getId() + " is done: " + timeBeforeStarts);
+                System.out.println(" Time until score for Task id: " + taskWrapper.getId() + " starts : " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
             }
-            System.out.println(" Score is starting for Task id: " + taskWrapper.getId());
+            System.out.println(" Score is starting for Task id: " + taskWrapper.getId() + " (" + taskWrapper.getTaskName()+" )");
             for (CompletedTask ct : taskWrapper.getCompletedTasks()) {
                 if (this.taskPlugin.isScriptType()) {
-                    this.runScript(this.taskPlugin.getTaskScoreJsContent(), ct);
+                    if(taskConfiguration.getScoreScriptId()==null) {
+                        this.runScript(this.taskPlugin.getTaskScoreJsContent(), ct);
+                    } else {
+                        ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
+                        this.runScript(es.getScriptContent(),ct);
+                    }
                 } else {
                     if(taskConfiguration.getScoreScriptId()==null) {
                         completedTaskService.scoreCompletedTask(ct, taskWrapper);
@@ -57,12 +67,22 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
 
     }
 
+    protected void retrieveScore() {
+        String attributesToAddJson = (String) this.getEngine().getBindings(
+                ScriptContext.ENGINE_SCOPE).get("completedTaskScore");
+
+        completedTaskScoreService.createCompletedTaskScoreFromScript(
+                attributesToAddJson,this.getCompletedTask().getId());
+
+
+    }
+
     @Override
     public void retrieveScriptVariables() {
 
         retreiveSubjectAttributesToAdd();
         retrieveCompletedTaskAttributesToAdd();
-
+        retrieveScore();
     }
 
     @Override

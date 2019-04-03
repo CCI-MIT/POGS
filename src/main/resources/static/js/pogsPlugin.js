@@ -67,7 +67,9 @@ class PogsPlugin {
         this.sendMessage('/pogsapp/ot.operations.submit', 'OPERATION', JSON.stringify(operation),
             this.pogsRef.subjectId, null, this.pogsRef.completedTaskId, this.pogsRef.sessionId);
     }
-
+    isSoloTask(){
+        return this.pogsRef.taskIsSolo;
+    }
     getSubjectByExternalId(externalId){
         var teammates = this.getTeammates();
         for(var i = 0; i < teammates.length; i ++) {

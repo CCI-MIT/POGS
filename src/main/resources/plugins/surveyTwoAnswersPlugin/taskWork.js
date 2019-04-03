@@ -1,4 +1,3 @@
-
 class TwoAnwserSurvey extends Survey {
 
     setupSurvey(surveyBluePrint){
@@ -16,7 +15,7 @@ class TwoAnwserSurvey extends Survey {
 
                 let originalField = new InputField(this,e)
                 let clonedField = new InputField(this,e);
-                clonedField.setFieldHTMLAsSecondAnswer();
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
                 originalField.setSecondAnswerField(clonedField);
 
                 this.fields.push(originalField);
@@ -26,7 +25,7 @@ class TwoAnwserSurvey extends Survey {
 
                 let originalField = new RadioField(this,e)
                 let clonedField = new RadioField(this,e);
-                clonedField.setFieldHTMLAsSecondAnswer();
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
                 originalField.setSecondAnswerField(clonedField);
 
                 this.fields.push(originalField);
@@ -37,7 +36,7 @@ class TwoAnwserSurvey extends Survey {
 
                 let originalField = new SelectField(this,e)
                 let clonedField = new SelectField(this,e);
-                clonedField.setFieldHTMLAsSecondAnswer();
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
                 originalField.setSecondAnswerField(clonedField);
 
                 this.fields.push(originalField);
@@ -47,19 +46,24 @@ class TwoAnwserSurvey extends Survey {
 
                 let originalField = new CheckboxField(this,e)
                 let clonedField = new CheckboxField(this,e);
-                clonedField.setFieldHTMLAsSecondAnswer();
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
                 originalField.setSecondAnswerField(clonedField);
 
                 this.fields.push(originalField);
                 this.fields.push(clonedField);
             }
             if(e.type == "introduction") {
-                this.fields.push(new InformationField(this,e));
+
+                let originalField = new InformationField(this,e)
+                let clonedField = new InformationField(this,e);
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
+                originalField.setSecondAnswerField(clonedField);
+
             }else if(e.type == "radiotable"){ // setup radio question
 
                 let originalField = new RadioTableField(this,e)
                 let clonedField = new RadioTableField(this,e);
-                clonedField.setFieldHTMLAsSecondAnswer();
+                clonedField.setFieldHTMLAsSecondAnswer(originalField);
                 originalField.setSecondAnswerField(clonedField);
 
                 this.fields.push(originalField);

@@ -2,7 +2,4 @@ name: memoryGridPlugin
 description: A grid to setup texts to be memorized and answered in the same grid cells.
 
 scoring:
-    scoringType : indexedAnswerOneAnswerKey
-    answerKeyPrefix: answerSheet
-    answerKeyFormat: CSV
-    answerSheetPrefix: sudokuAnswer_
+    scoringType : script

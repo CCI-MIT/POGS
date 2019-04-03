@@ -59,11 +59,11 @@ public class TaskPlugin {
 
 
     public boolean isScriptType(){
-        return getTaskPluginProperties().getScoring().getScoreAttributeName()
+        return getTaskPluginProperties().getScoring().getScoringType().getId().toString()
                 .equals(ScoringType.script.getId().toString());
     }
     public boolean isExternalService(){
-        return getTaskPluginProperties().getScoring().getScoreAttributeName()
+        return getTaskPluginProperties().getScoring().getScoringType()
                 .equals(ScoringType.externalService.getId().toString());
     }
     public String getTaskPluginName() {

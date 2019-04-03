@@ -82,6 +82,7 @@ class Pogs {
         this.chatBotName = config.chatBotName;
         this.sessionIsPerpetual = ((config.sessionIsPerpetual)?(config.sessionIsPerpetual):(false));
         this.doneUrlParameter = config.doneUrlParameter;
+        this.taskIsSolo = config.taskIsSolo;
         this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;

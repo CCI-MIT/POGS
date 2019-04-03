@@ -59,6 +59,8 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
             Subject subject =  subjectDao.get(this.getCompletedTask().getSubjectId());
 
             this.getEngine().put("subject", teamService.getSubjectJsonObject(subject));
+        } else {
+            this.getEngine().put("subject", null);
         }
 
         this.getEngine().put("isSoloTask", isSoloTask);
@@ -75,12 +77,13 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         //get all task_execution_attribute
         this.getEngine().put("taskConfigurationAttributes", taskAttr.toString());
+        System.out.println("taskConfigurationAttributes : " + taskAttr.toString());
 
         JSONArray completedTaskAttributes = completedTaskAttributeService
                 .listCompletedTaskAttributesForCompletedTask(this.getCompletedTask().getId());
 
         this.getEngine().put("completedTaskAttributes", completedTaskAttributes.toString());
-
+        System.out.println("completedTaskAttributes : " + completedTaskAttributes.toString());
 
 
     }

@@ -30,7 +30,7 @@ class CheckboxField extends Field {
         super.setupHooks();
         //$('#answer'+this.index+' input').on('change',this.handleCheckboxOnClick.bind(this));
         $('#answer'+this.index+' input').on('click', this.handleFocusIn.bind(this));
-        $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
+        //$('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
     }
     handleFocusIn(event) {
         //console.log("checkbox clicked");
@@ -44,14 +44,15 @@ class CheckboxField extends Field {
                                                             subIndex, 0.0,
                                                             0, false,target.is(":checked") );
             //this is because the value is not yet set in the item when event is called, so the opposite will be real value
+
         }
     }
-    handleFocusOut(event){
+    saveCurrentCheckboxAnswer(){
         // get all data from all inputs and compose final answer.
         let answer = [];
         let answerz = $('#answer'+this.index+' input');
-        let target = $(event.target);
-        let cellIndex = parseInt(target.data("cell-reference-index"));
+
+        let cellIndex = parseInt(this.index);
         for(let i = 0; i < answerz.length; i ++) {
             if($(answerz[i]).is(':checked')) {
                 answer.push($(answerz[i]).val());
@@ -60,10 +61,12 @@ class CheckboxField extends Field {
             }
         }
         //console.log("sending check answer: " + cellIndex);
+        console.log('Index: ' + cellIndex);
+        console.log('Answers' + answer);
         if(!isNaN(cellIndex)) {
             // console.log($(event.target))
             if(answer != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
+                this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                                 JSON.stringify(answer), 0.0,
                                                                 0, true, SURVEY_CONST.CHECKBOX_FIELD);
             }
@@ -99,6 +102,8 @@ class CheckboxField extends Field {
                 }
             }
             this.setFinalAnswer(message.sender);
+            if(message.sender ==this.getPogsPlugin().getSubjectId())
+                this.saveCurrentCheckboxAnswer();
         }
     }
 }
@@ -165,7 +170,6 @@ class CheckboxFieldEdit {
             //select answer for checkbox question
             let inputs = $('#question_set' + question_number + ' div input');
             for (let z = 0; z < answers.length; z++) {
-                let e = answers[i][z];
                 for (let j = 0; j < inputs.length; j++) {
                     if ($(inputs[j]).val() == answers[z]) {
                         $(inputs[j]).parent().find('input[type=checkbox]').prop("checked", true);
@@ -199,8 +203,13 @@ class CheckboxFieldEdit {
     }
     composeAnswerFromHTML(){
         let answer = [];
-        $.each($("#question_set"+this.questionNumber+" div input:checked"), function(){
-            answer.push($(this).siblings("input[type=text]").val());
+        $.each($("#question_set"+this.questionNumber+" div input[type=checkbox]"), function(){
+            if($(this).is(":checked")) {
+                answer.push($(this).siblings("input[type=text]").val());
+            } else {
+                answer.push("");
+            }
+
         });
         return answer;
     }

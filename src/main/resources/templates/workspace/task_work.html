@@ -49,6 +49,28 @@
 
         <div class="task_work" th:remove="tag" th:utext="${taskWorkHtml}" ></div>
 
+ <script th:inline="text">
+        /*<![CDATA[*/
+
+        [(${taskWorkJs})]
+
+        /*]]>*/
+    </script>
+
+    <script th:inline="text" th:if="${pogsSession.sessionWideScriptId}">
+        /*<![CDATA[*/
+            console.log("Has session wide script")
+            var sessionWideScript = pogs.createPlugin('sessionWideScript',function(){
+
+            console.log("Session wide script RUNNING")
+                setTimeout(function(){
+                [(${sessionWideScript})]
+
+                },500);
+            });
+        /*]]>*/
+    </script>
+
 
             <script>
                 var csrfParamName = "[(${_csrf.parameterName})]";
@@ -63,6 +85,7 @@
                        sessionId: '[(${pogsSession.id})]',
                        subjectId: '[(${subject.subjectExternalId})]',
                        taskId : '[(${task.id})]',
+                       taskIsSolo : [(${task.soloTask})],
                        lastTask: '[(${lastTask})]',
                        sessionName: '[(${pogsSession.sessionSuffix})]',
                        subjectCanTalkTo: [(${subjectCanTalkTo})],
@@ -93,13 +116,6 @@
         </div>
     </div>
 
-    <script th:inline="text">
-        /*<![CDATA[*/
-
-        [(${taskWorkJs})]
-
-        /*]]>*/
-    </script>
 
 </div>
 <div layout:fragment="communication" th:if="${hasChat}">
