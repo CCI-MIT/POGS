@@ -11,7 +11,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str = "";
         this.score = 0;
-        this.stopTime = (new Date().getTime() / 1000) + 122;
+        this.stopTime = (new Date().getTime() / 1000) + 92;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
         this.prob;
@@ -80,7 +80,7 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHooks() {
         super.setupHooks();
-        $('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
+        $('#answer' + this.index + ' input').on('change', this.handleRadioOnClick.bind(this));
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
     }
@@ -96,6 +96,8 @@ class JeopardyRadioField extends JeopardyField {
             let nonAnswers = this.removeA(this.result[this.questionNumber].value, this.result[this.questionNumber].Answer);
             machSuggestion += nonAnswers[Math.floor(Math.random() * 3)];
         }
+        if ((this.stopTime - (new Date().getTime() / 1000))>=61)
+            return;
         console.log("Machine suggestion "+machSuggestion);
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
@@ -129,8 +131,12 @@ class JeopardyRadioField extends JeopardyField {
             }
             console.log("Typed Value: " + valueTyped);
             if (valueTyped != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                if ((this.stopTime - (new Date().getTime() / 1000)<61))
+                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     valueTyped, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
+                else
+                    this.getPogsPlugin().saveCompletedTaskAttributeWithoutBroadcast(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                        valueTyped, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
             }
         }
     }
@@ -142,8 +148,12 @@ class JeopardyRadioField extends JeopardyField {
             this.selectedValue = $(event.target).attr('value'); // value of radio button
             console.log("Value of button clicked: " + this.selectedValue);
             if(this.selectedValue != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                if ((this.stopTime - (new Date().getTime() / 1000)<61))
+                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
                     this.selectedValue, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.RADIO_FIELD);
+                else
+                    this.getPogsPlugin().saveCompletedTaskAttributeWithoutBroadcast(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                        this.selectedValue, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.RADIO_FIELD);
             }
         }
     }
@@ -152,7 +162,9 @@ class JeopardyRadioField extends JeopardyField {
         super.broadcastReceived(message);
         let attrName = message.content.attributeName;
         let buttonType = message.content.extraData;
-
+        console.log("Element is found ", this.localPogsPlugin.getHasChat());
+        this.localPogsPlugin.setHasChat(false);
+        console.log("Element is found ", this.localPogsPlugin.getHasChat());
         if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.SUBMIT_FIELD)) {
 
             if (document.getElementById("machSuggestion")) {
@@ -166,7 +178,7 @@ class JeopardyRadioField extends JeopardyField {
             // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
             this.setFinalAnswer(message.sender);
             this.questionNumber++;
-            this.stopTime = (new Date().getTime() / 1000) + 122;
+            this.stopTime = (new Date().getTime() / 1000) + 92;
             console.log("Next question number " + this.questionNumber);
 
             var questionEl = document.getElementById("question-answer-machine");
@@ -237,10 +249,10 @@ class JeopardyRadioField extends JeopardyField {
         var startTime = new Date().getTime() / 1000;
         console.log("TIME "+this.stopTime);
         var distance = Math.floor(this.stopTime - startTime);
-        document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
         if (distance < 0) {
             // clearInterval(x);
             document.getElementById("submitAnswer").click();
         }
+        document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
     }
 }
