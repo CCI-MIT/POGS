@@ -13,13 +13,6 @@ class PogsPlugin {
         return this.pogsRef.sessionName;
     }
 
-    getHasChat(){
-        return this.pogsRef.hasChat;
-    }
-
-    setHasChat(hasChat){
-        this.pogsref.hasChat = hasChat;
-    }
     getTaskList(){
         var taskList = []
         for(var i =0; i< this.pogsRef.taskList.length; i ++){
