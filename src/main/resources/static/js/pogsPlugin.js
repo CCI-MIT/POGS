@@ -12,6 +12,7 @@ class PogsPlugin {
     getSessionName(){
         return this.pogsRef.sessionName;
     }
+
     getTaskList(){
         var taskList = []
         for(var i =0; i< this.pogsRef.taskList.length; i ++){
@@ -102,6 +103,27 @@ class PogsPlugin {
                                  this.getSubjectId(), null, this.getCompletedTaskId(),
                                  this.getSessionId());
     }
+
+
+    saveCompletedTaskAttributeWithoutBroadcast(attributeName, stringValue, floatValue, intValue,
+                               loggable, extraData) {
+        var messageContent = {
+            attributeName: attributeName,
+            attributeStringValue: stringValue,
+            attributeDoubleValue: floatValue,
+            attributeIntegerValue: intValue,
+            loggableAttribute: loggable,
+            mustCreateNewAttribute: false,
+            broadcastableAttribute: false,
+            extraData: extraData
+        };
+
+        this.pogsRef.sendMessage("/pogsapp/task.saveAttribute", "TASK_ATTRIBUTE", messageContent,
+            this.getSubjectId(), null, this.getCompletedTaskId(),
+            this.getSessionId());
+    }
+
+
     getConfigurationAttributes() {
         return this.pogsRef.taskConfigurationAttributesMap;
     }
