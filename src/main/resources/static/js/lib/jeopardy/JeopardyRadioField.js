@@ -151,7 +151,7 @@ class JeopardyRadioField extends JeopardyField {
             let agentRatings = [$('input[id="AgentRating-0"]').val(), $('input[id="AgentRating-1"]').val(), $('input[id="AgentRating-2"]').val(), $('input[id="AgentRating-3"]').val()];
             //console.log("Agent ratings "+ agentRatings+ " Member Influences "+ memberInfluences);
             if (agentRatings != null) {
-                this.getPogsPlugin().saveCompletedTaskAttributeWithoutBroadcast(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                this.getPogsPlugin().saveCompletedTaskAttributeWithoutBroadcast(JEOPARDY_CONST.FIELD_NAME + cellIndex + this.getPogsPlugin().getSubjectId(),
                     "Agent Ratings "+agentRatings.toString() + "Member Influences "+ memberInfluences.toString(), 0, this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
             }
         }
