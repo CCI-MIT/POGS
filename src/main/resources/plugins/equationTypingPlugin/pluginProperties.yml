@@ -2,6 +2,4 @@ name: equationTypingPlugin
 description: An equation typing task that provides a Google Doc-like shared textfield that all participants can type in simultaneously.
 
 scoring:
-    scoringType : externalService
-    url: http://localhost:8080/letscoretypingtext
-    answerSheetPrefix: finalText
+    scoringType : script

@@ -4,14 +4,25 @@ var _isSoloTask = isSoloTask;
 var _taskConfigurationAttributes = JSON.parse(taskConfigurationAttributes);
 var _completedTaskAttributes = JSON.parse(completedTaskAttributes);
 
+var totalOfRounds = 0;
 
-for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
-    if(_taskConfigurationAttributes[i].attributeName == "finalScore"){
-        answerSheet = _taskConfigurationAttributes[i].stringValue;
+for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
+    if(_completedTaskAttributes[i].attributeName == "totalOfRounds"){
+        totalOfRounds = parseInt(_completedTaskAttributes[i].integerValue);
         break;
     }
 }
 
+var rounds = [];
+function newRound(){
+    return {
+        "teamScoreRound" : 0,
+        "totalTargetsAppearedRound" : 0,
+        "subjectScoreRound" : [],
+        "subjectNumberOfClicksRound" : []
+
+    };
+}
 var _completedTaskScore = {
     "totalScore" : 0,
     "numberOfRightAnswers" : 0,
@@ -21,5 +32,30 @@ var _completedTaskScore = {
     "scoringData" : ""
 };
 
-_completedTaskScore.totalScore = parseFloat(answerSheet);
+for(var k = 0; k <= totalOfRounds; k++) {
+    var round = newRound();
+    var roundIndex = k +1;
+    for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
+        if(_completedTaskAttributes[i].attributeName == ("teamScoreRound"+roundIndex)){
+            round.teamScoreRound = parseInt(_completedTaskAttributes[i].integerValue);
+            _completedTaskScore.totalScore+=round.teamScoreRound;
+        }
+        if(_completedTaskAttributes[i].attributeName == ("totalTargetsAppearedRound"+roundIndex)){
+            round.totalTargetsAppearedRound = parseInt(_completedTaskAttributes[i].integerValue);
+            _completedTaskScore.numberOfEntries+=round.totalTargetsAppearedRound;
+        }
+        if(_completedTaskAttributes[i].attributeName == ("subjectScoreRound"+roundIndex)){
+            var su = {"external_id": _completedTaskAttributes[i].extraData, subject_score: parseInt(_completedTaskAttributes[i].integerValue)}
+            round.subjectScoreRound.push(su);
+        }
+        if(_completedTaskAttributes[i].attributeName == ("subjectNumberOfClicksRound"+roundIndex)){
+            var su = {"external_id": _completedTaskAttributes[i].extraData, subject_score: parseInt(_completedTaskAttributes[i].integerValue)}
+            round.subjectNumberOfClicksRound.push(su);
+        }
+    }
+    rounds.push(round);
+}
+
+_completedTaskScore.scoringData = JSON.stringify(rounds);
+
 completedTaskScore = JSON.stringify(_completedTaskScore);

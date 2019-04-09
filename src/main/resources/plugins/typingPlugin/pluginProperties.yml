@@ -4,4 +4,3 @@ description: A simple typing task that provides a Google Doc-like shared textfie
 scoring:
     scoringType : externalService
     url: http://localhost:8080/letscoretypingtext
-    answerSheetPrefix: finalText

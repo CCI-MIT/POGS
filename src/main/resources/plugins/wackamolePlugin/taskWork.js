@@ -56,6 +56,10 @@ class Wackamole {
 
         // mouse move event
         $("#wackamoleContainer").on('mousemove', self.handleMouseMove.bind(self));
+
+        self.pogsPlugin.saveCompletedTaskAttribute('totalOfRounds',
+                                                   "", 0.0,
+                                                   self.multiplayerRound, true,"");
         // check debounce function with different values
         // $("#wackamoleContainer").on('mousemove', self.debounce(self.handleMouseMove.bind(self), 100, true));
 
@@ -356,6 +360,10 @@ class Wackamole {
                 console.log("Number of clicks: " + self.numberOfClicks);
                 console.log("Player hitOnTarget: " + self.playerHitOnTarget);
                 console.log("total hitOnTarget: " + self.totalHitOnTarget);
+
+                self.pogsPlugin.saveCompletedTaskAttribute('totalOfRounds',
+                                                           "", 0.0,
+                                                           self.multiplayerRound, true,"");
 
 
                 self.pogsPlugin.saveCompletedTaskAttribute('teamScoreRound' + self.multiplayerRound,

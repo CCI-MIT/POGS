@@ -65,6 +65,7 @@ public class CompletedTaskAttributeService {
             teaJson.put("stringValue", tea.getStringValue());
             teaJson.put("doubleValue", tea.getDoubleValue());
             teaJson.put("integerValue", tea.getIntegerValue());
+            teaJson.put("extraData", tea.getExtraData());
             configurationArray.put(teaJson);
         }
         return configurationArray;
