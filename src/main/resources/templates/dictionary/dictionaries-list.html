@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dictionaries</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/dictionaries">Dictionaries</a></li>
+    </ol>
+    <h2>All Dictionaries:</h2>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a href="/admin/dictionaries/create" class="btn btn-outline-primary float-right">
+                    Create new dictionary</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Dictionary ID</th>
+            <th>Dictionary name</th>
+            <th>Ground truth </th>
+        </tr>
+        </thead>
+        <tbody>
+
+        <th:block th:each="dictionary : ${dictionaryList}">
+            <tr>
+                <td th:text="${dictionary.id}"></td>
+                <td><a th:text="${dictionary.dictionaryName}" th:href="${'/admin/dictionaries/'+ dictionary.id}"></a></td>
+                <td><a th:text="${(dictionary.hasGroundTruth)?('Yes'):('No')}" th:href="${'/admin/dictionaries/'+ dictionary.id}"></a></td>
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

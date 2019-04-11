@@ -21,6 +21,8 @@ public class SessionWrapper extends Session {
 
     private ArrayList<SessionSchedule> sessionSchedule;
 
+    private static final Integer SCORING_TIME_PAGE = 1000*8;
+
     public SessionWrapper(Session session) {
         super(session);
         this.sessionRounds = new ArrayList<>();
@@ -235,7 +237,7 @@ public class SessionWrapper extends Session {
     }
 
     private long getDonePageEndTime(Long lastRoundEndTime) {
-        return lastRoundEndTime + DateUtils.toMilliseconds(this.getDonePageTime());
+        return lastRoundEndTime + SCORING_TIME_PAGE + DateUtils.toMilliseconds(this.getDonePageTime());
     }
 
     public boolean isTaskExecutionModeSequential() {
@@ -303,6 +305,13 @@ public class SessionWrapper extends Session {
             this.sessionSchedule.addAll(rounds);
             lastRoundEndTimestamp = rw.getRoundFinishTimestamp();
         }
+
+
+        this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp
+                , lastRoundEndTimestamp + SCORING_TIME_PAGE, null,
+                null, this, "/scoring"));
+
+
         if (this.getDonePageEnabled()) {
             this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp
                     , getDonePageEndTime(lastRoundEndTimestamp), null,

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chatscripts </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <!--<li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>-->
+        <li class="breadcrumb-item "><a th:href="${'/admin/dictionaries/' + dictionary.id}" th:text="${dictionary.dictionaryName}"></a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/dictionaries/'+ dictionary.id}" th:text="${dictionary.dictionaryName}"></a></li>
+    </ol>
+    <h2 th:text="${dictionary.dictionaryName}"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/dictionaries/' + dictionary.id}" class="btn btn-outline-primary float-right">
+                Edit dictionary</a>
+        </div>
+    </div>
+    <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
+
+    <h3>Dictionary entries: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <button id="addChatentry" class="btn btn-success">Add dictionary entry</button>
+            </div>
+        </div>
+        <script>
+            $(function() {
+                $("#addChatentry").click(function(){
+
+                    var index = $("#chatEntryList tr").length ;
+                    var dictionaryId = $("#chatScriptId").val();
+                    var saida = "";
+                        saida+="<tr><td><input type=\"text\"  name=\"dictionaryEntryList["+index+"].entryType\" /></td>\n";
+                    	saida+="                <td>\n";
+                    	saida+="                    <input type=\"hidden\" name=\"dictionaryEntryList["+index+"].id\"  />\n";
+                    	saida+="                    <input type=\"text\" name=\"dictionaryEntryList["+index+"].entryCategory\"  />\n";
+                    	saida+="                </td>\n";
+                    	saida+="                <td><textarea type=\"text\" class=\"chatValue\" name=\"dictionaryEntryList["+index+"].entryValue\" /></td>\n";
+                    	saida+="                <td><button type=\"button\" class=\"pull-right fa fa-trash btn-danger deleteChatentry\" ></button></td><tr/>\n";
+
+                    $("#chatEntryList").append(saida);
+                });
+                $(".deleteChatentry").unbind().click(function () {
+                    var r = confirm("Are you sure you want to delete this entry from this dictionary ?");
+                    if (r == true) {
+                        $(this).parent().parent().remove();
+                    }
+                })
+            });
+        </script>
+    </div>
+    <br/>
+    <form action="#" th:action="@{/admin/dictionaries/dictionaryentries/edit}" th:object="${dictionaryEntriesBean}" method="post">
+        <input type="hidden" name="dictionaryId" id="dictionaryId" th:value="${dictionary.id}">
+        <!--<input type="hidden" name="studyId" th:value="${study.id}">-->
+        <table class="table table-striped" style="width: 500px;">
+            <thead>
+            <tr>
+                <th width="150">Entry type</th>
+                <th width="150">Category</th>
+                <th width="350">Value</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody id="chatEntryList">
+
+            <tr th:each="person, rowStat : *{dictionaryEntryList}">
+                <td><input type="text"  th:field="*{dictionaryEntryList[__${rowStat.index}__].entryType}" /></td>
+                <td>
+                    <input type="hidden" th:field="*{dictionaryEntryList[__${rowStat.index}__].id}"  />
+                    <input type="text" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryCategory}"  />
+                </td>
+                <td><textarea type="text" class="chatValue" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryValue}" /></td>
+                <td><button type="button" class="pull-right fa fa-trash btn-danger deleteChatentry" ></button></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <br/>
+        <button type="submit" class="btn btn-primary">Save dictionary entry list</button>
+        <br/>
+    </form>
+</div>
+</body>
+</html>
