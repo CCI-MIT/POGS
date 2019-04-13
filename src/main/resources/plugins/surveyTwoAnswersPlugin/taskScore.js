@@ -8,7 +8,7 @@ var _completedTaskAttributes = JSON.parse(completedTaskAttributes);
 var answerSheet;
 
 var RIGHT_ANSWER_REWARD = 1;
-var WRONG_ANSWER_REWARD = 0;
+var WRONG_ANSWER_REWARD = -3;
 
 for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
     if(_taskConfigurationAttributes[i].attributeName == "answerSheet"){
@@ -111,8 +111,13 @@ for(var answerKey in answerSheetAndKey) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
         } else {
-            _completedTaskScore.numberOfWrongAnswers++;
-            _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+
+            if ((anArray[1] == anArray[2]) && (anArray[0] == anArray[2])) {
+                _completedTaskScore.numberOfWrongAnswers++;
+                _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+            } else {
+
+            }
         }
     }
 }

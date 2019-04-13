@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="_csrf" type="org.springframework.security.web.csrf.CsrfToken"*/-->
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dictionary </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item "><a href="/admin/dictionaries">Dictionary</a></li>
+        <li class="breadcrumb-item active" th:if="${dictionary.id != null}">
+            <a th:href="${'/admin/dictionaries/' + dictionary.id}" th:text="${dictionary.dictionaryName}"></a>
+        </li>
+    </ol>
+    <h2>Edit dictionary</h2>
+    <form action="#" th:action="@{/admin/dictionaries}" th:object="${dictionary}" method="post">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <input type="hidden" name="id" th:value="*{id}"/>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="dictionaryName">Dictionary name:</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" id="dictionaryName" th:field="*{dictionaryName}"/>
+            </div>
+        </div>
+
+
+        <button th:if="${dictionary.id == null}" type="submit" class="btn btn-primary">Create dictionary
+        </button>
+        <button th:if="${dictionary.id != null}" type="submit" class="btn btn-primary">Save dictionary
+        </button>
+        <br/>
+    </form>
+</div>
+
+</div>
+</body>
+</html>

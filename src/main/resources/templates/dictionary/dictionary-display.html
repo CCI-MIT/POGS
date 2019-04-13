@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Chatscript </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/dictionaries">Chat scripts</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/dictionaries/' + dictionary.id}" th:text="${dictionary.dictionaryName}"></a></li>
+        <!--<li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}" th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>-->
+    </ol>
+    <h2 th:text="${dictionary.dictionaryName}"></h2>
+    <div class="col">
+        <div class="col-12">
+            <a th:href="${'/admin/dictionaries/' + dictionary.id}" class="btn btn-outline-primary float-right">
+                Edit dictionary</a>
+        </div>
+    </div>
+    <!--<p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>-->
+
+    <h3>Dictionary entries: </h3>
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <div class="col-12">
+                <a th:href="${'/admin/dictionaries/'+dictionary.id+'/dictionaryentries/edit'}"  class="btn btn-outline-primary float-right">
+                    Edit dictionary entries</a>
+            </div>
+        </div>
+    </div>
+    <br/>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Entry type</th>
+            <th>Category</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="dictionaryEntry : ${dictionaryEntriesBean.dictionaryEntryList}">
+            <tr>
+                <td th:text="${dictionaryEntry.entryType}"></td>
+                <td th:text="${dictionaryEntry.entryCategory}"></td>
+
+
+            </tr>
+        </th:block>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

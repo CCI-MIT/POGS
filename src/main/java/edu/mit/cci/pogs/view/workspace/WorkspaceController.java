@@ -591,6 +591,17 @@ public class WorkspaceController {
 
         return "workspace/task_work";
     }
+    @GetMapping("/scoring/{externalId}")
+    public String scoring(@PathVariable("externalId") String externalId, Model model) {
+        Subject su = workspaceService.getSubject(externalId);
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+
+        if (sr != null) {
+            model.addAttribute("showScore", false);
+        }
+        return checkExternalIdAndSessionRunningAndForward(su, model,
+                "workspace/session_done");
+    }
 
     @GetMapping("/done/{externalId}")
     public String done(@PathVariable("externalId") String externalId, Model model) {
