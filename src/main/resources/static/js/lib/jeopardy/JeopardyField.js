@@ -3,7 +3,10 @@ const JEOPARDY_CONST = {
     RADIO_FIELD: "RadioField",
     SUBMIT_FIELD: "SubmitButtonField",
     ASK_MACHINE: "AskedMachine",
-    ROUND_TRANSITION_SURVEY: "RoundTransitionSurvey"
+    ROUND_TRANSITION_SURVEY: "RoundTransitionSurvey",
+    INDIVIDUAL_RESPONSE: "IndividualResponse",
+    GROUP_RADIO_RESPONSE: "GroupRadioResponse",
+    INFLUENCE_MATRIX: "InfluenceMatrix"
 };
 
 const JEOPARDY_TRANSIENT = {
