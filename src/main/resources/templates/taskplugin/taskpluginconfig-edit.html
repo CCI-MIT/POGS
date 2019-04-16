@@ -110,6 +110,19 @@
 
                       </div>
                    </div>
+                   <div class="form-group row hiddable" >
+                       <label class="col-sm-3 col-form-label" for="introPageEnabled">Dictionary:</label>
+                       <div class="col-sm-9">
+                           <select class="custom-select pluginConfigSelect" style=""
+                                 th:field="*{dictionaryId}" name="">
+                                 <option selected="selected"  value="">Use no dictionary</option>
+                             <option
+                                     th:each="dict: ${dictionaries}"
+                                     th:value="${dict.id}"
+                                     th:text="${dict.dictionaryName}"></option>
+                         </select>
+                       </div>
+                   </div>
 
             </div>
             <script>

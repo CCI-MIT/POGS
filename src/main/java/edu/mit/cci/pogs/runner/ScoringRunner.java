@@ -53,7 +53,7 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
                     }
                 } else {
                     if(taskConfiguration.getScoreScriptId()==null) {
-                        completedTaskService.scoreCompletedTask(ct, taskWrapper);
+                         completedTaskService.scoreCompletedTask(ct, taskWrapper);
                     } else {
                         ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
                         this.runScript(es.getScriptContent(),ct);
