@@ -34,6 +34,9 @@ class Jeopardy {
             .replace(JEOPARDY_TRANSIENT.FOCUS_IN_CELL,"")
             .replace(JEOPARDY_TRANSIENT.MOUSE_OVER_FIELD,"")
             .replace(JEOPARDY_TRANSIENT.MOUSE_OUT_OF_FIELD,"");
+        if (index.indexOf("__") !==-1){
+            index = index.substring(0, index.indexOf('_'));
+        }
         if (index==-1)
             index = 0;
         if(this.fields.length > index) {
