@@ -60,7 +60,7 @@ node/
 /src/main/resources/dist/vendor/
 yarn.lock
 .eyeglass_cache
-
+*.pyc
 
 # .idea files we don't need
 .idea/codeStyles/codeStyleConfig.xml
