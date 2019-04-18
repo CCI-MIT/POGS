@@ -21,6 +21,7 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.completedtaskattribute.CompletedTaskAttributeDao;
 import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
+import edu.mit.cci.pogs.model.dao.dictionary.DictionaryDao;
 import edu.mit.cci.pogs.model.dao.dictionaryentry.DictionaryEntryDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
@@ -33,6 +34,7 @@ import edu.mit.cci.pogs.model.dao.unprocesseddictionaryentry.UnprocessedDictiona
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.DictionaryEntry;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
@@ -65,6 +67,9 @@ public class CompletedTaskService {
     private DictionaryService dictionaryService;
 
     @Autowired
+    private DictionaryDao dictionaryDao;
+
+    @Autowired
     protected CompletedTaskAttributeService completedTaskAttributeService;
 
     @Autowired
@@ -84,7 +89,7 @@ public class CompletedTaskService {
         }
 
 
-        if (tpp.getScoring().getScoringType().equals(ScoringType.externalService.getId())) {
+        if (tpp.getScoring().getScoringType().getId().equals(ScoringType.externalService.getId())) {
 
             getScoreFromExternalService(tpp,tw, ct, thtc);
         }
@@ -114,9 +119,12 @@ public class CompletedTaskService {
 
             if(tc.getDictionaryId()!= null ){
 
+                Dictionary dict = dictionaryDao.get(tc.getDictionaryId());
                 params.add(new BasicNameValuePair("dictionaryEntries", (dictionaryService
                         .listDictionaryEntriesJson(tc.getDictionaryId())).toString()));
                 params.add(new BasicNameValuePair("dictionaryId",tc.getDictionaryId().toString()));
+                params.add(new BasicNameValuePair("dictionaryHasGroundTruth",
+                        dict.getHasGroundTruth() + ""));
             }
 
             httpPost.setEntity(new UrlEncodedFormEntity(params));
@@ -131,7 +139,7 @@ public class CompletedTaskService {
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
-            JSONObject jo = new JSONObject(result);
+            JSONObject jo = new JSONObject(result.toString());
             if(jo.has("completedTaskScore")) {
                 CompletedTaskScore cts;
                 cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
@@ -154,9 +162,9 @@ public class CompletedTaskService {
                 if(completedTaskScore.has("numberOfRightAnswers")) {
                     cts.setNumberOfRightAnswers(completedTaskScore.getInt("numberOfRightAnswers"));
                 }
-                if(completedTaskScore.has("completedTaskId")) {
-                    cts.setCompletedTaskId(completedTaskScore.getLong("completedTaskId"));
-                }
+
+                cts.setCompletedTaskId(ct.getId());
+
                 if(completedTaskScore.has("numberOfEntries")) {
                     cts.setNumberOfEntries(completedTaskScore.getInt("numberOfEntries"));
                 }
@@ -180,12 +188,14 @@ public class CompletedTaskService {
                     JSONObject jsonObject = completedTaskScore.getJSONObject(i);
                     if(jsonObject.has("dictionaryId")) {
                         ude.setDictionaryId(jsonObject.getLong("dictionaryId"));
+                    } else {
+                        ude.setDictionaryId(tc.getDictionaryId());
                     }
-                    if(jsonObject.has("entryPredictedCategory(")) {
-                        ude.setEntryPredictedCategory(jsonObject.getString("entryPredictedCategory("));
+                    if(jsonObject.has("entryPredictedCategory")) {
+                        ude.setEntryPredictedCategory(jsonObject.getString("entryPredictedCategory"));
                     }
-                    if(jsonObject.has("entryValue(")) {
-                        ude.setEntryValue(jsonObject.getString("entryValue("));
+                    if(jsonObject.has("entryValue")) {
+                        ude.setEntryValue(jsonObject.getString("entryValue"));
                     }
                     ude.setHasBeenProcessed(false);
                     unprocessedDictionaryEntryDao.create(ude);
@@ -195,7 +205,7 @@ public class CompletedTaskService {
 
             client.close();
         } catch (IOException exeption) {
-
+            exeption.printStackTrace();
         }
 
     }

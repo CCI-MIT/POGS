@@ -12,11 +12,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mit.cci.pogs.model.dao.dictionary.DictionaryDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
@@ -39,6 +41,9 @@ public class TaskPluginController {
     @Autowired
     private ExecutableScriptDao executableScriptDao;
 
+    @Autowired
+    private DictionaryDao dictionaryDao;
+
     @GetMapping
     public String getTaskPlugins(Model model) {
 
@@ -53,6 +58,11 @@ public class TaskPluginController {
             taskConfigurationList.addAll(executableScriptDao.listByScriptType(st));
         }
         return taskConfigurationList;
+    }
+
+    @ModelAttribute("dictionaries")
+    public List<Dictionary> getDictionaries(){
+        return dictionaryDao.list();
     }
 
     @ModelAttribute("executableScriptTypes")
