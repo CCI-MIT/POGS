@@ -4,6 +4,9 @@ class JeopardyRadioField extends JeopardyField {
         this.index = this.registerListenerAndGetFieldId(this);
         this.selectedValue = null;
         this.result = [];
+        this.answers = [];
+        this.isInfluencePage = false;
+        this.delayToAdd = 60;
         for (var i = 0; i < questionJson.length; i++) {
             for (var j = 0; j < questionJson[i].length; j++) {
                 this.result.push(questions[questionJson[i][j] - 1]);
@@ -34,10 +37,13 @@ class JeopardyRadioField extends JeopardyField {
         $('#jeopardyForm').append(this.str);
         this.setupHooks();
         setInterval(this.timer.bind(this),1000);
-        this.reachedConsensus = false;
     }
 
     setupHTML() {
+        this.isInfluencePage = false;
+        while (this.answers.length !==0){
+            this.answers.pop();
+        }
         this.reachedConsensus = false;
         this.str = '<div id = "question-answer-machine">';
         this.str += '<div class="form-group fa-align-right" id="jeopardyField_' + this.index + '" style="min-width: 300px;">';
@@ -78,31 +84,33 @@ class JeopardyRadioField extends JeopardyField {
             ' </div>';
         $("submitAnswer").bind(this);
         this.str += this.getInteractionIndicatorHTML();
-        this.str += '<div><table border="1" class="text-dark" id = "initialResponse"><tr><th>Subject</th><th>Option</th></tr>';
-        for(var j = 0; j<this.teammates.length;j++){
-            this.str+='<tr class="text-dark">'+
-                '<td>'+ this.teammates[j].displayName +'</td>'+
-                '<td>Answer'+ '</td>'+
-                '</tr>';
-        }
-        this.str += '</table></div>';
+        this.str += '<div id = "initialResponse">';
+        this.str += '</div>';
         $("#initialResponse").bind(this);
-        this.str += '</div> <br>';
+        this.str += '</div><br>';
+
+        setTimeout( this.individualAnswerBroadcast.bind(this),30000);
+        setTimeout(this.individualAnswerDisplay.bind(this), 31000);
     }
 
     setupHooks() {
         super.setupHooks();
         $("#initialResponse").hide();
-        $("#initialResponse").delay(30000).fadeIn('fast');
+        $("#initialResponse").delay(32000).fadeIn('fast');
         $("#askMachineButton").hide();
         $("#askMachineButton").delay(60000).fadeIn('fast');
-        $('#showAnswer').delay(3000).fadeOut('fast');
+        $('#showAnswer').delay(5000).fadeOut('fast');
         $("#submitButton").hide();
         $('#submitButton').delay(60000).fadeIn('fast');
-        setTimeout(function() {
-            $('#messageInput').removeAttr('disabled');
-        }, 30000);
-
+        if (this.isInfluencePage){
+            setTimeout(function() {
+                $('#messageInput').removeAttr('disabled');
+            }, this.delayToAdd*1000);
+        }else{
+            setTimeout(function() {
+                $('#messageInput').removeAttr('disabled');
+            }, 30000);
+        }
         $('#answer' + this.index + ' input').on('change', this.handleRadioOnClick.bind(this));
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
@@ -135,10 +143,12 @@ class JeopardyRadioField extends JeopardyField {
         let cellIndex = $('input[name="answer"]:checked').index();
         if (!isNaN(cellIndex)) {
             let valueTyped = $('input[name="answer"]:checked').val();
+            if (this.reachedConsensus === false)
+                valueTyped = "Consensus Not Reached";
             if (valueTyped == this.result[this.questionNumber].Answer)
                 this.score = this.score + 5;
             else if (valueTyped === undefined) {
-                valueTyped = "Not Answered";
+                valueTyped = "Consensus Not Reached";
                 this.score = this.score;
             } else {
                 this.score = this.score;
@@ -186,8 +196,8 @@ class JeopardyRadioField extends JeopardyField {
         }
     }
 
-    roundTransitionHTML(event)
-    {
+    roundTransitionHTML(event) {
+        this.isInfluencePage = true;
         this.str = '<div id = "roundTransition"> ' +
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
             '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
@@ -198,6 +208,10 @@ class JeopardyRadioField extends JeopardyField {
             '</tr>';
         for(var j = 0;j<this.teammates.length;j++){
             if(this.localPogsPlugin.getSubjectId() == this.teammates[j].externalId){
+                this.str+='<tr class="text-dark">'+
+                    '<td><b> You </b></td>'+
+                    '<td>'+ '<input type="number" id="MemberInfluence-'+j+'" maxlength="3" size="3"/>'+ '</td>'+
+                    '</tr>';
                 continue;
             }
             this.str+='<tr class="text-dark">'+
@@ -250,7 +264,7 @@ class JeopardyRadioField extends JeopardyField {
             if (questionEl) {
                 if (this.questionNumber === 1 || this.questionNumber===4 || this.questionNumber===6) {
                     console.log("round transition");
-                    this.stopTime = (new Date().getTime() / 1000) + 20;
+                    this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
                     this.roundTransitionHTML();
                     questionEl.innerHTML = this.str;
                     this.setupHTML();
@@ -280,6 +294,8 @@ class JeopardyRadioField extends JeopardyField {
             $("#askMachineButton").attr("disabled", "true");
         }else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INFLUENCE_MATRIX)){
             this.nextQuestionSetup(message);
+        } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INDIVIDUAL_SUBMISSION)){
+            this.answers.push(message.content.attributeStringValue);
         }
     }
 
@@ -325,12 +341,40 @@ class JeopardyRadioField extends JeopardyField {
             }else {
                 this.setupHTML();
                 this.score = message.content.attributeIntegerValue;
-                let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">'+this.score +' points</p></div>'
+                let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">'+this.score +' points</p></div>';
                 questionEl.innerHTML = this.str;
                 document.getElementById(("jeopardyScore")).innerHTML = updateScore;
                 this.setupHooks();
             }
         }
+    }
+
+    individualAnswerBroadcast(){
+        let cellIndex = $('input[name="answer"]:checked').index();
+        if (!isNaN(cellIndex)) {
+            let valueTyped = $('input[name="answer"]:checked').val();
+           if (valueTyped === undefined) {
+                valueTyped = "No Answer";
+            }
+            if (valueTyped != null) {
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
+                    valueTyped + "__" + this.localPogsPlugin.getSubjectId(), this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.INDIVIDUAL_SUBMISSION);
+            }
+        }
+    }
+
+    individualAnswerDisplay(){
+        console.log("ANSWerS", this.answers.length);
+        let responseAnswer = '<table border="1" class="text-dark" id = "initialResponse"><tr><th>Subject</th><th>Option</th></tr>';
+        for(var j = 0; j<this.answers.length; j++){
+            let stringValue = this.answers[j];
+            responseAnswer+='<tr class="text-dark">'+
+                '<td>'+ stringValue.substr(stringValue.indexOf("__")+2) +'</td>'+
+                '<td>'+ stringValue.substr(0, stringValue.indexOf("__"))+'</td>'+
+                '</tr>';
+        }
+        responseAnswer += '</table>';
+        document.getElementById("initialResponse").innerHTML = responseAnswer;
     }
 
 }

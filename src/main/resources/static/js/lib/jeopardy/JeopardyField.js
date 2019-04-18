@@ -6,7 +6,8 @@ const JEOPARDY_CONST = {
     ROUND_TRANSITION_SURVEY: "RoundTransitionSurvey",
     INDIVIDUAL_RESPONSE: "IndividualResponse",
     GROUP_RADIO_RESPONSE: "GroupRadioResponse",
-    INFLUENCE_MATRIX: "InfluenceMatrix"
+    INFLUENCE_MATRIX: "InfluenceMatrix",
+    INDIVIDUAL_SUBMISSION: "IndividualSubmission"
 };
 
 const JEOPARDY_TRANSIENT = {
