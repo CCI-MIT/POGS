@@ -207,11 +207,17 @@ class JeopardyRadioField extends JeopardyField {
         this.isInfluencePage = true;
         this.isSumCorrect = false;
         this.areFieldsFilled = true;
-        this.str = '<div id = "roundTransition"> ' +
-            '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
+        this.str = '<div id = "roundTransition"> ';
+        if (this.questionNumber != 0){
+            this.str += '<div><p id = "showAnswer" class="text-right text-dark row">Answer to previous question is &nbsp<b>' +
+                this.result[this.questionNumber].Answer +'</b></p></div>';
+        }
+        $("#showAnswer").bind(this);
+        this.str+= '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
             'If your submission is correct, one of your teammates has made a mistake </p></div>'+
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
             '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
+
         this.str += '<table class="table table-striped text-dark">'+
             '<tr>'+
             '<th>Member</th>'+
