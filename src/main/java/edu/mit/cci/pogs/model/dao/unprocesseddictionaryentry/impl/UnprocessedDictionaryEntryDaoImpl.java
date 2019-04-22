@@ -29,11 +29,12 @@ public class UnprocessedDictionaryEntryDaoImpl extends AbstractDao<UnprocessedDi
     }
 
     @Override
-    public List<UnprocessedDictionaryEntry> listDictionaryEntriesByDictionary(Long id) {
+    public List<UnprocessedDictionaryEntry> listNotProcessedDictionaryEntriesByDictionary(Long id) {
         final SelectQuery<Record> query = dslContext.select()
                 .from(UNPROCESSED_DICTIONARY_ENTRY).getQuery();
 
         query.addConditions(UNPROCESSED_DICTIONARY_ENTRY.DICTIONARY_ID.eq(id));
+        query.addConditions(UNPROCESSED_DICTIONARY_ENTRY.HAS_BEEN_PROCESSED.eq(false));
         return query.fetchInto(UnprocessedDictionaryEntry.class);
     }
 

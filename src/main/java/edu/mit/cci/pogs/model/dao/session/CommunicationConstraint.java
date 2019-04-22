@@ -2,9 +2,9 @@ package edu.mit.cci.pogs.model.dao.session;
 
 public enum CommunicationConstraint {
     NO_CHAT('N',"No Chat"),
-    GROUP_CHAT('G',"Group chat channel - No constraint"),
-    MATRIX_CHAT('M',"Matrix chat - Constraint: matrix"),
-    DYADIC_CHAT('D',"Dyadic communication - Constraint telephone system");
+    GROUP_CHAT('G',"Group Chat Channel - No constraint"),
+    MATRIX_CHAT('M',"Matrix Chat - Constraint: matrix"),
+    DYADIC_CHAT('D',"Dyadic Communication - Constraint telephone system");
 
     private Character communicationTypeChar;
     private String communicationType;

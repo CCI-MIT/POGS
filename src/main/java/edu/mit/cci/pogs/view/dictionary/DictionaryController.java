@@ -9,11 +9,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import edu.mit.cci.pogs.model.dao.dictionary.DictionaryDao;
 import edu.mit.cci.pogs.model.dao.dictionaryentry.DictionaryEntryDao;
+import edu.mit.cci.pogs.model.dao.dictionaryentry.DictionaryEntryType;
+import edu.mit.cci.pogs.model.dao.unprocesseddictionaryentry.UnprocessedDictionaryEntryDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.service.DictionaryService;
 import edu.mit.cci.pogs.utils.MessageUtils;
+import edu.mit.cci.pogs.view.dictionary.beans.DictionaryBean;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryEntriesBean;
 
 @Controller
@@ -28,10 +35,25 @@ public class DictionaryController {
     @Autowired
     private DictionaryService dictionaryService;
 
+    @Autowired
+    private UnprocessedDictionaryEntryDao unprocessedDictionaryEntryDao;
+
+    @ModelAttribute("entryTypes")
+    public List<DictionaryEntryType> getDictionaryEntryTypes() {
+        return Arrays.asList(DictionaryEntryType.values());
+    }
+
     @GetMapping("/admin/dictionaries")
     public String getDictionaries(Model model) {
 
-        model.addAttribute("dictionaryList", dictionaryDao.list());
+        List<DictionaryBean> dictionaryBeanList = new ArrayList<>();
+        for(Dictionary d: dictionaryDao.list()) {
+            DictionaryBean db = new DictionaryBean(d);
+            db.setUnprocessedDictionaryEntries(unprocessedDictionaryEntryDao.listNotProcessedDictionaryEntriesByDictionary(d.getId()));
+            dictionaryBeanList.add(db);
+        }
+
+        model.addAttribute("dictionaryList", dictionaryBeanList);
         return "dictionary/dictionaries-list";
     }
 

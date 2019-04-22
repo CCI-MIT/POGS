@@ -109,7 +109,7 @@ class RadioFieldEdit {
 
             str += '<div class="form-check form-inline row"> <div class="col-sm-2"> </div> <button type="button" class="btn btn-secondary btn-sm add-radio-choice" id="addRadioChoice' + question_number + '">+</button> </div>'
 
-            str += '<small id="" class="form-text text-muted">If it applies provide the right answer by clicking in the right radio button field</small>';
+            str += '<small id="" class="form-text text-muted">If it applies, provide the answer key by checking the radio button field next to the correct answer.</small>';
             str += '</div> '
 
             $("#survey").append(str);

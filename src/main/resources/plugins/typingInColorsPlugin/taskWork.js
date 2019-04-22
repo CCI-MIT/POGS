@@ -33,6 +33,12 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                 this.handleAssignedColor(message.content.attributeIntegerValue, sub);
             }
         }.bind(this));
+        $(window).bind('beforeunload', this.beforeLeave.bind(this));
+    }
+    beforeLeave(){
+        this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
+                                                    $('#padContent_mirror').html(), 0, 0,
+                                                    true, '');
     }
     handleAssignedColor(colorIndex, subject){
         let allColorButtons = $("#colorPickerAndAssigner button");
