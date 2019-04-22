@@ -7,7 +7,8 @@ const JEOPARDY_CONST = {
     INDIVIDUAL_RESPONSE: "IndividualResponse",
     GROUP_RADIO_RESPONSE: "GroupRadioResponse",
     INFLUENCE_MATRIX: "InfluenceMatrix",
-    INDIVIDUAL_SUBMISSION: "IndividualSubmission"
+    INDIVIDUAL_SUBMISSION: "IndividualSubmission",
+    INCREASE_STOPTIME: "IncreaseStoptime"
 };
 
 const JEOPARDY_TRANSIENT = {

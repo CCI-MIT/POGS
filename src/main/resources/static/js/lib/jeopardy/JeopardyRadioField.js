@@ -7,6 +7,8 @@ class JeopardyRadioField extends JeopardyField {
         this.answers = [];
         this.isInfluencePage = false;
         this.delayToAdd = 60;
+        this.isSumCorrect = false;
+        this.areFieldsFilled = true;
         for (var i = 0; i < questionJson.length; i++) {
             for (var j = 0; j < questionJson[i].length; j++) {
                 this.result.push(questions[questionJson[i][j] - 1]);
@@ -95,6 +97,7 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHooks() {
         super.setupHooks();
+        $("#errorMessage").hide();
         $("#initialResponse").hide();
         $("#initialResponse").delay(32000).fadeIn('fast');
         $("#askMachineButton").hide();
@@ -115,6 +118,10 @@ class JeopardyRadioField extends JeopardyField {
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
         $('#finishSurvey').on('click', this.handleSurveyFinishedOnClick.bind(this));
+        for (var i = 0;i<this.teammates.length; i++)
+            $('#MemberInfluence-'+i).on('input', this.sumInfluence.bind(this));
+        for (var i = 0;i<this.teammates.length; i++)
+            $('#AgentRating-'+i).on('input', this.sumInfluence.bind(this));
     }
 
     handleAskMachineOnClick(event) {
@@ -198,7 +205,11 @@ class JeopardyRadioField extends JeopardyField {
 
     roundTransitionHTML(event) {
         this.isInfluencePage = true;
+        this.isSumCorrect = false;
+        this.areFieldsFilled = true;
         this.str = '<div id = "roundTransition"> ' +
+            '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
+            'If your submission is correct, one of your teammates has made a mistake </p></div>'+
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
             '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
@@ -220,6 +231,7 @@ class JeopardyRadioField extends JeopardyField {
                 '</tr>';
         }
         this.str += '</table>';
+        this.str +='<p class = "text-dark" id="influenceSum"></p><br>';
         this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
         '<tr>'+
@@ -267,7 +279,7 @@ class JeopardyRadioField extends JeopardyField {
                     this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
                     this.roundTransitionHTML();
                     questionEl.innerHTML = this.str;
-                    this.setupHTML();
+                    //this.setupHTML();
                     this.setupHooks();
                 }
                 else {
@@ -296,6 +308,9 @@ class JeopardyRadioField extends JeopardyField {
             this.nextQuestionSetup(message);
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INDIVIDUAL_SUBMISSION)){
             this.answers.push(message.content.attributeStringValue);
+        } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INCREASE_STOPTIME)){
+            this.stopTime = Number(message.content.attributeStringValue);
+            $("#errorMessage").show();
         }
     }
 
@@ -313,6 +328,10 @@ class JeopardyRadioField extends JeopardyField {
     timer(){
         var startTime = new Date().getTime() / 1000;
         var distance = Math.floor(this.stopTime - startTime);
+        if (this.isInfluencePage && distance===5 && (this.isSumCorrect===false || this.areFieldsFilled ===false)){
+            this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
+                (this.stopTime + 30).toString(), this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INCREASE_STOPTIME);
+        }
         if (distance < 0) {
             // clearInterval(x);
             if(document.getElementById("finishSurvey"))
@@ -364,7 +383,6 @@ class JeopardyRadioField extends JeopardyField {
     }
 
     individualAnswerDisplay(){
-        console.log("ANSWerS", this.answers.length);
         let responseAnswer = '<table border="1" class="text-dark" id = "initialResponse"><tr><th>Subject</th><th>Option</th></tr>';
         for(var j = 0; j<this.answers.length; j++){
             let stringValue = this.answers[j];
@@ -374,7 +392,36 @@ class JeopardyRadioField extends JeopardyField {
                 '</tr>';
         }
         responseAnswer += '</table>';
-        document.getElementById("initialResponse").innerHTML = responseAnswer;
+        if (document.getElementById("initialResponse"))
+            document.getElementById("initialResponse").innerHTML = responseAnswer;
     }
 
+    sumInfluence(){
+        var x = 0;
+        var conditionMet = false;
+        for (var i =0;i<this.teammates.length;i++){
+            if (document.getElementById("MemberInfluence-"+i)) {
+                x += Number(document.getElementById("MemberInfluence-" + i).value);
+                if (document.getElementById("MemberInfluence-" + i).value.length ===0) {
+                    this.areFieldsFilled = false;
+                    conditionMet = true;
+                }
+            }
+        }
+        for (var i = 0; i < this.teammates.length; i++) {
+            var temp = document.getElementById("AgentRating-" + i);
+            if (temp && (temp.value.length === 0 || Number(temp.value) < 0 || Number(temp.value) > 1)) {
+                this.areFieldsFilled = false;
+                conditionMet = true;
+                break;
+            }
+        }
+
+        if (conditionMet===false)
+            this.areFieldsFilled = true;
+        if (x===100)
+            this.isSumCorrect = true;
+        if (document.getElementById("influenceSum"))
+            document.getElementById("influenceSum").innerHTML = "<b>Sum of influences is " + x +"</b>";
+    }
 }
