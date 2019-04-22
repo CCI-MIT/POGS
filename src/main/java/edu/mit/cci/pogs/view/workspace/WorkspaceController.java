@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
@@ -369,6 +370,8 @@ public class WorkspaceController {
         if (pl != null) {
 
             model.addAttribute("task", new TaskWrapper(task));
+            model.addAttribute("secondsRemainingCurrentUrl",
+                    new Date().getTime() + task.getInteractionTime());
             model.addAttribute("taskConfigurationAttributes",
                     taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));
 

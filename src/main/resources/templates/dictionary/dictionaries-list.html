@@ -30,6 +30,7 @@
             <th>Dictionary ID</th>
             <th>Dictionary name</th>
             <th>Ground truth </th>
+            <th>Unprocessed entries </th>
         </tr>
         </thead>
         <tbody>
@@ -39,6 +40,9 @@
                 <td th:text="${dictionary.id}"></td>
                 <td><a th:text="${dictionary.dictionaryName}" th:href="${'/admin/dictionaries/'+ dictionary.id}"></a></td>
                 <td><a th:text="${(dictionary.hasGroundTruth)?('Yes'):('No')}" th:href="${'/admin/dictionaries/'+ dictionary.id}"></a></td>
+                <td><span th:text="${dictionary.totalOfUnprocessedDictionaryEntries}" style="margin-right: 10px"></span>
+                    <a th:if="${dictionary.totalOfUnprocessedDictionaryEntries != 0}" class="btn btn-sm btn-outline- btn-info" th:href="${'/admin/dictionaries/'+ dictionary.id+'/unprocessed'}">Analyze entries</a>
+                </td>
             </tr>
         </th:block>
         </tbody>

@@ -7,7 +7,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.UnprocessedDictionaryEntry;
 
 public interface UnprocessedDictionaryEntryDao extends Dao<UnprocessedDictionaryEntry, Long> {
 
-    List<UnprocessedDictionaryEntry> listDictionaryEntriesByDictionary(Long id);
+    List<UnprocessedDictionaryEntry> listNotProcessedDictionaryEntriesByDictionary(Long id);
     void deleteDictionaryEntry(UnprocessedDictionaryEntry dictionaryEntry);
 
 }

@@ -24,7 +24,6 @@ class MemoryGridTaskEdit {
         setupHTMLFieldEditors();
 
         $("#createGrid").click(function () {
-
             let arr = [];
             for(let i=0;i<$("#rowsSize").val();i++){
                 for(let j = 0 ; j< $("#colsSize").val(); j++){
@@ -41,7 +40,9 @@ class MemoryGridTaskEdit {
     setupHtmlFromAttributeString(bluePrint, answerSheet){
 
         $("#gridTable").empty();
-
+        if(bluePrint){
+            $("#createGrid").text("Reset grid");
+        }
             let headerRow = $('<tr/>');
             for (let j = 0; j < bluePrint.colsSize; j++) {
                 let td = $('<th/>');

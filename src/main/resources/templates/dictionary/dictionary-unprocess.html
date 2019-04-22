@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Unprocessed Dictionaries</title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item active"><a href="/admin/dictionaries">Dictionaries</a></li>
+        <li class="breadcrumb-item active" th:if="${dictionary.id != null}">
+            <a th:href="${'/admin/dictionaries/' + dictionary.id}" th:text="${dictionary.dictionaryName}"></a>
+        </li>
+    </ol>
+    <h2>Unprocessed entries:</h2>
+    <form action="#" th:action="@{'/admin/dictionaries/unprocessed'}" th:object="${unprocessedDictionaryEntriesBean}" method="post" id="unprocessedEntries">
+            <input type="hidden" name="dictionaryId" id="dictionaryId" th:value="${dictionary.id}">
+            <!--<input type="hidden" name="studyId" th:value="${study.id}">-->
+            <table class="table table-striped" style="width: 100%;">
+                <thead>
+                <tr>
+                    <th width="150">Entry type</th>
+                    <th width="300">Category</th>
+                    <th width="350">Value</th>
+
+                </tr>
+                </thead>
+                <tbody id="chatEntryList">
+
+                <tr th:each="person, rowStat : *{dictionaryEntryList}">
+                    <td>
+                        <select class="custom-select" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryType}" id="">
+                            <option
+                                    th:each="rg: ${entryTypes}"
+                                    th:value="${rg.id}"
+                                    th:text="${rg.description}" ></option>
+                        </select>
+                    </td>
+                    <td>
+
+                        <input type="hidden" th:field="*{dictionaryEntryList[__${rowStat.index}__].dictionaryId}"  />
+                        <input type="hidden" th:field="*{dictionaryEntryList[__${rowStat.index}__].id}"  />
+                        <input type="hidden" th:field="*{dictionaryEntryList[__${rowStat.index}__].hasBeenProcessed}"  />
+                        <input type="hidden" class="hiddenCategory" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryPredictedCategory}" >
+                        <select class="custom-select category-select" style="width:300px" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryPredictedCategory}" >
+                                <option class="" value="-2">No category selected yet</option>
+                                <option class="text_category" value="-1">Add new category manually</option>
+                                <option
+                                    th:each="rg: ${availableCategories}"
+                                    th:value="${rg}"
+                                    th:text="${rg}" ></option>
+                        </select>
+                        <input type="text" class="textCategory"   style="width:300px;display: none"/>
+                    </td>
+                    <td><textarea type="text" class="chatValue" th:field="*{dictionaryEntryList[__${rowStat.index}__].entryValue}" /></td>
+
+                </tr>
+                  <script>
+                    $(function () {
+
+                        $(".category-select").each(function(item){
+
+                           $(this).attr("name", "");
+
+                        });
+
+                        $(".category-select").change(function(){
+                           if($(this).val() == '-1') {
+                               $($(this).parent().find(".textCategory")).show();
+                           }
+                        });
+                        $( "#unprocessedEntries" ).submit(function( event ) {
+                            var valid = false;
+                            $(".category-select").each(function(item){
+                                console.log($(this).val());
+                                if($(this).val() != -1 ) {
+                                    $($(this).parent().find(".hiddenCategory")).val($(this).val());
+                                } else {
+                                    $($(this).parent().find(".hiddenCategory")).val(
+                                        $($(this).parent().find(".textCategory")).val()
+                                    );
+
+                                }
+                            });
+
+                         });
+                    });
+                    </script>
+                </tbody>
+            </table>
+            <br/>
+            <button type="submit" class="btn btn-primary">Save unprocessed entries</button>
+            <br/>
+        </form>
+</div>
+</body>
+</html>

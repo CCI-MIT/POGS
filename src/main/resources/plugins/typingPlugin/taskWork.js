@@ -15,8 +15,14 @@ class PogsOtClient extends ot.AbstractOtClient {
                 this.receiveOperation(JSON.parse(message.content.attributeStringValue));
             }
         }.bind(this));
-    }
 
+        $(window).bind('beforeunload', this.beforeLeave.bind(this));
+    }
+    beforeLeave(){
+        this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
+                                                    $('#padContent_mirror').html(), 0, 0,
+                                                    true, '');
+    }
     sendOperation(operation) {
         if (log.getLevel() <= log.levels.DEBUG) {
             log.debug("Sending operation: " + JSON.stringify(operation));
