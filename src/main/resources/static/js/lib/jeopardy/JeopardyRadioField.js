@@ -8,6 +8,7 @@ class JeopardyRadioField extends JeopardyField {
         this.isInfluencePage = false;
         this.delayToAdd = 60;
         this.isSumCorrect = false;
+        this.influenceCounter = 0;
         this.areFieldsFilled = true;
         for (var i = 0; i < questionJson.length; i++) {
             for (var j = 0; j < questionJson[i].length; j++) {
@@ -210,7 +211,7 @@ class JeopardyRadioField extends JeopardyField {
         this.str = '<div id = "roundTransition"> ';
         if (this.questionNumber != 0){
             this.str += '<div><p id = "showAnswer" class="text-right text-dark row">Answer to previous question is &nbsp<b>' +
-                this.result[this.questionNumber].Answer +'</b></p></div>';
+                this.result[this.questionNumber-1].Answer +'</b></p></div>';
         }
         $("#showAnswer").bind(this);
         this.str+= '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
@@ -282,6 +283,10 @@ class JeopardyRadioField extends JeopardyField {
             if (questionEl) {
                 if (this.questionNumber === 1 || this.questionNumber===4 || this.questionNumber===6) {
                     console.log("round transition");
+                    this.influenceCounter+=1;
+                    console.log("Influence Counter "+this.influenceCounter);
+                    if (this.influenceCounter===2)
+                        this.delayToAdd = 45;
                     this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
                     this.roundTransitionHTML();
                     questionEl.innerHTML = this.str;
