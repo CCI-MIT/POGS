@@ -44,6 +44,7 @@ class JeopardyRadioField extends JeopardyField {
 
     setupHTML() {
         this.isInfluencePage = false;
+        this.individualResponseSubmitted = false;
         while (this.answers.length !==0){
             this.answers.pop();
         }
@@ -92,26 +93,15 @@ class JeopardyRadioField extends JeopardyField {
         this.str += '</div>';
         $("#initialResponse").bind(this);
         this.str += '</div><br>';
-
-        setTimeout( this.individualAnswerBroadcast.bind(this),30000);
-        setTimeout(this.individualAnswerDisplay.bind(this), 31000);
     }
 
     setupHooks() {
         super.setupHooks();
         $("#errorMessage").hide();
         $("#initialResponse").hide();
-        $("#initialResponse").delay(32000).fadeIn('fast');
         $("#askMachineButton").hide();
-        $("#askMachineButton").delay(60000).fadeIn('fast');
         $('#showAnswer').delay(10000).fadeOut('fast');
         $("#submitButton").hide();
-        $('#submitButton').delay(60000).fadeIn('fast');
-        if (this.isInfluencePage===false){
-            setTimeout(function() {
-                $('#messageInput').removeAttr('disabled');
-            }, 30000);
-        }
         $('#answer' + this.index + ' input').on('change', this.handleRadioOnClick.bind(this));
         $('#submitAnswer').on('click', this.handleSubmitOnClick.bind(this));
         $('#askMachine').on('click', this.handleAskMachineOnClick.bind(this));
@@ -315,12 +305,7 @@ class JeopardyRadioField extends JeopardyField {
                     this.setupHooks();
                 }
             }
-            //End of round give a message
-            //End of task -> Thanks
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.GROUP_RADIO_RESPONSE)){
-            // var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
-            // var radioButtons = $("#answer"+question_number).find("input[value='"+message.content.attributeStringValue+"']").prop("checked",true);
-            // this.setFinalAnswer(message.sender);
             if (document.getElementById("individualAnswer-"+message.sender))
                 document.getElementById("individualAnswer-"+message.sender).innerHTML = message.content.attributeStringValue;
         }
@@ -339,6 +324,10 @@ class JeopardyRadioField extends JeopardyField {
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INCREASE_STOPTIME)){
             this.stopTime = Number(message.content.attributeStringValue);
             $("#errorMessage").show();
+        } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.GROUP_PHASE)){
+            $('#messageInput').removeAttr('disabled');
+            $("#errorMessage").hide();
+            this.individualAnswerBroadcast();
         }
     }
 
@@ -356,14 +345,27 @@ class JeopardyRadioField extends JeopardyField {
     timer(){
         var startTime = new Date().getTime() / 1000;
         var distance = Math.floor(this.stopTime - startTime);
-        if (this.isInfluencePage === false && distance=== this.totalTime-28 && this.individualResponseSubmitted===false){
-            // this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
-            //     (this.stopTime + 15).toString(), this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INCREASE_STOPTIME);
+        if (this.isInfluencePage === false){
+            if (distance=== this.totalTime-28 && this.individualResponseSubmitted===false){
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
+                    (this.stopTime + 15).toString(), this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INCREASE_STOPTIME);
+            } else if (distance === this.totalTime-30 && this.individualResponseSubmitted){
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
+                    "Next Phase", this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.GROUP_PHASE);
+            } else if (distance === this.totalTime-31){
+                this.individualAnswerDisplay();
+            } else if (distance === this.totalTime-32){
+                $("#initialResponse").show();
+            } else if (distance === this.totalTime - 60){
+                $('#submitButton').show();
+                $("#askMachineButton").show();
+            }
         } else if (this.isInfluencePage && distance===5 && (this.isSumCorrect===false || this.areFieldsFilled ===false)){
             this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
                 (this.stopTime + 15).toString(), this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INCREASE_STOPTIME);
         }
-        if (distance < 0) {
+
+        if (distance === 0) {
             // clearInterval(x);
             if(document.getElementById("finishSurvey"))
                 document.getElementById("finishSurvey").click();
