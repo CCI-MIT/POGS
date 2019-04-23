@@ -1,4 +1,4 @@
-this.questions =  [
+this.old_questions =  [
     {
         "ID":1
         ,"question":"On the verge of going bust in 1997, it was saved by a $150M investment by rival Microsoft"
