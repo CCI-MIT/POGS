@@ -220,7 +220,7 @@ class JeopardyRadioField extends JeopardyField {
         this.str+= '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
             'If your submission is correct, one of your teammates has made a mistake </p></div>'+
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
-            '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
+            '<p class = "text-dark"> <b>Rate the influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
 
         this.str += '<table class="table table-striped text-dark">'+
             '<tr>'+
@@ -245,13 +245,13 @@ class JeopardyRadioField extends JeopardyField {
         this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
         '<tr>'+
-        '<th>Agent</th>'+
+        '<th>Machine</th>'+
         '<th>Rating</th>'+
         '</tr>';
 
         for(var i = 0; i< this.teammates.length;i++){
         this.str+='<tr class="text-dark">'+
-                  '<td>'+ this.teammates[i].displayName +'</td>'+
+                  '<td>'+ this.teammates[i].displayName + " machine" +'</td>'+
                   '<td>'+ '<input type="number" id="AgentRating-'+i+'" maxlength="2" size="2"/>'+ '</td>'+
                   '</tr>';
         }
