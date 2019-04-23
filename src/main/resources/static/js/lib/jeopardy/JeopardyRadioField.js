@@ -8,6 +8,7 @@ class JeopardyRadioField extends JeopardyField {
         this.isInfluencePage = false;
         this.delayToAdd = 90;
         this.isSumCorrect = false;
+        this.influenceCounter = 0;
         this.areFieldsFilled = true;
         this.individualResponseSubmitted = false;
         for (var i = 0; i < questionJson.length; i++) {
@@ -220,11 +221,17 @@ class JeopardyRadioField extends JeopardyField {
         this.isSumCorrect = false;
         this.areFieldsFilled = true;
         $("#messageInput").attr("disabled","true");
-        this.str = '<div id = "roundTransition"> ' +
-            '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
+        this.str = '<div id = "roundTransition"> ';
+        if (this.questionNumber != 0){
+            this.str += '<div><p id = "showAnswer" class="text-right text-dark row">Answer to previous question is &nbsp<b>' +
+                this.result[this.questionNumber-1].Answer +'</b></p></div>';
+        }
+        $("#showAnswer").bind(this);
+        this.str+= '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
             'If your submission is correct, one of your teammates has made a mistake </p></div>'+
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
             '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
+
         this.str += '<table class="table table-striped text-dark">'+
             '<tr>'+
             '<th>Member</th>'+
@@ -289,6 +296,10 @@ class JeopardyRadioField extends JeopardyField {
             if (questionEl) {
                 if (this.questionNumber === 1 || this.questionNumber===4 || this.questionNumber===6) {
                     console.log("round transition");
+                    this.influenceCounter+=1;
+                    console.log("Influence Counter "+this.influenceCounter);
+                    if (this.influenceCounter===2)
+                        this.delayToAdd = 45;
                     this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
                     this.roundTransitionHTML();
                     questionEl.innerHTML = this.str;
