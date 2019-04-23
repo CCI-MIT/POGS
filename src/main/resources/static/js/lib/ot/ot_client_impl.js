@@ -35,25 +35,15 @@ ot.AbstractOtClient = (function() {
                     let html = '';
                     for (let i = 0; i < currentText.length; i++) {
                         let currentAuthorId = this._authorship[i];
-                        let isSelfAuthor = currentAuthorId === this._clientId;
                         let wasNotCurrentAuthorLast = this._authorship[i - 1] !== currentAuthorId;
-                        let isCurrentAuthorNext = this._authorship[i + 1]
-                                                  !== currentAuthorId;
                         if (i === 0 || wasNotCurrentAuthorLast
                          ) {
-                            //if (!isSelfAuthor) {
-
-                                html += `<span data-author="${currentAuthorId}">`
-                            //}
+                            if(i != 0) {
+                                html += '</span>'
+                            }
+                            html += `<span data-author="${currentAuthorId}">`
                         }
                         html += currentText[i];
-                        if (i === currentText.length - 1 //|| isCurrentAuthorNext
-                         )
-                         {
-                            //if (!isSelfAuthor) {
-                                html += '</span>'
-                            //}
-                        }
                     }
                     return html;
                 }.bind(this));

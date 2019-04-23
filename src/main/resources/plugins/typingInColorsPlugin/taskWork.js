@@ -10,8 +10,8 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         for(let k = 0; k < blueprint.length; k++) {
             $('#colorPickerAndAssigner')
                 .append('<button type="button" class="btn btn-lg" data-color-index="'+k+'" style="margin:10px;background-color: '+
-                        blueprint[k]+';color:'+generateFontColorBasedOnBackgroundColor(blueprint[k])+'" >Choose this color</button>');
-            this.availableColors.push(blueprint[k])
+                        blueprint[k].color+';color:'+generateFontColorBasedOnBackgroundColor(blueprint[k].color)+'" >Choose this color</button>');
+            this.availableColors.push(blueprint[k].color)
         }
         $("button").click(function (event) {
             this.sendAssignedColorToSelf($(event.target).data("color-index"));
@@ -39,6 +39,25 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
                                                     $('#padContent_mirror').html(), 0, 0,
                                                     true, '');
+
+        //this.subjectsColors[i].externalId
+
+        let team = this._pogsPlugin.getTeammates()
+        let canvas = $('#padContent_mirror');
+        for(var i = 0; i < team.length; i ++) {
+            if (team[i].externalId) {
+                let entries = canvas.find("span[data-author='subject-"+team[i].externalId+"']");
+                let text = "";
+                for(let i = 0 ; i < entries; i ++){
+                    text += $(entries[i]).html();
+                }
+                this._pogsPlugin.saveCompletedTaskAttribute(
+                    'fullTextAuthor_' + team[i].externalId,
+                    text, 0, 0,
+                    true, '');
+
+            }
+        }
     }
     handleAssignedColor(colorIndex, subject){
         let allColorButtons = $("#colorPickerAndAssigner button");
