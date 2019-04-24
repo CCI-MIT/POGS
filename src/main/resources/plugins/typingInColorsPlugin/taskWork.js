@@ -5,13 +5,25 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         super(padId, clientId, padElementId);
         this.subjectsColors = [];
         this.availableColors = [];
+        this.uniqueColors = {};
+        this.textSections = [];
+        this.textSectionsColors = [];
         log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
-
+        $("#padContent").attr("disabled", "disabled");
         for(let k = 0; k < blueprint.length; k++) {
+
+            if(!this.uniqueColors[blueprint[k].color]) {
+                this.uniqueColors[blueprint[k].color] = 1;
+                this.availableColors.push(blueprint[k].color);
+            }
+            this.textSections.push(blueprint[k].text);
+            this.textSectionsColors.push(blueprint[k].color);
+        }
+        this.setupText();
+        for(let k = 0; k < this.availableColors.length; k++) {
             $('#colorPickerAndAssigner')
                 .append('<button type="button" class="btn btn-lg" data-color-index="'+k+'" style="margin:10px;background-color: '+
-                        blueprint[k].color+';color:'+generateFontColorBasedOnBackgroundColor(blueprint[k].color)+'" >Choose this color</button>');
-            this.availableColors.push(blueprint[k].color)
+                        this.availableColors[k]+';color:'+generateFontColorBasedOnBackgroundColor(this.availableColors[k])+'" >Choose this color</button>');
         }
         $("button").click(function (event) {
             this.sendAssignedColorToSelf($(event.target).data("color-index"));
@@ -26,7 +38,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                 log.debug('Operation received: ' + message.content.attributeStringValue);
                 this.receiveOperation(JSON.parse(message.content.attributeStringValue));
             }
-            if(attrName == "subjectAssignedToColor"){
+            if(attrName.indexOf("subjectAssignedToColor")!= -1){
                 let isCurrentSubject = false;
                 let sub = this._pogsPlugin.getSubjectByExternalId(message.sender);
 
@@ -34,6 +46,48 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
             }
         }.bind(this));
         $(window).bind('beforeunload', this.beforeLeave.bind(this));
+    }
+    setupText(){
+
+        let inputsTxt = this.textSections;
+        let inputsColors = this.textSectionsColors;
+
+        let container = $('<div>',{
+            id: 'typingInColorstaskText',
+            class: 'rol col-12'
+        });
+
+        let saida = "";
+        saida+="<style>\n";
+        saida+="#typingInColorstaskText {\n";
+        saida+="    -moz-user-select: none;\n";
+        saida+="-webkit-user-select: none;\n";
+        saida+="-ms-user-select: none;\n";
+        saida+="-o-user-select: none;\n";
+        saida+="user-select: none;\n";
+        saida+="}\n";
+        saida+="</style>\n";
+        $(".information").append(saida);
+        $(".information").append(container);
+
+        let body = "";
+        let lastColor = "";
+        for(let k=0; k < inputsTxt.length; k++) {
+            let newColor = inputsColors[k];
+            if(newColor == ""){
+                newColor = "#000000";
+            }
+            if(newColor!=lastColor) {
+                if(lastColor!=""){
+                    body += "</span>";
+                }
+                body += "<span style='background-color:"+newColor+";color:"+generateFontColorBasedOnBackgroundColor(newColor)+"'>"
+                lastColor = newColor;
+            }
+            body += replaceNewLinesForBrs(inputsTxt[k]);
+        }
+        body +="</span>";
+        $("#typingInColorstaskText").html(body);
     }
     beforeLeave(){
         this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
@@ -46,9 +100,10 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         let canvas = $('#padContent_mirror');
         for(var i = 0; i < team.length; i ++) {
             if (team[i].externalId) {
+
                 let entries = canvas.find("span[data-author='subject-"+team[i].externalId+"']");
                 let text = "";
-                for(let i = 0 ; i < entries; i ++){
+                for(let i = 0 ; i < entries.length; i ++){
                     text += $(entries[i]).html();
                 }
                 this._pogsPlugin.saveCompletedTaskAttribute(
@@ -66,6 +121,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
             if($(allColorButtons[k]).data("color-index") == colorIndex) {
                 if(isCurrentSubject) {
                     $(allColorButtons[k]).text("You chose this color!")
+                    $("#padContent").attr("disabled", null);
                 } else {
                     $(allColorButtons[k]).text( subject.displayName+" chose this color!")
                 }
@@ -102,7 +158,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
 
     }
     sendAssignedColorToSelf(colorIndex){
-        this._pogsPlugin.saveCompletedTaskAttribute('subjectAssignedToColor',
+        this._pogsPlugin.saveCompletedTaskAttribute('subjectAssignedToColor_'+colorIndex,
                                                     this._pogsPlugin.getSubjectId(), 0.0,
                                                     colorIndex, true, colorIndex);
     }
@@ -121,7 +177,10 @@ const typingPlugin = pogs.createPlugin('typingPlugin', function() {
     const otClient = new PogsOtColorsClient(this, 'padContent',$.parseJSON(this.getStringAttribute("gridBluePrint")));
 });
 
-
+function replaceNewLinesForBrs(st){
+    if(st === undefined) return "";
+    return st.replace(/\n/g,"<br/>");
+}
 function generateFontColorBasedOnBackgroundColor(colorz) {
     let color = parseColor(colorz);
     let r = color[0];

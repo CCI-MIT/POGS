@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.view.workspace;
 
 import org.jooq.tools.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +36,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
+import edu.mit.cci.pogs.runner.TaskBeforeWorkRunner;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
@@ -99,6 +101,9 @@ public class WorkspaceController {
 
     @Autowired
     private ExecutableScriptDao executableScriptDao;
+
+    @Autowired
+    private ApplicationContext context;
 
     @GetMapping("/sessions/{sessionId}")
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
@@ -367,9 +372,10 @@ public class WorkspaceController {
 
         Task task = taskDao.get(taskId);
         TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+        TaskWrapper tw = new TaskWrapper(task);
         if (pl != null) {
 
-            model.addAttribute("task", new TaskWrapper(task));
+            model.addAttribute("task", tw);
             model.addAttribute("secondsRemainingCurrentUrl",
                     new Date().getTime() + task.getInteractionTime());
             model.addAttribute("taskConfigurationAttributes",
@@ -406,15 +412,27 @@ public class WorkspaceController {
                     .NO_CHAT.getId().toString()) ? (true) : (false)));
 
             //TODO: FIGURE OUT A WAY TO RUN THE CODE BEFORE.
-            //if (pl.getTaskBeforeWorkJsContent() != null) {
-            //    runTaskBeforeWorkScript(pl, teammates, taskConfigurationAttributes, configuration.getTaskConfigurationId());
-            //}
+
+            if (pl.getTaskBeforeWorkJsContent() != null) {
+                startBeforeWorkScript(null,tw, pl);
+            }
+
 
         }
 
         return "workspace/task_workpreview";
     }
 
+    private void startBeforeWorkScript(SessionWrapper session, TaskWrapper task, TaskPlugin pl){
+        TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
+
+        csr.setSession(session);
+        csr.setTaskWrapper(task);
+        csr.setTaskPlugin(pl);
+
+        Thread thread = new Thread(csr);
+        thread.start();
+    }
     @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
     public String taskWorkPluginTest(
             @PathVariable("taskPlugin") String taskPlugin,
