@@ -16,7 +16,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str = "";
         this.score = 0;
-        this.totalTime = 120
+        this.totalTime = 120;
         this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
@@ -65,6 +65,7 @@ class JeopardyRadioField extends JeopardyField {
         $("#showAnswer").bind(this);
         $("#askMachineButton").bind(this);
         $("#messageInput").attr("disabled","true");
+        $("#messageSubmitButton").attr("disabled","true");
         this.str += '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>';
         this.str += '<div><p id = "jeopardyScore" class="text-right text-dark row"></p></div>';
         this.str += '<div class="form-group" id="jeopardyField_' + this.index + '" style="min-width: 300px;">'
@@ -141,8 +142,8 @@ class JeopardyRadioField extends JeopardyField {
             let consensusReached = true;
             for (var i=1;i<this.teammates.length;i++){
                 if (document.getElementById("individualAnswer-"+this.teammates[i].externalId) &&
-                    document.getElementById("individualAnswer-"+this.teammates[i].externalId)!=
-                    document.getElementById("individualAnswer-"+this.teammates[i-1].externalId)){
+                    document.getElementById("individualAnswer-"+this.teammates[i].externalId).innerHTML!==
+                    document.getElementById("individualAnswer-"+this.teammates[i-1].externalId).innerHTML){
                     consensusReached = false;
                     break;
                 }
@@ -150,7 +151,7 @@ class JeopardyRadioField extends JeopardyField {
                     consensusReached = false;
             }
 
-            if (consensusReached && valueTyped == this.result[this.questionNumber].Answer)
+            if (consensusReached && valueTyped === this.result[this.questionNumber].Answer)
                 this.score = this.score + 5;
             else if (valueTyped === undefined) {
                 valueTyped = "Consensus Not Reached";
@@ -211,6 +212,7 @@ class JeopardyRadioField extends JeopardyField {
         this.isSumCorrect = false;
         this.areFieldsFilled = true;
         $("#messageInput").attr("disabled","true");
+        $("#messageSubmitButton").attr("disabled","true");
         this.str = '<div id = "roundTransition"> ';
         if (this.questionNumber != 0){
             this.str += '<div><p id = "showAnswer" class="text-right text-dark row">Answer to previous question is &nbsp<b>' +
@@ -220,7 +222,7 @@ class JeopardyRadioField extends JeopardyField {
         this.str+= '<div><p id = "errorMessage" class ="text-danger row">Make sure that the influence adds to 100 and all fields are filled!<br> ' +
             'If your submission is correct, one of your teammates has made a mistake </p></div>'+
             '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>' +
-            '<p class = "text-dark"> <b>Influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
+            '<p class = "text-dark"> <b>Rate the influence of your teammates so far. <br> The numbers must add up to 100</b></p>';
 
         this.str += '<table class="table table-striped text-dark">'+
             '<tr>'+
@@ -245,13 +247,13 @@ class JeopardyRadioField extends JeopardyField {
         this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
         '<tr>'+
-        '<th>Agent</th>'+
+        '<th>Machine</th>'+
         '<th>Rating</th>'+
         '</tr>';
 
         for(var i = 0; i< this.teammates.length;i++){
         this.str+='<tr class="text-dark">'+
-                  '<td>'+ this.teammates[i].displayName +'</td>'+
+                  '<td>'+ this.teammates[i].displayName + " machine" +'</td>'+
                   '<td>'+ '<input type="number" id="AgentRating-'+i+'" maxlength="2" size="2"/>'+ '</td>'+
                   '</tr>';
         }
@@ -284,7 +286,7 @@ class JeopardyRadioField extends JeopardyField {
 
             var questionEl = document.getElementById("question-answer-machine");
             if (questionEl) {
-                if (this.questionNumber === 1 || this.questionNumber===4 || this.questionNumber===6) {
+                if (this.questionNumber%5===0 || this.questionNumber===54) {
                     console.log("round transition");
                     this.influenceCounter+=1;
                     console.log("Influence Counter "+this.influenceCounter);
@@ -326,6 +328,7 @@ class JeopardyRadioField extends JeopardyField {
             $("#errorMessage").show();
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.GROUP_PHASE)){
             $('#messageInput').removeAttr('disabled');
+            $('#messageSubmitButton').removeAttr('disabled');
             $("#errorMessage").hide();
             this.individualAnswerBroadcast();
         }
@@ -385,7 +388,7 @@ class JeopardyRadioField extends JeopardyField {
 
         var questionEl = document.getElementById("question-answer-machine");
         if (questionEl) {
-            if (this.questionNumber === 63) {
+            if (this.questionNumber === 54) {
                 this.str = '<div id = "thankYou"> ' +
                     '<p class = "text-dark"> End of Experiment</p>' +
                     ' </div>';
@@ -417,12 +420,18 @@ class JeopardyRadioField extends JeopardyField {
 
     individualAnswerDisplay(){
         let responseAnswer = '<table border="1" class="text-dark"><tr><th>Subject</th><th>Option</th></tr>';
-        for(var j = 0; j<this.answers.length; j++){
-            let stringValue = this.answers[j];
+        for(var j = 0; j<this.teammates.length; j++){
+            let answer = "";
+            for (var i = 0;i<this.answers.length;i++) {
+                let stringValue = this.answers[i];
+                if (this.teammates[j].externalId === stringValue.substr(stringValue.indexOf("__")+2)){
+                    answer = stringValue.substr(0, stringValue.indexOf("__"));
+                    break;
+                }
+            }
             responseAnswer+='<tr class="text-dark">'+
-                '<td>'+ stringValue.substr(stringValue.indexOf("__")+2) +'</td>'+
-                '<td id="individualAnswer-' + stringValue.substr(stringValue.indexOf("__")+2)+'">'+
-                stringValue.substr(0, stringValue.indexOf("__"))+'</td>'+
+                '<td>'+ this.teammates[j].externalId +'</td>'+
+                '<td id="individualAnswer-' + this.teammates[j].externalId+'">'+ answer+'</td>'+
                 '</tr>';
         }
         responseAnswer += '</table> &nbsp; &nbsp;';
