@@ -2,7 +2,7 @@ package edu.mit.cci.pogs.model.dao.session;
 
 public enum TeamCreationMethod {
 
-    RESEARCHER('S', "Specified by Researcher"),
+    //RESEARCHER('S', "Specified by Researcher"),
     RANDOMLY_SPECIFIC_SIZE('C', "Randomly selected - multiple groups of a single specific size"),
     RANDOMLY_MATRIX('E', "Randomly selected - multiple groups of multiple sizes (based on a matrix)");
 
