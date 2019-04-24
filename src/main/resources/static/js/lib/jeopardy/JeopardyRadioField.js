@@ -284,7 +284,7 @@ class JeopardyRadioField extends JeopardyField {
 
             var questionEl = document.getElementById("question-answer-machine");
             if (questionEl) {
-                if (this.questionNumber === 1 || this.questionNumber===4 || this.questionNumber===6) {
+                if (this.questionNumber%5===0 || this.questionNumber===54) {
                     console.log("round transition");
                     this.influenceCounter+=1;
                     console.log("Influence Counter "+this.influenceCounter);
@@ -385,7 +385,7 @@ class JeopardyRadioField extends JeopardyField {
 
         var questionEl = document.getElementById("question-answer-machine");
         if (questionEl) {
-            if (this.questionNumber === 63) {
+            if (this.questionNumber === 54) {
                 this.str = '<div id = "thankYou"> ' +
                     '<p class = "text-dark"> End of Experiment</p>' +
                     ' </div>';
