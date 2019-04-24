@@ -16,7 +16,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str = "";
         this.score = 0;
-        this.totalTime = 10;
+        this.totalTime = 120;
         this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
