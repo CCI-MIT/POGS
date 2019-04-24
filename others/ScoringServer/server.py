@@ -3,9 +3,10 @@ from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
 import cgi
 import json
 from typingTask import score_typing_task
+from typingInColorsTask import score_typing_in_colors_task
 
 PORT_NUMBER = 8082
-DEBUG = False
+DEBUG = False 
 #This class will handles any incoming request from
 #the browser 
 class myHandler(BaseHTTPRequestHandler):
@@ -43,7 +44,8 @@ class myHandler(BaseHTTPRequestHandler):
 		if self.path != None:
 			if "/typingTask" in self.path :
 				resp = score_typing_task(params)
-		#	if "" in path : OTHER SCORING TYPES
+			if "/typingInColorsTask" in self.path : 
+				resp = score_typing_in_colors_task(params)
 
 		self.send_response(200)
 		self.send_header('Content-type','text/html')
