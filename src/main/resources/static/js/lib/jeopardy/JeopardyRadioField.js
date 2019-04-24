@@ -16,7 +16,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str = "";
         this.score = 0;
-        this.totalTime = 120
+        this.totalTime = 10;
         this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
         this.questionNumber = 0;
         var probabilities = jeopardyJson;
@@ -65,6 +65,7 @@ class JeopardyRadioField extends JeopardyField {
         $("#showAnswer").bind(this);
         $("#askMachineButton").bind(this);
         $("#messageInput").attr("disabled","true");
+        $("#messageSubmitButton").attr("disabled","true");
         this.str += '<div><p id = "jeopardyCountdown" class="text-right text-dark row"></p></div>';
         this.str += '<div><p id = "jeopardyScore" class="text-right text-dark row"></p></div>';
         this.str += '<div class="form-group" id="jeopardyField_' + this.index + '" style="min-width: 300px;">'
@@ -211,6 +212,7 @@ class JeopardyRadioField extends JeopardyField {
         this.isSumCorrect = false;
         this.areFieldsFilled = true;
         $("#messageInput").attr("disabled","true");
+        $("#messageSubmitButton").attr("disabled","true");
         this.str = '<div id = "roundTransition"> ';
         if (this.questionNumber != 0){
             this.str += '<div><p id = "showAnswer" class="text-right text-dark row">Answer to previous question is &nbsp<b>' +
@@ -326,6 +328,7 @@ class JeopardyRadioField extends JeopardyField {
             $("#errorMessage").show();
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.GROUP_PHASE)){
             $('#messageInput').removeAttr('disabled');
+            $('#messageSubmitButton').removeAttr('disabled');
             $("#errorMessage").hide();
             this.individualAnswerBroadcast();
         }
