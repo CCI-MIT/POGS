@@ -141,8 +141,8 @@ class JeopardyRadioField extends JeopardyField {
             let consensusReached = true;
             for (var i=1;i<this.teammates.length;i++){
                 if (document.getElementById("individualAnswer-"+this.teammates[i].externalId) &&
-                    document.getElementById("individualAnswer-"+this.teammates[i].externalId)!=
-                    document.getElementById("individualAnswer-"+this.teammates[i-1].externalId)){
+                    document.getElementById("individualAnswer-"+this.teammates[i].externalId).innerHTML!==
+                    document.getElementById("individualAnswer-"+this.teammates[i-1].externalId).innerHTML){
                     consensusReached = false;
                     break;
                 }
@@ -150,7 +150,7 @@ class JeopardyRadioField extends JeopardyField {
                     consensusReached = false;
             }
 
-            if (consensusReached && valueTyped == this.result[this.questionNumber].Answer)
+            if (consensusReached && valueTyped === this.result[this.questionNumber].Answer)
                 this.score = this.score + 5;
             else if (valueTyped === undefined) {
                 valueTyped = "Consensus Not Reached";
@@ -417,12 +417,18 @@ class JeopardyRadioField extends JeopardyField {
 
     individualAnswerDisplay(){
         let responseAnswer = '<table border="1" class="text-dark"><tr><th>Subject</th><th>Option</th></tr>';
-        for(var j = 0; j<this.answers.length; j++){
-            let stringValue = this.answers[j];
+        for(var j = 0; j<this.teammates.length; j++){
+            let answer = "";
+            for (var i = 0;i<this.answers.length;i++) {
+                let stringValue = this.answers[i];
+                if (this.teammates[j].externalId === stringValue.substr(stringValue.indexOf("__")+2)){
+                    answer = stringValue.substr(0, stringValue.indexOf("__"));
+                    break;
+                }
+            }
             responseAnswer+='<tr class="text-dark">'+
-                '<td>'+ stringValue.substr(stringValue.indexOf("__")+2) +'</td>'+
-                '<td id="individualAnswer-' + stringValue.substr(stringValue.indexOf("__")+2)+'">'+
-                stringValue.substr(0, stringValue.indexOf("__"))+'</td>'+
+                '<td>'+ this.teammates[j].externalId +'</td>'+
+                '<td id="individualAnswer-' + this.teammates[j].externalId+'">'+ answer+'</td>'+
                 '</tr>';
         }
         responseAnswer += '</table> &nbsp; &nbsp;';
