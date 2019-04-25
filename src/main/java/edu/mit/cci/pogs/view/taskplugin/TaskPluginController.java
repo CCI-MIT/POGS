@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
+import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.view.taskplugin.beans.TaskPluginConfigBean;
 
 @Controller
@@ -103,22 +105,28 @@ public class TaskPluginController {
 
     @PostMapping("{taskPluginName}")
     public String saveConfiguration(@PathVariable("taskPluginName") String taskPluginName,
-                                    @ModelAttribute TaskPluginConfigBean taskPluginConfigBean) {
+                                    @ModelAttribute TaskPluginConfigBean taskPluginConfigBean,
+                                    RedirectAttributes redirectAttributes) {
 
         if (taskPluginConfigBean.getId() == null) {
             TaskConfiguration tc = taskConfigurationDao.create(taskPluginConfigBean);
             taskPluginConfigBean.setId(tc.getId());
+
             if(taskPluginConfigBean.getAttributes()!=null) {
                 for (TaskExecutionAttribute tea : taskPluginConfigBean.getAttributes()) {
                     tea.setId(null);
                 }
             }
+            MessageUtils.addSuccessMessage("Plugin configuration created successfully!", redirectAttributes);
         } else {
             taskConfigurationDao.update(taskPluginConfigBean);
+            MessageUtils.addSuccessMessage("Plugin configuration updated successfully!", redirectAttributes);
         }
         taskConfigurationService.createOrUpdateTaskExecutionAttribute(taskPluginConfigBean);
 
-        return "redirect:/admin/taskplugins/" + taskPluginName;
+
+
+        return "redirect:/admin/taskplugins/" + taskPluginName + "/" + taskPluginConfigBean.getId();
     }
 
     @GetMapping("{taskPluginName}/{configurationId}")
