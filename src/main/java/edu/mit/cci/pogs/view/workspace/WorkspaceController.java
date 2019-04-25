@@ -419,9 +419,13 @@ public class WorkspaceController {
                     .NO_CHAT.getId().toString()) ? (true) : (false)));
 
 
+
             if (pl.getTaskBeforeWorkJsContent() != null) {
                 startBeforeWorkScript(null,tw, pl, executionAttributes, fakeSub, team, model);
 
+            }
+            if(!model.containsAttribute("completedTaskAttributes")){
+                model.addAttribute("completedTaskAttributes","[]");
             }
 
 
