@@ -21,6 +21,9 @@ h3 {
     vertical-align: top;
 }
 
+.move_toggle{
+    margin-right: 10px;
+}
 
 .form-control--error {
     color: red;

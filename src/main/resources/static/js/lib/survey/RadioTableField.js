@@ -138,7 +138,7 @@ class RadioTableFieldEdit {
         let str = "";
         this.questionNumber = question_number;
         str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "radiotable" >'
-
+        str += '<span><div class="btn btn-sm btn-warning move_toggle">Minimize</div>Radio table field: <span class="question_number">' + question_number + '</span></span><div class="content">';
         //add question field
         str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8 mandatory" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'"> <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>'
 
@@ -173,6 +173,7 @@ class RadioTableFieldEdit {
 
         str += '</tbody></table><small id="" class="form-text text-muted">If it applies provide the right answer by clicking in the right radio button field</small>';
         str += '</div> '
+        str += '</div>';
 
         $("#survey").append(str);
 

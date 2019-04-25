@@ -174,12 +174,12 @@ public class SessionRunner implements Runnable {
                     SessionSchedule ss = session.getSessionSchedule().get(i);
                     _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
                     if (ss.getTaskReference() != null) {
-                        if ((session.getTeamCreationMoment().equals(
+                        /*if ((session.getTeamCreationMoment().equals(
                                 TeamCreationTime.BEGINING_TASK.getId().toString()))) {
                             createTeams(session, null, session.getCurrentRound());
                             createCompletedTasks(session, session.getCurrentRound(), true);
                             //TODO handle team creation before task.
-                        }
+                        }*/
                     }
                     while (ss.isHappeningNow(DateUtils.now())) {
 

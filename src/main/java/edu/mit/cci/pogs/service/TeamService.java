@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -123,6 +124,7 @@ public class TeamService {
 
     public Subject generateFakeSubject(String subjectExternalId) {
         Subject su = new Subject();
+        su.setId(new Date().getTime());
         su.setSubjectExternalId(subjectExternalId);
         su.setSubjectDisplayName(subjectExternalId);
         return su;
@@ -148,7 +150,7 @@ public class TeamService {
         return ja;
     }
 
-    public JSONArray getFakeTeamatesJSONObject() {
+    public JSONArray getFakeTeamatesJSONArray() {
         List<Subject> teammates = new ArrayList<>();
         teammates.add(generateFakeSubject("su01"));
         teammates.add(generateFakeSubject("su02"));

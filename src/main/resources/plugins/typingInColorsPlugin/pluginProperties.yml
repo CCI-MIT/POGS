@@ -1,0 +1,6 @@
+name: typingInColorsPlugin
+description: A simple typing task that provides a Google Doc-like shared textfield that all participants can type in simultaneously and texts must be copied using the right combination of colors
+
+scoring:
+    scoringType : externalService
+    url: http://localhost:8082/typingInColorsTask

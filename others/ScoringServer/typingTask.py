@@ -25,8 +25,8 @@ def calculate_text_has_ground_truth(request_parameters):
 		ground_truth_dictionary_entry = dictionary_entries[0]['entryValue']
 
 
-		settings['groupTypedText'] = typed_text
-		settings['groundTruth'] = ground_truth_dictionary_entry
+		settings['groupTypedText'] = str(typed_text)
+		settings['groundTruth'] = str(ground_truth_dictionary_entry)
 		
 		evaluator = typingTaskEvaluator(settings)
 

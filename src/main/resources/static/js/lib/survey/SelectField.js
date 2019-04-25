@@ -60,7 +60,7 @@ class SelectFieldEdit {
         str +=
             '<div class="container question_set" id="question_set' + question_number
             + '" data-question-type = "select" >'
-
+        str += '<span><div class="btn btn-sm btn-warning move_toggle">Minimize</div>Select field: <span class="question_number">' + question_number + '</span></span><div class="content">';
         //add question field
         str +=
             '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question'
@@ -100,6 +100,7 @@ class SelectFieldEdit {
         str +=
             '<small id="" class="form-text text-muted">If it applies provide the right answer in the "Right Answer" Field </small>';
         str += '</div> '
+        str += '</div>';
 
         $("#survey").append(str);
 

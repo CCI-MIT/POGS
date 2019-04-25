@@ -24,6 +24,8 @@ class InformationFieldEdit {
         this.questionNumber = question_number;
         var str = "";
         str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "introduction">';
+
+        str += '<span><div class="btn btn-sm btn-warning move_toggle">Minimize</div>Information field: <span class="question_number">' + question_number + '</span></span><div class="content">';
         // add text area
         str += '<div class="form-group w_100 row"><label class="col-sm-1 col-form-label">Info:</label>'
                + '<div class="col-sm-9"><textarea class="form-control htmleditor" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea></div>'
@@ -36,7 +38,7 @@ class InformationFieldEdit {
         }
 
         str += '</div>';
-
+        str += '</div>';
         $("#survey").append(str);
 
         $("#removeQuestion"+question_number).click(function () { //setup removeQuestion Button

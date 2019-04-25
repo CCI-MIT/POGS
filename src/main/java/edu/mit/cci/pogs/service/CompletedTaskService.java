@@ -162,6 +162,9 @@ public class CompletedTaskService {
                 if(completedTaskScore.has("numberOfRightAnswers")) {
                     cts.setNumberOfRightAnswers(completedTaskScore.getInt("numberOfRightAnswers"));
                 }
+                if(completedTaskScore.has("scoringData")) {
+                    cts.setScoringData(completedTaskScore.getString("scoringData"));
+                }
 
                 cts.setCompletedTaskId(ct.getId());
 
