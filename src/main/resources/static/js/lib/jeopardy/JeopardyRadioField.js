@@ -19,13 +19,13 @@ class JeopardyRadioField extends JeopardyField {
         this.totalTime = 120;
         this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
         this.questionNumber = 0;
+        this.influenceBroadcastCount = 0;
         var probabilities = jeopardyJson;
         this.prob;
-        this.localPogsPlugin = this.getPogsPlugin();
-        this.teammates = this.localPogsPlugin.getTeammates();
-        var currentId = this.localPogsPlugin.getSubjectId();
+        this.subjectId = this.getPogsPlugin().getSubjectId();
+        this.teammates = this.getPogsPlugin().getTeammates();
         for (var i = 0; i < this.teammates.length; i++) {
-            if (currentId == this.teammates[i].displayName) {
+            if (this.subjectId == this.teammates[i].displayName) {
                 if (i == 0)
                     this.prob = parseFloat(probabilities.prob1);
                 else if (i == 1)
@@ -49,6 +49,7 @@ class JeopardyRadioField extends JeopardyField {
             this.answers.pop();
         }
         this.str = '<div id = "question-answer-machine">';
+        this.str += '<div><p class ="text-dark row">Q No. '+ this.questionNumber +'</p></div>';
         this.str += '<div class="form-group fa-align-right" id="jeopardyField_' + this.index + '" style="min-width: 300px;">';
         this.str += '<div><p id = "errorMessage" class ="text-danger row">Individual answer is mandatory. You or one of your ' +
             'teammates has not provided the answer yet </p></div>';
@@ -161,7 +162,7 @@ class JeopardyRadioField extends JeopardyField {
             }
             if (valueTyped != null) {
                 if ((this.stopTime - (new Date().getTime() / 1000) < this.totalTime-30))
-                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.localPogsPlugin.getSubjectId(),
+                    this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
                         valueTyped, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.SUBMIT_FIELD);
                 else {
                     this.getPogsPlugin().saveCompletedTaskAttributeWithoutBroadcast(JEOPARDY_CONST.FIELD_NAME + cellIndex, valueTyped,
@@ -182,7 +183,7 @@ class JeopardyRadioField extends JeopardyField {
             let agentRatings = [$('input[id="AgentRating-0"]').val(), $('input[id="AgentRating-1"]').val(), $('input[id="AgentRating-2"]').val(), $('input[id="AgentRating-3"]').val()];
 
             if (agentRatings != null) {
-                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.localPogsPlugin.getSubjectId(),
+                this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
                     "Agent Ratings "+agentRatings.toString() + "Member Influences "+ memberInfluences.toString(), 0, this.score, true, JEOPARDY_CONST.INFLUENCE_MATRIX);
             }
         }
@@ -230,7 +231,7 @@ class JeopardyRadioField extends JeopardyField {
             '<th>Influence</th>'+
             '</tr>';
         for(var j = 0;j<this.teammates.length;j++){
-            if(this.localPogsPlugin.getSubjectId() == this.teammates[j].externalId){
+            if(this.subjectId == this.teammates[j].externalId){
                 this.str+='<tr class="text-dark">'+
                     '<td><b> You </b></td>'+
                     '<td>'+ '<input type="number" id="MemberInfluence-'+j+'" maxlength="3" size="3"/>'+ '</td>'+
@@ -244,7 +245,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str += '</table>';
         this.str +='<p class = "text-dark" id="influenceSum"></p><br>';
-        this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1</b></p>';
+        this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1 Eg: 0.1, 0.2, etc.</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
         '<tr>'+
         '<th>Machine</th>'+
@@ -279,14 +280,13 @@ class JeopardyRadioField extends JeopardyField {
             }
 
             var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
-            // var radioButtons = $("#answer" + question_number).find("input[value='" + message.content.attributeStringValue + "']").prop("checked", true);
             this.setFinalAnswer(message.sender);
             this.questionNumber++;
             this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
 
             var questionEl = document.getElementById("question-answer-machine");
             if (questionEl) {
-                if (this.questionNumber%5===0 || this.questionNumber===54) {
+                if (this.questionNumber%2===0 || this.questionNumber===54) {
                     console.log("round transition");
                     this.influenceCounter+=1;
                     console.log("Influence Counter "+this.influenceCounter);
@@ -320,7 +320,11 @@ class JeopardyRadioField extends JeopardyField {
             if (document.getElementById("machineResponse-"+message.sender))
                 document.getElementById("machineResponse-"+message.sender).innerHTML = machineAnswer.substring(machineAnswer.indexOf(':')+1);
         }else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INFLUENCE_MATRIX)){
-            this.nextQuestionSetup(message);
+            this.influenceBroadcastCount+=1;
+            if (this.influenceBroadcastCount>=this.teammates.length) {
+                this.influenceBroadcastCount = 0;
+                this.nextQuestionSetup(message);
+            }
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INDIVIDUAL_SUBMISSION)){
             this.answers.push(message.content.attributeStringValue);
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INCREASE_STOPTIME)){
@@ -368,13 +372,11 @@ class JeopardyRadioField extends JeopardyField {
                 (this.stopTime + 15).toString(), this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INCREASE_STOPTIME);
         }
 
-        if (distance === 0) {
-            // clearInterval(x);
-            if(document.getElementById("finishSurvey"))
-                document.getElementById("finishSurvey").click();
-            if(document.getElementById("submitAnswer"))
-                document.getElementById("submitAnswer").click();
+        if (distance <= 0 && document.getElementById("finishSurvey")) {
+            document.getElementById("finishSurvey").click();
         }
+        if(distance === 0 && document.getElementById("submitAnswer"))
+            document.getElementById("submitAnswer").click();
         document.getElementById("jeopardyCountdown").innerHTML = distance + "s ";
     }
 
@@ -390,7 +392,8 @@ class JeopardyRadioField extends JeopardyField {
         if (questionEl) {
             if (this.questionNumber === 54) {
                 this.str = '<div id = "thankYou"> ' +
-                    '<p class = "text-dark"> End of Experiment</p>' +
+                    '<p class = "text-dark"> End of Experiment <br> Take the survey' +
+                    '<a href="https://docs.google.com/forms/d/1UPMhammm3ivvzlSKgvYtw4U3jW37j0KJQHcb_Wrjk64/viewform?edit_requested=true">here</a></p>' +
                     ' </div>';
                 questionEl.innerHTML = this.str;
             }else {
@@ -413,7 +416,7 @@ class JeopardyRadioField extends JeopardyField {
             }
             if (valueTyped != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex,
-                    valueTyped + "__" + this.localPogsPlugin.getSubjectId(), this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.INDIVIDUAL_SUBMISSION);
+                    valueTyped + "__" + this.subjectId, this.result[this.questionNumber].ID, this.score, false, JEOPARDY_CONST.INDIVIDUAL_SUBMISSION);
             }
         }
     }
@@ -439,7 +442,7 @@ class JeopardyRadioField extends JeopardyField {
         for (var i =0;i<this.teammates.length;i++){
             responseAnswer+= '<tr class="text-dark">'+
                 '<td>'+ this.teammates[i].externalId + " machine" +'</td>'+
-                '<td id = "machineResponse-'+this.teammates[i].displayName+'">Not Used</td>'+
+                '<td id = "machineResponse-'+this.teammates[i].displayName+'">NA</td>'+
                 '</tr>';
         }
         responseAnswer += '</table>';
