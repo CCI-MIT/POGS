@@ -15,14 +15,23 @@ def score_typing_in_colors_task(request_parameters):
 		finalscore = 0.0
 		full_ground_truth = ''
 		finalscoretruth = 0.0
+		color_score = []
+		counter = 0
 		for section in sections:
 			full_ground_truth = full_ground_truth + str(section['ground_truth'])
-			finalscore += (calculate_score_for_text_segment(section['typed_value'],section['ground_truth']))
-			finalscoretruth+= (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
+			section_score = (calculate_score_for_text_segment(section['typed_value'],section['ground_truth']))
+			finalscore += section_score
+			section_ground_score = (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
+			finalscoretruth+=section_ground_score
+			color_score.append({'color': section['color'],'color_score': section_score, 'ground_text_score': section_ground_score 'color_index': counter})
+			counter +=1
 	
-		finalscore += calculate_score_for_text_segment(typed_text,full_ground_truth )
-		finalscoretruth += calculate_score_for_text_segment(full_ground_truth,full_ground_truth )
+		total_typed_score = calculate_score_for_text_segment(typed_text,full_ground_truth )
+		finalscore +=total_typed_score
+		total_typed_score_ground_truth = calculate_score_for_text_segment(full_ground_truth,full_ground_truth )
+		finalscoretruth += total_typed_score_ground_truth
 		print finalscoretruth
+		normalized_total_score = (finalscore/finalscoretruth)*100
 
 	resp = { 'completedTaskScore': {
 		'numberOfProcessedEntries' : 100,
@@ -30,7 +39,14 @@ def score_typing_in_colors_task(request_parameters):
 		'numberOfRightAnswers' : 0, 
 		'completedTaskId' :  request_parameters['completedTaskId'][0],
 		'numberOfEntries' :  0, 
-		'totalScore' : finalscore
+		'scoringData' : json.dumps(
+			{'colors_score': color_score, 'total_text': {
+				'total_text_score' : total_typed_score,
+			 	'total_text_ground_truth_score':total_typed_score_ground_truth, },
+			 'final_score_number': finalscore,
+			 'final_score_ground_truth_number': finalscoretruth
+			 'normalized_total_score': normalized_total_score})
+		'totalScore' : normalized_total_score
 	}}
 	return resp
 
@@ -57,7 +73,7 @@ def get_text_sections_by_color_in_order(request_parameters):
 		if section['color'] in colors:
 			colors[section['color']]['ground_truth'] = colors[section['color']]['ground_truth'] + section['text']
 		else:
-			colors[section['color']] = {'ground_truth': section['text'], 'typed_value' : '', 'author': ''}
+			colors[section['color']] = {'ground_truth': section['text'], 'typed_value' : '', 'author': '', 'color': section['color']}
 			colorOrder.append(section['color'])
 
 	counter = 0
