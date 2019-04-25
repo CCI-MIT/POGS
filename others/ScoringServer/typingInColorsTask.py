@@ -23,7 +23,7 @@ def score_typing_in_colors_task(request_parameters):
 			finalscore += section_score
 			section_ground_score = (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
 			finalscoretruth+=section_ground_score
-			color_score.append({'color': section['color'],'color_score': section_score, 'ground_text_score': section_ground_score 'color_index': counter})
+			color_score.append({'color': section['color'],'color_score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
 			counter +=1
 	
 		total_typed_score = calculate_score_for_text_segment(typed_text,full_ground_truth )
@@ -42,10 +42,10 @@ def score_typing_in_colors_task(request_parameters):
 		'scoringData' : json.dumps(
 			{'colors_score': color_score, 'total_text': {
 				'total_text_score' : total_typed_score,
-			 	'total_text_ground_truth_score':total_typed_score_ground_truth, },
+			 	'total_text_ground_truth_score':total_typed_score_ground_truth },
 			 'final_score_number': finalscore,
-			 'final_score_ground_truth_number': finalscoretruth
-			 'normalized_total_score': normalized_total_score})
+			 'final_score_ground_truth_number': finalscoretruth,
+			 'normalized_total_score': normalized_total_score}),
 		'totalScore' : normalized_total_score
 	}}
 	return resp

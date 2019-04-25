@@ -26,7 +26,10 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                         this.availableColors[k]+';color:'+generateFontColorBasedOnBackgroundColor(this.availableColors[k])+'" >Choose this color</button>');
         }
         $("button").click(function (event) {
-            this.sendAssignedColorToSelf($(event.target).data("color-index"));
+            var r = confirm("Are you sure you want to select this color? You won't be able to change colors!");
+            if (r == true) {
+                this.sendAssignedColorToSelf($(event.target).data("color-index"));
+            }
         }.bind(this));
 
         this._pogsPlugin = pogsPlugin;
@@ -120,10 +123,12 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         for(let k = 0 ; k < allColorButtons.length; k++) {
             if($(allColorButtons[k]).data("color-index") == colorIndex) {
                 if(isCurrentSubject) {
-                    $(allColorButtons[k]).text("You chose this color!")
+                    $(allColorButtons[k]).text("You chose this color!");
                     $("#padContent").attr("disabled", null);
+                    $("#colorPickerAndAssigner button").addClass("disabled");
                 } else {
                     $(allColorButtons[k]).text( subject.displayName+" chose this color!")
+                    $(allColorButtons[k]).addClass("disabled");
                 }
                 this.subjectsColors.push({externalId: subject.externalId, backgroundColor:this.availableColors[colorIndex],
                                              fontColor: generateFontColorBasedOnBackgroundColor(this.availableColors[colorIndex])});
