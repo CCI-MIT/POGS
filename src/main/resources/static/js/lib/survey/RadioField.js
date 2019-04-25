@@ -30,7 +30,7 @@ class RadioField extends Field {
             str += '<div class="form-check form-inline row">'
             $.each(this.jsonInfo.value, function (j, choice) { // setup radio question
 
-                str += '  <label class="form-check-label text-left text-dark" style="margin-right: 10px;">'
+                str += '  <label class="form-check-label text-left text-dark" style="margin-right: 26px;">'
                 str +=
                     '    <input type="radio" class="form-check-input" name="answer' + this.index
                     + '" value="' + choice + '" data-cell-reference-index="' + this.index + '">'

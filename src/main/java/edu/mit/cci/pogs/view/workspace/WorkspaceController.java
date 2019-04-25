@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.view.workspace;
 import org.jooq.tools.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -34,6 +36,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
+import edu.mit.cci.pogs.runner.PreviewTaskBeforeWorkRunner;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.TaskBeforeWorkRunner;
@@ -378,8 +381,10 @@ public class WorkspaceController {
             model.addAttribute("task", tw);
             model.addAttribute("secondsRemainingCurrentUrl",
                     new Date().getTime() + task.getInteractionTime());
+            org.json.JSONArray executionAttributes =
+                    taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId());
             model.addAttribute("taskConfigurationAttributes",
-                    taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));
+                    executionAttributes);
 
             JSONArray allLogs = new JSONArray();
             model.addAttribute("eventsUntilNow", allLogs);
@@ -389,8 +394,10 @@ public class WorkspaceController {
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
             model.addAttribute("taskWorkHtml", pl.getTaskWorkHtmlContent());
 
-            model.addAttribute("subject", teamService.generateFakeSubject(subjectExternalId));
-            model.addAttribute("teammates", teamService.getFakeTeamatesJSONObject());
+            Subject fakeSub = teamService.generateFakeSubject(subjectExternalId);
+            model.addAttribute("subject", fakeSub);
+            org.json.JSONArray team = teamService.getFakeTeamatesJSONArray();
+            model.addAttribute("teammates", team);
 
 
             model.addAttribute("subjectCanTalkTo", teamService.getFakeSubjectCanTalkTo());
@@ -411,10 +418,10 @@ public class WorkspaceController {
             model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
                     .NO_CHAT.getId().toString()) ? (true) : (false)));
 
-            //TODO: FIGURE OUT A WAY TO RUN THE CODE BEFORE.
 
             if (pl.getTaskBeforeWorkJsContent() != null) {
-                startBeforeWorkScript(null,tw, pl);
+                startBeforeWorkScript(null,tw, pl, executionAttributes, fakeSub, team, model);
+
             }
 
 
@@ -423,15 +430,32 @@ public class WorkspaceController {
         return "workspace/task_workpreview";
     }
 
-    private void startBeforeWorkScript(SessionWrapper session, TaskWrapper task, TaskPlugin pl){
-        TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
+    private void startBeforeWorkScript(SessionWrapper session, TaskWrapper task, TaskPlugin pl,
+                                       org.json.JSONArray executionAttributes, Subject fakeSubject,
+                                       org.json.JSONArray team,
+                                       Model model){
+        PreviewTaskBeforeWorkRunner csr = (PreviewTaskBeforeWorkRunner) context.getBean("PreviewTaskBeforeWorkRunner");
 
-        csr.setSession(session);
+        //csr.setSession(session);
+        task.setTaskStartTimestamp(new Date().getTime());
+        CompletedTask fakeCT = new CompletedTask();
+        fakeCT.setSolo(task.getSoloTask().toString());
+
+        if(task.getSoloTask()){
+            fakeCT.setSubjectId(fakeSubject.getId());
+        } else {
+
+        }
+        csr.setCompletedTask(fakeCT);
+
+        task.getCompletedTasks().add(fakeCT);
         csr.setTaskWrapper(task);
         csr.setTaskPlugin(pl);
-
-        Thread thread = new Thread(csr);
-        thread.start();
+        csr.setExecutionAttributes(executionAttributes);
+        csr.setFakeSubject(fakeSubject);
+        csr.setTeam(team);
+        csr.run();
+        model.addAttribute("completedTaskAttributes",csr.getCompletedTaskAttributesToAdd());
     }
     @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
     public String taskWorkPluginTest(
@@ -454,7 +478,7 @@ public class WorkspaceController {
             model.addAttribute("eventsUntilNow", new JSONArray());
             model.addAttribute("subject", teamService.generateFakeSubject(subjectExternalId));
 
-            model.addAttribute("teammates", teamService.getFakeTeamatesJSONObject());
+            model.addAttribute("teammates", teamService.getFakeTeamatesJSONArray());
 
             model.addAttribute("allTasksList", taskService.getFakeJsonTaskList());
 
