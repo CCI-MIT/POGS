@@ -434,7 +434,7 @@ public class WorkspaceController {
                                        org.json.JSONArray executionAttributes, Subject fakeSubject,
                                        org.json.JSONArray team,
                                        Model model){
-        PreviewTaskBeforeWorkRunner csr = (PreviewTaskBeforeWorkRunner) context.getBean("PreviewTaskBeforeWorkRunner");
+        PreviewTaskBeforeWorkRunner csr = (PreviewTaskBeforeWorkRunner) context.getBean("previewTaskBeforeWorkRunner");
 
         //csr.setSession(session);
         task.setTaskStartTimestamp(new Date().getTime());
