@@ -231,13 +231,31 @@ class SurveyTaskEdit {
             createOrUpdateAttribute("surveyBluePrint",JSON.stringify(surveyBluePrint),null,null,this.taskConfigId,0, surveyBluePrint.id);
             createOrUpdateAttribute("answerSheet",JSON.stringify(answerSheet),null,null,this.taskConfigId,1, answerSheet.id);
             question_number = surveyBluePrint.length;
-            sortable('#survey');
+            sortable('#survey')[0].addEventListener('sortupdate', function(e) {
+
+
+                resetOrder();
+
+            });
 
         }
+        function resetOrder(){
+            $(".question_number").each(function( index ) {
+                console.log( index + ": " + $( this ).text() );
+                $( this ).text(+ (index + 1))
+            });
+        }
+        $(".move_toggle").click(function(event){
+            $(".content").toggle();
+            let tx = $($(".move_toggle")[0]).text();
+            $(".move_toggle").text(((tx=="Minimize")?("Maximize"):("Minimize")));
+            event.stopPropagation();
+        });
 
 
         $("#addQuestion").click(function () { //Setup add question button
 
+            question_number = question_number + 1;
             let withVideo = $("#withVideo").prop("checked");
             if (($("#questionType")).val() == "text") { //For adding short answer (text) question
                 this.fieldList.push(new InputFieldEdit(question_number, "", withVideo, "", "", ""));
@@ -257,16 +275,22 @@ class SurveyTaskEdit {
                 this.fieldList.push(new RadioTableFieldEdit(question_number, "", withVideo, "", {columns: ["col 1","col 2"],rows: ["row 1","row 2"]},null));
             }
 
-            question_number = question_number + 1;
 
-            sortable('#survey');
+
+            sortable('#survey')[0].addEventListener('sortupdate', function(e) {
+
+
+                resetOrder();
+
+            });
+            resetOrder();
 
         }.bind(this));
 
     }
 
     setupHtmlFromAttributeString(bluePrint, answerSheet){
-        var question_number = 0;
+        var question_number = 1;
         for(var i=0; i < bluePrint.length; i++){
             let withVideo = false;
             if(bluePrint[i].video_url != undefined){
@@ -310,6 +334,13 @@ class SurveyTaskEdit {
 
     setupAttributesFromHtml(){
         var bluePrint = [], answerSheet = [];
+
+        let newOrderFieldList = []
+        for(let i = 0 ; i < this.fieldList.length; i ++ ){
+            let fielNewPosition = $('#question_set'+this.fieldList[i].questionNumber + ' .question_number').text();
+            newOrderFieldList[(parseInt(fielNewPosition) -1)] = this.fieldList[i];
+        }
+        this.fieldList = newOrderFieldList;
 
         for(let i = 0 ; i < this.fieldList.length; i ++ ){
 

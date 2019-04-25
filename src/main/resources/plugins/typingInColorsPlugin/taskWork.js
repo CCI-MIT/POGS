@@ -126,9 +126,11 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                     $(allColorButtons[k]).text("You chose this color!");
                     $("#padContent").attr("disabled", null);
                     $("#colorPickerAndAssigner button").addClass("disabled");
+                    $("#colorPickerAndAssigner button").unbind();
                 } else {
                     $(allColorButtons[k]).text( subject.displayName+" chose this color!")
                     $(allColorButtons[k]).addClass("disabled");
+                    $(allColorButtons[k]).unbind();
                 }
                 this.subjectsColors.push({externalId: subject.externalId, backgroundColor:this.availableColors[colorIndex],
                                              fontColor: generateFontColorBasedOnBackgroundColor(this.availableColors[colorIndex])});

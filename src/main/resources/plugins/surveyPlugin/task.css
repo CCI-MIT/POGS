@@ -34,7 +34,9 @@ label{
 .embed-responsive{
     margin-bottom: 20px;
 }
-
+.move_toggle{
+    margin-right: 10px;
+}
 .question_set{
     padding-bottom: 20px;
     border-bottom: 1px solid;
