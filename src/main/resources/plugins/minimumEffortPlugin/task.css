@@ -1,0 +1,24 @@
+/*
+ Any CSS that the developer will need to use on the editing page, primer and task work.
+*/
+
+table input {
+    width:50px;
+}
+table th {
+    vertical-align: middle;
+    text-align: center;
+}
+#minEff h2 {
+    color: black;
+}
+#taskText {
+    color:black;
+    margin-bottom: 60px;
+}
+#optionList button {
+    margin: 5px;
+}
+#roundResult {
+    color:black;
+}
