@@ -128,7 +128,7 @@ class JeopardyRadioField extends JeopardyField {
             return;
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
-            "AskMachine:"+machSuggestion, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+            "AskMachine:"+machSuggestion + ":" + this.prob, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
 
         var element = document.getElementById("askMachineSuggestion");
         if (element) {
@@ -175,12 +175,15 @@ class JeopardyRadioField extends JeopardyField {
     handleSurveyFinishedOnClick(event) {
         let cellIndex = 0;
         if (!isNaN(cellIndex)) {
-            let m1 = $('input[id="MemberInfluence-0"]').val();
-            let m2 = $('input[id="MemberInfluence-1"]').val();
-            let m3 = $('input[id="MemberInfluence-2"]').val();
-            let m4 = $('input[id="MemberInfluence-3"]').val();
+            let m1 = this.teammates[0].externalId + ":" + $('input[id="MemberInfluence-0"]').val();
+            let m2 = this.teammates[1].externalId + ":" + $('input[id="MemberInfluence-1"]').val();
+            let m3 = this.teammates[2].externalId + ":" + $('input[id="MemberInfluence-2"]').val();
+            let m4 = this.teammates[3].externalId + ":" + $('input[id="MemberInfluence-3"]').val();
             let memberInfluences = [m1, m2, m3, m4];
-            let agentRatings = [$('input[id="AgentRating-0"]').val(), $('input[id="AgentRating-1"]').val(), $('input[id="AgentRating-2"]').val(), $('input[id="AgentRating-3"]').val()];
+            let agentRatings = [this.teammates[0].externalId+":"+$('input[id="AgentRating-0"]').val(),
+                this.teammates[1].externalId + ":" + $('input[id="AgentRating-1"]').val(),
+                this.teammates[2].externalId + ":" + $('input[id="AgentRating-2"]').val(),
+                this.teammates[3].externalId + ":" + $('input[id="AgentRating-3"]').val()];
 
             if (agentRatings != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
@@ -275,36 +278,38 @@ class JeopardyRadioField extends JeopardyField {
         let buttonType = message.content.extraData;
         if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.SUBMIT_FIELD)) {
 
-            if (document.getElementById("machSuggestion")) {
-                document.getElementById("machSuggestion").innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
-            }
-
-            var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
-            this.setFinalAnswer(message.sender);
-            this.questionNumber++;
-            this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
-
-            var questionEl = document.getElementById("question-answer-machine");
-            if (questionEl) {
-                if (this.questionNumber%2===0 || this.questionNumber===54) {
-                    console.log("round transition");
-                    this.influenceCounter+=1;
-                    console.log("Influence Counter "+this.influenceCounter);
-                    if (this.influenceCounter===2)
-                        this.delayToAdd = 45;
-                    this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
-                    this.roundTransitionHTML();
-                    questionEl.innerHTML = this.str;
-                    //this.setupHTML();
-                    this.setupHooks();
+            if (this.stopTime - (new Date().getTime() / 1000)<=(this.totalTime-30)) {
+                if (document.getElementById("machSuggestion")) {
+                    document.getElementById("machSuggestion").innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
                 }
-                else {
-                    this.setupHTML();
-                    this.score = message.content.attributeIntegerValue;
-                    let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">'+this.score +' points</p></div>'
-                    questionEl.innerHTML = this.str;
-                    document.getElementById(("jeopardyScore")).innerHTML = updateScore;
-                    this.setupHooks();
+
+                var question_number = attrName.replace(JEOPARDY_CONST.FIELD_NAME, "");
+                this.setFinalAnswer(message.sender);
+                this.questionNumber++;
+                this.stopTime = (new Date().getTime() / 1000) + this.totalTime;
+
+                var questionEl = document.getElementById("question-answer-machine");
+                if (questionEl) {
+                    if (this.questionNumber % 5 === 0) {
+                        console.log("round transition");
+                        this.influenceCounter += 1;
+                        console.log("Influence Counter " + this.influenceCounter);
+                        if (this.influenceCounter === 2)
+                            this.delayToAdd = 45;
+                        this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
+                        this.roundTransitionHTML();
+                        questionEl.innerHTML = this.str;
+                        //this.setupHTML();
+                        this.setupHooks();
+                    }
+                    else {
+                        this.setupHTML();
+                        this.score = message.content.attributeIntegerValue;
+                        let updateScore = '<div><p id = "jeopardyScore" class="text-right text-dark row">' + this.score + ' points</p></div>'
+                        questionEl.innerHTML = this.str;
+                        document.getElementById(("jeopardyScore")).innerHTML = updateScore;
+                        this.setupHooks();
+                    }
                 }
             }
         } else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.GROUP_RADIO_RESPONSE)){
@@ -364,8 +369,9 @@ class JeopardyRadioField extends JeopardyField {
             } else if (distance === this.totalTime-32){
                 $("#initialResponse").show();
             } else if (distance === this.totalTime - 60){
-                $('#submitButton').show();
                 $("#askMachineButton").show();
+            } else if (distance === this.totalTime - 75){
+                $('#submitButton').show();
             }
         } else if (this.isInfluencePage && distance===5 && (this.isSumCorrect===false || this.areFieldsFilled ===false)){
             this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + "0",
@@ -390,7 +396,7 @@ class JeopardyRadioField extends JeopardyField {
 
         var questionEl = document.getElementById("question-answer-machine");
         if (questionEl) {
-            if (this.questionNumber === 54) {
+            if (this.questionNumber === 45) {
                 this.str = '<div id = "thankYou"> ' +
                     '<p class = "text-dark"> End of Experiment <br> Take the survey' +
                     '<a href="https://docs.google.com/forms/d/1UPMhammm3ivvzlSKgvYtw4U3jW37j0KJQHcb_Wrjk64/viewform?edit_requested=true">here</a></p>' +
