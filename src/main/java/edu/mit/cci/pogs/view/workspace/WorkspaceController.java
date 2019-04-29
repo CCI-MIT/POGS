@@ -114,7 +114,7 @@ public class WorkspaceController {
                                    Model model) {
         model.addAttribute("action", "/sessions/start/" + sessionId);
         model.addAttribute("externalId", externalId);
-        return "/workspace/landing";
+        return "workspace/landing";
     }
 
     @GetMapping("/sessions/start/{sessionId}")

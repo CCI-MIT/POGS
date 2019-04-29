@@ -22,7 +22,7 @@ class RadioTableField extends Field {
 
         $.each(choices.columns,function(i){
 
-            str += '<th>'+choices.columns[i]+'</th>';
+            str += '<th style="font-weight: 100;line-height: normal;">'+choices.columns[i]+'</th>';
         });
         str += '</thead>';
         str += '<tbody>'
@@ -30,10 +30,10 @@ class RadioTableField extends Field {
         let subindex = 0;
         $.each(choices.rows,function(i){
             str += '<tr>'
-                   + '<th class="row-header" style="width:300px;min-height:60px">'+choices.rows[i]+'</th>';
+                   + '<th class="row-header" style="width:500px;min-height:60px;text-align: left;font-weight: 100;line-height: normal;">'+choices.rows[i]+'</th>';
 
             for(let j =0 ; j < choices.columns.length; j ++) {
-                str += '<td style="width:300px">';
+                str += '<td style="width:200px">';
                 str += '<input type="radio" class="" name="answer' + this.index + '_'+ i +'" value="'+choices.columns[j]+'" data-cell-reference-subindex="'+subindex+'" data-cell-reference-index="'+this.index+'"">';
                 str += '</td>';
                 subindex++;

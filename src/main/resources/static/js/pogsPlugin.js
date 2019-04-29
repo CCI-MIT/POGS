@@ -44,7 +44,7 @@ class PogsPlugin {
         var teamm = [];
         var teammates = this.getTeammates();
         for(var i = 0; i < teammates.length; i ++) {
-            if(teammates[i].externalId == this.pogsRef.subjectId){
+            if(teammates[i].externalId != this.pogsRef.subjectId){
                 teamm.push(teammates[i].displayName);
             }
         }
