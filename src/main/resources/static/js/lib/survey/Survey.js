@@ -21,6 +21,7 @@ class Survey {
 
         var replacements = this.replacements;
 
+
         // [['m01', 'm02', 'm03'],
         //     ['m02', 'm03'],
         //     "Last task name",
@@ -56,7 +57,7 @@ class Survey {
         }
 
         if (surveyItem.value.constructor === Array) {
-            console.log("value is array");
+            //console.log("value is array");
             if (surveyItem.value !== undefined && surveyItem.value.length > 0) {
                 for (var i = 0; i < surveyItem.value.length; i++) {
 
@@ -86,7 +87,7 @@ class Survey {
         } else {
 
             if (surveyItem.value.constructor === Object) {
-                console.log("value is object");
+                //console.log("value is object");
                 for (let i = 0; i < surveyItem.value.columns.length; i++) {
 
                     if (surveyItem.value.columns[i].match(new RegExp(regex, 'gi'))) {
@@ -118,6 +119,7 @@ class Survey {
                             if (surveyItem.value.rows[i].match(new RegExp(allVariables[j], 'gi'))) {
 
                                 if (replacements[i].constructor === Array) {
+
                                     surveyItem.value.rows = [];
 
                                     for (let k = 0; k < replacements[j].length; k++) {
@@ -125,6 +127,7 @@ class Survey {
                                     }
                                     return surveyItem;
                                 } else {
+
                                     surveyItem.value.rows[i] =
                                         surveyItem.value.rows.replace(new RegExp(allVariables[j], 'gi'),
                                                                       replacements[j]);

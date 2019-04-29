@@ -22,7 +22,7 @@ class RadioTableField extends Field {
 
         $.each(choices.columns,function(i){
 
-            str += '<th>'+choices.columns[i]+'</th>';
+            str += '<th style="font-weight: 100;line-height: normal;">'+choices.columns[i]+'</th>';
         });
         str += '</thead>';
         str += '<tbody>'
