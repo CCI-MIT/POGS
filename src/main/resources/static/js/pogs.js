@@ -160,8 +160,11 @@ class Pogs {
 
     }
     onCountdownEnd(){
+        this.subscribe("onUnload", function(){
+            window.location = this.nextUrl;
+        }.bind(this))
         this.fire(null, 'onUnload', this);
-        window.location = this.nextUrl;
+
     }
     processOldEventsUntilNow(){
         for(var i=0; i< this.eventsUntilNow.length ; i++) {

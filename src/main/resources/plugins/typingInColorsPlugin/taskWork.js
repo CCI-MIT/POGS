@@ -116,7 +116,9 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                     true, '');
 
             }
+
         }
+        console.log('Before leave');
     }
     handleAssignedColor(colorIndex, subject){
         let allColorButtons = $("#colorPickerAndAssigner button");
