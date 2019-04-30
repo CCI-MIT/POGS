@@ -48,7 +48,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
                 this.handleAssignedColor(message.content.attributeIntegerValue, sub);
             }
         }.bind(this));
-        $(window).bind('beforeunload', this.beforeLeave.bind(this));
+        this._pogsPlugin.pogsRef.subscribe('onUnload', this.beforeLeave.bind(this));
     }
     setupText(){
 
@@ -93,6 +93,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         $("#typingInColorstaskText").html(body);
     }
     beforeLeave(){
+        $("#padContent").attr("disabled","disabled");
         this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
                                                     $('#padContent_mirror').html(), 0, 0,
                                                     true, '');

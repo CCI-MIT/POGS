@@ -27,17 +27,18 @@
                class="btn btn-outline-primary float-right">
                 Edit session</a>
 
-                <a th:if="${sessionBean.hasSessionStarted}" class="btn-link btn-info float-right"
+                <a th:if="${sessionBean.hasSessionStarted}" style="margin:5px" class="btn-link btn-info float-right"
                 th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/export'}">
                                 Export session data</a>
-                <button th:if="${sessionBean.hasSessionStarted}" class="btn-link btn-info float-right"
-                th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/replay'}"
-                  disabled>
-                                Replay session</button>
 
-            <a th:if="${sessionBean.hasSessionStarted}" class="btn btn-danger float-right"
+            <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-danger float-right"
                id="resetSession">
                 Reset session</a>
+
+            <a th:if="${sessionBean.hasSessionStarted}"
+               th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}"
+               class="btn btn-outline-primary float-right" style="margin:5px">
+                View session details (read only)</a>
 
         </div>
     </div>

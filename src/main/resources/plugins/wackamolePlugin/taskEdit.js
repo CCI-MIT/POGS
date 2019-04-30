@@ -42,14 +42,17 @@ class WhackTaskEdit {
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="moleAppearTime'+ this.numOfPlayer +'">Mole appear time: </label>\n' +
             '                <input type="number" min="0.01" step="0.01" class="form-control col-sm-8" id="moleAppearTime'+ this.numOfPlayer +'" placeholder="Enter seconds" value="'+ moleAppearTime +'">\n' +
+            '                <small id="" class="form-text text-muted">Total amount of seconds a mole will be visible to subjects</small>'+
             '            </div>\n' +
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="maxMoleNum'+ this.numOfPlayer +'">Max mole number: </label>\n' +
             '                <input type="number" min="1" max="100" step="1" class="form-control col-sm-8" id="maxMoleNum'+ this.numOfPlayer +'" placeholder="Enter mole number" value="'+ maxMoleNum +'">\n' +
+            '                <small id="" class="form-text text-muted">Number of moles to appear at the same time</small>'+
             '            </div>\n' +
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="clickDelay'+ this.numOfPlayer +'">Click delay: </label>\n' +
             '                <input type="number" min="0" step="0.0001" class="form-control col-sm-8" id="clickDelay'+ this.numOfPlayer +'" placeholder="Enter seconds" value="'+ clickDelay +'">\n' +
+            '                <small id="" class="form-text text-muted">Number of seconds that the system will count as valid clicks after a mole disappeared</small>'+
             '            </div> <hr>\n' +
             '        </div>';
         $("#whack").append(str);

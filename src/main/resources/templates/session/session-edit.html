@@ -82,7 +82,7 @@
                                                     <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
                                                 </div>
                                             </div>
-                                            <small id="perpetualStartDate" class="form-text text-muted">All dates are in Boston, USA (EST Timezone)</small>
+                                            <small id="perpetualStartDate" class="form-text text-muted">All dates and times are based on the U.S. Eastern Time</small>
                                         </div>
                                     </div>
                                     <script type="text/javascript">
@@ -110,7 +110,7 @@
                                                     <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
                                                 </div>
                                             </div>
-                                            <small id="perpetualStartDate" class="form-text text-muted">All dates are in Boston, USA (EST Timezone)</small>
+                                            <small id="perpetualStartDate" class="form-text text-muted">All dates and times are based on the U.S. Eastern Time</small>
                                         </div>
                                     </div>
                                     <script type="text/javascript">
@@ -192,7 +192,7 @@
                                                     <div class="input-group-text"><i class="fa fa-calendar"><!-- --></i></div>
                                                 </div>
                                             </div>
-                                            <small id="perpetualStartDate" class="form-text text-muted">All dates are in Boston, USA (EST Timezone)</small>
+                                            <small id="perpetualStartDate" class="form-text text-muted">All dates and times are based on the U.S. Eastern Time</small>
                                         </div>
                                     </div>
                                     <script type="text/javascript">
@@ -262,14 +262,15 @@
                                         <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
                                 </div>
-                                <div class="form-group row">
+                                <!-- div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="waitingRoomTime">Waiting Room Time:</label>
                                     <div class="col-sm-9">
                                         <input class="form-control" type="number"  min="0" step="1" id="waitingRoomTime" th:field="*{waitingRoomTime}"/>
                                         <small id="waitingRoomTimeHelp" class="form-text text-muted">In seconds</small>
                                         <div class="invalid-feedback">Please provide a valid time in seconds greater or equal to 5 seconds.</div>
                                     </div>
-                                </div>
+                                </div -->
+                                <input class="form-control" type="hidden"  min="0" step="1" id="waitingRoomTime" th:field="*{waitingRoomTime}"/>
 
                                 <div class="form-group row">
                                     <label class="col-sm-3 col-form-label" for="displayNameChangePageEnabled">Display Name Change Page Enabled:</label>
@@ -351,7 +352,7 @@
                     </div>
                 </div>
                 <div class="form-group row" id="fixedInteractionTimeContainer">
-                    <label class="col-sm-3 col-form-label" for="fixedInteractionTime">Fixed iteraction time:</label>
+                    <label class="col-sm-3 col-form-label" for="fixedInteractionTime">Fixed interaction time:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="number" data-number="done" min="0" step="1" id="fixedInteractionTime" th:field="*{fixedInteractionTime}"/>
                         <small id="fixedInteractionTimeHelp" class="form-text text-muted">In seconds</small>
@@ -775,9 +776,9 @@
 
         <a class="btn btn-danger btn-primary" th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}">Cancel</a>
 
-        <button th:if="${sessionBean.id == null}" type="submit" class="btn btn-primary">Create session
+        <button th:if="${sessionBean.id == null and not sessionBean.hasSessionStarted}" type="submit" class="btn btn-primary">Create session
         </button>
-        <button th:if="${sessionBean.id != null}" type="submit" class="btn btn-primary">Save session
+        <button th:if="${sessionBean.id != null and not sessionBean.hasSessionStarted}" type="submit" class="btn btn-primary">Save session
         </button>
         <br/>
     </form>

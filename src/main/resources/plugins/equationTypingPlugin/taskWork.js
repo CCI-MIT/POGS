@@ -44,7 +44,8 @@ class EquationTypingTaskPlugin{
         }
         let btn  = $('<input/>', {
             "class": "btn btn-info",
-            text: "Done"
+            "type": "button",
+            "value": "Done"
         });
 
         div.append(inp);
@@ -57,15 +58,18 @@ class EquationTypingTaskPlugin{
 
 
         if(sub.externalId == this.pogsPlugin.getSubjectId()){
+
+            $('<span style="font-size:10px;color:black;">It\'s time for</span>').appendTo(workOn);
             $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
               + '(you)</span>').appendTo(workOn);
-            $('<span style="font-size:10px;color:black;"> turn to answer</span>').appendTo(workOn);
+            $('<span style="font-size:10px;color:black;">to submit an answer</span>').appendTo(workOn);
         }else {
+            $('<span style="font-size:10px;color:black;">It\'s time for</span>').appendTo(workOn);
             $('<span class="badge ' + sub.externalId + '_color username">'
               + sub.displayName
               + '</span>').appendTo(workOn);
 
-            $('<span style="font-size:10px;color:black;"> turn to answer</span>').appendTo(workOn);
+            $('<span style="font-size:10px;color:black;">to submit an answer</span>').appendTo(workOn);
         }
         div.append(workOn);
 

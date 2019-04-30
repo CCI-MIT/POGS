@@ -16,12 +16,16 @@ class PogsOtClient extends ot.AbstractOtClient {
             }
         }.bind(this));
 
-        $(window).bind('beforeunload', this.beforeLeave.bind(this));
+        this._pogsPlugin.pogsRef.subscribe('onUnload', this.beforeLeave.bind(this));
     }
     beforeLeave(){
+        console.log("Just before leave is called")
+        $("#padContent").attr("disabled","disabled");
+        console.log("after disabling");
         this._pogsPlugin.saveCompletedTaskAttribute('fullTextAuthorship',
                                                     $('#padContent_mirror').html(), 0, 0,
                                                     true, '');
+        console.log("after Saved completed attr");
     }
     sendOperation(operation) {
         if (log.getLevel() <= log.levels.DEBUG) {

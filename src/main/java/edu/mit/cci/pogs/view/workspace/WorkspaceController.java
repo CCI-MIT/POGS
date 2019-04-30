@@ -341,9 +341,9 @@ public class WorkspaceController {
         Subject su = workspaceService.getSubject(subjectExternalId);
 
         return checkSubjectSessionTaskAndForward(su, task, "workspace/task_intro", model);
-
-
     }
+
+
 
     @GetMapping("/round/{roundId}/task/{taskId}/p/{subjectExternalId}")
     public String taskPrimer(@PathVariable("taskId") Long taskId,
@@ -360,13 +360,66 @@ public class WorkspaceController {
         model.addAttribute("taskPrimerHtml", pl.getTaskPrimerHtmlContent());
 
 
+        org.json.JSONArray executionAttributes =
+                taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId());
         model.addAttribute("taskConfigurationAttributes",
-                        taskExecutionAttributeService.listExecutionAttributesAsJsonArray(
-                                task.getId()));
+                executionAttributes);
+
         return checkSubjectSessionTaskAndForward(su, task, "workspace/task_primer", model);
 
     }
 
+    @GetMapping("/task/{taskId}/p/{subjectExternalId}")
+    public String taskPrimerPreview(@PathVariable("taskId") Long taskId,
+                             @PathVariable("subjectExternalId") String subjectExternalId,
+                             Model model) {
+
+        Task task = taskDao.get(taskId);
+        Subject su = workspaceService.getSubject(subjectExternalId);
+
+        TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+
+        model.addAttribute("taskCss", pl.getTaskCSSContent());
+        model.addAttribute("taskPrimerJs", pl.getTaskPrimerJsContent());
+        model.addAttribute("taskPrimerHtml", pl.getTaskPrimerHtmlContent());
+
+
+        model.addAttribute("taskConfigurationAttributes",
+                taskExecutionAttributeService.listExecutionAttributesAsJsonArray(
+                        task.getId()));
+
+        model.addAttribute("task", task);
+        Subject fakeSub = teamService.generateFakeSubject(subjectExternalId);
+        model.addAttribute("subject", fakeSub);
+        //model.addAttribute("pogsSession", sr.getSession());
+        model.addAttribute("secondsRemainingCurrentUrl",
+                DateUtils.toMilliseconds(task.getPrimerTime()));
+
+        return  "workspace/task_primerpreview";
+
+    }
+
+    @GetMapping("/task/{taskId}/i/{subjectExternalId}")
+    public String taskIntroPreview(
+                            @PathVariable("taskId") Long taskId,
+                            @PathVariable("subjectExternalId") String subjectExternalId,
+                            Model model) {
+
+        Task task = taskDao.get(taskId);
+        Subject su = workspaceService.getSubject(subjectExternalId);
+
+        model.addAttribute("task", task);
+        Subject fakeSub = teamService.generateFakeSubject(subjectExternalId);
+        model.addAttribute("subject", fakeSub);
+        //model.addAttribute("pogsSession", sr.getSession());
+        model.addAttribute("secondsRemainingCurrentUrl",
+                DateUtils.toMilliseconds(task.getPrimerTime()));
+
+
+        return "workspace/task_intropreview";
+
+
+    }
 
     @GetMapping("/task/{taskId}/t/{subjectExternalId}")
     public String taskConfigTest(@PathVariable("taskId") Long taskId,

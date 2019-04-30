@@ -57,7 +57,7 @@
             <tr>
                 <td th:text="${sessionz.id}"></td>
                 <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
-                <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+                <td th:text="${#dates.format(sessionz.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
                 <td><a th:href="${'/admin/export/session/'+ sessionz.id}" class = "btn btn-outline-secondary">Export</a></td>
             </tr>
         </th:block>

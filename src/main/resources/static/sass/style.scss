@@ -46,12 +46,13 @@ body {
 .flexbox-row .communication {
   background: white;
   padding: 1em;
+  max-height: 600px
 }
 
 .flexbox-row .information{
   background: #fff;
   padding: 1em;
-  max-width: 330px;
+  max-width: 350px;
   max-height: 600px;
   overflow-y: scroll;
 }

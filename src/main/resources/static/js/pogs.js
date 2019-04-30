@@ -106,7 +106,7 @@ class Pogs {
         this.communicationType = config.communicationType;
 
 
-        this.nextUrl = config.nextUrl+ "/"+ this.subjectId;
+        this.nextUrl =  this.validateFinalUrl(config.nextUrl);
         this.secondsRemainingCurrentUrl = (new Date().getTime() +
                                            parseInt(config.secondsRemainingCurrentUrl));
         this.taskConfigurationAttributes = config.taskConfigurationAttributes;
@@ -142,10 +142,9 @@ class Pogs {
             }).appendTo(".header");
         }
 
-        this.countDown = new Countdown(this.secondsRemainingCurrentUrl, "countdown",
-                                       function () {
-                                           window.location = this.nextUrl
-                                       }.bind(this))
+        this.countDown = new Countdown(this.secondsRemainingCurrentUrl,
+                                       "countdown",
+                                       this.onCountdownEnd.bind(this))
 
         this.subscribe('flowBroadcast', this.onFlowBroadcastReceived.bind(this));
 
@@ -159,6 +158,10 @@ class Pogs {
             }
         }
 
+    }
+    onCountdownEnd(){
+        this.fire(null, 'onUnload', this);
+        window.location = this.nextUrl;
     }
     processOldEventsUntilNow(){
         for(var i=0; i< this.eventsUntilNow.length ; i++) {
@@ -281,17 +284,25 @@ class Pogs {
                                  this.subjectId, null, this.completedTaskId,
                                  this.sessionId);
     }
+    validateFinalUrl(newUrlToBeSet) {
+        //check if there is HTTPS or HTTP in the URL.
+        if ((newUrlToBeSet.indexOf("http") == -1)&&(newUrlToBeSet.indexOf("https")==-1)) {
+            return newUrlToBeSet + '/' + this.subjectId;
+        } else {
+            if((newUrlToBeSet.indexOf("/sessions/")!=-1) && this.doneUrlParameter){
+                return newUrlToBeSet + '?externalId=' + this.subjectId;
+            }
+            return newUrlToBeSet;
+        }
+        //if no http /https , must be a local redirect use / + user id
+        //
+
+    }
     onFlowBroadcastReceived(message) {
 
         if((message.content.currentUrl + "/" +this.subjectId == window.location.pathname)) {
             this.nextUrl = message.content.nextUrl;
-            if ((message.content.nextUrl.indexOf("http") == -1)&&(message.content.nextUrl.indexOf("https"))) {
-                this.nextUrl = this.nextUrl + '/' + this.subjectId;
-            }else {
-                if(this.doneUrlParameter) {
-                    this.nextUrl = this.nextUrl + '?externalId=' + this.subjectId;
-                }
-            }
+            this.nextUrl = this.validateFinalUrl(this.nextUrl);
             var finalDate = (new Date().getTime() + parseInt(
                 message.content.secondsRemainingCurrentUrl));
             this.countDown.updateCountDownDate(finalDate)
