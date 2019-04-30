@@ -16,7 +16,7 @@ class RadioTableField extends Field {
             str += new VideoInformation(this.jsonInfo.video_url).getHTML();
         }
 
-        str += '<div id="answer'+this.index+'"><table style="color:#000000"><thead><th></th>';
+        str += '<div id="answer'+this.index+'"><table class="table table-striped"" style="color:#000000"><thead><th></th>';
 
         let choices = this.jsonInfo.value;
 
