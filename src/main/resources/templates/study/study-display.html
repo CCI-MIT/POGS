@@ -46,6 +46,7 @@
     <table class="table table-striped">
         <thead>
         <tr>
+            <th>Original Session ID</th>
             <th>Session ID</th>
             <th>Session name</th>
             <th>Session start date </th>
@@ -54,7 +55,9 @@
         </thead>
         <tbody>
         <th:block th:each="sessionz : ${sessionsList}">
-            <tr>
+            <tr th:classappend="${sessionz.parentSessionId != null} ? noclass : table-dark ">
+                <td th:if="${sessionz.parentSessionId}" th:text="${sessionz.parentSessionId}"></td>
+                <td th:unless="${sessionz.parentSessionId}" > - </td>
                 <td th:text="${sessionz.id}"></td>
                 <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
                 <td th:text="${#dates.format(sessionz.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
