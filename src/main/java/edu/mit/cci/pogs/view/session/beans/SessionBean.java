@@ -465,8 +465,12 @@ public class SessionBean {
     }
 
     public boolean getHasSessionStarted() {
-        return !getStatus()
-                .equals(SessionStatus.NOTSTARTED.getId().toString());
+        if(getStatus()!=null) {
+            return !getStatus()
+                    .equals(SessionStatus.NOTSTARTED.getId().toString());
+        }
+        return false;
+
     }
 
     public Integer getFixedInteractionTime() {
