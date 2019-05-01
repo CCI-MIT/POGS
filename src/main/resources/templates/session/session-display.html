@@ -27,9 +27,9 @@
                class="btn btn-outline-primary float-right">
                 Edit session</a>
 
-                <a th:if="${sessionBean.hasSessionStarted}" style="margin:5px" class="btn-link btn-info float-right"
+                <!-- a th:if="${sessionBean.hasSessionStarted}" style="margin:5px" class="btn-link btn-info float-right"
                 th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/export'}">
-                                Export session data</a>
+                                Export session data</a -->
 
             <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-danger float-right"
                id="resetSession">

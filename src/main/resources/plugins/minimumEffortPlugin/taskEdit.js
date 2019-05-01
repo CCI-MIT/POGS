@@ -89,7 +89,7 @@ pogsTaskConfigEditor.register(new MinimumEffortTaskEdit());
 function generateNewPaymentStructure(numbers) {
 let k = 0;
 
-
+    $("#paymentStructure").append('<tr><th>Own number</th><th colspan="'+numbers+'">Smallest number in group</th></tr>');
 
     for(let i = 0 ; i < numbers; i++) {
         if(i == 0){

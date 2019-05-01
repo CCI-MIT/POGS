@@ -297,8 +297,7 @@ class Pogs {
             }
             return newUrlToBeSet;
         }
-        //if no http /https , must be a local redirect use / + user id
-        //
+
 
     }
     onFlowBroadcastReceived(message) {

@@ -5,19 +5,20 @@ var _taskConfigurationAttributes = JSON.parse(taskConfigurationAttributes);
 var _completedTaskAttributes = JSON.parse(completedTaskAttributes);
 
 
-var answerSheet;
+var gridBluePrint;
 
 var RIGHT_ANSWER_REWARD = 1;
 var WRONG_ANSWER_REWARD = 0;
 
 
 for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
-    if(_taskConfigurationAttributes[i].attributeName == "answerSheet"){
-        answerSheet = _taskConfigurationAttributes[i].stringValue.split(",");
+    if(_taskConfigurationAttributes[i].attributeName == "gridBluePrint"){
+        gridBluePrint = _taskConfigurationAttributes[i].stringValue.split(",");
         break;
     }
 }
 
+var paymentStructure = gridBluePrint.paymentStructure;
 var _completedTaskScore = {
     "totalScore" : 0,
     "numberOfRightAnswers" : 0,
@@ -27,33 +28,54 @@ var _completedTaskScore = {
     "scoringData" : ""
 };
 
-var answerKeyMap = [];
+let userArray = [];
 
-
-for(var k =0 ; k < answerSheet.length; k ++ ) {
-    answerKeyMap[k] = "";
+for(var k =0 ; k < _teammates.length; k ++ ) {
+    userArray[_teammates[k].externalId]= {"user_external_id": _teammates[k].externalId, "roundPayouts": [], "roundOptions": []};
 }
+
+/*"users": [
+    {
+        "user": "externalId",
+        "roundPayouts": [
+            {"roundNumber": 1, roundPayout: "130"},
+            {"roundNumber": 2, roundPayout: "120"},
+            {"roundNumber": 3, roundPayout: "29"},
+            {"roundNumber": 4, roundPayout: "20"},
+            {"roundNumber": 5, roundPayout: "92"},
+        ]
+    }
+*/
+/*
+var roundsAnswers = [];
 
 for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
-    if(_completedTaskAttributes[i].attributeName.indexOf("sudokuAnswer_") != -1){
-        var index = parseInt(_completedTaskAttributes[i].attributeName.replace("sudokuAnswer_",""));
-        var answer = _completedTaskAttributes[i].stringValue;
-        answerKeyMap[index] = answer;
+    if(_completedTaskAttributes[i].attributeName.indexOf("roundAnswer_") != -1){
+        let arr = _completedTaskAttributes[i].attributeName.replace("roundAnswer_", "").split("|");
+        let roundNumber = parseInt(arr[0]);
+        let userId = arr[1];
+        userArray[userId].roundOptions[roundNumber] = parseInt(_completedTaskAttributes[i].integerValue);
+        roundsAnswers[roundNumber].push(parseInt(_completedTaskAttributes[i].integerValue))
+    }
+}
+var roundsMinimals = [];
+for(var k=0 ;k < roundsAnswers.length; k++){
+    roundsMinimals[k] = 9999999;
+}
+for(var k=0 ;k < roundsAnswers.length; k++){
+    for(var z=0; z < roundsAnswers[k].length; z++){
+        if(roundsAnswers[k][z] < roundsMinimals[k]){
+            roundsMinimals[k] = roundsAnswers[k][z];
+        }
     }
 }
 
-for(var i=0 ;i < answerSheet.length; i++) {
-
-    _completedTaskScore.numberOfEntries++;
-    _completedTaskScore.numberOfProcessedEntries++;
-    if (answerSheet[i] == answerKeyMap[i]) {
-        _completedTaskScore.numberOfRightAnswers++;
-        _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
-    } else {
-        _completedTaskScore.numberOfWrongAnswers++;
-        _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+for (var us in userArray){
+    for(var k = 0; k < userArray[us].roundOptions.length; k++){
+        if(paymentStructure[userArray[us].roundOptions[k])
     }
 }
 
+*/
 
 completedTaskScore = JSON.stringify(_completedTaskScore);
