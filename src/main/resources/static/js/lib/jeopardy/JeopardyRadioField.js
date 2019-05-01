@@ -175,15 +175,15 @@ class JeopardyRadioField extends JeopardyField {
     handleSurveyFinishedOnClick(event) {
         let cellIndex = 0;
         if (!isNaN(cellIndex)) {
-            let m1 = this.teammates[0].externalId + ":" + $('input[id="MemberInfluence-0"]').val();
-            let m2 = this.teammates[1].externalId + ":" + $('input[id="MemberInfluence-1"]').val();
-            let m3 = this.teammates[2].externalId + ":" + $('input[id="MemberInfluence-2"]').val();
-            let m4 = this.teammates[3].externalId + ":" + $('input[id="MemberInfluence-3"]').val();
+            let m1 = this.teammates[0].externalId + "=" + $('input[id="MemberInfluence-0"]').val();
+            let m2 = this.teammates[1].externalId + "=" + $('input[id="MemberInfluence-1"]').val();
+            let m3 = this.teammates[2].externalId + "=" + $('input[id="MemberInfluence-2"]').val();
+            let m4 = this.teammates[3].externalId + "=" + $('input[id="MemberInfluence-3"]').val();
             let memberInfluences = [m1, m2, m3, m4];
             let agentRatings = [this.teammates[0].externalId+":"+$('input[id="AgentRating-0"]').val(),
-                this.teammates[1].externalId + ":" + $('input[id="AgentRating-1"]').val(),
-                this.teammates[2].externalId + ":" + $('input[id="AgentRating-2"]').val(),
-                this.teammates[3].externalId + ":" + $('input[id="AgentRating-3"]').val()];
+                this.teammates[1].externalId + "=" + $('input[id="AgentRating-1"]').val(),
+                this.teammates[2].externalId + "=" + $('input[id="AgentRating-2"]').val(),
+                this.teammates[3].externalId + "=" + $('input[id="AgentRating-3"]').val()];
 
             if (agentRatings != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
