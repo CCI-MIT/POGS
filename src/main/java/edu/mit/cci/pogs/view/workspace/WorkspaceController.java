@@ -142,6 +142,7 @@ public class WorkspaceController {
             Subject ref = subjectDao.getByExternalId(externalId);
             if (ref != null) {
                 su.setPreviousSessionSubject(ref.getId());
+                su.setSubjectDisplayName(ref.getSubjectDisplayName());
                 allSubAttr = subjectAttributeDao.listBySubjectId(ref.getId());
             }
 
