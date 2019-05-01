@@ -67,7 +67,7 @@ this.questions = [
             "ID":9
             ,"question":"The first mechanical computer designed by Charles Babbage was called"
             ,"Answer":"Analytical Engine"
-            ,"value":["Abacus", "Analytical Engine", "Professor", "Calculator"]
+            ,"value":["Abacus", "Analytical Engine", "Processor", "Calculator"]
             ,"Category":"Science and Technology"
             ,"Level":"Medium"
         },

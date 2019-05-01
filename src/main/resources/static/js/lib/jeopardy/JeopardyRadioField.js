@@ -128,7 +128,7 @@ class JeopardyRadioField extends JeopardyField {
             return;
 
         this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME+"0",
-            "AskMachine:"+machSuggestion + ":" + this.prob, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
+            "AskMachine:"+machSuggestion + "_" + this.prob, this.result[this.questionNumber].ID, this.score, true, JEOPARDY_CONST.ASK_MACHINE);
 
         var element = document.getElementById("askMachineSuggestion");
         if (element) {
@@ -187,7 +187,7 @@ class JeopardyRadioField extends JeopardyField {
 
             if (agentRatings != null) {
                 this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
-                    "Agent Ratings "+agentRatings.toString() + "Member Influences "+ memberInfluences.toString(), 0, this.score, true, JEOPARDY_CONST.INFLUENCE_MATRIX);
+                    "Agent Ratings "+agentRatings.toString() + " Member Influences "+ memberInfluences.toString(), 0, this.score, true, JEOPARDY_CONST.INFLUENCE_MATRIX);
             }
         }
     }
@@ -278,7 +278,7 @@ class JeopardyRadioField extends JeopardyField {
         let buttonType = message.content.extraData;
         if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1) && (buttonType == JEOPARDY_CONST.SUBMIT_FIELD)) {
 
-            if (this.stopTime - (new Date().getTime() / 1000)<=(this.totalTime-30)) {
+            if (this.stopTime - (new Date().getTime() / 1000)<=(this.totalTime-30) && this.isInfluencePage === false) {
                 if (document.getElementById("machSuggestion")) {
                     document.getElementById("machSuggestion").innerHTML = '<div class="text-center text-dark col-4" id="machSuggestion">\n' + '</div>';
                 }
@@ -293,7 +293,6 @@ class JeopardyRadioField extends JeopardyField {
                     if (this.questionNumber % 5 === 0) {
                         console.log("round transition");
                         this.influenceCounter += 1;
-                        console.log("Influence Counter " + this.influenceCounter);
                         if (this.influenceCounter === 2)
                             this.delayToAdd = 45;
                         this.stopTime = (new Date().getTime() / 1000) + this.delayToAdd;
@@ -323,7 +322,7 @@ class JeopardyRadioField extends JeopardyField {
             $("#askMachineButton").attr("disabled", "true");
             let machineAnswer = message.content.attributeStringValue;
             if (document.getElementById("machineResponse-"+message.sender))
-                document.getElementById("machineResponse-"+message.sender).innerHTML = machineAnswer.substring(machineAnswer.indexOf(':')+1);
+                document.getElementById("machineResponse-"+message.sender).innerHTML = machineAnswer.substring(machineAnswer.indexOf(':')+1, machineAnswer.indexOf('_'));
         }else if ((attrName.indexOf(JEOPARDY_CONST.FIELD_NAME) != -1)&& (buttonType == JEOPARDY_CONST.INFLUENCE_MATRIX)){
             this.influenceBroadcastCount+=1;
             if (this.influenceBroadcastCount>=this.teammates.length) {
