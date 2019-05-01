@@ -55,7 +55,7 @@
         </thead>
         <tbody>
         <th:block th:each="sessionz : ${sessionsList}">
-            <tr th:classappend="${sessionz.parentSessionId != null} ? noclass : table-dark ">
+            <tr th:classappend="${sessionz.parentSessionId != null} ? noclass : table-info ">
                 <td th:if="${sessionz.parentSessionId}" th:text="${sessionz.parentSessionId}"></td>
                 <td th:unless="${sessionz.parentSessionId}" > - </td>
                 <td th:text="${sessionz.id}"></td>
