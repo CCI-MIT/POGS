@@ -32,19 +32,23 @@ class EquationTypingTaskPlugin{
         let inp = null;
         if(sub.externalId == this.pogsPlugin.getSubjectId()) {
             inp = $('<input/>', {
+                "class": "doneInp",
                 'id': 'inputEquation_' + this.totalFieldIndex,
                 'data-cell-reference-index': this.totalFieldIndex
             });
         } else {
             inp = $('<input/>', {
+                "class": "doneInp",
                 'id': 'inputEquation_' + this.totalFieldIndex,
                 'disabled': 'disabled',
                 'data-cell-reference-index': this.totalFieldIndex
             });
         }
         let btn  = $('<input/>', {
-            "class": "btn btn-info",
+            "class": "btn btn-info doneBtn",
+            'id': 'doneEquation_' + this.totalFieldIndex,
             "type": "button",
+            'data-cell-reference-index': this.totalFieldIndex,
             "value": "Done"
         });
 
@@ -80,7 +84,7 @@ class EquationTypingTaskPlugin{
     setupHooks(){
         $("input").unbind().on('keyup', this.handleOnClick.bind(this));
 
-        $("input").unbind().on('change', this.handleOnBlur.bind(this));
+        $(".doneBtn").unbind().on('click', this.handleOnBlur.bind(this));
 
 
     }
@@ -102,7 +106,7 @@ class EquationTypingTaskPlugin{
 
         if(!isNaN(cellIndex)) {
 
-            let valueTyped = $(event.target).val();
+            let valueTyped = $('#inputEquation_' + cellIndex).val();
 
             if(valueTyped != null) {
                 this.pogsPlugin.saveCompletedTaskAttribute('equationAnswer' + cellIndex,
@@ -117,7 +121,7 @@ class EquationTypingTaskPlugin{
         if (attrName == "typedInField") {
             let index = message.content.attributeIntegerValue;
             //do nothing/
-            $('#cell_' + index + ' input').val(message.content.attributeStringValue);
+            $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
         } else {
             let index = attrName.replace('equationAnswer', '');
             $('#cell_' + index + ' input').val(message.content.attributeStringValue);
