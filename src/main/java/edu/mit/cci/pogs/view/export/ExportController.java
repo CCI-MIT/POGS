@@ -220,8 +220,10 @@ public class ExportController {
         StringBuilder line = new StringBuilder();
         for (T element : list){
             for (Field field:attributes){
-                line.append(field.get(element));
-                line.append(",");
+                if(field.isAccessible()) {
+                    line.append(field.get(element));
+                    line.append(",");
+                }
             }
             if (isMapPresent)
                 line.append(String.valueOf(taskSessionMap[0].get(attributes[i].get(element))));

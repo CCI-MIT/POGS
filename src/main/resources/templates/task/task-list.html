@@ -43,9 +43,20 @@
                 <td><a th:text="${task.taskName}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
                 <td><a th:text="${task.taskPluginType}" th:href="${'/admin/tasks/'+ task.id+ '/edit'}"></a></td>
                 <td><a th:text="${task.interactionTime + ' seconds'}" th:href="${'/admin/tasks/'+ task.id + '/edit'}"></a></td>
-                <td><a th:href="${'/task/' + task.id + '/t/su01'} " target="_blank"
-                                    class="btn btn-outline-primary float-right">
-                                    Preview task in workspace</a></td>
+                <td>
+
+                <a  th:href="${'/task/' + task.id + '/t/su01'} " style="margin:5px" target="_blank"
+                                                    class="btn btn-outline-primary btn-sm  float-right">
+                                                    Preview task work</a>
+
+                <a th:if="${task.primerPageEnabled}" th:href="${'/task/' + task.id + '/p/su01'} " style="margin:5px" target="_blank"
+                                    class="btn btn-outline-primary btn-sm float-right">
+                                    Preview task primer</a>
+
+                <a th:if="${task.introPageEnabled}" th:href="${'/task/' + task.id + '/i/su01'} " style="margin:5px" target="_blank"
+                                                                    class="btn btn-sm btn-outline-primary float-right">
+                                                                    Preview task intro</a>
+                </td>
             </tr>
         </th:block>
         </tbody>

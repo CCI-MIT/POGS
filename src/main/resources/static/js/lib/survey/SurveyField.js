@@ -71,7 +71,7 @@ class Field {
             let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
             $("#surveyField_" + this.index + " .finalsubjectanswer").empty();
 
-            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName +((isOwnSub)?("(you)"):(""))
               + '</span>')
                 .appendTo("#surveyField_" + this.index + " .finalsubjectanswer");
 
@@ -92,9 +92,13 @@ class Field {
     }
     addSubjectInteraction(subjectId){
         let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
+        let isOwnSub = false;
+        if(sub.externalId == this.getPogsPlugin().getSubjectId() ){
+            isOwnSub = true;
+        }
         if($("#surveyField_"+this.index+" .subjectpool ."+sub.externalId+'_color').length == 0) {
 
-            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName + ((isOwnSub)?("(you)"):(""))
               + '</span>')
                 .appendTo("#surveyField_" + this.index + " .subjectpool");
             $("#surveyField_" + this.index + " .interaction-indicator").addClass("text-muted");
