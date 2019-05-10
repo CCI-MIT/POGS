@@ -153,13 +153,13 @@ class JeopardyRadioField extends JeopardyField {
             }
 
             if (consensusReached && valueTyped === this.result[this.questionNumber].Answer)
-                this.score = this.score + 5;
+                this.score = this.score + 4;
             else if (valueTyped === undefined) {
                 valueTyped = "Consensus Not Reached";
-                this.score = this.score;
-            } else {
-                this.score = this.score;
-            }
+                this.score = this.score-1;
+            } else
+                this.score = this.score-1;
+
             if (valueTyped != null) {
                 if ((this.stopTime - (new Date().getTime() / 1000) < this.totalTime-30))
                     this.getPogsPlugin().saveCompletedTaskAttribute(JEOPARDY_CONST.FIELD_NAME + cellIndex + "__" + this.subjectId,
@@ -248,7 +248,7 @@ class JeopardyRadioField extends JeopardyField {
         }
         this.str += '</table>';
         this.str +='<p class = "text-dark" id="influenceSum"></p><br>';
-        this.str += '<p class = "text-dark"><b> Rate the competence of the machines so far between 0 to 1 Eg: 0.1, 0.2, etc.</b></p>';
+        this.str += '<p class = "text-dark"><b> What is the accuracy of the machines? Rate between 0 to 1 Eg: 0.1, 0.2, etc.</b></p>';
         this.str += '<table class="table table-striped text-dark">'+
         '<tr>'+
         '<th>Machine</th>'+
