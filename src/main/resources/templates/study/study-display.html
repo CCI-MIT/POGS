@@ -79,7 +79,7 @@
         <tbody>
         <th:block th:each="sessionz : ${sessionsList}">
             <tr>
-                <td> <button class="btn btn-sm btn-outline-info hideChildren" th:data-id="${sessionz.baseSession.id}" style="font-size: 12px;margin: 5px;display: none">Hide child sessions</button><button style="font-size: 12px;margin: 5px;" class="btn btn-sm btn-outline-info showChildren " th:data-id="${sessionz.baseSession.id}" >Show child sessions</button> </td>
+                <td> <button th:if="${#lists.size(sessionz.childSessions) != 0}" class="btn btn-sm btn-outline-info hideChildren" th:data-id="${sessionz.baseSession.id}" style="font-size: 12px;margin: 5px;display: none">Hide child sessions</button><button th:if="${#lists.size(sessionz.childSessions) != 0}" style="font-size: 12px;margin: 5px;" class="btn btn-sm btn-outline-info showChildren " th:data-id="${sessionz.baseSession.id}" >Show child sessions</button> </td>
                 <td th:text="${sessionz.baseSession.id}"></td>
                 <td><a th:text="${study.studySessionPrefix + sessionz.baseSession.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.baseSession.id} "></a></td>
                 <td th:text="${#dates.format(sessionz.baseSession.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
