@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
@@ -12,6 +14,7 @@ import edu.mit.cci.pogs.model.dao.studyhasresearchgroup.StudyHasResearchGroupDao
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.view.study.beans.SessionBean;
 import edu.mit.cci.pogs.view.study.beans.StudyBean;
 
 @Service
@@ -109,6 +112,33 @@ public class StudyService {
     }
 
 
+    public List<SessionBean> groupBessionsByBaseSessions(Long studyId) {
+        List<Session> sessions = listSessionsByStudyId(studyId);
+        HashMap<Long, SessionBean> baseSessions = new LinkedHashMap<>();
+        for(Session s: sessions){
+            if(s.getParentSessionId()== null) {
+                baseSessions.put(s.getId(),new SessionBean(s));
+            }
+        }
+
+        for(Session s: sessions){
+            if(s.getParentSessionId()!= null) {
+                SessionBean base = baseSessions.get(s.getParentSessionId());
+                if(base != null ) {
+                    base.getChildSessions().add(s);
+                }
+            }
+        }
+        List<SessionBean> baseSessionList = new ArrayList();
+        if(baseSessions.values()!=null) {
+            for (SessionBean sb : baseSessions.values()) {
+                baseSessionList.add(sb);
+            }
+        }
+
+        return baseSessionList;
+
+    }
 
     public List<Session> listSessionsByStudyId(Long studyId) {
         return sessionDao.listByStudyId(studyId);

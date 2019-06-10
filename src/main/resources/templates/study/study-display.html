@@ -43,6 +43,29 @@
         </div>
     </div>
     <br/>
+
+    <script>
+        $(function() {
+
+            $(".hideChildren").on('click', function(){
+                var id = $(this).data("id");
+
+                $(".childSession[data-id='"+id+"']").hide();
+                $(this).hide();
+                $(".showChildren[data-id='"+id+"']").show();
+            })
+
+            $(".showChildren").on('click', function(){
+                var id = $(this).data("id");
+
+                $(".childSession[data-id='"+id+"']").show();
+
+                $(this).hide();
+                $(".hideChildren[data-id='"+id+"']").show();
+            })
+        });
+    </script>
+
     <table class="table table-striped">
         <thead>
         <tr>
@@ -55,14 +78,25 @@
         </thead>
         <tbody>
         <th:block th:each="sessionz : ${sessionsList}">
-            <tr th:classappend="${sessionz.parentSessionId != null} ? noclass : table-info ">
-                <td th:if="${sessionz.parentSessionId}" th:text="${sessionz.parentSessionId}"></td>
-                <td th:unless="${sessionz.parentSessionId}" > - </td>
-                <td th:text="${sessionz.id}"></td>
-                <td><a th:text="${study.studySessionPrefix + sessionz.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.id} "></a></td>
-                <td th:text="${#dates.format(sessionz.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
-                <td><a th:href="${'/admin/export/session/'+ sessionz.id}" class = "btn btn-outline-secondary">Export</a></td>
+            <tr>
+                <td> <button class="btn btn-sm btn-outline-info hideChildren" th:data-id="${sessionz.baseSession.id}" style="font-size: 12px;margin: 5px;display: none">Hide child sessions</button><button style="font-size: 12px;margin: 5px;" class="btn btn-sm btn-outline-info showChildren " th:data-id="${sessionz.baseSession.id}" >Show child sessions</button> </td>
+                <td th:text="${sessionz.baseSession.id}"></td>
+                <td><a th:text="${study.studySessionPrefix + sessionz.baseSession.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.baseSession.id} "></a></td>
+                <td th:text="${#dates.format(sessionz.baseSession.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
+                <td><a th:href="${'/admin/export/session/'+ sessionz.baseSession.id}" class = "btn btn-outline-secondary">Export</a></td>
             </tr>
+
+            <th:block th:each="childSession : ${sessionz.childSessions}" >
+                <tr class="table-info childSession" th:data-id="${sessionz.baseSession.id}" style="display: none">
+                    <td th:if="${childSession.parentSessionId}" th:text="${childSession.parentSessionId}"></td>
+
+                    <td th:text="${childSession.id}"></td>
+                    <td><a th:text="${study.studySessionPrefix + childSession.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + childSession.id} "></a></td>
+                    <td th:text="${#dates.format(childSession.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
+                    <td><a th:href="${'/admin/export/session/'+ childSession.id}" class = "btn btn-outline-secondary">Export</a></td>
+                </tr>
+            </th:block>
+
         </th:block>
         </tbody>
     </table>

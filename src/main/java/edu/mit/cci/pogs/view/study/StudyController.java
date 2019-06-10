@@ -22,6 +22,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
+import edu.mit.cci.pogs.view.study.beans.SessionBean;
 import edu.mit.cci.pogs.view.study.beans.StudyBean;
 
 @Controller
@@ -50,7 +51,7 @@ public class StudyController {
         model.addAttribute("study", study);
 
 
-        List<Session> sessions = studyService.listSessionsByStudyId(study.getId());
+        List<SessionBean> sessions = studyService.groupBessionsByBaseSessions(study.getId());
 
         model.addAttribute("sessionsList", sessions);
 
