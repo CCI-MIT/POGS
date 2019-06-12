@@ -414,7 +414,7 @@ public class WorkspaceController {
         model.addAttribute("subject", fakeSub);
         //model.addAttribute("pogsSession", sr.getSession());
         model.addAttribute("secondsRemainingCurrentUrl",
-                DateUtils.toMilliseconds(task.getPrimerTime()));
+                DateUtils.toMilliseconds(task.getIntroTime()));
 
 
         return "workspace/task_intropreview";
