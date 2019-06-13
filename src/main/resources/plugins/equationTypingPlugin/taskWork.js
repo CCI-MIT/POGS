@@ -162,7 +162,9 @@ class EquationTypingTaskPlugin{
         if (attrName == "typedInField") {
             let index = message.content.attributeIntegerValue;
             //do nothing/
-            $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
+            if(message.sender != this.pogsPlugin.getSubjectId()) {
+                $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
+            }
         } else {
             let index = attrName.replace('equationAnswer', '');
 
