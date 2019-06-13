@@ -45,11 +45,14 @@ class MemoryGridTaskPrimer{
 
             for(let j = 0 ; j< parseInt(gridBluePrint.colsSize); j++) {
                 let td = $('<td/>',{
+                });
+                let span = $('<span/>',{
                     'id': 'gridCell' + total,
-                    'style': ((!colorsInPrime)?(''):('background-color: ' + gridBluePrint.columnColors[j] + ';color:' +
-                             generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';')),
+                    'style': ((!colorsInPrime)?(''):('background-color: ' + gridBluePrint.columnColors[j] + ';padding:5px;display:none;border-radius: 50px;color:' +
+                                                     generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';')),
                     text: answerSheet[total]
                 });
+                td.append(span);
 
 
                 tableRow.append(td);
@@ -75,9 +78,13 @@ class MemoryGridTaskPrimer{
                 let ref = appearingOrder[j][k];
                 setTimeout(function () {
                     console.log("Working on ref: " + ref);
+                    $(ref).show();
                     $(ref).addClass('fadeIn');
                     setTimeout(function () {
                         $(ref).addClass('fadeOut');
+                        setTimeout(function () {
+                            $(ref).hide();
+                        }, 5000);
                     }, 4500);
 
                 }, 5000 * j);

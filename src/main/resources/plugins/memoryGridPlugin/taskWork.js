@@ -104,7 +104,7 @@ class MemoryGridTask {
                 td.append(
                     $('<div/>', {
                         'style': 'color:black;font-size:10px',
-                         text: ((!columnsUserCanChange[j])?(''):('You cannot edit this field!')),
+                         text: ((!columnsUserCanChange[j])?('Answer this field'):('You cannot edit this field!')),
                         'class': 'cantEdit'
                     })
                 );

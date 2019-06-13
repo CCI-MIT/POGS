@@ -5,6 +5,7 @@ class EquationTypingTaskPlugin{
         this.orderIndex = -1;
         this.totalFieldIndex = -1;
         this.teamMates = this.pogsPlugin.getTeammates();
+        this.isTaskSolo = this.pogsPlugin.isSoloTask();
     }
     setup(bluePrint,gridOrder) {
 
@@ -30,17 +31,31 @@ class EquationTypingTaskPlugin{
         let sub = this.teamMates[this.orderIndex];
 
         let inp = null;
+        let isUsersTurn = false;
+        let btnEdit = null;
         if(sub.externalId == this.pogsPlugin.getSubjectId()) {
             inp = $('<input/>', {
                 "class": "doneInp",
                 'id': 'inputEquation_' + this.totalFieldIndex,
+                'style':'margin-right: 5px;',
                 'data-cell-reference-index': this.totalFieldIndex
             });
+            isUsersTurn = true;
+            btnEdit  = $('<input/>', {
+                "class": "btn btn-danger btnEdit",
+                'id': 'editEquation_' + this.totalFieldIndex,
+                "type": "button",
+                "style": "display: none;margin-left: 5px;",
+                'data-cell-reference-index': this.totalFieldIndex,
+                "value": "Edit"
+            });
+
         } else {
             inp = $('<input/>', {
                 "class": "doneInp",
                 'id': 'inputEquation_' + this.totalFieldIndex,
                 'disabled': 'disabled',
+                'style':'margin-right: 5px;',
                 'data-cell-reference-index': this.totalFieldIndex
             });
         }
@@ -52,28 +67,40 @@ class EquationTypingTaskPlugin{
             "value": "Done"
         });
 
+
+
+
         div.append(inp);
         div.append(btn);
+        if(isUsersTurn) {
+            div.append(btnEdit);
+        }
 
         let workOn = $('<div/>', {
-            'class': 'workingOn'
+            'class': 'workingOn',
+            'style': 'margin-bottom: 5px;'
         });
 
 
+        if(!this.isTaskSolo) {
+            if (sub.externalId == this.pogsPlugin.getSubjectId()) {
 
-        if(sub.externalId == this.pogsPlugin.getSubjectId()){
+                $('<span style="font-size:10px;color:black;">It\'s time for</span>')
+                    .appendTo(workOn);
+                $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+                  + '(you)</span>').appendTo(workOn);
+                $('<span style="font-size:10px;color:black;">to submit an answer</span>')
+                    .appendTo(workOn);
+            } else {
+                $('<span style="font-size:10px;color:black;">It\'s time for</span>')
+                    .appendTo(workOn);
+                $('<span class="badge ' + sub.externalId + '_color username">'
+                  + sub.displayName
+                  + '</span>').appendTo(workOn);
 
-            $('<span style="font-size:10px;color:black;">It\'s time for</span>').appendTo(workOn);
-            $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
-              + '(you)</span>').appendTo(workOn);
-            $('<span style="font-size:10px;color:black;">to submit an answer</span>').appendTo(workOn);
-        }else {
-            $('<span style="font-size:10px;color:black;">It\'s time for</span>').appendTo(workOn);
-            $('<span class="badge ' + sub.externalId + '_color username">'
-              + sub.displayName
-              + '</span>').appendTo(workOn);
-
-            $('<span style="font-size:10px;color:black;">to submit an answer</span>').appendTo(workOn);
+                $('<span style="font-size:10px;color:black;">to submit an answer</span>')
+                    .appendTo(workOn);
+            }
         }
         div.append(workOn);
 
@@ -82,9 +109,11 @@ class EquationTypingTaskPlugin{
 
     }
     setupHooks(){
-        $("input").unbind().on('keyup', this.handleOnClick.bind(this));
+        $(".doneInp").unbind().on('keyup', this.handleOnClick.bind(this));
 
         $(".doneBtn").unbind().on('click', this.handleOnBlur.bind(this));
+
+        $(".btnEdit").unbind().on('click', this.handleOnClickEdit.bind(this));
 
 
     }
@@ -97,6 +126,7 @@ class EquationTypingTaskPlugin{
             this.pogsPlugin.saveCompletedTaskAttribute('typedInField',
                                                        valueTyped, 0.0,
                                                        cellIndex, false);
+
         }
     }
     handleOnBlur(event){
@@ -112,8 +142,19 @@ class EquationTypingTaskPlugin{
                 this.pogsPlugin.saveCompletedTaskAttribute('equationAnswer' + cellIndex,
                                                            valueTyped, 0.0,
                                                            0, true, '');
+                $("#editEquation_"+cellIndex).show();
             }
         }
+    }
+    handleOnClickEdit(event){
+        console.log("Before cellIndex ");
+        let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
+        console.log("Clicked edit " + cellIndex);
+
+        $("#inputEquation_"+cellIndex).prop('disabled', false);
+        $("#editEquation_"+cellIndex).hide();
+        $("#inputEquation_"+cellIndex).focus();
+        $('#doneEquation_' + cellIndex).attr("value", "Done");
     }
     broadcastReceived(message) {
         let attrName = message.content.attributeName;
@@ -124,7 +165,12 @@ class EquationTypingTaskPlugin{
             $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
         } else {
             let index = attrName.replace('equationAnswer', '');
-            $('#cell_' + index + ' input').val(message.content.attributeStringValue);
+
+            //$('#cell_' + index + ' input').val(message.content.attributeStringValue);
+
+            $("#inputEquation_"+index).val(message.content.attributeStringValue);
+            $("#inputEquation_"+index).prop('disabled', true);
+            $("#doneEquation_"+index).val(message.content.attributeStringValue);
 
             if(this.totalFieldIndex == index) {
                 this.createNextFieldAndWhoShouldBeAbleToEdit();
