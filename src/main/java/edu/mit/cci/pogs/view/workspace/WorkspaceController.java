@@ -434,7 +434,7 @@ public class WorkspaceController {
 
             model.addAttribute("task", tw);
             model.addAttribute("secondsRemainingCurrentUrl",
-                    new Date().getTime() + task.getInteractionTime());
+                     + DateUtils.toMilliseconds(task.getInteractionTime()));
             org.json.JSONArray executionAttributes =
                     taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId());
             model.addAttribute("taskConfigurationAttributes",
