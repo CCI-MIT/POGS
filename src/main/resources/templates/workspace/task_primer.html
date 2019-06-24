@@ -12,10 +12,16 @@
 
 
 
-        <div class="form-group waiting_message" >
-            <div id="countdown"></div>
-            <div th:remove="tag" th:utext="${task.primerText}"></div>
-        </div>
+       <div class="form-group waiting_message w-100" >
+                   <div id="countdown"></div>
+                   <div class="row w-100">
+                       <div class="col-2 w-100"></div>
+                       <div class="col-8" style="text-align: left">
+                           <div  th:remove="tag" th:utext="${task.primerText}"></div>
+                       </div>
+                       <div class="col-2 w-100"></div>
+                   </div>
+               </div>
     <style  th:inline="text" th:if="${taskCss != null}">
 
         /*<![CDATA[*/
