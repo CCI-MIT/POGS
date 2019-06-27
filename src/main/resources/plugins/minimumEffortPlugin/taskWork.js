@@ -210,21 +210,23 @@ class MinimumEffortTask {
     }
 
     createTable() {
-        $(".information")
+        //$(".information")
+        $("#payoffContainer")
             .append('<table id="paymentStructure" border="1" style="margin: auto"></table>');
     }
 
     generateNewPaymentStructure(numbers) {
         let k = 0;
         this.createTable();
-        $("#paymentStructure").append('<tr><th>Own number</th><th colspan="' + numbers
+        $("#paymentStructure").append('<tr><th> - </th><th colspan="' + numbers
                                  + '">Smallest number in group</th></tr>');
 
         for (let i = 0; i < numbers; i++) {
             if (i == 0) {
                 let line = $("<tr>");
                 let column = $("<th>");
-                column.text(" - ");
+                column.css("width","40px")
+                column.text(" Your number ");
                 line.append(column);
                 for (let j = 0; j < numbers; j++) {
                     let column = $("<th>");

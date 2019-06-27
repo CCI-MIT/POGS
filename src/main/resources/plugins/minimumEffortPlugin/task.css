@@ -2,12 +2,18 @@
  Any CSS that the developer will need to use on the editing page, primer and task work.
 */
 
+table {
+    font-size: 13px
+}
 table input {
     width:50px;
 }
 table th {
     vertical-align: middle;
     text-align: center;
+}
+table td {
+    padding: 3px
 }
 #minEff h2 {
     color: black;
