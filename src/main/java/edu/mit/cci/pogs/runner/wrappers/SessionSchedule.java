@@ -86,6 +86,6 @@ public class SessionSchedule {
     }
 
     public boolean isHappeningNow(Long currentTimestamp) {
-        return currentTimestamp >= getStartTimestamp() && currentTimestamp < getEndTimestamp();
+        return (currentTimestamp >= getStartTimestamp() && currentTimestamp < getEndTimestamp());
     }
 }

@@ -71,6 +71,11 @@ class Field {
             let sub = this.getPogsPlugin().getSubjectByExternalId(subjectId);
             $("#surveyField_" + this.index + " .finalsubjectanswer").empty();
 
+            let isOwnSub = false;
+            if(sub.externalId == this.getPogsPlugin().getSubjectId() ){
+                isOwnSub = true;
+            }
+
             $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName +((isOwnSub)?("(you)"):(""))
               + '</span>')
                 .appendTo("#surveyField_" + this.index + " .finalsubjectanswer");
