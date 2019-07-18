@@ -61,6 +61,8 @@ public class SessionBean {
 
     private Long      sessionWideScriptId;
 
+    private Boolean displayNameGenerationEnabled;
+
 
 
     public SessionBean() {
@@ -113,6 +115,7 @@ public class SessionBean {
         this.scheduleConditionType = value.getScheduleConditionType();
         this.executableScriptId = value.getExecutableScriptId();
         this.sessionWideScriptId = value.getSessionWideScriptId();
+        this.displayNameGenerationEnabled = value.getDisplayNameGenerationEnabled();
     }
 
     public String getScheduleConditionType() {
@@ -495,5 +498,13 @@ public class SessionBean {
 
     public void setSessionWideScriptId(Long sessionWideScriptId) {
         this.sessionWideScriptId = sessionWideScriptId;
+    }
+
+    public Boolean getDisplayNameGenerationEnabled() {
+        return displayNameGenerationEnabled;
+    }
+
+    public void setDisplayNameGenerationEnabled(Boolean displayNameGenerationEnabled) {
+        this.displayNameGenerationEnabled = displayNameGenerationEnabled;
     }
 }

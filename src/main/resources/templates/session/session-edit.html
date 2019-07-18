@@ -277,6 +277,15 @@
                                     <div class="col-sm-9">
                                         <input class="form-check-input" value="false" data-trigger="displayName"  th:field="*{displayNameChangePageEnabled}" type="checkbox" id="displayNameChangePageEnabled" />
                                     </div>
+
+                                </div>
+
+                                <div class="form-group row">
+                                    <label class="col-sm-3 col-form-label" for="displayNameGenerationEnabled">Generate Display Name Enabled:</label>
+                                    <div class="col-sm-9">
+                                        <input class="form-check-input" value="false" data-trigger="displayName"  th:field="*{displayNameGenerationEnabled}" type="checkbox" id="displayNameGenerationEnabled" />
+                                    </div>
+                                    <small id="displayNameGenerator" class="form-text text-muted">If enabled subjects will be assigned random greek letters at the beginning of the session</small>
                                 </div>
 
                                 <div class="form-group row hideable" data-hide="displayName">

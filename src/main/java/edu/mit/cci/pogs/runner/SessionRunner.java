@@ -70,6 +70,7 @@ import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
+import edu.mit.cci.pogs.utils.StringUtils;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -489,8 +490,25 @@ public class SessionRunner implements Runnable {
 
 
         assignColorsToTeamMembers(round.getRoundTeams());
-    }
 
+        if(session.getDisplayNameGenerationEnabled()){
+            assignDisplayNamesToTeamMembers(round.getRoundTeams());
+        }
+    }
+    private void assignDisplayNamesToTeamMembers(List<TeamWrapper> roundTeams) {
+        for (TeamWrapper tw : roundTeams) {
+            List<Subject> subjectList = tw.getSubjects();
+            String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size());
+            for(int i = 0; i <subjectList.size(); i ++){
+                Subject su = subjectList.get(i);
+                if(displayNames.length>i) {
+                    su.setSubjectDisplayName(displayNames[i]);
+                    subjectDao.update(su);
+                }
+            }
+        }
+
+    }
     private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
 
         for (TeamWrapper tw : roundTeams) {
