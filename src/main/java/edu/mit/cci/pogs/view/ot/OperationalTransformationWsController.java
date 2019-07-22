@@ -78,6 +78,7 @@ public class OperationalTransformationWsController {
         //TODO: workaround because the sending doesn't seem to work
         workspaceTaskWSController.saveTaskAttribute(message);
 
+        /*
         final TaskAttributeMessageContent fullTextContent =
                 new TaskAttributeMessageContent("fullText", true);
         fullTextContent.setBroadcastableAttribute(false);
@@ -89,5 +90,6 @@ public class OperationalTransformationWsController {
                 pogsMessage.getCompletedTaskId(), pogsMessage.getSessionId());
 
         workspaceTaskWSController.saveTaskAttribute(fullTextMessage);
+        */
     }
 }

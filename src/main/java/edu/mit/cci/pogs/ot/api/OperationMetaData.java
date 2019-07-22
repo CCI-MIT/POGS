@@ -33,4 +33,9 @@ public class OperationMetaData {
     public void setAdditionalMetaData(Map<String, String> additionalMetaData) {
         this.additionalMetaData = additionalMetaData;
     }
+
+    @Override
+    public String toString() {
+        return "[" + authorId + "]" + "<" + timestamp + ">";
+    }
 }
