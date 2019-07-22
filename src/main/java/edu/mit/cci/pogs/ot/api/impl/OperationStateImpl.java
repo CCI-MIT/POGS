@@ -26,8 +26,7 @@ public class OperationStateImpl implements OperationState {
             operation = transform(operation);
         }
         operation.setId(operations.size());
-        System.out.println("operations.size() - " + operations.size());
-        System.out.println("Operation ID to apply - " + operation.getId());
+
         text = operation.apply(text);
         operations.add(operation);
         return operation;
