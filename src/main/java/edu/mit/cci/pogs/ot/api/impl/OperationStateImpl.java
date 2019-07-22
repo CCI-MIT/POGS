@@ -43,7 +43,7 @@ public class OperationStateImpl implements OperationState {
         final List<Operation> concurrentOperations = findOperationsSince(operation.getParentId());
 
         Operation transformedOperation = operation;
-        System.out.println(concurrentOperations);
+
         for (Operation concurrentOperation : concurrentOperations) {
             final TransformedOperationPair transformedOperationPair =
                     transformedOperation.transform(concurrentOperation);

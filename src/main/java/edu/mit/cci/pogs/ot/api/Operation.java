@@ -273,6 +273,16 @@ public class Operation {
         Operation operationA = this;
 
         if (operationA.baseLength != operationB.baseLength) {
+            System.out.println(" ----------------------------------------------------------------");
+            System.out.println("operationA: " + operationA.getId() + " operationB: "+ operationB.getId());
+            System.out.println("operationA components size " + operationA.components.size()+"");
+            System.out.println(operationA.components);
+            System.out.println(operationA.metaData);
+
+            System.out.println("operationB components size " + operationB.components.size()+"");
+            System.out.println(operationB.components);
+            System.out.println(operationB.metaData);
+            System.out.println(" ----------------------------------------------------------------");
             throw new IllegalArgumentException(String.format(
                     "Both operations must have the same baseLength: operationA.baseLength = %d, "
                             + "operationB.baseLength = %d.\nOperationA: %s\nOperationB: %s",
