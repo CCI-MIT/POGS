@@ -33,7 +33,7 @@ public class OperationService {
         return processOperation(padId, operation, false);
     }
 
-    public Operation processOperation(String padId, Operation operation, boolean create) {
+    public synchronized  Operation processOperation(String padId, Operation operation, boolean create) {
         if (operation.getPadId() != null && !Objects.equals(operation.getPadId(), padId)) {
             throw new IllegalArgumentException(String.format(
                     "This operation's padId %s does not match the given padId %s.",
@@ -48,7 +48,7 @@ public class OperationService {
                 throw new IllegalArgumentException("There is no server state with the given padId");
             }
         }
-
+        System.out.println("Before apply: " + operation.getId());
         return operationState.apply(operation);
     }
 

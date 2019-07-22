@@ -172,7 +172,7 @@ public class WorkspaceController {
                 }
             }
         }
-
+        //go to pre-check-in page (wait)
         return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
     }
 

@@ -29,7 +29,7 @@ class MemoryGridTask {
                 tableRow.append(tdz);
             }
             for (let j = 0; j < gridBluePrint.colsSize; j++) {
-                let td = $('<th/>');
+                let td = $('<th>');
                 let divHeader = $('<div/>', {style: "font-color: black"});
                 let divSubj = $('<div/>');
                 for (let k = 0; k < this.colorHasSubjects[j].length; k++) {
@@ -62,6 +62,7 @@ class MemoryGridTask {
 
             if(headersInTask){
                 let td = $('<th/>', {text: (i+1)});
+
                 tableRow.append(td);
             }
             for(let j = 0 ; j< gridBluePrint.colsSize; j++) {

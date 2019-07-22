@@ -59,12 +59,23 @@ class EquationTypingTaskPlugin{
                 'data-cell-reference-index': this.totalFieldIndex
             });
         }
+
+
+
         let btn  = $('<input/>', {
             "class": "btn btn-info doneBtn",
             'id': 'doneEquation_' + this.totalFieldIndex,
             "type": "button",
             'data-cell-reference-index': this.totalFieldIndex,
             "value": "Done"
+        });
+
+        let btnTK  = $('<input/>', {
+            "class": "btn btn-danger takeTurnBtn",
+            'id': 'takeTurnEquation_' + this.totalFieldIndex,
+            "type": "button",
+            'data-cell-reference-index': this.totalFieldIndex,
+            "value": "Take turn"
         });
 
 
@@ -74,6 +85,8 @@ class EquationTypingTaskPlugin{
         div.append(btn);
         if(isUsersTurn) {
             div.append(btnEdit);
+        } else {
+            div.append(btnTK);
         }
 
         let workOn = $('<div/>', {
