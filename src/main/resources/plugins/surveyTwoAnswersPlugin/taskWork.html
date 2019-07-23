@@ -52,6 +52,7 @@ class Field {
 
     }
     setSecondAnswerField(field){
+        console.log("Setting second answer field object" + field)
         this.secondAnswerField = field;
     }
     broadcastReceived(message){
@@ -70,11 +71,26 @@ class Field {
 
 
     }
+    setAuthorModal(){
+    	$("#surveyField_"+this.index).css("position","relative");
+    	$("#surveyField_"+this.index).append("<div id='not_able_answer_"+this.index+"' style='width: 100%;height: 100%;position: absolute;top: 0;left: 0;background-color: rgb(0,0,0);background-color: rgba(0,0,0,0.4);text-align: center;padding: 26px;margin-left: -24px;'><div>You can't answer the second because you were author of the first answer .</div></div>");
+    }
+    unsetAuthorModal(){
+    if($("#not_able_answer_"+this.index)){
+    	$("#not_able_answer_"+this.index).remove();
+    	$("#surveyField_"+this.index).css("position","");
+    	}
+    }
     setOriginalFieldAuthor(author){
         this.originalFieldAuthor = author;
         //if it is me set the block
         this.show();
-        console.log("Showing the field after final awnswer is set to original field")
+        if(this.originalFieldAuthor == this.getPogsPlugin().getSubjectId()){
+            this.setAuthorModal();
+        }else {
+            this.unsetAuthorModal();
+        }
+        console.log("Showing the field after final awnswer is set to original field and final answer was: " + this.originalFieldAuthor)
     }
     show(){
         $('#surveyField_' +this.index).show();

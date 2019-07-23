@@ -173,7 +173,7 @@ WorkspaceController {
                 }
             }
         }
-
+        //go to pre-check-in page (wait)
         return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
     }
 
@@ -198,7 +198,7 @@ WorkspaceController {
         }
         SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr == null) {
-            model.addAttribute("errorMessage", "Too early.");
+            model.addAttribute("errorMessage", "Session id: " + su.getSessionId() +"  Too early.");
             return "workspace/error";
         }
         if (sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {

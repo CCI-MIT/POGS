@@ -48,7 +48,11 @@ class MemoryGridTaskPrimer{
                 });
                 let span = $('<span/>',{
                     'id': 'gridCell' + total,
-                    'style': ((!colorsInPrime)?(''):('background-color: ' + gridBluePrint.columnColors[j] + ';padding:5px;display:none;border-radius: 50px;color:' +
+                    'style': ((!colorsInPrime)?
+                              ('background-color:black ;padding:5px;display:none;border-radius:50px;'
+                               + 'color:white;'):('background-color: ' +
+                                                  gridBluePrint.columnColors[j] +
+                                                  ';padding:5px;display:none;border-radius: 50px;color:' +
                                                      generateFontColorBasedOnBackgroundColor(gridBluePrint.columnColors[j]) + ';')),
                     text: answerSheet[total]
                 });

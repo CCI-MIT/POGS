@@ -26,6 +26,7 @@ public class OperationStateImpl implements OperationState {
             operation = transform(operation);
         }
         operation.setId(operations.size());
+
         text = operation.apply(text);
         operations.add(operation);
         return operation;
@@ -42,6 +43,7 @@ public class OperationStateImpl implements OperationState {
         final List<Operation> concurrentOperations = findOperationsSince(operation.getParentId());
 
         Operation transformedOperation = operation;
+
         for (Operation concurrentOperation : concurrentOperations) {
             final TransformedOperationPair transformedOperationPair =
                     transformedOperation.transform(concurrentOperation);
@@ -64,4 +66,6 @@ public class OperationStateImpl implements OperationState {
     public List<Operation> getAllOperations() {
         return new ArrayList<>(operations);
     }
+
+
 }

@@ -12,9 +12,13 @@ body{
 #gridTable td {
     border: 2px solid #444;
     text-align: center;
+    vertical-align: text-top;
     color: white;
-    width: 177px;
+    width: 105px;
     height: 74px;
+}
+td input {
+    width: 105px;
 }
 
 #gridTable th {
