@@ -54,6 +54,18 @@ public class TaskConfigurationDaoImpl extends AbstractDao<TaskConfiguration, Lon
         }
     }
 
+    public TaskConfiguration getByTaskPluginConfigurationId(long taskPluginInt) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(TASK_CONFIGURATION).getQuery();
+        query.addConditions(TASK_CONFIGURATION.ID.eq(taskPluginInt));
+        Record record =  query.fetchOne();
+        if(record == null) {
+            return null;
+        }else{
+            return record.into(TaskConfiguration.class);
+        }
+    }
+
 
 }
  
