@@ -90,6 +90,15 @@ public class TaskExecutionAttributeService {
         return attributesToJsonArray(taskExecutionAttributes);
     }
 
+    public JSONArray listExecutionAttributesFromPluginConfigAsJsonArray(long pluginConfigId){
+        //get task configurations
+        TaskConfiguration tc = taskConfigurationDao.getByTaskPluginConfigurationId(pluginConfigId);
+
+        List<TaskExecutionAttribute> taskExecutionAttributes = taskExecutionAttributeDao
+                .listByTaskConfigurationId(tc.getId());
+
+        return attributesToJsonArray(taskExecutionAttributes);
+    }
 
 
 }

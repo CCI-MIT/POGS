@@ -58,7 +58,8 @@ import edu.mit.cci.pogs.utils.DateUtils;
 
 
 @Controller
-public class WorkspaceController {
+public class
+WorkspaceController {
 
     @Autowired
     private WorkspaceService workspaceService;
@@ -518,7 +519,7 @@ public class WorkspaceController {
     @GetMapping("/taskplugin/{taskPlugin}/{pluginConfig}/w/{subjectExternalId}")
     public String taskWorkPluginTest(
             @PathVariable("taskPlugin") String taskPlugin,
-            @PathVariable("pluginConfig") String pluginConfig,
+            @PathVariable("pluginConfig") long pluginConfigId,
             @PathVariable("subjectExternalId") String subjectExternalId,
             Model model) {
 
@@ -526,7 +527,7 @@ public class WorkspaceController {
         if (pl != null) {
 
             model.addAttribute("taskConfigurationAttributes",
-                    taskExecutionAttributeService.listExecutionAttributesFromPluginConfigAsJsonArray(pluginConfig));
+                    taskExecutionAttributeService.listExecutionAttributesFromPluginConfigAsJsonArray(pluginConfigId));
             //get task html & js from plugin file system
             model.addAttribute("taskCss", pl.getTaskCSSContent());
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
