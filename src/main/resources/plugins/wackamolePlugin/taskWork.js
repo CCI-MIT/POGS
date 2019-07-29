@@ -37,6 +37,11 @@ class Wackamole {
 
         $.each(whackValues, function (i, e) {
             //if (teammates[e.player].externalId == self.pogsPlugin.getSubjectId()) {
+                console.log(" whackConfig i :" + i);
+                console.log(" e.maxMoleNum:" + e.maxMoleNum);
+                console.log(" e.numberOfRounds:" + e.numberOfRounds);
+                console.log(" e.moleAppearTime:" + e.moleAppearTime);
+
                 self.maxMoleNumber = e.maxMoleNum;
                 self.numberOfRounds = e.numberOfRounds;
                 self.moleAppearTime = e.moleAppearTime * 1000; // time in millisecond
@@ -405,6 +410,8 @@ class Wackamole {
                 //if not ended start new round
                 if(self.multiplayerRound + 1 <= self.numberOfRounds) {
                     self.handleReadyOnClick(null);
+                } else {
+                    $("#newRoundText").text("No more rounds to start!")
                 }
             }
         }, 170); // This is mole appear frequency when moleNum is less than maxMoleNum
