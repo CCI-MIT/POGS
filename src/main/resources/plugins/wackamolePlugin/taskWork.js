@@ -98,7 +98,11 @@ class Wackamole {
             self.teammates[player.externalId] = playerObj;
         });
 
-        this.handleReadyOnClick(null);//auto start round.
+        setTimeout(function () {
+            this.handleReadyOnClick(null);//auto start round after 10 seconds
+        }.bind(this),1000*10);
+
+
     }
 
     broadcastReceived(message) {
