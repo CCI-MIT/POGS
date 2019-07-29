@@ -74,6 +74,7 @@ class EquationTypingTaskPlugin{
             "class": "btn btn-danger takeTurnBtn",
             'id': 'takeTurnEquation_' + this.totalFieldIndex,
             "type": "button",
+            "style": "margin-left:10px",
             'data-cell-reference-index': this.totalFieldIndex,
             "value": "Take turn"
         });
@@ -85,6 +86,8 @@ class EquationTypingTaskPlugin{
         div.append(btn);
         if(isUsersTurn) {
             div.append(btnEdit);
+            btnTK.css("display","none");
+            div.append(btnTK);
         } else {
             div.append(btnTK);
         }
@@ -100,14 +103,14 @@ class EquationTypingTaskPlugin{
 
                 $('<span style="font-size:10px;color:black;">It\'s time for</span>')
                     .appendTo(workOn);
-                $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+                $('<span class="badge badgeUser ' + sub.externalId + '_color username">' + sub.displayName
                   + '(you)</span>').appendTo(workOn);
                 $('<span style="font-size:10px;color:black;">to submit an answer</span>')
                     .appendTo(workOn);
             } else {
                 $('<span style="font-size:10px;color:black;">It\'s time for</span>')
                     .appendTo(workOn);
-                $('<span class="badge ' + sub.externalId + '_color username">'
+                $('<span class="badge badgeUser ' + sub.externalId + '_color username">'
                   + sub.displayName
                   + '</span>').appendTo(workOn);
 
@@ -121,6 +124,7 @@ class EquationTypingTaskPlugin{
         this.setupHooks();
 
     }
+
     setupHooks(){
         $(".doneInp").unbind().on('keyup', this.handleOnClick.bind(this));
 
@@ -128,7 +132,21 @@ class EquationTypingTaskPlugin{
 
         $(".btnEdit").unbind().on('click', this.handleOnClickEdit.bind(this));
 
+        $(".takeTurnBtn").unbind().on('click', this.handleTakeTurn.bind(this));
 
+
+    }
+    handleTakeTurn(event) {
+
+        var cellIndex = parseInt($(event.target).data("cell-reference-index"));
+
+        if (!isNaN(cellIndex)) {
+
+            this.pogsPlugin.saveCompletedTaskAttribute('takeTurnInField',
+                                                       "", 0.0,
+                                                       cellIndex, true, '');
+
+        }
     }
     handleOnClick(event){
 
@@ -160,9 +178,9 @@ class EquationTypingTaskPlugin{
         }
     }
     handleOnClickEdit(event){
-        console.log("Before cellIndex ");
+        //console.log("Before cellIndex ");
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        console.log("Clicked edit " + cellIndex);
+        //console.log("Clicked edit " + cellIndex);
 
         $("#inputEquation_"+cellIndex).prop('disabled', false);
         $("#editEquation_"+cellIndex).hide();
@@ -171,24 +189,78 @@ class EquationTypingTaskPlugin{
     }
     broadcastReceived(message) {
         let attrName = message.content.attributeName;
+        let cellIndex = message.content.attributeIntegerValue;
 
-        if (attrName == "typedInField") {
-            let index = message.content.attributeIntegerValue;
-            //do nothing/
-            if(message.sender != this.pogsPlugin.getSubjectId()) {
-                $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
+        if(attrName == "takeTurnInField"){
+
+            if(message.sender == this.pogsPlugin.getSubjectId()) {
+                //if user who took the turn is self
+                //enable field
+                $("#inputEquation_"+cellIndex).prop('disabled', false);
+                $("#takeTurnEquation_"+cellIndex).hide();
+
             }
-        } else {
-            let index = attrName.replace('equationAnswer', '');
+            let sub = this.teamMates[this.orderIndex];
+            if(sub.externalId == this.pogsPlugin.getSubjectId()) {
+                //if user who lost turn is self
+                //disable field
+                $("#inputEquation_"+cellIndex).prop('disabled', true);
+                $("#takeTurnEquation_"+cellIndex).show();
 
-            //$('#cell_' + index + ' input').val(message.content.attributeStringValue);
+            }
 
-            $("#inputEquation_"+index).val(message.content.attributeStringValue);
-            $("#inputEquation_"+index).prop('disabled', true);
-            $("#doneEquation_"+index).val(message.content.attributeStringValue);
 
-            if(this.totalFieldIndex == index) {
-                this.createNextFieldAndWhoShouldBeAbleToEdit();
+            //set current user to submit answer
+
+            let workOn = $("#cell_"+cellIndex +" .workingOn");
+
+            workOn.empty();
+
+            sub = this.pogsPlugin.getSubjectByExternalId(message.sender);
+
+
+
+            if(message.sender == this.pogsPlugin.getSubjectId()) {
+                //adds the (you)
+                $('<span style="font-size:10px;color:black;">It\'s time for</span>')
+                    .appendTo(workOn);
+                $('<span class="badge badgeUser ' + sub.externalId + '_color username">' + sub.displayName
+                  + '(you)</span>').appendTo(workOn);
+                $('<span style="font-size:10px;color:black;">to submit an answer</span>')
+                    .appendTo(workOn);
+            } else {
+                $('<span style="font-size:10px;color:black;">It\'s time for</span>')
+                    .appendTo(workOn);
+                $('<span class="badge badgeUser ' + sub.externalId + '_color username">'
+                  + sub.displayName
+                  + '</span>').appendTo(workOn);
+
+                $('<span style="font-size:10px;color:black;">to submit an answer</span>')
+                    .appendTo(workOn);
+            }
+
+        }
+        else {
+
+            if (attrName == "typedInField") {
+                let index = message.content.attributeIntegerValue;
+                //do nothing/
+                if (message.sender != this.pogsPlugin.getSubjectId()) {
+                    $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
+                }
+            } else {
+                let index = attrName.replace('equationAnswer', '');
+
+                //$('#cell_' + index + ' input').val(message.content.attributeStringValue);
+
+                $("#inputEquation_" + index).val(message.content.attributeStringValue);
+                $("#inputEquation_" + index).prop('disabled', true);
+                $("#doneEquation_" + index).val(message.content.attributeStringValue);
+                $("#takeTurnEquation_"+index).hide();
+
+                if (this.totalFieldIndex == index) {
+                    this.createNextFieldAndWhoShouldBeAbleToEdit();
+                }
             }
         }
     }

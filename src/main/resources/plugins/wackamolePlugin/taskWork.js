@@ -14,6 +14,8 @@ class Wackamole {
         this.playerHitOnTarget = 0;
         this.totalTarget = 0;
         this.multiplayerRound = 0;
+        this.numberOfRounds = 0;
+
         console.log(pogsPlugin);
     }
 
@@ -34,11 +36,12 @@ class Wackamole {
         });
 
         $.each(whackValues, function (i, e) {
-            if (teammates[e.player].externalId == self.pogsPlugin.getSubjectId()) {
+            //if (teammates[e.player].externalId == self.pogsPlugin.getSubjectId()) {
                 self.maxMoleNumber = e.maxMoleNum;
+                self.numberOfRounds = e.numberOfRounds;
                 self.moleAppearTime = e.moleAppearTime * 1000; // time in millisecond
                 self.clickDelay = e.clickDelay * 1000;
-            }
+            //}
         });
 
         // Only show readyView at start
@@ -94,6 +97,8 @@ class Wackamole {
             var playerObj = new Player(externalId, displayName,  isCurrentPlayer);
             self.teammates[player.externalId] = playerObj;
         });
+
+        this.handleReadyOnClick(null);//auto start round.
     }
 
     broadcastReceived(message) {
@@ -392,6 +397,11 @@ class Wackamole {
                 $(".whack_gametable-cell").find('.fa-optin-monster').remove();
                 $(".whack_gametable-cell").removeClass("hasMole");
                 self.displayEvaluationForm();
+
+                //if not ended start new round
+                if(self.multiplayerRound + 1 <= self.numberOfRounds) {
+                    self.handleReadyOnClick(null);
+                }
             }
         }, 170); // This is mole appear frequency when moleNum is less than maxMoleNum
 
