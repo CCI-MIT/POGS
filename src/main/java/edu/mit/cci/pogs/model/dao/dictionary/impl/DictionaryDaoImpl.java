@@ -13,7 +13,7 @@ import edu.mit.cci.pogs.model.dao.dictionary.DictionaryDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.records.DictionaryRecord;
 
-import static edu.mit.cci.pogs.model.jooq.Tables.DICTIONARY;
+import static edu.mit.cci.pogs.model.jooq.Tables.*;
 
 @Repository
 public class DictionaryDaoImpl extends AbstractDao<Dictionary, Long, DictionaryRecord> implements DictionaryDao {
@@ -30,6 +30,18 @@ public class DictionaryDaoImpl extends AbstractDao<Dictionary, Long, DictionaryR
     public List<Dictionary> list() {
         final SelectQuery<Record> query = dslContext.select()
                 .from(DICTIONARY).getQuery();
+
+        return query.fetchInto(Dictionary.class);
+    }
+
+    public List<Dictionary> listDictionariesWithUserGroup(Long userId){
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(DICTIONARY)
+                .join(DICTIONARY_HAS_RESEARCH_GROUP).on(DICTIONARY_HAS_RESEARCH_GROUP.DICTIONARY_ID.eq(DICTIONARY.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(DICTIONARY_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
+                .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .getQuery();
 
         return query.fetchInto(Dictionary.class);
     }

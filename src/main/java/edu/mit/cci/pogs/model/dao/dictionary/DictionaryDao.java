@@ -7,4 +7,5 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 
 public interface DictionaryDao extends Dao<Dictionary, Long> {
     List<Dictionary> list();
+    List<Dictionary> listDictionariesWithUserGroup(Long userId);
 }
