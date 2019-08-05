@@ -9,7 +9,7 @@ curl \
     https://github.com/ether/etherpad-lite/archive/develop.tar.gz && \
 mkdir /home/pogs/binaries/etherpad-lite && \
 echo "Unpackaging etherpad" && \
-tar xf /opt/etherpad-lite.tar.gz \
+tar xf /home/pogs/binaries/etherpad-lite.tar.gz \
     --directory /home/pogs/binaries/etherpad-lite \
     --strip-components=1
 echo "Deleting tar.gz"
