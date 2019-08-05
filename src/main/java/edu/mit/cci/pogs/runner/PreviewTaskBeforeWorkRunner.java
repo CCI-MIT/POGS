@@ -26,6 +26,9 @@ public class PreviewTaskBeforeWorkRunner extends TaskBeforeWorkRunner {
         //get all subjects + subjects attributes
 
         boolean isSoloTask = false;
+        this.getEngine().put("sessionId", -1);
+        this.getEngine().put("completedTaskId", -1);
+
         if(this.getCompletedTask().getSubjectId()!=null){
             isSoloTask = true;
 
@@ -44,7 +47,10 @@ public class PreviewTaskBeforeWorkRunner extends TaskBeforeWorkRunner {
         //get all task_execution_attribute
         this.getEngine().put("taskConfigurationAttributes", executionAttributes);
 
-        this.getEngine().put("completedTaskAttributes", "[]");
+        this.getEngine().put("completedTaskAttributes", "[{" +
+                "    \"attributeName\": \"padID\"," +
+                "    \"stringValue\": \"TESTPAD\"" +
+                "}]");
 
     }
 

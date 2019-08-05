@@ -8,10 +8,12 @@ class Pogs {
         this.task = null;  // observers
         this.team = null;  // observers
     }
-    createPlugin(pluginName, initFunc) {
-        var pl = new PogsPlugin(pluginName, initFunc, this);
+    createPlugin(pluginName, initFunc, destroyFunct) {
+        var pl = new PogsPlugin(pluginName, initFunc, this,destroyFunct);
         this.plugins.push(pl);
         this.subscribe('onReady', pl.initFunc.bind(pl));
+
+        this.subscribe("onUnload", pl.destroyFunc.bind(pl));
         return pl;
     }
     setupSubjectColors(){
