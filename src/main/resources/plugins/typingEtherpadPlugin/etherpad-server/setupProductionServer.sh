@@ -5,7 +5,7 @@ curl \
     --fail \
     --silent \
     --show-error \
-    --output /opt/etherpad-lite.tar.gz \
+    --output /home/pogs/binaries/etherpad-lite.tar.gz \
     https://github.com/ether/etherpad-lite/archive/develop.tar.gz && \
 mkdir /home/pogs/binaries/etherpad-lite && \
 echo "Unpackaging etherpad" && \
