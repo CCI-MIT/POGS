@@ -19,7 +19,7 @@ ARG ETHERPAD_VERSION=develop
 #
 # EXAMPLE:
 #   ETHERPAD_PLUGINS="ep_codepad ep_author_neat"
-ARG ETHERPAD_PLUGINS=
+ARG ETHERPAD_PLUGINS="ep_font_size"
 
 # Set the following to production to avoid installing devDeps
 # this can be done with build args (and is mandatory to build ARM version)
@@ -60,6 +60,7 @@ RUN for PLUGIN_NAME in ${ETHERPAD_PLUGINS}; do npm install "${PLUGIN_NAME}"; don
 #   https://stackoverflow.com/questions/31528384/conditional-copy-add-in-dockerfile#46801962
 COPY settings.json /opt/etherpad-lite/
 COPY APIKEY.txt /opt/etherpad-lite/
+COPY pad.css /opt/etherpad-lite/src/static/custom/
 
 EXPOSE 9001
 CMD ["node", "node_modules/ep_etherpad-lite/node/server.js"]

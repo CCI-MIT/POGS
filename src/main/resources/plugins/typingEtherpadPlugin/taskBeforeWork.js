@@ -121,7 +121,7 @@ var sessionId_ = sessionId;
 var completedTaskId_ = completedTaskId;
 
 //1 Create new session if not already created;
-var groupId = createGroupIfNotExistsFor("s"+ sessionId_);
+var groupId = createGroupIfNotExistsFor(sessionId_);
 
 var _subjectAttributesToAdd = [];
 //2 For each subject

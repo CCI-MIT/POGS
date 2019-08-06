@@ -20,3 +20,6 @@ echo "Copy settings.json to etherpad-lite"
 cp  settings.json /home/pogs/binaries/etherpad-lite/
 echo "Copy APIKEY.txt to etherpad-lite"
 cp  APIKEY.txt /home/pogs/binaries/etherpad-lite/
+echo "Copy custom pad css to etherpad-lite"
+cp pad.css /home/pogs/binaries/etherpad-lite/src/static/custom/
+echo "Now update the settings.json file with mysql configuration"

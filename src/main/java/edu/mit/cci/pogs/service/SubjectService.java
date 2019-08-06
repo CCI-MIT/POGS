@@ -96,9 +96,9 @@ public class SubjectService {
                                 sa.setRealValue(att.getDouble("doubleValue"));
                             }
                             if(att.has("internalAttribute")){
-                                //sa.setInternalAttribute(true);
+                                sa.setInternalAttribute(true);
                             } else {
-                                //sa.setInternalAttribute(false);
+                                sa.setInternalAttribute(false);
                             }
                             boolean alreadyExist = false;
                             List<SubjectAttribute> list = subjectAttributeDao.listBySubjectId(su.getId());
