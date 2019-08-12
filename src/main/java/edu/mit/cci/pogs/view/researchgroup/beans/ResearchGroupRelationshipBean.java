@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
 
 
@@ -32,10 +33,20 @@ public class ResearchGroupRelationshipBean {
         }
     }
 
-    public void setTaskyHasResearchSelectedValues(List<TaskHasResearchGroup> studyHasResearchGroup){
-        if(studyHasResearchGroup!=null && !studyHasResearchGroup.isEmpty()){
+    public void setTaskyHasResearchSelectedValues(List<TaskHasResearchGroup> taskHasResearchGroup){
+        if(taskHasResearchGroup!=null && !taskHasResearchGroup.isEmpty()){
             List<String> selectedValues = new ArrayList<>();
-            for(TaskHasResearchGroup rghau: studyHasResearchGroup){
+            for(TaskHasResearchGroup rghau: taskHasResearchGroup){
+                selectedValues.add(rghau.getResearchGroupId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
+
+    public void setTaskGroupHasResearchSelectedValues(List<TaskGroupHasResearchGroup> taskGroupHasResearchGroup){
+        if(taskGroupHasResearchGroup!=null && !taskGroupHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(TaskGroupHasResearchGroup rghau: taskGroupHasResearchGroup){
                 selectedValues.add(rghau.getResearchGroupId().toString());
             }
             this.selectedValues = selectedValues.toArray( new String[0]);

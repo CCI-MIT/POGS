@@ -2,7 +2,6 @@ package edu.mit.cci.pogs.model.dao.taskgroup.impl;
  
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.records.TaskGroupRecord;
 import org.jooq.DSLContext;
@@ -13,9 +12,11 @@ import org.springframework.stereotype.Repository;
  
 import java.util.List;
 
-import static edu.mit.cci.pogs.model.jooq.Tables.STUDY_HAS_RESEARCH_GROUP;
-import static edu.mit.cci.pogs.model.jooq.Tables.TASK_GROUP;
- 
+import static edu.mit.cci.pogs.model.jooq.tables.ResearchGroupHasAuthUser.RESEARCH_GROUP_HAS_AUTH_USER;
+import static edu.mit.cci.pogs.model.jooq.tables.TaskGroup.TASK_GROUP;
+import static edu.mit.cci.pogs.model.jooq.tables.TaskGroupHasResearchGroup.TASK_GROUP_HAS_RESEARCH_GROUP;
+
+
 @Repository
 public class TaskGroupDaoImpl extends AbstractDao<TaskGroup, Long, TaskGroupRecord> implements TaskGroupDao {
  
@@ -34,5 +35,18 @@ public class TaskGroupDaoImpl extends AbstractDao<TaskGroup, Long, TaskGroupReco
  
         return query.fetchInto(TaskGroup.class);
     }
+
+    @Override
+    public List<TaskGroup> listTaskGroupsWithUserGroup(Long id) {
+        final SelectQuery<Record> query = dslContext.selectDistinct(TASK_GROUP.fields())
+                .from(TASK_GROUP)
+                .join(TASK_GROUP_HAS_RESEARCH_GROUP).on(TASK_GROUP_HAS_RESEARCH_GROUP.TASK_GROUP_ID.eq(TASK_GROUP.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(TASK_GROUP_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
+                .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(id))
+                .getQuery();
+
+        return query.fetchInto(TaskGroup.class);
+    }
+
 }
  

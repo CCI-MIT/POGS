@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.model.dao.taskgrouphasresearchgroup.TaskGroupHasResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasResearchGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,13 +20,19 @@ public class TaskGroupService {
 
     private final TaskGroupDao taskGroupDao;
 
+    private final TaskGroupHasResearchGroupDao taskGroupHasResearchGroupDao;
 
     private final TaskGroupHasTaskDao taskGroupHasTaskDao;
 
     @Autowired
-    public TaskGroupService(TaskGroupDao taskGroupDao, TaskGroupHasTaskDao taskGroupHasTaskDao) {
+    public TaskGroupService(TaskGroupDao taskGroupDao, TaskGroupHasTaskDao taskGroupHasTaskDao, TaskGroupHasResearchGroupDao taskGroupHasResearchGroupDao) {
         this.taskGroupHasTaskDao = taskGroupHasTaskDao;
         this.taskGroupDao = taskGroupDao;
+        this.taskGroupHasResearchGroupDao = taskGroupHasResearchGroupDao;
+    }
+
+    public List<TaskGroupHasResearchGroup> listTaskGroupHasResearchGroupByTaskGroup(Long taskGroupId) {
+        return taskGroupHasResearchGroupDao.listByTaskGroupId(taskGroupId);
     }
 
     public TaskGroup createOrUpdate(TaskGroupBean taskGroupBean) {
@@ -37,11 +45,59 @@ public class TaskGroupService {
         if (tg.getId() == null) {
             tg = taskGroupDao.create(tg);
             taskGroupBean.setId(tg.getId());
+            createOrUpdateUserGroups(taskGroupBean);
         } else {
             taskGroupDao.update(tg);
+            createOrUpdateUserGroups(taskGroupBean);
         }
         createOrUpdateTaskGroupHasTask(taskGroupBean);
         return tg;
+    }
+
+    private void createOrUpdateUserGroups(TaskGroupBean taskGroupBean) {
+        if (taskGroupBean.getResearchGroupRelationshipBean() == null && taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
+            return;
+        }
+        List<TaskGroupHasResearchGroup> toCreate = new ArrayList<>();
+        List<TaskGroupHasResearchGroup> toDelete = new ArrayList<>();
+        List<TaskGroupHasResearchGroup> currentlySelected = listTaskGroupHasResearchGroupByTaskGroup(taskGroupBean.getId());
+
+        for (TaskGroupHasResearchGroup rghau : currentlySelected) {
+            boolean foundRGH = false;
+            for (String researchGroupId : taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
+                    foundRGH = true;
+                }
+            }
+            if (!foundRGH) {
+                toDelete.add(rghau);
+            }
+
+        }
+
+        for (String researchGroupId : taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+
+            boolean selectedAlreadyIn = false;
+            for (TaskGroupHasResearchGroup rghau : currentlySelected) {
+                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
+                    selectedAlreadyIn = true;
+                }
+            }
+            if (!selectedAlreadyIn) {
+                TaskGroupHasResearchGroup rghau = new TaskGroupHasResearchGroup();
+                rghau.setTaskGroupId(taskGroupBean.getId());
+                rghau.setResearchGroupId(new Long(researchGroupId));
+                toCreate.add(rghau);
+            }
+
+        }
+        for (TaskGroupHasResearchGroup toCre : toCreate) {
+            taskGroupHasResearchGroupDao.create(toCre);
+        }
+        for (TaskGroupHasResearchGroup toDel : toDelete) {
+            taskGroupHasResearchGroupDao.delete(toDel);
+        }
+
     }
 
     private void createOrUpdateTaskGroupHasTask(TaskGroupBean studyBean) {

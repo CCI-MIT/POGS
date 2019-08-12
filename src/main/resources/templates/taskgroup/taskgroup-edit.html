@@ -54,6 +54,50 @@
                 <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><span th:text="${rg.taskName}"></span><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
             </ul>
 
+            <!-- Begin research group field -->
+            <fieldset class="form-group">
+                <legend>Research groups</legend>
+
+                <select multiple="multiple" size="10" th:field="*{researchGroupRelationshipBean.selectedValues}" id="researchGroups">
+                    <option
+                            th:each="rg: ${researchGroups}"
+                            th:value="${rg.id}"
+                            th:text="${rg.groupName}" ></option>
+                </select>
+                <div class="invalid-feedback" id="researchGroupError">
+                    Choose at least one research group. <br/>
+                    If you choose a research group that you are not associated with you won't be able to edit this study.
+                </div>
+            </fieldset>
+            <script>
+
+                $(function() {
+                    //$('select[name="researchgroups"]')
+
+                    $('#researchGroups')
+                        .bootstrapDualListbox({
+                            selectedListLabel:"Chosen groups",
+                            nonSelectedListLabel: "Available groups",
+                            moveAllLabel:"Move all",
+                            removeAllLabel: "Remove all"
+                        });
+                    /* hack for bootstrap 4 */
+                    var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                    dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                    dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                    dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                    dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+
+
+                });
+
+
+                function isValidUsernameRegex(value){
+                    var regexp = /^[a-zA-Z0-9]+$/;
+                    return (regexp.test(value));
+                }
+            </script>
+
             <script>
                 $(function() {
 
@@ -99,6 +143,12 @@
                             $("#taskGroupName").addClass("is-invalid");
                             valid = false;
                         }
+
+                        if($("#researchGroups").val()== null){
+                            $("#researchGroupError").show();
+                            valid = false;
+                        }
+
                         if(!valid){
                             event.preventDefault();
                             event.stopPropagation();
