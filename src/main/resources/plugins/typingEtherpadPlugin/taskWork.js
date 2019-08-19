@@ -53,7 +53,7 @@ function setCookie(name,value,days) {
     if(window.location.href.indexOf("localhost")!=-1) {
         document.cookie = name + "=" + (value || "") + expires + "; path=/";
     } else {
-        document.cookie = name + "=" + (value || "") + expires + "; domain=.pogs.info";
+        document.cookie = name + "=" + (value || "") + expires + "; domain=etherpad.pogs.info ; path=/";
     }
 }
 function getCookie(name) {
