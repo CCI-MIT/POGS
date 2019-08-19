@@ -23,4 +23,9 @@ cp  APIKEY.txt /home/pogs/binaries/etherpad-lite/
 echo "Copy custom pad css to etherpad-lite"
 mkdir /home/pogs/binaries/etherpad-lite/src/static/custom
 cp pad.css /home/pogs/binaries/etherpad-lite/src/static/custom/
+cat APIAddedFunctions.js >> /home/pogs/binaries/etherpad-lite/src/node/db/API.js
+sed -i '136i, "getRevisionDate"           : ["padID", "rev"], "getRevisionAuthor"           : ["padID", "rev"]' /home/pogs/binaries/etherpad-lite/src/node/handler/APIHandler.js
+sed -i '44i authorColors=true;' /home/pogs/binaries/etherpad-lite/src/node/utils/ExportHtml.js
+cat pad.css >> /home/pogs/binaries/etherpad-lite/src/static/skins/no-skin/pad.css
+
 echo "Now update the settings.json file with mysql configuration"

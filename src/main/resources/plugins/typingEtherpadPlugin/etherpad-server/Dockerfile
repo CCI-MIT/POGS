@@ -19,7 +19,7 @@ ARG ETHERPAD_VERSION=develop
 #
 # EXAMPLE:
 #   ETHERPAD_PLUGINS="ep_codepad ep_author_neat"
-ARG ETHERPAD_PLUGINS="ep_font_size"
+ARG ETHERPAD_PLUGINS=""
 
 # Set the following to production to avoid installing devDeps
 # this can be done with build args (and is mandatory to build ARM version)
@@ -52,6 +52,9 @@ RUN bin/installDeps.sh
 # able to split at spaces.
 RUN for PLUGIN_NAME in ${ETHERPAD_PLUGINS}; do npm install "${PLUGIN_NAME}"; done
 
+#COPY ep_pogs /opt/etherpad-lite/node_modules/ep_pogs enable to use the local copy of plugin
+#RUN  npm install /opt/etherpad-lite/temp/ep_pogs/
+
 # Copy the custom configuration file, if present. The configuration file has to
 # be manually put inside the same directory containing the Dockerfile (we cannot
 # directly point to "../settings.json" for Docker's security restrictions).
@@ -61,6 +64,10 @@ RUN for PLUGIN_NAME in ${ETHERPAD_PLUGINS}; do npm install "${PLUGIN_NAME}"; don
 COPY settings.json /opt/etherpad-lite/
 COPY APIKEY.txt /opt/etherpad-lite/
 COPY pad.css /opt/etherpad-lite/src/static/custom/
+COPY APIAddedFunctions.js /opt/etherpad-lite/temp/
+COPY injectChangesToAPICode.sh /opt/etherpad-lite/temp/
+RUN /opt/etherpad-lite/temp/injectChangesToAPICode.sh
+
 
 EXPOSE 9001
 CMD ["node", "node_modules/ep_etherpad-lite/node/server.js"]

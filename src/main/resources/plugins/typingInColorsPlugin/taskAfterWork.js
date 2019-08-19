@@ -44,7 +44,6 @@ function getPadText(padId) {
     }
     return null;
 }
-
 function getPadHTML(padId) {
     var apiResponse = JSON.parse(newConnection(
         API_ADDRESS + "getHTML/?apikey="+API_KEY+"&padID="+padId , "GET"));

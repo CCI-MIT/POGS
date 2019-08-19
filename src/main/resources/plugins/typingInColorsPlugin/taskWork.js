@@ -1,15 +1,15 @@
-class PogsOtColorsClient extends ot.AbstractOtClient {
-    constructor(pogsPlugin, padElementId, blueprint) {
-        const padId = "pad-for-task-" + pogsPlugin.getCompletedTaskId();
-        const clientId = "subject-" + pogsPlugin.getSubjectId();
-        super(padId, clientId, padElementId);
+class EtherpadWithColors {
+    constructor(pogsPlugin,blueprint, padID) {
+        this._pogsPlugin = pogsPlugin;
+
+        this.padID = padID;
         this.subjectsColors = [];
         this.availableColors = [];
         this.uniqueColors = {};
         this.textSections = [];
         this.textSectionsColors = [];
-        log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
-        $("#padContent").attr("disabled", "disabled");
+
+        //$("#padContent").attr("disabled", "disabled");
         for(let k = 0; k < blueprint.length; k++) {
 
             if(!this.uniqueColors[blueprint[k].color]) {
@@ -127,9 +127,11 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
             if($(allColorButtons[k]).data("color-index") == colorIndex) {
                 if(isCurrentSubject) {
                     $(allColorButtons[k]).text("You chose this color!");
-                    $("#padContent").attr("disabled", null);
+                    //$("#padContent").attr("disabled", null);
+                    //TODO INSERT IFRAME. with selected COLOR.
                     $("#colorPickerAndAssigner button").addClass("disabled");
                     $("#colorPickerAndAssigner button").unbind();
+                    this.setupPad(this.padID,this.availableColors[colorIndex]);
                 } else {
                     $(allColorButtons[k]).text( subject.displayName+" chose this color!")
                     $(allColorButtons[k]).addClass("disabled");
@@ -178,14 +180,69 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         }
         this._pogsPlugin.sendOperation(operation);
     }
+
+    setupPad(padId,currentUserColor){
+        //1 - get sessionID for this pad
+        const subjectId = this._pogsPlugin.getSubjectId();
+        const sessionIDAtt = this._pogsPlugin.getTeammateAttribute(subjectId,
+                                                                   "ETHERPAD_SESSION_ID");
+        let sessionId = null;
+        if(sessionIDAtt){
+            sessionId = sessionIDAtt.stringValue;
+        }
+
+        //2 - set COOKIE according to the DOMAIN.
+
+        console.log("sessionID "  + sessionId);
+        console.log("padID " + padId);
+
+        setCookie("sessionID",sessionId, 1);
+
+        let etherpadAddress = "http://etherpad.pogs-main.mit.edu/"
+        if(window.location.href.indexOf("localhost")!=-1){
+            etherpadAddress = "http://localhost:9001/p/"
+        }
+        let iframe_src = etherpadAddress + padId + "?showControls=false&showLineNumbers=false&showChat=false&userColor="+currentUserColor;
+
+        $("#etherpadArea").append('<iframe src="'+iframe_src+'" frameborder="0" style="position:relative;width:100%;height:100%;"></iframe>');
+    }
 }
 
-const typingPlugin = pogs.createPlugin('typingPlugin', function() {
+const typingPlugin = pogs.createPlugin('typingInColorsPlugin', function() {
 
+    const otClient = new EtherpadWithColors(this,
+                                            $.parseJSON(
+                                                this.getStringAttribute("gridBluePrint")),
+                                            this.getCompletedTaskStringAttribute("padID"));
+},
+    function(){
+        eraseCookie("sessionID");
+        console.log("Erasing the cookie");
 
+    });
 
-    const otClient = new PogsOtColorsClient(this, 'padContent',$.parseJSON(this.getStringAttribute("gridBluePrint")));
-});
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+}
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+function eraseCookie(name) {
+    document.cookie = name+'=; Max-Age=-99999999;';
+}
 
 function replaceNewLinesForBrs(st){
     if(st === undefined) return "";
