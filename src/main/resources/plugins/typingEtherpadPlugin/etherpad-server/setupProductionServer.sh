@@ -34,4 +34,5 @@ echo "GRANT ALL PRIVILEGES ON etherpad_lite_db.* TO 'etherpad'@'localhost';"
 echo "FLUSH PRIVILEGES;"
 
 echo "Now update the settings.json file with mysql password configuration"
+echo "sudo cp etherpad.service /etc/systemd/system/"
 
