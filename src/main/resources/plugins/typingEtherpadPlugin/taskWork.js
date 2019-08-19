@@ -33,7 +33,7 @@ class Etherpad {
         if(colorVariable!=null){
             currentUserColor = colorVariable.stringValue;
         }
-        let etherpadAddress = "https://etherpad.pogs.info/"
+        let etherpadAddress = "https://etherpad.pogs.info/p/"
         if(window.location.href.indexOf("localhost")!=-1){
             etherpadAddress = "http://localhost:9001/p/"
         }

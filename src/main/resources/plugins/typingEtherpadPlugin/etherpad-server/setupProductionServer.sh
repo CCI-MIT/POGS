@@ -28,11 +28,14 @@ sed -i '136i, "getRevisionDate"           : ["padID", "rev"], "getRevisionAuthor
 sed -i '44i authorColors=true;' /home/pogs/binaries/etherpad-lite/src/node/utils/ExportHtml.js
 cat pad.css >> /home/pogs/binaries/etherpad-lite/src/static/skins/no-skin/pad.css
 echo "As mysql root create database and user for etherpad:"
+echo "================================================================="
 echo "CREATE DATABASE etherpad_lite_db CHARACTER SET utf8 COLLATE utf8_general_ci;"
 echo "CREATE USER 'etherpad'@'localhost' IDENTIFIED BY 'password';"
 echo "GRANT ALL PRIVILEGES ON etherpad_lite_db.* TO 'etherpad'@'localhost';"
 echo "FLUSH PRIVILEGES;"
-
+echo "================================================================="
 echo "Now update the settings.json file with mysql password configuration"
+echo "Install etherpad as service in RedHat"
 echo "sudo cp etherpad.service /etc/systemd/system/"
+echo "systemctl start etherpad && systemctl enable etherpad"
 
