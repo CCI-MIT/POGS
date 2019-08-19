@@ -198,7 +198,7 @@ class EtherpadWithColors {
 
         setCookie("sessionID",sessionId, 1);
 
-        let etherpadAddress = "http://etherpad.pogs-main.mit.edu/"
+        let etherpadAddress = "https://etherpad.pogs.info/"
         if(window.location.href.indexOf("localhost")!=-1){
             etherpadAddress = "http://localhost:9001/p/"
         }

@@ -132,7 +132,7 @@
   /*
   "dbType" : "mysql",
   "dbSettings" : {
-                   "user"    : "etherpaduser",
+                   "user"    : "etherpad",
                    "host"    : "localhost",
                    "port"    : 3306,
                    "password": "PASSWORD",
