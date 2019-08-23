@@ -43,15 +43,16 @@ class TypingTaskEdit {
         }.bind(this));
     }
     setupHtmlFromAttributeString(attributez){
+        if($("#dictionaryId").val()!="") {
+            this.getDictJson($("#dictionaryId").val(), function () {
 
-        this.getDictJson($("#dictionaryId").val(),function(){
+                for (let k = 0; k < attributez.length; k++) {
+                    this.createColorField(attributez[k].color, attributez[k].text);
+                }
+                this.refreshPreview();
 
-            for(let k =0; k < attributez.length; k ++) {
-                this.createColorField(attributez[k].color, attributez[k].text);
-            }
-            this.refreshPreview();
-
-        }.bind(this));
+            }.bind(this));
+        }
 
 
 
