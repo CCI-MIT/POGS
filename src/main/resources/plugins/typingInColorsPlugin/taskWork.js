@@ -7,6 +7,8 @@ class EtherpadWithColors {
         this.availableColors = [];
         this.uniqueColors = {};
         this.textSections = [];
+        this.dictionaryTexts = {};
+        this.dictDataFetchCount = 0;
         this.textSectionsColors = [];
 
         //$("#padContent").attr("disabled", "disabled");
@@ -19,7 +21,7 @@ class EtherpadWithColors {
             this.textSections.push(blueprint[k].text);
             this.textSectionsColors.push(blueprint[k].color);
         }
-        this.setupText();
+        this.setupDictionaryData();
         for(let k = 0; k < this.availableColors.length; k++) {
             $('#colorPickerAndAssigner')
                 .append('<button type="button" class="btn btn-lg" data-color-index="'+k+'" style="margin:10px;background-color: '+
@@ -50,47 +52,45 @@ class EtherpadWithColors {
         }.bind(this));
         this._pogsPlugin.pogsRef.subscribe('onUnload', this.beforeLeave.bind(this));
     }
+    setupDictionaryData(){
+        let dict = this._pogsPlugin.pogsRef.getDictionary();
+        if(dict) {
+            for (let i = 0; i < this.textSections.length; i++) {
+
+                this._pogsPlugin.pogsRef.getDictionaryEntry(this.textSections[i],function(ret){
+                    this.dictionaryTexts[ret.id] = {textContent:atob(ret.entryValue),
+                        backgroundColor:"#ffffff", fontColor: "#000000"};
+                    this.dictDataFetchCount++;
+                    if(this.dictDataFetchCount == this.textSections.length){
+                        this.setupText();
+                    }
+                }.bind(this));
+
+            }
+        }
+    }
     setupText(){
 
         let inputsTxt = this.textSections;
         let inputsColors = this.textSectionsColors;
 
+        let textsToCanvas = [];
         let container = $('<div>',{
             id: 'typingInColorstaskText',
             class: 'rol col-12'
         });
 
-        let saida = "";
-        saida+="<style>\n";
-        saida+="#typingInColorstaskText {\n";
-        saida+="    -moz-user-select: none;\n";
-        saida+="-webkit-user-select: none;\n";
-        saida+="-ms-user-select: none;\n";
-        saida+="-o-user-select: none;\n";
-        saida+="user-select: none;\n";
-        saida+="}\n";
-        saida+="</style>\n";
-        $(".information").append(saida);
         $(".information").append(container);
 
-        let body = "";
-        let lastColor = "";
+
         for(let k=0; k < inputsTxt.length; k++) {
-            let newColor = inputsColors[k];
-            if(newColor == ""){
-                newColor = "#000000";
-            }
-            if(newColor!=lastColor) {
-                if(lastColor!=""){
-                    body += "</span>";
-                }
-                body += "<span style='background-color:"+newColor+";color:"+generateFontColorBasedOnBackgroundColor(newColor)+"'>"
-                lastColor = newColor;
-            }
-            body += replaceNewLinesForBrs(inputsTxt[k]);
+            let aux = this.dictionaryTexts[inputsTxt[k]];
+            aux.backgroundColor = inputsColors[k];
+            aux.fontColor = generateFontColorBasedOnBackgroundColor(inputsColors[k]);
+            textsToCanvas.push(aux);
         }
-        body +="</span>";
-        $("#typingInColorstaskText").html(body);
+        this.canvasImage = new CanvasTextToImage(textsToCanvas,"typingInColorstaskText", 318);
+
     }
     beforeLeave(){
         $("#padContent").attr("disabled","disabled");
@@ -145,7 +145,7 @@ class EtherpadWithColors {
         this.updateSubjectColors();
     }
     updateSubjectColors(){
-        $("head style").remove();
+        //$("head style").remove();
         let rule = "";
         for (let i = 0; i < this.subjectsColors.length; i++) {
             rule += `.${this.subjectsColors[i].externalId}_color, `

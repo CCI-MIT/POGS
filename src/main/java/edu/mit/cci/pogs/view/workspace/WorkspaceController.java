@@ -48,6 +48,7 @@ import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
+import edu.mit.cci.pogs.service.DictionaryService;
 import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectService;
@@ -112,6 +113,9 @@ WorkspaceController {
 
     @Autowired
     private ApplicationContext context;
+
+    @Autowired
+    private DictionaryService dictionaryService;
 
     @GetMapping("/sessions/{sessionId}")
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
@@ -444,6 +448,8 @@ WorkspaceController {
             model.addAttribute("taskConfigurationAttributes",
                     executionAttributes);
 
+            model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
+
             JSONArray allLogs = new JSONArray();
             model.addAttribute("eventsUntilNow", allLogs);
 
@@ -574,6 +580,9 @@ WorkspaceController {
 
             model.addAttribute("taskConfigurationAttributes",
                     taskExecutionAttributeService.listExecutionAttributesFromPluginConfigAsJsonArray(pluginConfigId));
+
+            model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTaskPlugin(pluginConfigId));
+
             //get task html & js from plugin file system
             model.addAttribute("taskCss", pl.getTaskCSSContent());
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());
@@ -724,6 +733,9 @@ WorkspaceController {
                 model.addAttribute("eventsUntilNow", eventLogService.getAllLogsUntilNow(completedTask.getId()));
 
                 model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(task, su, round)));
+
+
+                model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
 
                 model.addAttribute("taskConfigurationAttributes",
                         taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));

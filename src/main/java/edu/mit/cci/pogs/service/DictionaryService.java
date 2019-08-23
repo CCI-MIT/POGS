@@ -16,11 +16,16 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 
+import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.dictionary.DictionaryDao;
 import edu.mit.cci.pogs.model.dao.dictionaryentry.DictionaryEntryDao;
+import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
+import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurationDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.DictionaryEntry;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryEntriesBean;
 
@@ -31,11 +36,18 @@ public class DictionaryService {
     private final DictionaryEntryDao dictionaryEntryDao;
     private final Environment env;
 
+    private final TaskHasTaskConfigurationDao taskHasTaskConfigurationDao;
+    private final TaskConfigurationDao taskConfigurationDao;
+
     @Autowired
-    public DictionaryService(DictionaryDao dictionaryDao, DictionaryEntryDao dictionaryEntryDao, Environment env) {
+    public DictionaryService(DictionaryDao dictionaryDao, DictionaryEntryDao dictionaryEntryDao,
+                             Environment env, TaskHasTaskConfigurationDao taskHasTaskConfigurationDao,
+    TaskConfigurationDao taskConfigurationDao) {
         this.dictionaryDao = dictionaryDao;
         this.dictionaryEntryDao = dictionaryEntryDao;
         this.env = env;
+        this.taskHasTaskConfigurationDao = taskHasTaskConfigurationDao;
+        this.taskConfigurationDao = taskConfigurationDao;
     }
 
     public void updateDictionaryEntryList(DictionaryEntriesBean dictionaryEntriesBean) {
@@ -71,7 +83,48 @@ public class DictionaryService {
         }
         return configurationArray;
     }
+    public JSONObject getDictionaryJSONObjectForTaskPlugin(long pluginConfigId) {
+        TaskConfiguration tc = taskConfigurationDao.getByTaskPluginConfigurationId(pluginConfigId);
+        JSONObject jo = getJsonObjectFromTaskConfig(tc);
+        if (jo != null) return jo;
+        return null;
+    }
 
+    public JSONObject getDictionaryJSONObjectForTask(Long taskId){
+        TaskHasTaskConfiguration configuration = taskHasTaskConfigurationDao
+                .getByTaskId(taskId);
+        TaskConfiguration tg = taskConfigurationDao.get(configuration.getTaskConfigurationId());
+        JSONObject jo = getJsonObjectFromTaskConfig(tg);
+        if (jo != null) return jo;
+        return null;
+    }
+
+    private JSONObject getJsonObjectFromTaskConfig(TaskConfiguration tg) {
+        if(tg!=null){
+            if(tg.getDictionaryId()!=null) {
+
+                Dictionary dict = dictionaryDao.get(tg.getDictionaryId());
+                List<DictionaryEntry> entries = dictionaryEntryDao.listDictionaryEntriesByDictionary(tg.getDictionaryId());
+                JSONArray ja = new JSONArray();
+                if(entries!=null &&! entries.isEmpty()){
+                    for(DictionaryEntry de: entries){
+                        ja.put(de.getId());
+                    }
+                }
+                if(dict!=null){
+                    JSONObject jo = new JSONObject();
+                    jo.put("id", dict.getId());
+                    jo.put("hasGroundTruth",dict.getHasGroundTruth());
+                    jo.put("dictionaryName",dict.getDictionaryName());
+                    jo.put("dictionaryEntries", ja);
+                    return jo;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Deprecated
     public File generateImageFromDictionary(HttpServletRequest request, Long dictionaryId, String backgroundColor){
 
         Dictionary dict = dictionaryDao.get(dictionaryId);
@@ -149,6 +202,7 @@ public class DictionaryService {
         return null;
 
     }
+
 
 }
 class WordPlacement {

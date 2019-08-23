@@ -15,6 +15,7 @@ import edu.mit.cci.pogs.model.dao.unprocesseddictionaryentry.UnprocessedDictiona
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.DictionaryEntry;
 import edu.mit.cci.pogs.service.DictionaryService;
+import edu.mit.cci.pogs.view.dictionary.beans.DictionaryEntriesBean;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryEntryWorkspaceBean;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryWorkspaceBean;
 
@@ -41,6 +42,24 @@ public class DictionaryWorkspaceController {
             dwb.getDictionaryEntries().add(de.getId());
         }
         return dwb;
+
+
+    }
+    @GetMapping("/dictionaries/{dictionaryId}/full")
+    public DictionaryEntriesBean getDictionaryJsonFull(@PathVariable("dictionaryId") Long dictionaryId) {
+
+        Dictionary d = dictionaryDao.get(dictionaryId);
+        DictionaryWorkspaceBean dwb = new DictionaryWorkspaceBean();
+        dwb.setDictionaryName(d.getDictionaryName());
+        dwb.setHasGroundTruth(d.getHasGroundTruth());
+        List<DictionaryEntry> allEntries = dictionaryEntryDao.listDictionaryEntriesByDictionary(dictionaryId);
+
+        DictionaryEntriesBean dewb = new DictionaryEntriesBean();
+        dewb.setDictionaryId(d.getId());
+        dewb.setDictionaryEntryList(allEntries);
+
+
+        return dewb;
 
 
     }

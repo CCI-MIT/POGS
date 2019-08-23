@@ -2,6 +2,27 @@ class Etherpad {
     constructor(pogsPlugin) {
         this._pogsPlugin = pogsPlugin;
     }
+    setupTextIfAny(){
+        let dict = this._pogsPlugin.pogsRef.getDictionary();
+        if(dict){
+            if(dict.hasGroundTruth){
+                let dictEntry = dict.dictionaryEntries[0];
+                if(dictEntry) {
+                    this._pogsPlugin.pogsRef.getDictionaryEntry(dictEntry,function(ret){
+
+                        $(".information").append('<div id="canvasText"></div>');
+
+
+                        let texts = [{textContent:atob(ret.entryValue),
+                            backgroundColor:"#ffffff", fontColor: "#000000"}];
+                        this.canvasImage = new CanvasTextToImage(texts,"canvasText", 318);
+
+
+                    }.bind(this));
+                }
+            }
+        }
+    }
     setupPad(padId){
         //1 - get sessionID for this pad
         const subjectId = this._pogsPlugin.getSubjectId();
@@ -40,6 +61,8 @@ class Etherpad {
         let iframe_src = etherpadAddress + padId + "?showControls=false&showLineNumbers=false&showChat=false&userColor="+currentUserColor;
 
         $("#etherpadArea").append('<iframe src="'+iframe_src+'" frameborder="0" style="position:relative;width:100%;height:100%;"></iframe>');
+
+        this.setupTextIfAny();
     }
 }
 
@@ -85,6 +108,8 @@ var typingPlugin = pogs.createPlugin('typingPluginEtherpad',function(){
     console.log("Erasing the cookie");
 
 });
+
+
 
 //<iframe id="etherpad-main" src="{{ iframe_src }}"></iframe>
 //iframe_src = completed_task.etherpad_workspace_url + \

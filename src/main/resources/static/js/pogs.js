@@ -64,6 +64,7 @@ class Pogs {
 
         var css = document.createElement('style'); // Creates <style></style>
         css.type = 'text/css'; // Specifies the type
+        css.id="subject_colors";
         if (css.styleSheet) css.styleSheet.cssText = rule; // Support for IE
         else css.appendChild(document.createTextNode(rule)); // Support for the rest
         document.getElementsByTagName("head")[0].appendChild(css); // Specifies where to place the css
@@ -114,6 +115,7 @@ class Pogs {
         this.taskConfigurationAttributes = config.taskConfigurationAttributes;
 
         this.completedTaskAttributes = config.completedTaskAttributes;
+        this.dictionary = config.dictionary;
 
         this.eventsUntilNow = config.eventsUntilNow;
         this.taskConfigurationAttributesMap = new Map();
@@ -160,6 +162,24 @@ class Pogs {
             }
         }
 
+    }
+    getDictionary(){
+        if(this.dictionary){
+            return this.dictionary;
+        }
+    }
+    getDictionaryEntry(id, callback){
+        if(this.dictionary){
+            $.getJSON("/dictionaries/" + this.dictionary.id + '/dictionaryentries/' + id,null, function(emp) {
+                if(emp) {
+                    return callback(emp);
+                } else {
+                    return callback(null);
+                }
+            });
+            return;
+        }
+        callback(null);
     }
     onCountdownEnd(){
         this.subscribe("onUnload", function(){

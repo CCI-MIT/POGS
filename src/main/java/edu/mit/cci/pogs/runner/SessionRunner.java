@@ -548,6 +548,7 @@ public class SessionRunner implements Runnable {
                 color.getGreen(), color.getBlue()));
 
         sa.setSubjectId(su.getId());
+        sa.setInternalAttribute(true);
         subjectAttributeDao.create(sa);
     }
 

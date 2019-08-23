@@ -102,10 +102,9 @@ class GroupChatManager {
         for(var i = 0; i < this.subjectsInChannel.length; i ++) {
             var properties = "";
 
-            for (var j = 0; j < this.subjectsInChannel[i].attributes.length; j++) {
+            for (let j = 0; j < this.subjectsInChannel[i].attributes.length; j++) {
 
-                if(this.subjectsInChannel[i].attributes[j].attributeName!="SUBJECT_DEFAULT_BACKGROUND_COLOR" &&
-                   this.subjectsInChannel[i].attributes[j].attributeName!="SUBJECT_DEFAULT_FONT_COLOR") {
+                if(!this.subjectsInChannel[i].attributes[j].internalAttribute) {
                     properties +=
                         "<h5><b>" + this.subjectsInChannel[i].attributes[j].attributeName + ": </b>"
                         + this.subjectsInChannel[i].attributes[j].stringValue + "</h5>"
