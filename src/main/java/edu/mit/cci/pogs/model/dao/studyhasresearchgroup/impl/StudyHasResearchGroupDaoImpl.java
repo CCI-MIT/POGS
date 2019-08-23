@@ -38,6 +38,7 @@ public class StudyHasResearchGroupDaoImpl extends AbstractDao<StudyHasResearchGr
 
         final SelectQuery<Record> query = dslContext.select()
                 .from(STUDY_HAS_RESEARCH_GROUP).getQuery();
+            query.addOrderBy(STUDY_HAS_RESEARCH_GROUP.STUDY_ID);
             query.addConditions(STUDY_HAS_RESEARCH_GROUP.STUDY_ID.eq(studyId));
         return query.fetchInto(StudyHasResearchGroup.class);
     }

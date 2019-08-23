@@ -20,6 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
@@ -602,14 +606,25 @@ WorkspaceController {
 
         return "workspace/task_workplugin";
     }
-
+    private void eraseCookies(HttpServletRequest req, HttpServletResponse resp) {
+        Cookie[] cookies = req.getCookies();
+        if (cookies != null)
+            for (Cookie cookie : cookies) {
+                cookie.setMaxAge(0);
+                resp.addCookie(cookie);
+            }
+    }
 
     @GetMapping("/round/{roundId}/task/{taskId}/w/{subjectExternalId}")
     public String taskWork(@PathVariable("roundId") Long roundId,
                            @PathVariable("taskId") Long taskId,
                            @PathVariable("subjectExternalId") String subjectExternalId,
+                           HttpServletRequest request,
+                           HttpServletResponse response,
                            Model model) {
 
+
+        this.eraseCookies(request,response);
 
         Task task = taskDao.get(taskId);
         Subject su = workspaceService.getSubject(subjectExternalId);

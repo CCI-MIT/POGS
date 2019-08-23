@@ -90,7 +90,11 @@ function getCookie(name) {
     return null;
 }
 function eraseCookie(name) {
-    document.cookie = name+'=; Max-Age=-99999999;';
+    if(window.location.href.indexOf("localhost")!=-1) {
+        document.cookie = name + "=;Max-Age=-99999999; path=/";
+    } else {
+        document.cookie = name + "=;Max-Age=-99999999; domain=pogs.info ; path=/";
+    }
 }
 
 var typingPlugin = pogs.createPlugin('typingPluginEtherpad',function(){
