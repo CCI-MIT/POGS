@@ -70,6 +70,16 @@ public class ResearchGroupRelationshipBean {
         }
     }
 
+    public void setExecutableScriptHasResearchSelectedValues(List<ExecutableScriptHasResearchGroup> executableScriptHasResearchGroup){
+        if(executableScriptHasResearchGroup!=null && !executableScriptHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(ExecutableScriptHasResearchGroup rghau: executableScriptHasResearchGroup){
+                selectedValues.add(rghau.getResearchGroupId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
+
     private String[] selectedValues;
 
     public String[] getSelectedValues() {

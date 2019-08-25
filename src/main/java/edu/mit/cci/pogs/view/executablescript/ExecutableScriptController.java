@@ -1,5 +1,11 @@
 package edu.mit.cci.pogs.view.executablescript;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+import edu.mit.cci.pogs.service.ExecutableScriptService;
+import edu.mit.cci.pogs.view.executablescript.beans.ExecutableScriptBean;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,10 +31,16 @@ public class ExecutableScriptController {
     @Autowired
     private ExecutableScriptDao executableScriptDao;
 
+    @Autowired
+    private ExecutableScriptService executableScriptService;
+
+    @Autowired
+    private ResearchGroupDao researchGroupDao;
+
     @GetMapping("/admin/executablescripts")
     public String getExecutableScripts(Model model) {
 
-        model.addAttribute("executablescriptsList", executableScriptDao.list());
+        model.addAttribute("executablescriptsList", executableScriptDao.listExecutableScriptsWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "executablescript/executablescript-list";
     }
 
@@ -49,9 +61,12 @@ public class ExecutableScriptController {
     @GetMapping("admin/executablescripts/create")
     public String createExecutableScript(Model model) {
 
-        ExecutableScript chatScript = new ExecutableScript();
+        ExecutableScriptBean executableScriptBean = new ExecutableScriptBean(new ExecutableScript());
 
-        model.addAttribute("executablescript",chatScript);
+        executableScriptBean.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+
+        model.addAttribute("executablescript",executableScriptBean);
 
         return "executablescript/executablescript-edit";
     }
@@ -59,24 +74,38 @@ public class ExecutableScriptController {
     @GetMapping("/admin/executablescripts/{chatscriptId}/edit")
     public String editExecutableScript(@PathVariable("chatscriptId") Long chatscriptId, Model model) {
 
-        ExecutableScript chatScript = executableScriptDao.get(chatscriptId);
-        model.addAttribute("executablescript", chatScript);
+        ExecutableScriptBean executableScriptBean = new ExecutableScriptBean(executableScriptDao.get(chatscriptId));
+        executableScriptBean.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+        executableScriptBean.getResearchGroupRelationshipBean()
+                .setExecutableScriptHasResearchSelectedValues(
+                        executableScriptService.listExecutableScriptHasResearchGroupByDictionaryId(chatscriptId));
+
+
+        model.addAttribute("executablescript", executableScriptBean);
         return "executablescript/executablescript-edit";
     }
 
     @PostMapping("/admin/executablescripts")
-    public String saveExecutableScript(@ModelAttribute ExecutableScript executablescript, RedirectAttributes redirectAttributes) {
+    public String saveExecutableScript(@ModelAttribute ExecutableScriptBean executableScriptBean, RedirectAttributes redirectAttributes) {
 
-        if (executablescript.getId() == null) {
-            executablescript = executableScriptDao.create(executablescript);
+        executableScriptService.createOrUpdate(executableScriptBean);
+
+        if (executableScriptBean.getId() == null) {
+
             MessageUtils.addSuccessMessage("Executable Script created successfully!", redirectAttributes);
         } else {
-            executableScriptDao.update(executablescript);
+
             MessageUtils.addSuccessMessage("Executable Script updated successfully!", redirectAttributes);
         }
-        return "redirect:/admin/executablescripts/"+executablescript.getId();
+        return "redirect:/admin/executablescripts/"+executableScriptBean.getId();
     }
 
+    @ModelAttribute("researchGroups")
+    public List<ResearchGroup> getAllResearchGroups() {
 
+        List<ResearchGroup> res = researchGroupDao.list();
+        return res;
+    }
 
 }
