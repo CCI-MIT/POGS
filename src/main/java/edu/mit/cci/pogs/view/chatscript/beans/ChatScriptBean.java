@@ -1,34 +1,26 @@
 package edu.mit.cci.pogs.view.chatscript.beans;
 
-public class ChatScriptBean {
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 
-    private Long id;
+public class ChatScriptBean extends ChatScript {
 
-    private String chatScriptName;
+
+    public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {
+        return researchGroupRelationshipBean;
+    }
+
+    public void setResearchGroupRelationshipBean(ResearchGroupRelationshipBean researchGroupRelationshipBean) {
+        this.researchGroupRelationshipBean = researchGroupRelationshipBean;
+    }
+
+    private ResearchGroupRelationshipBean researchGroupRelationshipBean;
 
     public ChatScriptBean() {}
 
-    public ChatScriptBean(
-            Long   id,
-            String chatScriptName
-    ) {
-        this.id = id;
-        this.chatScriptName = chatScriptName;
+    public ChatScriptBean(ChatScript chatScript) {
+        super(chatScript);
     }
 
-    public Long getId() {
-        return id;
-    }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getChatScriptName() {
-        return chatScriptName;
-    }
-
-    public void setChatScriptName(String chatScriptName) {
-        this.chatScriptName = chatScriptName;
-    }
 }

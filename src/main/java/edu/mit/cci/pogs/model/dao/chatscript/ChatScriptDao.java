@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ChatScriptDao extends Dao<ChatScript, Long> {
     List<ChatScript> list();
+    List<ChatScript> listChatScriptWithUserGroup(Long userId);
 }

@@ -1,5 +1,10 @@
 package edu.mit.cci.pogs.view.taskplugin;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
+import edu.mit.cci.pogs.service.TaskConfigurationService;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +24,6 @@ import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
 import edu.mit.cci.pogs.model.dao.taskexecutionattribute.TaskExecutionAttributeDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.view.taskplugin.beans.TaskPluginConfigBean;
@@ -35,16 +36,22 @@ public class TaskPluginController {
     private TaskConfigurationDao taskConfigurationDao;
 
     @Autowired
-    private TaskExecutionAttributeService taskConfigurationService;
+    private TaskExecutionAttributeService taskExecutionAttributeService;
 
     @Autowired
     private TaskExecutionAttributeDao taskExecutionAttributeDao;
+
+    @Autowired
+    private TaskConfigurationService taskConfigurationService;
 
     @Autowired
     private ExecutableScriptDao executableScriptDao;
 
     @Autowired
     private DictionaryDao dictionaryDao;
+
+    @Autowired
+    private ResearchGroupDao researchGroupDao;
 
     @GetMapping
     public String getTaskPlugins(Model model) {
@@ -83,7 +90,7 @@ public class TaskPluginController {
             model.addAttribute("taskPlugin", taskPlugin);
         }
         //get task plugins configurations
-        List<TaskConfiguration> taskConfigurationList = taskConfigurationDao.listByTaskPluginName(taskPlugin.getTaskPluginName());
+        List<TaskConfiguration> taskConfigurationList = taskConfigurationDao.listTaskConfigurationsByNameWithUserGroup(taskPlugin.getTaskPluginName(), AuthUserDetailsService.getLoggedInUser());
         model.addAttribute("taskConfigurationList", taskConfigurationList);
 
         return "taskplugin/taskplugin-display";
@@ -108,9 +115,12 @@ public class TaskPluginController {
                                     @ModelAttribute TaskPluginConfigBean taskPluginConfigBean,
                                     RedirectAttributes redirectAttributes) {
 
+
+        TaskConfiguration taskConfiguration = taskConfigurationService.createOrUpdate(taskPluginConfigBean);
+
         if (taskPluginConfigBean.getId() == null) {
-            TaskConfiguration tc = taskConfigurationDao.create(taskPluginConfigBean);
-            taskPluginConfigBean.setId(tc.getId());
+
+            taskPluginConfigBean.setId(taskConfiguration.getId());
 
             if(taskPluginConfigBean.getAttributes()!=null) {
                 for (TaskExecutionAttribute tea : taskPluginConfigBean.getAttributes()) {
@@ -119,11 +129,10 @@ public class TaskPluginController {
             }
             MessageUtils.addSuccessMessage("Plugin configuration created successfully!", redirectAttributes);
         } else {
-            taskConfigurationDao.update(taskPluginConfigBean);
+
             MessageUtils.addSuccessMessage("Plugin configuration updated successfully!", redirectAttributes);
         }
-        taskConfigurationService.createOrUpdateTaskExecutionAttribute(taskPluginConfigBean);
-
+        taskExecutionAttributeService.createOrUpdateTaskExecutionAttribute(taskPluginConfigBean);
 
 
         return "redirect:/admin/taskplugins/" + taskPluginName + "/" + taskPluginConfigBean.getId();
@@ -140,7 +149,12 @@ public class TaskPluginController {
         TaskPluginConfigBean tpcb = new TaskPluginConfigBean(taskConfiguration);
         tpcb.setAttributes(taskExecutionAttributes);
 
+        List<TaskConfigurationHasResearchGroup> test = taskConfigurationService.listTaskConfigurationyHasResearchGroupByTaskConfigurationId(configurationId);
+        tpcb.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
+        tpcb.getResearchGroupRelationshipBean().setTaskConfigurationHasResearchSelectedValues(taskConfigurationService.listTaskConfigurationyHasResearchGroupByTaskConfigurationId(configurationId));
+
         setupModelAttributesForPlugin(model, taskPlugin, tpcb);
+
 
         return "taskplugin/taskpluginconfig-edit";
 
@@ -173,5 +187,12 @@ public class TaskPluginController {
         }
         model.addAttribute("taskEditJs", taskPlugin.getTaskEditJsContent());
         model.addAttribute("taskEditHtml", taskPlugin.getTaskEditHtmlContent());
+    }
+
+    @ModelAttribute("researchGroups")
+    public List<ResearchGroup> getAllResearchGroups() {
+
+        List<ResearchGroup> res = researchGroupDao.list();
+        return res;
     }
 }

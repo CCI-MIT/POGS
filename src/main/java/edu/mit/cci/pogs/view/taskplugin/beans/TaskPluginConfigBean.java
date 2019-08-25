@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.view.taskplugin.beans;
 
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
 
@@ -17,6 +18,8 @@ public class TaskPluginConfigBean extends TaskConfiguration {
         super(tc);
 
     }
+
+    private ResearchGroupRelationshipBean researchGroupRelationshipBean;
 
     private List<TaskExecutionAttribute> attributes;
 
@@ -42,5 +45,13 @@ public class TaskPluginConfigBean extends TaskConfiguration {
             }
         }
         return ja.toString();
+    }
+
+    public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {
+        return researchGroupRelationshipBean;
+    }
+
+    public void setResearchGroupRelationshipBean(ResearchGroupRelationshipBean researchGroupRelationshipBean) {
+        this.researchGroupRelationshipBean = researchGroupRelationshipBean;
     }
 }

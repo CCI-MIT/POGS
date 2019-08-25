@@ -10,11 +10,10 @@ import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.records.TaskConfigurationRecord;
 
-import static edu.mit.cci.pogs.model.jooq.Tables.TASK_CONFIGURATION;
+import static edu.mit.cci.pogs.model.jooq.Tables.*;
 
 @Repository
 public class TaskConfigurationDaoImpl extends AbstractDao<TaskConfiguration, Long, TaskConfigurationRecord> implements TaskConfigurationDao {
@@ -65,6 +64,21 @@ public class TaskConfigurationDaoImpl extends AbstractDao<TaskConfiguration, Lon
             return record.into(TaskConfiguration.class);
         }
     }
+
+    @Override
+    public List<TaskConfiguration> listTaskConfigurationsByNameWithUserGroup(String taskPluginName, Long userId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(TASK_CONFIGURATION)
+                .join(TASK_CONFIGURATION_HAS_RESEARCH_GROUP).on(TASK_CONFIGURATION_HAS_RESEARCH_GROUP.TASK_CONFIGURATION_ID.eq(TASK_CONFIGURATION.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(TASK_CONFIGURATION_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
+                .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .getQuery();
+
+        query.addConditions(TASK_CONFIGURATION.TASK_PLUGIN_NAME.eq(taskPluginName));
+        return query.fetchInto(TaskConfiguration.class);
+    }
+
+
 
 
 }

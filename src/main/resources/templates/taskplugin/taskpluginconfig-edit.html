@@ -125,6 +125,7 @@
                    </div>
 
             </div>
+
             <script>
             function checkboxOnClickOnLoad(){
                var trigg = $(this).data("trigger");
@@ -143,6 +144,56 @@
                 });
             </script>
         </fieldset>
+
+        <fieldset class="form-group">
+            <legend>Research groups</legend>
+
+            <select multiple="multiple" size="10" th:field="*{researchGroupRelationshipBean.selectedValues}" id="researchGroups">
+                <option
+                        th:each="rg: ${researchGroups}"
+                        th:value="${rg.id}"
+                        th:text="${rg.groupName}" ></option>
+            </select>
+            <div class="invalid-feedback" id="researchGroupError">
+                Choose at least one research group. <br/>
+                If you choose a research group that you are not associated with you won't be able to edit this study.
+            </div>
+        </fieldset>
+        <script>
+            $(function() {
+                //$('select[name="researchgroups"]')
+                $('#researchGroups')
+                    .bootstrapDualListbox({
+                        selectedListLabel:"Chosen groups",
+                        nonSelectedListLabel: "Available groups",
+                        moveAllLabel:"Move all",
+                        removeAllLabel: "Remove all"
+                    });
+                /* hack for bootstrap 4 */
+                var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+                $( "#taskConfigForm" ).submit(function( event ) {
+                    var valid = true;
+                    if($("#researchGroups").val()== null){
+                        $("#researchGroupError").show();
+                        valid = false;
+                    }
+                    if(!valid){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                });
+            });
+            function isValidUsernameRegex(value){
+                var regexp = /^[a-zA-Z0-9]+$/;
+                return (regexp.test(value));
+            }
+        </script>
+        <!-- End research group field -->
+
         <fieldset class="form-group row" style="border-style: solid;border-color: gray;border-width: 2px;">
             <legend class="col-form-legend col-sm-2" >Advanced</legend>
             <div class="container">

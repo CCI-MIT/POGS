@@ -11,5 +11,6 @@ public interface TaskConfigurationDao extends Dao<TaskConfiguration, Long> {
     List<TaskConfiguration> listByTaskPluginName(String taskPluginName);
     TaskConfiguration getByTaskPluginConfigurationName(String taskPluginName);
     TaskConfiguration getByTaskPluginConfigurationId(long taskPluginInt);
+    List<TaskConfiguration> listTaskConfigurationsByNameWithUserGroup(String taskPluginName, Long userId);
 }
  

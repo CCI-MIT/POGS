@@ -3,10 +3,7 @@ package edu.mit.cci.pogs.view.researchgroup.beans;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasResearchGroup;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 
 
 public class ResearchGroupRelationshipBean {
@@ -47,6 +44,26 @@ public class ResearchGroupRelationshipBean {
         if(taskGroupHasResearchGroup!=null && !taskGroupHasResearchGroup.isEmpty()){
             List<String> selectedValues = new ArrayList<>();
             for(TaskGroupHasResearchGroup rghau: taskGroupHasResearchGroup){
+                selectedValues.add(rghau.getResearchGroupId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
+
+    public void setChatScriptHasResearchSelectedValues(List<ChatScriptHasResearchGroup> dictionaryHasResearchGroup){
+        if(dictionaryHasResearchGroup!=null && !dictionaryHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(ChatScriptHasResearchGroup rghau: dictionaryHasResearchGroup){
+                selectedValues.add(rghau.getResearchGroupId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
+
+    public void setTaskConfigurationHasResearchSelectedValues(List<TaskConfigurationHasResearchGroup> taskConfigurationHasResearchGroup){
+        if(taskConfigurationHasResearchGroup!=null && !taskConfigurationHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(TaskConfigurationHasResearchGroup rghau: taskConfigurationHasResearchGroup){
                 selectedValues.add(rghau.getResearchGroupId().toString());
             }
             this.selectedValues = selectedValues.toArray( new String[0]);
