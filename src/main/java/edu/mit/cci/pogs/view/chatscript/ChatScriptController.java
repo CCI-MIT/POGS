@@ -1,17 +1,24 @@
 package edu.mit.cci.pogs.view.chatscript;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.chatentry.ChatEntryDao;
 import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScriptHasResearchGroup;
 import edu.mit.cci.pogs.service.ChatScriptService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.view.chatscript.beans.ChatEntriesBean;
 import edu.mit.cci.pogs.view.chatscript.beans.ChatScriptBean;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+
+import java.util.List;
 
 @Controller
 //@RequestMapping(value = "/admin/chatscripts")
@@ -26,16 +33,19 @@ public class ChatScriptController {
     @Autowired
     private ChatScriptService chatScriptService;
 
+    @Autowired
+    private ResearchGroupDao researchGroupDao;
+
     @GetMapping("/admin/chatscripts")
     public String getChatScript1(Model model) {
 
-        model.addAttribute("chatscriptList", chatScriptDao.list());
+        model.addAttribute("chatscriptList", chatScriptDao.listChatScriptWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "chatscript/chatscript-list";
     }
 
     @GetMapping("/chatscripts/")
     public String getChatScript(Model model) {
-         model.addAttribute("chatscriptList", chatScriptDao.list());
+         model.addAttribute("chatscriptList", chatScriptDao.listChatScriptWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "chatscript/chatscript-list";
     }
 
@@ -53,19 +63,25 @@ public class ChatScriptController {
     @GetMapping("admin/chatscripts/create")
     public String createChatScript(Model model) {
 
-        ChatScriptBean chatScriptBean = new ChatScriptBean();
         ChatScript chatScript = new ChatScript();
-        model.addAttribute("chatscript",chatScript);
-        model.addAttribute("chatscriptBean", chatScriptBean);
+        ChatScriptBean chatScriptBean = new ChatScriptBean(chatScript);
+        chatScriptBean.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+
+        model.addAttribute("chatscript",chatScriptBean);
+        //model.addAttribute("chatscriptBean", chatScriptBean);
         return "chatscript/chatscript-edit";
     }
 
     @GetMapping("/admin/chatscripts/{chatscriptId}/edit")
     public String editChatScript(@PathVariable("chatscriptId") Long chatscriptId, Model model) {
 
-        ChatScriptBean chatScript = new ChatScriptBean();
-        chatScript.setId(chatscriptId);
-        model.addAttribute("chatscript", chatScript);
+        ChatScriptBean chatScriptBean = new ChatScriptBean(chatScriptDao.get(chatscriptId));
+        chatScriptBean.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
+        List<ChatScriptHasResearchGroup> test = chatScriptService.listChatScriptHasResearchGroupByChatScriptId(chatscriptId);
+        chatScriptBean.getResearchGroupRelationshipBean().setChatScriptHasResearchSelectedValues(chatScriptService.listChatScriptHasResearchGroupByChatScriptId(chatscriptId));
+        chatScriptBean.setId(chatscriptId);
+        model.addAttribute("chatscript", chatScriptBean);
         return "chatscript/chatscript-edit";
     }
 
@@ -77,16 +93,11 @@ public class ChatScriptController {
     }
 
     @PostMapping("/admin/chatscripts")
-    public String saveChatScript(@ModelAttribute ChatScript chatscript, RedirectAttributes redirectAttributes) {
+    public String saveChatScript(@ModelAttribute ChatScriptBean chatscriptBean, RedirectAttributes redirectAttributes) {
 
-        if (chatscript.getId() == null) {
-            chatscript = chatScriptDao.create(chatscript);
-            MessageUtils.addSuccessMessage("Chat Script created successfully!", redirectAttributes);
-        } else {
-            chatScriptDao.update(chatscript);
-            MessageUtils.addSuccessMessage("Chat Script updated successfully!", redirectAttributes);
-        }
-        return "redirect:/admin/chatscripts/"+chatscript.getId();
+
+        ChatScript chatScript = chatScriptService.createOrUpdate(chatscriptBean);
+        return "redirect:/admin/chatscripts/"+chatScript.getId();
     }
 
     @GetMapping("/admin/chatscripts/{id}/chatentries/edit")
@@ -99,5 +110,12 @@ public class ChatScriptController {
         model.addAttribute("chatscript", chatScript);
         model.addAttribute("chatEntriesBean", chatEntriesBean);
         return "chatscript/chatentry-edit";
+    }
+
+    @ModelAttribute("researchGroups")
+    public List<ResearchGroup> getAllResearchGroups() {
+
+        List<ResearchGroup> res = researchGroupDao.list();
+        return res;
     }
 }

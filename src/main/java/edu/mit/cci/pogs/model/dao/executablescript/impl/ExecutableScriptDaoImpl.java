@@ -14,7 +14,7 @@ import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.records.ExecutableScriptRecord;
 
-import static edu.mit.cci.pogs.model.jooq.Tables.EXECUTABLE_SCRIPT;
+import static edu.mit.cci.pogs.model.jooq.Tables.*;
 
 @Repository
 public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long, ExecutableScriptRecord> implements ExecutableScriptDao {
@@ -37,6 +37,18 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
             return query.fetchInto(ExecutableScript.class);
 
+    }
+
+    @Override
+    public List<ExecutableScript> listExecutableScriptsWithUserGroup(Long userId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(EXECUTABLE_SCRIPT)
+                .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP.EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
+                .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .getQuery();
+
+        return query.fetchInto(ExecutableScript.class);
     }
 
     @Override

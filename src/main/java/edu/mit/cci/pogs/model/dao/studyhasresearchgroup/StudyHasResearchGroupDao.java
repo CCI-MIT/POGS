@@ -8,7 +8,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
 public interface StudyHasResearchGroupDao extends Dao<StudyHasResearchGroup, Long> {
  
     List<StudyHasResearchGroup> list();
-    List<StudyHasResearchGroup> listByStudyId(Long studyId);
+    List<StudyHasResearchGroup> listByStudyId(Long chatScriptId);
     List<StudyHasResearchGroup> listByResearchGroup(Long researchGroupId);
     void delete(StudyHasResearchGroup rghau);
 }
