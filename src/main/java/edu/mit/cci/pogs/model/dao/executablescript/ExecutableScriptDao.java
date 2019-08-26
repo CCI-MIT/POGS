@@ -14,6 +14,7 @@ public interface ExecutableScriptDao  extends Dao<ExecutableScript, Long> {
 
     List<ExecutableScript> list();
 
+    List<ExecutableScript> listByScriptTypeWithUserGroup(ScriptType scriptType,Long userId);
 
 
 }

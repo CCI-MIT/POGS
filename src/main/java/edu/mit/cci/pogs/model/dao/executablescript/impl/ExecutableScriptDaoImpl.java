@@ -39,12 +39,33 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
     }
 
+
+    public List<ExecutableScript> listByScriptTypeWithUserGroup(ScriptType scriptType,Long userId) {
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(EXECUTABLE_SCRIPT)
+                .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
+                        .EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER
+                        .RESEARCH_GROUP_ID.eq(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
+                                .RESEARCH_GROUP_ID)).getQuery();
+
+        query.addConditions(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId));
+        query.addConditions(EXECUTABLE_SCRIPT.SCRIPT_TYPE.eq(scriptType.getId().toString()));
+
+        return query.fetchInto(ExecutableScript.class);
+
+    }
+
     @Override
     public List<ExecutableScript> listExecutableScriptsWithUserGroup(Long userId) {
         final SelectQuery<Record> query = dslContext.select()
                 .from(EXECUTABLE_SCRIPT)
-                .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP.EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))
-                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
+                .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
+                        .EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))
+                .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER
+                        .RESEARCH_GROUP_ID.eq(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
+                                .RESEARCH_GROUP_ID))
                 .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
                 .getQuery();
 

@@ -45,8 +45,8 @@ public class TaskGroupController {
 
     @ModelAttribute("tasks")
     public List<Task> getTasks() {
-        //TODO: add the constraint for only the tasks associated with the current users research group
-        return taskDao.list();
+
+        return taskDao.listTasksWithUserGroup(AuthUserDetailsService.getLoggedInUser());
     }
 
     @GetMapping

@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
@@ -83,7 +84,7 @@ public class SessionController {
     @ModelAttribute("taskGroups")
     public List<TaskGroup> getTaskGroups() {
 
-        return taskGroupDao.list();
+        return taskGroupDao.listTaskGroupsWithUserGroup(AuthUserDetailsService.getLoggedInUser());
     }
 
     @ModelAttribute("sessionScheduleConditionToStart")
@@ -100,12 +101,14 @@ public class SessionController {
 
     @ModelAttribute("executableScripts")
     public List<ExecutableScript> getExecutableScripts() {
-        return executableScriptDao.listByScriptType(ScriptType.PERPETUAL_INIT_CONDITION);
+        return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.PERPETUAL_INIT_CONDITION,
+                AuthUserDetailsService.getLoggedInUser());
     }
 
     @ModelAttribute("sessionWideExecutableScripts")
     public List<ExecutableScript> getSessionWideExecutableScripts() {
-        return executableScriptDao.listByScriptType(ScriptType.SESSION_WIDE_OVERRIDE);
+        return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_WIDE_OVERRIDE,
+                AuthUserDetailsService.getLoggedInUser());
     }
 
     @ModelAttribute("sessionScheduleConditionType")

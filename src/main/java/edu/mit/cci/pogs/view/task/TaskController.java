@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
@@ -65,7 +66,7 @@ public class TaskController {
 
     @ModelAttribute("chatScripts")
     public List<ChatScript> getChatScripts(){
-        return chatScriptDao.list();
+        return chatScriptDao.listChatScriptWithUserGroup(AuthUserDetailsService.getLoggedInUser());
     }
     @ModelAttribute("communicationConstraints")
     public List<CommunicationConstraint> getCommunicationConstraints() {
@@ -81,7 +82,7 @@ public class TaskController {
     public List<TaskConfiguration> getPluginConfiguration(){
         List<TaskConfiguration> taskConfigurationList = new ArrayList<>();
         for(TaskPlugin tp : TaskPlugin.getAllTaskPlugins()) {
-            taskConfigurationList.addAll(taskConfigurationDao.listByTaskPluginName(tp.getTaskPluginName()));
+            taskConfigurationList.addAll(taskConfigurationDao.listTaskConfigurationsByNameWithUserGroup(tp.getTaskPluginName(), AuthUserDetailsService.getLoggedInUser()));
         }
         return taskConfigurationList;
     }
@@ -94,7 +95,7 @@ public class TaskController {
     @GetMapping
     public String getTask(Model model) {
 
-        model.addAttribute("tasksList", taskDao.list());
+        model.addAttribute("tasksList", taskDao.listTasksWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "task/task-list";
     }
 
