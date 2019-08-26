@@ -98,6 +98,7 @@ public class TeamService {
 
     public JSONObject getSubjectJsonObject(Subject s) {
         JSONObject subject = new JSONObject();
+        subject.put("id", s.getId());
         subject.put("externalId", s.getSubjectExternalId());
         subject.put("displayName", s.getSubjectDisplayName());
         JSONArray subjectAttributes = new JSONArray();
@@ -105,6 +106,7 @@ public class TeamService {
         for (SubjectAttribute sa : attributes) {
             JSONObject att = new JSONObject();
             att.put("attributeName", sa.getAttributeName());
+            att.put("internalAttribute", sa.getInternalAttribute());
             att.put("stringValue", sa.getStringValue());
             att.put("integerValue", sa.getIntegerValue());
             att.put("realValue", sa.getRealValue());
@@ -124,7 +126,7 @@ public class TeamService {
 
     public Subject generateFakeSubject(String subjectExternalId) {
         Subject su = new Subject();
-        su.setId(new Date().getTime());
+        su.setId(-1*Long.parseLong(subjectExternalId.replace("su0","")));
         su.setSubjectExternalId(subjectExternalId);
         su.setSubjectDisplayName(subjectExternalId);
         return su;
@@ -164,6 +166,7 @@ public class TeamService {
         int colorIndex = 0;
         for (Subject s : teammates) {
             JSONObject subject = new JSONObject();
+            subject.put("id", s.getId());
             subject.put("externalId", s.getSubjectExternalId());
             subject.put("displayName", s.getSubjectDisplayName());
 
@@ -177,6 +180,9 @@ public class TeamService {
                     String.format("#%02x%02x%02x", color.getRed(),
                             color.getGreen(), color.getBlue())
             );
+
+            att.put("internalAttribute", true);
+
             subjectAttributes.put(att);
 
             att = new JSONObject();
@@ -186,6 +192,7 @@ public class TeamService {
             att.put("stringValue", String.format("#%02x%02x%02x", color.getRed(),
                     color.getGreen(), color.getBlue()));
             colorIndex++;
+            att.put("internalAttribute", true);
 
             subjectAttributes.put(att);
 

@@ -23,21 +23,26 @@ class WhackTaskEdit {
         }
 
         $("#addPlayer").click(function () { //Setup add question button
-            this.addPlayer(1,1,0);
+            this.addPlayer(1, 1,1,0);
         }.bind(this));
 
     }
 
-    addPlayer(moleAppearTime, maxMoleNum, clickDelay){
+    addPlayer(numberOfRounds, moleAppearTime, maxMoleNum, clickDelay){
         var self = this;
         this.numOfPlayer++;
         var str =
             '<div class="container player" id="player'+ this.numOfPlayer +'">\n' +
             '            <div class="form-group row">\n' +
-            '                <bold class="col-sm-2 col-form-label">Player '+ this.numOfPlayer +'</bold>\n' +
-            '                <div class="col-sm-8">' +
-            '                   <button type="button" class="btn btn-danger btn-sm pull-right" id="removePlayer' + this.numOfPlayer + '">remove</button>' +
-            '                </div>' +
+            '                <bold class="col-sm-2 col-form-label">Configuration</bold>\n' + //'+ this.numOfPlayer +'
+            //'                <div class="col-sm-8">' +
+            //'                   <button type="button" class="btn btn-danger btn-sm pull-right" id="removePlayer' + this.numOfPlayer + '">remove</button>' +
+            //'                </div>' +
+            '            </div>\n' +
+            '            <div class="form-group row">\n' +
+            '                <label class="col-sm-2 col-form-label" for="moleAppearTime'+ this.numOfPlayer +'">Number of rounds: </label>\n' +
+            '                <input type="number" min="1" step="1" class="form-control col-sm-8" id="numberOfRounds'+ this.numOfPlayer +'" placeholder="Enter the number of rounds" value="'+ numberOfRounds +'">\n' +
+            '                <small id="" class="form-text text-muted">Total amount of rounds subjecs will be able to play</small>'+
             '            </div>\n' +
             '            <div class="form-group row">\n' +
             '                <label class="col-sm-2 col-form-label" for="moleAppearTime'+ this.numOfPlayer +'">Mole appear time: </label>\n' +
@@ -68,7 +73,7 @@ class WhackTaskEdit {
     setupHtmlFromAttributeString(bluePrint){
         var self = this;
         $.each(bluePrint, function(i, e){
-            self.addPlayer(e.moleAppearTime, e.maxMoleNum, e.clickDelay)
+            self.addPlayer(e.numberOfRounds, e.moleAppearTime, e.maxMoleNum, e.clickDelay)
         });
 
     }
@@ -79,6 +84,7 @@ class WhackTaskEdit {
             var playerConfig = {};
             var playerId = e.id.match(/\d+/);
             playerConfig["player"] = i.toString();
+            playerConfig["numberOfRounds"] = $("#numberOfRounds"+playerId).val();
             playerConfig["moleAppearTime"] = $("#moleAppearTime"+playerId).val();
             playerConfig["maxMoleNum"] = $("#maxMoleNum"+playerId).val();
             playerConfig["clickDelay"] = $("#clickDelay"+playerId).val();

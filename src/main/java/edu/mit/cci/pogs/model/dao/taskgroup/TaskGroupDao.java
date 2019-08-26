@@ -8,5 +8,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
 public interface TaskGroupDao extends Dao<TaskGroup, Long> {
  
     List<TaskGroup> list();
+
+    List<TaskGroup> listTaskGroupsWithUserGroup(Long id);
 }
  

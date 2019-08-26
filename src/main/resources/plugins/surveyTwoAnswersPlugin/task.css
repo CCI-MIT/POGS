@@ -54,3 +54,6 @@ label{
     margin: 1%;
     height: 50%;
 }
+select {
+    max-width: 350px;
+}

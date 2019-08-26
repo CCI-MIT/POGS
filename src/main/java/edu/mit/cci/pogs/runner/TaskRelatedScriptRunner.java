@@ -54,6 +54,10 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
         //get all subjects + subjects attributes
 
         boolean isSoloTask = false;
+
+        this.getEngine().put("sessionId", session.getId());
+        this.getEngine().put("completedTaskId", this.getCompletedTask().getId());
+
         if(this.getCompletedTask().getSubjectId()!=null){
             isSoloTask = true;
             Subject subject =  subjectDao.get(this.getCompletedTask().getSubjectId());

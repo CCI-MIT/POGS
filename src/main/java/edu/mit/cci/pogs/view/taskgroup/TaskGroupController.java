@@ -1,5 +1,9 @@
 package edu.mit.cci.pogs.view.taskgroup;
 
+import edu.mit.cci.pogs.config.AuthUserDetailsService;
+import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +38,9 @@ public class TaskGroupController {
     private TaskDao taskDao;
 
     @Autowired
+    private ResearchGroupDao researchGroupDao;
+
+    @Autowired
     private TaskGroupService taskGroupService;
 
     @ModelAttribute("tasks")
@@ -45,7 +52,7 @@ public class TaskGroupController {
     @GetMapping
     public String getTaskGroup(Model model) {
 
-        model.addAttribute("taskGroupsList", taskGroupDao.list());
+        model.addAttribute("taskGroupsList", taskGroupDao.listTaskGroupsWithUserGroup(AuthUserDetailsService.getLoggedInUser()));
         return "taskgroup/taskgroup-list";
     }
 
@@ -59,15 +66,27 @@ public class TaskGroupController {
     @GetMapping("/create")
     public String createTaskGroup(Model model) {
 
-        model.addAttribute("taskGroup", new TaskGroup());
+        TaskGroupBean tb = new TaskGroupBean();
+        tb.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+        model.addAttribute("taskGroup", tb);
         return "taskgroup/taskgroup-edit";
     }
 
     @GetMapping("{id}/edit")
-    public String createTaskGroup(@PathVariable("id") Long id, Model model) {
+    public String editTaskGroup(@PathVariable("id") Long id, Model model) {
         TaskGroupBean bean = new TaskGroupBean(taskGroupDao.get(id));
 
+
+        bean.setResearchGroupRelationshipBean(
+                new ResearchGroupRelationshipBean());
+        bean.getResearchGroupRelationshipBean()
+                .setTaskGroupHasResearchSelectedValues(
+                        taskGroupService.listTaskGroupHasResearchGroupByTaskGroup(id));
+
+
         model.addAttribute("taskGroup", bean);
+
         List<TaskGroupHasTaskBean> currentTaskGroupHasTasks = resolveTaskGroupHasTaskBeans(
                 taskGroupService.listTaskGroupHasTaskByTaskGroup(id));
 
@@ -102,6 +121,12 @@ public class TaskGroupController {
         }
 
         return "redirect:/admin/taskgroups";
+    }
+
+    @ModelAttribute("researchGroups")
+    public List<ResearchGroup> getAllResearchGroups() {
+
+        return researchGroupDao.list();
     }
 
 }

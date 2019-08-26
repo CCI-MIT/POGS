@@ -1,9 +1,14 @@
 'use strict';
 
 class PogsPlugin {
-    constructor(pluginName, initFunc, pogsRef){
+    constructor(pluginName, initFunc, pogsRef, destroyFunc){
         this.pluginName = pluginName;
         this.initFunc = initFunc;
+        if(destroyFunc) {
+            this.destroyFunc = destroyFunc;
+        } else {
+            this.destroyFunc = function(){ console.log("Plug in destroy method")};
+        }
         this.pogsRef = pogsRef;
     }
     getSubjectId() {
@@ -49,6 +54,20 @@ class PogsPlugin {
             }
         }
         return teamm;
+    }
+    getTeammateAttribute(subjectId, propertyName){
+        if(!this.getTeammates()) return;
+
+        let subject = this.getSubjectByExternalId(subjectId);
+        if(subject.attributes){
+            for (var j = 0; j < subject.attributes.length; j++) {
+                if (subject.attributes[j].attributeName == propertyName) {
+                    return subject.attributes[j];
+                }
+            }
+        }
+        return null;
+
     }
     getTeammates(){
         return this.pogsRef.teammates;

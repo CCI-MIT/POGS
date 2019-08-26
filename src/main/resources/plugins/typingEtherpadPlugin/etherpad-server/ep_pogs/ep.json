@@ -1,0 +1,10 @@
+{
+    "parts": [
+        {
+            "name": "pogs",
+            "hooks": {
+                "getLineHTMLForExport" : "ep_pogs/index:getLineHTMLForExport"
+            }
+        }
+    ]
+}

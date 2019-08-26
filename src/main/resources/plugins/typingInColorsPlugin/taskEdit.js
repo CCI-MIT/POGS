@@ -2,6 +2,8 @@ class TypingTaskEdit {
 
     init(taskConfigId, currentAttributes){
         this.taskConfigId = taskConfigId;
+
+        this.dictionaries={};
         let gridBluePrint = null;
         for(var i = 0 ; i< currentAttributes.length; i ++){
             if(currentAttributes[i].attributeName == "gridBluePrint") {
@@ -17,34 +19,61 @@ class TypingTaskEdit {
         $("#createColors").click(function () {
             this.createColorField("#000000","");
         }.bind(this));
+
+        $("#dictionaryId").change(this.setupSectionsFromDictionary.bind(this));
+    }
+    getDictJson(dictId, callBack){
+
+        $.getJSON("/dictionaries/" + dictId + '/full',null, function(emp) {
+
+            let dictionaries = emp.dictionaryEntryList;
+
+            for(var i=0 ; i< dictionaries.length; i++ ) {
+                this.dictionaries[dictionaries[i].id]= dictionaries[i];
+            }
+            callBack(dictionaries);
+        }.bind(this));
+    }
+    setupSectionsFromDictionary(ref) {
+        this.getDictJson($(ref.target).val(), function(dictionaries){
+            //console.log("Inside call back funciton");
+
+            for(var i=0 ; i< dictionaries.length; i ++){
+                this.createColorField("#000000",dictionaries[i].id);
+            }
+            this.refreshPreview();
+        }.bind(this));
     }
     setupHtmlFromAttributeString(attributez){
-        for(let k =0; k < attributez.length; k ++) {
-            this.createColorField(attributez[k].color, attributez[k].text);
+        if($("#dictionaryId").val()!="") {
+            this.getDictJson($("#dictionaryId").val(), function () {
+
+                for (let k = 0; k < attributez.length; k++) {
+                    this.createColorField(attributez[k].color, attributez[k].text);
+                }
+                this.refreshPreview();
+
+            }.bind(this));
         }
-        this.refreshPreview();
+
+
+
     }
     refreshPreview(){
         let inputsTxt = $(".colorField .colorText");
         let inputsColors = $(".colorField .colorPick");
-        let body = "";
-        let lastColor = "";
+
+        let texts = [];
         for(let k=0; k < inputsTxt.length; k++) {
             let newColor = $(inputsColors[k]).val();
-            if(newColor == ""){
-                newColor = "#000000";
-            }
-            if(newColor!=lastColor) {
-                if(lastColor!=""){
-                    body += "</span>";
-                }
-                body += "<span style='background-color:"+newColor+";color:"+generateFontColorBasedOnBackgroundColor(newColor)+"'>"
-                lastColor = newColor;
-            }
-            body += replaceNewLinesForBrs($(inputsTxt[k]).val());
+
+            texts.push({textContent:this.dictionaries[$(inputsTxt[k]).val()].entryValue,
+                    backgroundColor:newColor, fontColor:
+                    generateFontColorBasedOnBackgroundColor(newColor)});
         }
-        body +="</span>";
-        $("#livePreviewContainer").html(body);
+        $("#livePreviewContainer canvas").remove();
+        this.canvasImage = new CanvasTextToImage(texts,"livePreviewContainer", 318);
+
     }
     createColorField(colorValue, textValue) {
         if(colorValue === undefined) colorValue= "#000000";
@@ -53,8 +82,9 @@ class TypingTaskEdit {
         $("#colorFieldContainer").append(
               '    <div class="form-group row colorField"  class="col-12">\n'
             + '      <div class="col-6 row">'
-            + '         <label for="example-color-input" class="col-3 col-form-label">Text '+numberOfFields+'</label>\n'
-            + '         <textarea class="form-control  col-9 colorText" rows="1" id="colorField'+numberOfFields+'Text"></textarea>'
+            + '         <label for="example-color-input" class="col-3 col-form-label"># '+numberOfFields+'</label>\n'
+            + '         <input type="hidden" class="form-control  col-9 colorText" rows="1" id="colorField'+numberOfFields+'Text" />'
+            + '         <div  class="form-control  col-9 " rows="1" id="colorField'+numberOfFields+'TextLabel"></div>'
             + '      </div>\n'
             + '      <div class="col-5 row">'
             + '         <label for="example-color-input" class="col-4 col-form-label">Color '+numberOfFields+'</label>\n'
@@ -65,19 +95,20 @@ class TypingTaskEdit {
             + '           </span>'
             + '          </div>'
             + '      </div>\n'
-            + '      <div class="col-1">\n'
-            + '           <button type="button" class="btn btn-danger btn-sm remove-color" data-color-index="'+numberOfFields+'"> X </button>'
-            + '      </div>\n'
+            //+ '      <div class="col-1">\n'
+            //+ '           <button type="button" class="btn btn-danger btn-sm remove-color" data-color-index="'+numberOfFields+'"> X </button>'
+            //+ '      </div>\n'
             + '    </div>');
 
-        $('#colorField'+numberOfFields+'Text').val(textValue);
+        $('#colorField'+numberOfFields+'TextLabel').text(this.dictionaries[textValue].entryCategory);
+        $('#colorField'+numberOfFields+'Text').val(this.dictionaries[textValue].id);
 
         $('#colorField'+ numberOfFields).colorpicker({format: 'auto'});
 
         $('#colorField'+ numberOfFields).on('change',this.refreshPreview.bind(this));
         $('#colorField'+numberOfFields+'Text').on('change',this.refreshPreview.bind(this));
 
-        this.setupDelete();
+        //this.setupDelete();
     }
     setupDelete(){
         $(".remove-color").unbind().click(function (event) {

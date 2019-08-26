@@ -509,8 +509,10 @@
                             <label class="col-sm-5 col-form-label" for="sessionWideScriptIdSelect">Session wide script override:</label>
                             <div class="col-sm-7">
                                 <select class="custom-select" th:field="*{sessionWideScriptId}" id="sessionWideScriptIdSelect">
-                                    <option th:if="${#lists.isEmpty(sessionWideExecutableScripts) }"
-                                                                         value=""  >No override</option>
+
+                                    <option th:if="*{sessionWideScriptId==null}" selected="selected" value="">No override</option>
+                                    <option th:if="*{sessionWideScriptId!=null}"  value="">No override</option>
+
                                     <option
                                        th:if="${not #lists.isEmpty(sessionWideExecutableScripts) }"
                                             th:each="rg: ${sessionWideExecutableScripts}"

@@ -18,7 +18,7 @@
         </li>
     </ol>
     <h2>Edit Chatscript</h2>
-    <form action="#" th:action="@{/admin/chatscripts}" th:object="${chatscript}" method="post">
+    <form action="#" th:action="@{/admin/chatscripts}" th:object="${chatscript}" method="post" id="saveChatScript">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <input type="hidden" name="id" th:value="*{id}"/>
         <div class="form-group row">
@@ -27,6 +27,69 @@
                 <input class="form-control" type="text" id="chatscriptName" th:field="*{chatScriptName}"/>
             </div>
         </div>
+
+        <!-- Begin research group field -->
+        <fieldset class="form-group">
+            <legend>Research groups</legend>
+
+            <select multiple="multiple" size="10" th:field="*{researchGroupRelationshipBean.selectedValues}" id="researchGroups">
+                <option
+                        th:each="rg: ${researchGroups}"
+                        th:value="${rg.id}"
+                        th:text="${rg.groupName}" ></option>
+            </select>
+            <div class="invalid-feedback" id="researchGroupError">
+                Choose at least one research group. <br/>
+                If you choose a research group that you are not associated with you won't be able to edit this study.
+            </div>
+        </fieldset>
+        <script>
+
+            $(function() {
+                //$('select[name="researchgroups"]')
+
+                $('#researchGroups')
+                    .bootstrapDualListbox({
+                        selectedListLabel:"Chosen groups",
+                        nonSelectedListLabel: "Available groups",
+                        moveAllLabel:"Move all",
+                        removeAllLabel: "Remove all"
+                    });
+                /* hack for bootstrap 4 */
+                var dualListContainer = $('#researchGroups').bootstrapDualListbox('getContainer');
+                dualListContainer.find('.moveall i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.removeall i').removeClass().addClass('fa fa-arrow-left');
+                dualListContainer.find('.move i').removeClass().addClass('fa fa-arrow-right');
+                dualListContainer.find('.remove i').removeClass().addClass('fa fa-arrow-left');
+
+                $( "#saveChatScript" ).submit(function( event ) {
+
+
+                    var valid = true;
+                    if(!isValidUsernameRegex($("#studySessionPrefix").val())){
+                        $("#studySessionPrefix").addClass("is-invalid");
+                        valid = false;
+                    }
+
+                    if($("#researchGroups").val()== null){
+                        $("#researchGroupError").show();
+                        valid = false;
+                    }
+
+
+                    if(!valid){
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                });
+            });
+
+
+            function isValidUsernameRegex(value){
+                var regexp = /^[a-zA-Z0-9]+$/;
+                return (regexp.test(value));
+            }
+        </script>
 
 
         <button th:if="${chatscript.id == null}" type="submit" class="btn btn-primary">Create chat script

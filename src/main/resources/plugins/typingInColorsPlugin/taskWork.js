@@ -1,15 +1,17 @@
-class PogsOtColorsClient extends ot.AbstractOtClient {
-    constructor(pogsPlugin, padElementId, blueprint) {
-        const padId = "pad-for-task-" + pogsPlugin.getCompletedTaskId();
-        const clientId = "subject-" + pogsPlugin.getSubjectId();
-        super(padId, clientId, padElementId);
+class EtherpadWithColors {
+    constructor(pogsPlugin,blueprint, padID) {
+        this._pogsPlugin = pogsPlugin;
+
+        this.padID = padID;
         this.subjectsColors = [];
         this.availableColors = [];
         this.uniqueColors = {};
         this.textSections = [];
+        this.dictionaryTexts = {};
+        this.dictDataFetchCount = 0;
         this.textSectionsColors = [];
-        log.info(`Initializing PogsOtClient for pad ${padId} as client ${clientId}`);
-        $("#padContent").attr("disabled", "disabled");
+
+        //$("#padContent").attr("disabled", "disabled");
         for(let k = 0; k < blueprint.length; k++) {
 
             if(!this.uniqueColors[blueprint[k].color]) {
@@ -19,7 +21,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
             this.textSections.push(blueprint[k].text);
             this.textSectionsColors.push(blueprint[k].color);
         }
-        this.setupText();
+        this.setupDictionaryData();
         for(let k = 0; k < this.availableColors.length; k++) {
             $('#colorPickerAndAssigner')
                 .append('<button type="button" class="btn btn-lg" data-color-index="'+k+'" style="margin:10px;background-color: '+
@@ -50,47 +52,45 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         }.bind(this));
         this._pogsPlugin.pogsRef.subscribe('onUnload', this.beforeLeave.bind(this));
     }
+    setupDictionaryData(){
+        let dict = this._pogsPlugin.pogsRef.getDictionary();
+        if(dict) {
+            for (let i = 0; i < this.textSections.length; i++) {
+
+                this._pogsPlugin.pogsRef.getDictionaryEntry(this.textSections[i],function(ret){
+                    this.dictionaryTexts[ret.id] = {textContent:atob(ret.entryValue),
+                        backgroundColor:"#ffffff", fontColor: "#000000"};
+                    this.dictDataFetchCount++;
+                    if(this.dictDataFetchCount == this.textSections.length){
+                        this.setupText();
+                    }
+                }.bind(this));
+
+            }
+        }
+    }
     setupText(){
 
         let inputsTxt = this.textSections;
         let inputsColors = this.textSectionsColors;
 
+        let textsToCanvas = [];
         let container = $('<div>',{
             id: 'typingInColorstaskText',
             class: 'rol col-12'
         });
 
-        let saida = "";
-        saida+="<style>\n";
-        saida+="#typingInColorstaskText {\n";
-        saida+="    -moz-user-select: none;\n";
-        saida+="-webkit-user-select: none;\n";
-        saida+="-ms-user-select: none;\n";
-        saida+="-o-user-select: none;\n";
-        saida+="user-select: none;\n";
-        saida+="}\n";
-        saida+="</style>\n";
-        $(".information").append(saida);
         $(".information").append(container);
 
-        let body = "";
-        let lastColor = "";
+
         for(let k=0; k < inputsTxt.length; k++) {
-            let newColor = inputsColors[k];
-            if(newColor == ""){
-                newColor = "#000000";
-            }
-            if(newColor!=lastColor) {
-                if(lastColor!=""){
-                    body += "</span>";
-                }
-                body += "<span style='background-color:"+newColor+";color:"+generateFontColorBasedOnBackgroundColor(newColor)+"'>"
-                lastColor = newColor;
-            }
-            body += replaceNewLinesForBrs(inputsTxt[k]);
+            let aux = this.dictionaryTexts[inputsTxt[k]];
+            aux.backgroundColor = inputsColors[k];
+            aux.fontColor = generateFontColorBasedOnBackgroundColor(inputsColors[k]);
+            textsToCanvas.push(aux);
         }
-        body +="</span>";
-        $("#typingInColorstaskText").html(body);
+        this.canvasImage = new CanvasTextToImage(textsToCanvas,"typingInColorstaskText", 318);
+
     }
     beforeLeave(){
         $("#padContent").attr("disabled","disabled");
@@ -127,9 +127,11 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
             if($(allColorButtons[k]).data("color-index") == colorIndex) {
                 if(isCurrentSubject) {
                     $(allColorButtons[k]).text("You chose this color!");
-                    $("#padContent").attr("disabled", null);
+                    //$("#padContent").attr("disabled", null);
+                    //TODO INSERT IFRAME. with selected COLOR.
                     $("#colorPickerAndAssigner button").addClass("disabled");
                     $("#colorPickerAndAssigner button").unbind();
+                    this.setupPad(this.padID,this.availableColors[colorIndex]);
                 } else {
                     $(allColorButtons[k]).text( subject.displayName+" chose this color!")
                     $(allColorButtons[k]).addClass("disabled");
@@ -143,7 +145,7 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         this.updateSubjectColors();
     }
     updateSubjectColors(){
-        $("head style").remove();
+        //$("head style").remove();
         let rule = "";
         for (let i = 0; i < this.subjectsColors.length; i++) {
             rule += `.${this.subjectsColors[i].externalId}_color, `
@@ -178,14 +180,73 @@ class PogsOtColorsClient extends ot.AbstractOtClient {
         }
         this._pogsPlugin.sendOperation(operation);
     }
+
+    setupPad(padId,currentUserColor){
+        //1 - get sessionID for this pad
+        const subjectId = this._pogsPlugin.getSubjectId();
+        const sessionIDAtt = this._pogsPlugin.getTeammateAttribute(subjectId,
+                                                                   "ETHERPAD_SESSION_ID");
+        let sessionId = null;
+        if(sessionIDAtt){
+            sessionId = sessionIDAtt.stringValue;
+        }
+
+        //2 - set COOKIE according to the DOMAIN.
+
+        console.log("sessionID "  + sessionId);
+        console.log("padID " + padId);
+
+        setCookie("sessionID",sessionId, 1);
+
+        let etherpadAddress = "https://etherpad.pogs.info/p/"
+        if(window.location.href.indexOf("localhost")!=-1){
+            etherpadAddress = "http://localhost:9001/p/"
+        }
+        let iframe_src = etherpadAddress + padId + "?showControls=false&showLineNumbers=false&showChat=false&userColor="+currentUserColor;
+
+        $("#etherpadArea").append('<iframe src="'+iframe_src+'" frameborder="0" style="position:relative;width:100%;height:100%;"></iframe>');
+    }
 }
 
-const typingPlugin = pogs.createPlugin('typingPlugin', function() {
+const typingPlugin = pogs.createPlugin('typingInColorsPlugin', function() {
 
+    const otClient = new EtherpadWithColors(this,
+                                            $.parseJSON(
+                                                this.getStringAttribute("gridBluePrint")),
+                                            this.getCompletedTaskStringAttribute("padID"));
+},
+    function(){
+        eraseCookie("sessionID");
+        console.log("Erasing the cookie");
 
+    });
 
-    const otClient = new PogsOtColorsClient(this, 'padContent',$.parseJSON(this.getStringAttribute("gridBluePrint")));
-});
+function setCookie(name,value,days) {
+    var expires = "";
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days*24*60*60*1000));
+        expires = "; expires=" + date.toUTCString();
+    }
+    if(window.location.href.indexOf("localhost")!=-1) {
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    } else {
+        document.cookie = name + "=" + (value || "") + expires + "; domain=pogs.info";
+    }
+}
+function getCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+function eraseCookie(name) {
+    document.cookie = name+'=; Max-Age=-99999999;';
+}
 
 function replaceNewLinesForBrs(st){
     if(st === undefined) return "";
