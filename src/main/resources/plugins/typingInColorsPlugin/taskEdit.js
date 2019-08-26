@@ -31,13 +31,15 @@ class TypingTaskEdit {
             for(var i=0 ; i< dictionaries.length; i++ ) {
                 this.dictionaries[dictionaries[i].id]= dictionaries[i];
             }
-            callBack();
+            callBack(dictionaries);
         }.bind(this));
     }
     setupSectionsFromDictionary(ref) {
-        this.getDictJson($(ref.target).val(), function(){
-            for(var i=0 ; i< this.dictionaries.length; i ++){
-                this.createColorField("#000000",this.dictionaries[i].id);
+        this.getDictJson($(ref.target).val(), function(dictionaries){
+            //console.log("Inside call back funciton");
+
+            for(var i=0 ; i< dictionaries.length; i ++){
+                this.createColorField("#000000",dictionaries[i].id);
             }
             this.refreshPreview();
         }.bind(this));

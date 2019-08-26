@@ -59,7 +59,15 @@ public class ResearchGroupRelationshipBean {
             this.selectedValues = selectedValues.toArray( new String[0]);
         }
     }
-
+    public void setDictionaryHasResearchSelectedValues(List<DictionaryHasResearchGroup> dictionaryHasResearchGroup){
+        if(dictionaryHasResearchGroup!=null && !dictionaryHasResearchGroup.isEmpty()){
+            List<String> selectedValues = new ArrayList<>();
+            for(DictionaryHasResearchGroup rghau: dictionaryHasResearchGroup){
+                selectedValues.add(rghau.getDictionaryId().toString());
+            }
+            this.selectedValues = selectedValues.toArray( new String[0]);
+        }
+    }
     public void setTaskConfigurationHasResearchSelectedValues(List<TaskConfigurationHasResearchGroup> taskConfigurationHasResearchGroup){
         if(taskConfigurationHasResearchGroup!=null && !taskConfigurationHasResearchGroup.isEmpty()){
             List<String> selectedValues = new ArrayList<>();
