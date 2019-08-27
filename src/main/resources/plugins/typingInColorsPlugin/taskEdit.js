@@ -22,11 +22,17 @@ class TypingTaskEdit {
 
         $("#dictionaryId").change(this.setupSectionsFromDictionary.bind(this));
     }
-    getDictJson(dictId, callBack){
+    cleanCurrentConfig(){
+        $("#colorFieldContainer").empty();
+        this.dictionaries = [];
 
+    }
+    getDictJson(dictId, callBack){
+        this.cleanCurrentConfig();
         $.getJSON("/dictionaries/" + dictId + '/full',null, function(emp) {
 
             let dictionaries = emp.dictionaryEntryList;
+
 
             for(var i=0 ; i< dictionaries.length; i++ ) {
                 this.dictionaries[dictionaries[i].id]= dictionaries[i];

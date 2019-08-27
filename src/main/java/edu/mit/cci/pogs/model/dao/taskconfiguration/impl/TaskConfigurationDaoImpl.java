@@ -67,7 +67,7 @@ public class TaskConfigurationDaoImpl extends AbstractDao<TaskConfiguration, Lon
 
     @Override
     public List<TaskConfiguration> listTaskConfigurationsByNameWithUserGroup(String taskPluginName, Long userId) {
-        final SelectQuery<Record> query = dslContext.select()
+        final SelectQuery<Record> query = dslContext.select(TASK_CONFIGURATION.fields())
                 .from(TASK_CONFIGURATION)
                 .join(TASK_CONFIGURATION_HAS_RESEARCH_GROUP).on(TASK_CONFIGURATION_HAS_RESEARCH_GROUP.TASK_CONFIGURATION_ID.eq(TASK_CONFIGURATION.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(TASK_CONFIGURATION_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))

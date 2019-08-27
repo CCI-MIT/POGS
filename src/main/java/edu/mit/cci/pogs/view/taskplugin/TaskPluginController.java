@@ -90,7 +90,8 @@ public class TaskPluginController {
             model.addAttribute("taskPlugin", taskPlugin);
         }
         //get task plugins configurations
-        List<TaskConfiguration> taskConfigurationList = taskConfigurationDao.listTaskConfigurationsByNameWithUserGroup(taskPlugin.getTaskPluginName(), AuthUserDetailsService.getLoggedInUser());
+        List<TaskConfiguration> taskConfigurationList = taskConfigurationDao.
+                listTaskConfigurationsByNameWithUserGroup(taskPlugin.getTaskPluginName(), AuthUserDetailsService.getLoggedInUser());
         model.addAttribute("taskConfigurationList", taskConfigurationList);
 
         return "taskplugin/taskplugin-display";
