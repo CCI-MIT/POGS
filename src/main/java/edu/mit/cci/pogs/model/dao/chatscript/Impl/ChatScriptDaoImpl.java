@@ -1,19 +1,21 @@
 package edu.mit.cci.pogs.model.dao.chatscript.Impl;
 
-import edu.mit.cci.pogs.model.dao.api.AbstractDao;
-import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
-import edu.mit.cci.pogs.model.jooq.tables.records.ChatScriptRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+import edu.mit.cci.pogs.model.dao.api.AbstractDao;
+import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
+import edu.mit.cci.pogs.model.jooq.tables.records.ChatScriptRecord;
+
 import static edu.mit.cci.pogs.model.jooq.Tables.CHAT_SCRIPT;
 import static edu.mit.cci.pogs.model.jooq.tables.ChatScriptHasResearchGroup.CHAT_SCRIPT_HAS_RESEARCH_GROUP;
 import static edu.mit.cci.pogs.model.jooq.tables.ResearchGroupHasAuthUser.RESEARCH_GROUP_HAS_AUTH_USER;
-
-import java.util.List;
 
 @Repository
 public class ChatScriptDaoImpl extends AbstractDao<ChatScript, Long, ChatScriptRecord> implements ChatScriptDao {
@@ -41,6 +43,7 @@ public class ChatScriptDaoImpl extends AbstractDao<ChatScript, Long, ChatScriptR
                 .join(CHAT_SCRIPT_HAS_RESEARCH_GROUP).on(CHAT_SCRIPT_HAS_RESEARCH_GROUP.CHAT_SCRIPT_ID.eq(CHAT_SCRIPT.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(CHAT_SCRIPT_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
                 .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .orderBy(CHAT_SCRIPT.ID)
                 .getQuery();
 
         return query.fetchInto(ChatScript.class);

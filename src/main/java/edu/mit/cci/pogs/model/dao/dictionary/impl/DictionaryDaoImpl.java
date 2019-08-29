@@ -41,6 +41,7 @@ public class DictionaryDaoImpl extends AbstractDao<Dictionary, Long, DictionaryR
                 .join(DICTIONARY_HAS_RESEARCH_GROUP).on(DICTIONARY_HAS_RESEARCH_GROUP.DICTIONARY_ID.eq(DICTIONARY.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(DICTIONARY_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
                 .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .orderBy(DICTIONARY.ID)
                 .getQuery();
 
         return query.fetchInto(Dictionary.class);
