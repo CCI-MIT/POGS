@@ -59,7 +59,7 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
     @Override
     public List<ExecutableScript> listExecutableScriptsWithUserGroup(Long userId) {
-        final SelectQuery<Record> query = dslContext.select()
+        final SelectQuery<Record> query = dslContext.select(EXECUTABLE_SCRIPT.fields())
                 .from(EXECUTABLE_SCRIPT)
                 .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
                         .EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))

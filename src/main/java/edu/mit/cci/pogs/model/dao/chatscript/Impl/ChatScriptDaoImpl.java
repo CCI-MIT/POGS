@@ -36,7 +36,7 @@ public class ChatScriptDaoImpl extends AbstractDao<ChatScript, Long, ChatScriptR
 
     @Override
     public List<ChatScript> listChatScriptWithUserGroup(Long userId) {
-        final SelectQuery<Record> query = dslContext.select()
+        final SelectQuery<Record> query = dslContext.select(CHAT_SCRIPT.fields())
                 .from(CHAT_SCRIPT)
                 .join(CHAT_SCRIPT_HAS_RESEARCH_GROUP).on(CHAT_SCRIPT_HAS_RESEARCH_GROUP.CHAT_SCRIPT_ID.eq(CHAT_SCRIPT.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER.RESEARCH_GROUP_ID.eq(CHAT_SCRIPT_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))

@@ -39,7 +39,7 @@
                         <option
                                 th:each="rg: ${tasks}"
                                 th:value="${rg.id}"
-                                th:text="${rg.taskName}" ></option>
+                                th:text="${'#' + rg.id + ' - ' + rg.taskName}" ></option>
                     </select>
                     <div class="input-group-append">
                         <button type="button" id="addTaskGroup" class="btn btn-outline-secondary">Add task to task group</button>

@@ -38,7 +38,7 @@ public class TaskDaoImpl extends AbstractDao<Task, Long, TaskRecord> implements 
 
     @Override
     public List<Task> listTasksWithUserGroup(Long userId) {
-        final SelectQuery<Record> query = dslContext.select()
+        final SelectQuery<Record> query = dslContext.select(TASK.fields())
                 .from(TASK)
                 .join(TASK_HAS_RESEARCH_GROUP).on(TASK_HAS_RESEARCH_GROUP.TASK_ID.eq(TASK.ID))
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER
