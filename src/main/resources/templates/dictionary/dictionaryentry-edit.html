@@ -20,7 +20,7 @@
     <h2 th:text="${dictionary.dictionaryName}"></h2>
     <div class="col">
         <div class="col-12">
-            <a th:href="${'/admin/dictionaries/' + dictionary.id}" class="btn btn-outline-primary float-right">
+            <a th:href="${'/admin/dictionaries/' + dictionary.id} + '/edit" class="btn btn-outline-primary float-right">
                 Edit dictionary</a>
         </div>
     </div>

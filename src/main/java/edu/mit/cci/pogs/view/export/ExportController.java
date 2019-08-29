@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -55,6 +57,9 @@ public class ExportController {
             e.printStackTrace();
         }
     }
+
+
+
 
     @GetMapping("/admin/export/study/{studyId}")
     public void getStudyData(HttpServletResponse response, @PathVariable("studyId") Long studyId){
@@ -132,6 +137,7 @@ public class ExportController {
 
         String fileName = "SubjectContribution_"+String.valueOf(studyId)+"_" + LocalDateTime.now() + ".csv";
         fileName = fileName.replaceAll(":","_");
+
         try {
             response.setContentType("application/zip");
             response.setHeader("Content-Disposition", "attachment; filename=Subject Contribution Report " + new Date().toString()  + ".zip");
@@ -201,7 +207,7 @@ public class ExportController {
         }
     }
 
-    private <T> String writeDataToCSV(Field[] attributes,List<T> list, Map<Long,Long>... taskSessionMap)
+    private <T> String writeDataToCSV(Method[] attributes, List<T> list, Map<Long,Long>... taskSessionMap)
             throws IllegalAccessException{
         boolean isMapPresent = false;
         if (taskSessionMap.length>0  && taskSessionMap[0].size()>0)
@@ -210,23 +216,30 @@ public class ExportController {
         if (isMapPresent && list.get(0) instanceof CompletedTaskScore)
             i=2;
         StringBuilder header = new StringBuilder();
-        for (Field field:attributes){
-            header.append(field.getName());
-            header.append(",");
+        for (Method method:attributes){
+            if(method.getName().startsWith("get")) {
+                header.append(method.getName().replaceFirst("get",""));
+                header.append(",");
+            }
         }
         if (isMapPresent)
             header.append(SESSION_ID);
         header.append("\n");
         StringBuilder line = new StringBuilder();
         for (T element : list){
-            for (Field field:attributes){
-                if(field.isAccessible()) {
-                    line.append(field.get(element));
-                    line.append(",");
+            for (Method method:attributes){
+                if(method.getName().startsWith("get")) {
+                    try {
+                        line.append(method.invoke(element, null));
+                        line.append(",");
+                    }catch (InvocationTargetException ite){
+                        ite.printStackTrace();
+                    }
                 }
             }
-            if (isMapPresent)
-                line.append(String.valueOf(taskSessionMap[0].get(attributes[i].get(element))));
+            if(isMapPresent) {
+                //line.append(String.valueOf(taskSessionMap[0]));
+            }
             line.append("\n");
         }
         header.append(line);
@@ -262,7 +275,7 @@ public class ExportController {
             eventLogFileName=eventLogFileName.replaceAll(":","_");
             PrintWriter writer1 = new PrintWriter(new OutputStreamWriter
                     (new FileOutputStream(eventLogFileName), "UTF-8"));
-            writer1.print(writeDataToCSV(EventLog.class.getDeclaredFields(),eventLogList));
+            writer1.print(writeDataToCSV(EventLog.class.getDeclaredMethods(),eventLogList));
             writer1.close();
 
 //            Get Completed Task Ids
@@ -286,7 +299,7 @@ public class ExportController {
             completedTaskFileName=completedTaskFileName.replaceAll(":","_");
             PrintWriter writer2 = new PrintWriter(new OutputStreamWriter
                     (new FileOutputStream(completedTaskFileName), "UTF-8"));
-            writer2.print(writeDataToCSV(CompletedTask.class.getDeclaredFields(),completedTaskList,taskSessionMap));
+            writer2.print(writeDataToCSV(CompletedTask.class.getDeclaredMethods(),completedTaskList,taskSessionMap));
             writer2.close();
 
 //            Get Completed Task Scores
@@ -298,7 +311,7 @@ public class ExportController {
             completedTaskScoreFileName=completedTaskScoreFileName.replaceAll(":","_");
             PrintWriter writer3 = new PrintWriter(new OutputStreamWriter
                     (new FileOutputStream(completedTaskScoreFileName), "UTF-8"));
-            writer3.print(writeDataToCSV(CompletedTaskScore.class.getDeclaredFields(),completedTaskScoreList,taskSessionMap));
+            writer3.print(writeDataToCSV(CompletedTaskScore.class.getDeclaredMethods(),completedTaskScoreList,taskSessionMap));
             writer3.close();
 
 //            Compute the Zip File
