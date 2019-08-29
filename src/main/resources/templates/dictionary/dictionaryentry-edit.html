@@ -41,7 +41,9 @@
                     var index = $("#chatEntryList tr").length ;
                     var dictionaryId = $("#chatScriptId").val();
                     var saida = "";
-                        saida+="<tr><td><input type=\"text\"  name=\"dictionaryEntryList["+index+"].entryType\" /></td>\n";
+
+
+                        saida+='<tr><td><select class="custom-select" id="dictionaryEntryList'+index+'.entryType" name="dictionaryEntryList['+index+'].entryType"><option value="C">Correct entry</option><option value="E">Wrong entry</option></select></td>\n';
                     	saida+="                <td>\n";
                     	saida+="                    <input type=\"hidden\" name=\"dictionaryEntryList["+index+"].id\"  />\n";
                     	saida+="                    <input type=\"text\" name=\"dictionaryEntryList["+index+"].entryCategory\"  />\n";

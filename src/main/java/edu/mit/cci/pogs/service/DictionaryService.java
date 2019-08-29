@@ -16,7 +16,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -61,18 +63,20 @@ public class DictionaryService {
     public void updateDictionaryEntryList(DictionaryEntriesBean dictionaryEntriesBean) {
         List<DictionaryEntry> dictionaryEntryList = dictionaryEntriesBean.getDictionaryEntryList();
         List<DictionaryEntry> existingDictEntries = dictionaryEntryDao.listDictionaryEntriesByDictionary(dictionaryEntriesBean.getDictionaryId());
+        Map<Long, DictionaryEntry> existingMap = new HashMap<>();
+        existingDictEntries.stream().forEach(a -> existingMap.put(a.getId(),a));
 
         for (DictionaryEntry dictEntry : dictionaryEntryList) {
             dictEntry.setDictionaryId(dictionaryEntriesBean.getDictionaryId());
             if(dictEntry.getId()!=null){
                 dictionaryEntryDao.update(dictEntry);
-                existingDictEntries.remove(dictEntry);
+                existingMap.remove(dictEntry.getId());
             }else{
                 dictionaryEntryDao.create(dictEntry);
             }
         }
 
-        for (DictionaryEntry dictEnt: existingDictEntries){
+        for (DictionaryEntry dictEnt: existingMap.values()){
             dictionaryEntryDao.deleteDictionaryEntry(dictEnt);
         }
     }
