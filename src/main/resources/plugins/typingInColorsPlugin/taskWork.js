@@ -128,7 +128,7 @@ class EtherpadWithColors {
                 if(isCurrentSubject) {
                     $(allColorButtons[k]).text("You chose this color!");
                     //$("#padContent").attr("disabled", null);
-                    //TODO INSERT IFRAME. with selected COLOR.
+
                     $("#colorPickerAndAssigner button").addClass("disabled");
                     $("#colorPickerAndAssigner button").unbind();
                     this.setupPad(this.padID,this.availableColors[colorIndex]);
@@ -245,7 +245,11 @@ function getCookie(name) {
     return null;
 }
 function eraseCookie(name) {
-    document.cookie = name+'=; Max-Age=-99999999;';
+    if(window.location.href.indexOf("localhost")!=-1) {
+        document.cookie = name + "=;Max-Age=-99999999; path=/";
+    } else {
+        document.cookie = name + "=;Max-Age=-99999999; domain=pogs.info ; path=/";
+    }
 }
 
 function replaceNewLinesForBrs(st){
