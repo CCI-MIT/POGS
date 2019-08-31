@@ -63,7 +63,7 @@ public class ResearchGroupRelationshipBean {
         if(dictionaryHasResearchGroup!=null && !dictionaryHasResearchGroup.isEmpty()){
             List<String> selectedValues = new ArrayList<>();
             for(DictionaryHasResearchGroup rghau: dictionaryHasResearchGroup){
-                selectedValues.add(rghau.getDictionaryId().toString());
+                selectedValues.add(rghau.getResearchGroupId().toString());
             }
             this.selectedValues = selectedValues.toArray( new String[0]);
         }
