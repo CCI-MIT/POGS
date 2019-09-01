@@ -77,13 +77,8 @@ public class TaskGroupController {
     public String editTaskGroup(@PathVariable("id") Long id, Model model) {
         TaskGroupBean bean = new TaskGroupBean(taskGroupDao.get(id));
 
-
-        bean.setResearchGroupRelationshipBean(
-                new ResearchGroupRelationshipBean());
-        bean.getResearchGroupRelationshipBean()
-                .setTaskGroupHasResearchSelectedValues(
-                        taskGroupService.listTaskGroupHasResearchGroupByTaskGroup(id));
-
+        bean.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
+        bean.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(taskGroupService.listTaskGroupHasResearchGroupByTaskGroup(id));
 
         model.addAttribute("taskGroup", bean);
 
