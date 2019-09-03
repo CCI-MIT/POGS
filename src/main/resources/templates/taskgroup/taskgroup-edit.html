@@ -51,7 +51,7 @@
             <br/>
             <ul class="list-group o-sortable list-group-sortable" id="listTaskGroup">
 
-                <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><span th:text="${'#' + rg.id + ' - ' + rg.taskName}"></span><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
+                <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><span th:text="${'#' + rg.taskId + ' - ' + rg.taskName}"></span><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
             </ul>
 
             <!-- Begin research group field -->
