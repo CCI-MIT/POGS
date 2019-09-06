@@ -16,5 +16,7 @@ public interface CompletedTaskAttributeDao extends Dao<CompletedTaskAttribute, L
     void deleteByCompletedTaskId(Long completedTaskId);
 
     List<CompletedTaskAttribute> listByCompletedTaskId(Long completedTaskId);
+
+    List<CompletedTaskAttribute> listByCompletedTasksIds(List<Long> completedTaskIds);
 }
  

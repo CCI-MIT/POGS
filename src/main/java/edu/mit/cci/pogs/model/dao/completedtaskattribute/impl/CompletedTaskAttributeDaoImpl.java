@@ -72,6 +72,13 @@ public class CompletedTaskAttributeDaoImpl extends AbstractDao<CompletedTaskAttr
         }
     }
 
+    public List<CompletedTaskAttribute> listByCompletedTasksIds(List<Long> completedTaskIds){
+        final SelectQuery<Record> query = dslContext.select()
+                .from(COMPLETED_TASK_ATTRIBUTE).where(COMPLETED_TASK_ATTRIBUTE.
+                        COMPLETED_TASK_ID.in(completedTaskIds)).getQuery();
+        return query.fetchInto(CompletedTaskAttribute.class);
+    }
+
     public void deleteByCompletedTaskId(Long completedTaskId) {
         dslContext.delete(COMPLETED_TASK_ATTRIBUTE)
                 .where(COMPLETED_TASK_ATTRIBUTE.COMPLETED_TASK_ID.eq(completedTaskId))

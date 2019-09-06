@@ -35,13 +35,12 @@
     </div>
     <br>
     <div class="row">
-        <div class="col"></div>
-        <div class ="col">
-            <div class="col-12">
-                <a th:href="${'/admin/export/study/'+ study.id}" class = "btn btn-outline-primary float-right">Export Study</a>
-            </div>
+        <div class="col-12">
+            <a th:href="${'/admin/export/study/'+ study.id}" class = "btn btn-outline-primary float-right">Export Study Sessions</a>
         </div>
     </div>
+
+
     <br/>
 
     <script>
@@ -83,7 +82,7 @@
                 <td th:text="${sessionz.baseSession.id}"></td>
                 <td><a th:text="${study.studySessionPrefix + sessionz.baseSession.sessionSuffix}" th:href="${'/admin/studies/'+ study.id + '/sessions/' + sessionz.baseSession.id} "></a></td>
                 <td th:text="${#dates.format(sessionz.baseSession.sessionStartDate, 'MM/dd/yyyy HH:mm')}"></td>
-                <td><a th:href="${'/admin/export/session/'+ sessionz.baseSession.id}" class = "btn btn-outline-secondary">Export</a></td>
+                <td><a th:href="${'/admin/export/session/'+ sessionz.baseSession.id}" class = "btn btn-outline-secondary" th:if="${#lists.size(sessionz.childSessions) == 0}">Export</a></td>
             </tr>
 
             <th:block th:each="childSession : ${sessionz.childSessions}" >
