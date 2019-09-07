@@ -4,6 +4,7 @@ import edu.mit.cci.pogs.model.dao.dictionaryhasresearchgroup.DictionaryHasResear
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.DictionaryHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryBean;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -148,10 +149,9 @@ public class DictionaryService {
     public Dictionary createOrUpdate(DictionaryBean dictionaryBean) {
         
         Dictionary dictionary = new Dictionary();
-        dictionary.setId(dictionaryBean.getId());
-        dictionary.setDictionaryName(dictionaryBean.getDictionaryName());
-        dictionary.setHasGroundTruth(dictionaryBean.getHasGroundTruth() == null ? false : dictionaryBean.getHasGroundTruth());
-        
+
+        ObjectUtils.Copy(dictionary, dictionaryBean);
+
         if (dictionary.getId() == null) {
             dictionary = dictionaryDao.create(dictionary);
             dictionaryBean.setId(dictionary.getId());

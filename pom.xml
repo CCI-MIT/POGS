@@ -113,6 +113,11 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.5.6</version>
 		</dependency>
+		<dependency>
+			<groupId>commons-beanutils</groupId>
+			<artifactId>commons-beanutils</artifactId>
+			<version>1.9.3</version>
+		</dependency>
         <!-- Monitoring dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.service;
 
 import edu.mit.cci.pogs.model.dao.taskgrouphasresearchgroup.TaskGroupHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasResearchGroup;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,9 +39,8 @@ public class TaskGroupService {
     public TaskGroup createOrUpdate(TaskGroupBean taskGroupBean) {
 
         TaskGroup tg = new TaskGroup();
-        tg.setId(taskGroupBean.getId());
-        tg.setTaskGroupName(taskGroupBean.getTaskGroupName());
 
+        ObjectUtils.Copy(tg, taskGroupBean);
 
         if (tg.getId() == null) {
             tg = taskGroupDao.create(tg);

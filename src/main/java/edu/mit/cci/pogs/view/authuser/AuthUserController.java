@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.view.authuser;
 
+import edu.mit.cci.pogs.view.authuser.beans.AuthUserBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -65,7 +66,7 @@ public class AuthUserController {
     @GetMapping("{id}/edit")
     public String createAuthUser(@PathVariable("id") Long id, Model model) {
         AuthUserBean aub = new AuthUserBean(authUserDao.get(id));
-        aub.setAdmin(false);
+        aub.setIsAdmin(false);
         aub.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
         aub.getResearchGroupRelationshipBean()

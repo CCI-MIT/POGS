@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,10 +45,8 @@ public class StudyService {
     public Study createOrUpdate(StudyBean studyBean) {
 
         Study study = new Study();
-        study.setId(studyBean.getId());
-        study.setStudyDescription(studyBean.getStudyDescription());
-        study.setStudyName(studyBean.getStudyName());
-        study.setStudySessionPrefix(studyBean.getStudySessionPrefix());
+
+        ObjectUtils.Copy(study, studyBean);
 
         if (study.getId() == null) {
             study = studyDao.create(study);

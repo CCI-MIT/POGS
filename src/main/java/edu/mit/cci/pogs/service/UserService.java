@@ -5,8 +5,9 @@ import edu.mit.cci.pogs.model.dao.user.UserDao;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.auth.beans.RegisterBean;
-import edu.mit.cci.pogs.view.authuser.AuthUserBean;
+import edu.mit.cci.pogs.view.authuser.beans.AuthUserBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,6 +33,7 @@ public class UserService {
 
     public AuthUser createUser(RegisterBean registerBean) {
         AuthUser authUser = new AuthUser();
+
         authUser.setEmailAddress(registerBean.getEmailAddress());
         authUser.setPassword(passwordEncoder.encode(registerBean.getPassword()));
         authUser.setFirstName(registerBean.getFirstName());
@@ -43,12 +45,9 @@ public class UserService {
 
     public AuthUser adminCreateOrUpdateUser(AuthUserBean authUserBean) {
         AuthUser authUser = new AuthUser();
-        authUser.setEmailAddress(authUserBean.getEmailAddress());
 
-        authUser.setFirstName(authUserBean.getFirstName());
-        authUser.setLastName(authUserBean.getLastName());
-        authUser.setIsAdmin(authUserBean.getAdmin());
-        authUser.setId(authUserBean.getId());
+
+        ObjectUtils.Copy(authUser, authUserBean);
 
         if (authUser.getId() == null) {
 

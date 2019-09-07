@@ -4,7 +4,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatEntry;
 
 import java.util.List;
 
-public class ChatEntriesBean {
+public class ChatEntriesBean{
 
     List<ChatEntry> chatEntryList;
 

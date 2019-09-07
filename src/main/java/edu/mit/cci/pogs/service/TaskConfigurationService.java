@@ -8,6 +8,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfigurationHasResearchGrou
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 import edu.mit.cci.pogs.utils.MessageUtils;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.taskplugin.beans.TaskPluginConfigBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -89,13 +90,8 @@ public class TaskConfigurationService {
     public TaskConfiguration createOrUpdate(TaskPluginConfigBean taskPluginConfigurationBean) {
 
         TaskConfiguration taskPluginConfiguration = new TaskConfiguration();
-        taskPluginConfiguration.setId(taskPluginConfigurationBean.getId());
-        taskPluginConfiguration.setConfigurationName(taskPluginConfigurationBean.getConfigurationName());
-        taskPluginConfiguration.setScoreScriptId(taskPluginConfigurationBean.getScoreScriptId());
-        taskPluginConfiguration.setAfterWorkScriptId(taskPluginConfigurationBean.getAfterWorkScriptId());
-        taskPluginConfiguration.setBeforeWorkScriptId(taskPluginConfigurationBean.getBeforeWorkScriptId());
-        taskPluginConfiguration.setDictionaryId(taskPluginConfigurationBean.getDictionaryId());
-        taskPluginConfiguration.setTaskPluginName(taskPluginConfigurationBean.getTaskPluginName());
+
+        ObjectUtils.Copy(taskPluginConfiguration, taskPluginConfigurationBean);
 
         if (taskPluginConfiguration.getId() == null) {
             taskPluginConfiguration = taskConfigurationDao.create(taskPluginConfiguration);

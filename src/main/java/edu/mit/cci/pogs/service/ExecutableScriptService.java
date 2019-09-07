@@ -5,6 +5,7 @@ import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.executablescripthasresearchgroup.ExecutableScriptHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScriptHasResearchGroup;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.executablescript.beans.ExecutableScriptBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -82,10 +83,8 @@ public class ExecutableScriptService {
     public ExecutableScript createOrUpdate(ExecutableScriptBean executableScriptBean) {
 
         ExecutableScript executableScript = new ExecutableScript();
-        executableScript.setId(executableScriptBean.getId());
-        executableScript.setScriptContent(executableScriptBean.getScriptContent());
-        executableScript.setScriptName(executableScriptBean.getScriptName());
-        executableScript.setScriptType(executableScriptBean.getScriptType());
+
+        ObjectUtils.Copy(executableScript, executableScriptBean);
 
         if (executableScript.getId() == null) {
             executableScript = executableScriptDao.create(executableScript);

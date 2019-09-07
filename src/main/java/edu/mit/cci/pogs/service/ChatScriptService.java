@@ -5,6 +5,7 @@ import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
 import edu.mit.cci.pogs.model.dao.chatscripthasresearchgroup.ChatScriptHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScriptHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.chatscript.beans.ChatScriptBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,8 +110,8 @@ public class ChatScriptService {
     public ChatScript createOrUpdate(ChatScriptBean chatScriptBean) {
 
         ChatScript chatScript = new ChatScript();
-        chatScript.setId(chatScriptBean.getId());
-        chatScript.setChatScriptName(chatScriptBean.getChatScriptName());
+
+        ObjectUtils.Copy(chatScript, chatScriptBean);
 
         if (chatScript.getId() == null) {
             chatScript = chatScriptDao.create(chatScript);

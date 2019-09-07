@@ -5,10 +5,9 @@ import java.util.List;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroup;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 
-public class TaskGroupBean {
+public class TaskGroupBean extends TaskGroup{
 
-    private Long id;
-    private String taskGroupName;
+
     private List<Long> selectedTasks;
 
     private ResearchGroupRelationshipBean researchGroupRelationshipBean;
@@ -18,25 +17,9 @@ public class TaskGroupBean {
     }
 
     public TaskGroupBean(TaskGroup tg) {
-        this.id = tg.getId();
-        this.taskGroupName = tg.getTaskGroupName();
+        super(tg);
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTaskGroupName() {
-        return taskGroupName;
-    }
-
-    public void setTaskGroupName(String taskGroupName) {
-        this.taskGroupName = taskGroupName;
-    }
 
     public List<Long> getSelectedTasks() {
         return selectedTasks;

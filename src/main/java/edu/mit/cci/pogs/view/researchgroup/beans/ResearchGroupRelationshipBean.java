@@ -28,14 +28,16 @@ public class ResearchGroupRelationshipBean {
             List<String> selectedValues = new ArrayList<>();
             for(T rghau: objectHasResearchGroup){
                 for (Method declaredMethod : rghau.getClass().getDeclaredMethods()) {
-                    declaredMethod.getName().equalsIgnoreCase("getResearchGroupId");
-                    try {
-                        String researchGroupId = declaredMethod.invoke(rghau).toString();
-                        selectedValues.add(researchGroupId);
+                    if (declaredMethod.getName().equalsIgnoreCase("getResearchGroupId") == true){
+                        try {
+                            String researchGroupId = declaredMethod.invoke(rghau).toString();
+                            selectedValues.add(researchGroupId);
+                        }
+                        catch (Exception e){
+                            System.out.println("Incorrect paremter type for Research Group selection");
+                        }
                     }
-                    catch (Exception e){
-                        System.out.println("Incorrect paremter type for Research Group selection");
-                    }
+
                 }
 
             }

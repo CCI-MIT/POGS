@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,34 +73,14 @@ public class TaskService {
     public TaskBean createOrUpdate(TaskBean value) {
         Task tk = new Task();
 
-        tk.setId(value.getId());
-        tk.setTaskName(value.getTaskName());
-        tk.setTaskPluginType(value.getTaskPluginType());
-        tk.setSoloTask(value.getSoloTask());
-        tk.setInteractionTime(value.getInteractionTime());
-        tk.setIntroPageEnabled(value.getIntroPageEnabled());
-        tk.setIntroText(value.getIntroText());
-        tk.setIntroTime(value.getIntroTime());
-        tk.setPrimerPageEnabled(value.getPrimerPageEnabled());
-        tk.setPrimerText(value.getPrimerText());
-        tk.setPrimerTime(value.getPrimerTime());
-        tk.setInteractionWidgetEnabled(value.getInteractionWidgetEnabled());
-        tk.setInteractionText(value.getInteractionText());
-        tk.setCommunicationType(value.getCommunicationType());
-        tk.setCollaborationTodoListEnabled(value.getCollaborationTodoListEnabled());
-        tk.setCollaborationFeedbackWidgetEnabled(value.getCollaborationFeedbackWidgetEnabled());
-        tk.setCollaborationVotingWidgetEnabled(value.getCollaborationVotingWidgetEnabled());
-        tk.setScoringType(value.getScoringType());
-        tk.setSubjectCommunicationId(value.getSubjectCommunicationId());
-        tk.setChatScriptId(value.getChatScriptId());
-        tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
-        tk.setShouldScore(value.getShouldScore());
+        ObjectUtils.Copy(tk, value);
+
         if (tk.getShouldScore() == null) {
             tk.setShouldScore(false);
         }
         if (tk.getInteractionTime() == null) {
             tk.setInteractionTime(0);
-        }
+         }
         if (tk.getIntroTime() == null) {
             tk.setIntroTime(0);
         }
