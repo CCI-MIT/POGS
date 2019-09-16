@@ -4,6 +4,7 @@ import edu.mit.cci.pogs.model.dao.dictionaryhasresearchgroup.DictionaryHasResear
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Dictionary;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.DictionaryHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.StudyHasResearchGroup;
+import edu.mit.cci.pogs.service.base.ServiceBase;
 import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryBean;
 import org.json.JSONArray;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +40,7 @@ import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.view.dictionary.beans.DictionaryEntriesBean;
 
 @Service
-public class DictionaryService {
+public class DictionaryService extends ServiceBase {
 
     private final DictionaryDao dictionaryDao;
     private final DictionaryEntryDao dictionaryEntryDao;
@@ -103,47 +105,36 @@ public class DictionaryService {
         if (dictionaryBean.getResearchGroupRelationshipBean() == null && dictionaryBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<DictionaryHasResearchGroup> toCreate = new ArrayList<>();
-        List<DictionaryHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<DictionaryHasResearchGroup> currentlySelected = listDictionaryHasResearchGroupByDictionaryId(dictionaryBean.getId());
-        
-        for (DictionaryHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : dictionaryBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
-            
+
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(DictionaryHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
+
+        String[] newSelectedValues = dictionaryBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+
+        for (Long toCre : toCreate) {
+            DictionaryHasResearchGroup rghau = new DictionaryHasResearchGroup();
+            rghau.setDictionaryId(dictionaryBean.getId());
+            rghau.setResearchGroupId(toCre);
+            dictionaryHasResearchGroupDao.create(rghau);
         }
-        
-        
-        for (String researchGroupId : dictionaryBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-            
-            boolean selectedAlreadyIn = false;
-            for (DictionaryHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                DictionaryHasResearchGroup rghau = new DictionaryHasResearchGroup();
-                rghau.setDictionaryId(dictionaryBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-            
+        for (Long toDel : toDelete) {
+
+            DictionaryHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getDictionaryId() == dictionaryBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
+
+            dictionaryHasResearchGroupDao.delete(rghau);
         }
-        for (DictionaryHasResearchGroup toCre : toCreate) {
-            dictionaryHasResearchGroupDao.create(toCre);
-        }
-        for (DictionaryHasResearchGroup toDel : toDelete) {
-            dictionaryHasResearchGroupDao.delete(toDel);
-        }
-        
     }
     
     public Dictionary createOrUpdate(DictionaryBean dictionaryBean) {

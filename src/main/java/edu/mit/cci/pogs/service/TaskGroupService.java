@@ -2,12 +2,14 @@ package edu.mit.cci.pogs.service;
 
 import edu.mit.cci.pogs.model.dao.taskgrouphasresearchgroup.TaskGroupHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasResearchGroup;
+import edu.mit.cci.pogs.service.base.ServiceBase;
 import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.dao.taskgrouphastask.TaskGroupHasTaskDao;
@@ -16,7 +18,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.view.taskgroup.bean.TaskGroupBean;
 
 @Service
-public class TaskGroupService {
+public class TaskGroupService extends ServiceBase {
 
 
     private final TaskGroupDao taskGroupDao;
@@ -58,44 +60,34 @@ public class TaskGroupService {
         if (taskGroupBean.getResearchGroupRelationshipBean() == null && taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<TaskGroupHasResearchGroup> toCreate = new ArrayList<>();
-        List<TaskGroupHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<TaskGroupHasResearchGroup> currentlySelected = listTaskGroupHasResearchGroupByTaskGroup(taskGroupBean.getId());
 
-        for (TaskGroupHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(TaskGroupHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            TaskGroupHasResearchGroup rghau = new TaskGroupHasResearchGroup();
+            rghau.setTaskGroupId(taskGroupBean.getId());
+            rghau.setResearchGroupId(toCre);
+            taskGroupHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
-        for (String researchGroupId : taskGroupBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+            TaskGroupHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getTaskGroupId() == taskGroupBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-            boolean selectedAlreadyIn = false;
-            for (TaskGroupHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                TaskGroupHasResearchGroup rghau = new TaskGroupHasResearchGroup();
-                rghau.setTaskGroupId(taskGroupBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for (TaskGroupHasResearchGroup toCre : toCreate) {
-            taskGroupHasResearchGroupDao.create(toCre);
-        }
-        for (TaskGroupHasResearchGroup toDel : toDelete) {
-            taskGroupHasResearchGroupDao.delete(toDel);
+            taskGroupHasResearchGroupDao.delete(rghau);
         }
 
     }

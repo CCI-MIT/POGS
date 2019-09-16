@@ -18,6 +18,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.utils.DateUtils;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
@@ -148,75 +149,11 @@ public class SessionService {
 
     public Session createOrUpdate(SessionBean sessionBean) {
         Session session = new Session();
-        session.setId(sessionBean.getId());
-        session.setSessionSuffix(sessionBean.getSessionSuffix());
-        session.setSessionStartDate(sessionBean.getSessionStartDate());
-        session.setStudyId(sessionBean.getStudyId());
-        session.setStatus(sessionBean.getStatus());
-        session.setWaitingRoomTime(sessionBean.getWaitingRoomTime());
-        session.setIntroPageEnabled(sessionBean.getIntroPageEnabled());
-        session.setIntroText(sessionBean.getIntroText());
-        session.setIntroTime(sessionBean.getIntroTime());
-        session.setDisplayNameChangePageEnabled(sessionBean.getDisplayNameChangePageEnabled());
-        session.setDisplayNameChangeTime(sessionBean.getDisplayNameChangeTime());
-        session.setRosterPageEnabled(sessionBean.getRosterPageEnabled());
-        session.setRosterTime(sessionBean.getRosterTime());
-        session.setDonePageEnabled(sessionBean.getDonePageEnabled());
-        session.setDonePageText(sessionBean.getDonePageText());
-        session.setDonePageTime(sessionBean.getDonePageTime());
-        session.setDoneRedirectUrl(sessionBean.getDoneRedirectUrl());
-        session.setCouldNotAssignToTeamMessage(sessionBean.getCouldNotAssignToTeamMessage());
-        session.setTaskExecutionType(sessionBean.getTaskExecutionType());
-        session.setRoundsEnabled(sessionBean.getRoundsEnabled());
-        session.setNumberOfRounds(sessionBean.getNumberOfRounds());
-        session.setCommunicationType(sessionBean.getCommunicationType());
-        session.setChatBotName(sessionBean.getChatBotName());
-        session.setScoreboardEnabled(sessionBean.getScoreboardEnabled());
-        session.setScoreboardDisplayType(sessionBean.getScoreboardDisplayType());
-        session.setScoreboardUseDisplayNames(sessionBean.getScoreboardUseDisplayNames());
-        session.setCollaborationTodoListEnabled(sessionBean.getCollaborationTodoListEnabled());
-        session.setCollaborationFeedbackWidgetEnabled(sessionBean.getCollaborationFeedbackWidgetEnabled());
-        session.setCollaborationVotingWidgetEnabled(sessionBean.getCollaborationVotingWidgetEnabled());
-        session.setTeamCreationMoment(sessionBean.getTeamCreationMoment());
-        session.setTeamCreationType(sessionBean.getTeamCreationType());
-        session.setTeamMinSize(sessionBean.getTeamMinSize());
-        session.setTeamMaxSize(sessionBean.getTeamMaxSize());
-        session.setTeamCreationMethod(sessionBean.getTeamCreationMethod());
-        session.setTeamCreationMatrix(sessionBean.getTeamCreationMatrix());
-        session.setFixedInteractionTime(sessionBean.getFixedInteractionTime());
 
-        session.setSessionScheduleType(sessionBean.getSessionScheduleType());
-        session.setPerpetualStartDate(sessionBean.getPerpetualStartDate());
-        session.setPerpetualEndDate(sessionBean.getPerpetualEndDate());
-        session.setPerpetualSubjectsNumber(sessionBean.getPerpetualSubjectsNumber());
-        session.setPerpetualSubjectsPrefix(sessionBean.getPerpetualSubjectsPrefix());
-        session.setDoneUrlParameter(sessionBean.getDoneUrlParameter());
-        session.setScheduleConditionType(sessionBean.getScheduleConditionType());
-        session.setExecutableScriptId(sessionBean.getExecutableScriptId());
-        session.setSessionWideScriptId(sessionBean.getSessionWideScriptId());
-        session.setDisplayNameGenerationEnabled(sessionBean.getDisplayNameGenerationEnabled());
+        ObjectUtils.Copy(session, sessionBean);
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
-
-        if (session.getRosterTime() == null) {
-            session.setRosterTime(0);
-        }
-        if (session.getIntroTime() == null) {
-            session.setIntroTime(0);
-        }
-        if (session.getDonePageTime() == null) {
-            session.setDonePageTime(0);
-        }
-        if (session.getWaitingRoomTime() == null) {
-            session.setWaitingRoomTime(0);
-        }
-        if (session.getFixedInteractionTime() == null) {
-            session.setFixedInteractionTime(0);
-        }
-        if (session.getDisplayNameChangeTime() == null) {
-            session.setDisplayNameChangeTime(0);
-        }
 
         if(sessionBean.getSessionScheduleType().equals(SessionScheduleType.SCHEDULED_DATE.getId())){
             session.setPerpetualStartDate(null);
@@ -294,17 +231,17 @@ public class SessionService {
         return clonedNonPerpetualSession;
     }
 
-    private void createOrUpdateSessionHasTaskGroups(SessionBean studyBean) {
-        if (studyBean.getSessionHasTaskGroupRelationshipBean() == null && studyBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues() == null) {
+    private void createOrUpdateSessionHasTaskGroups(SessionBean sessionBean) {
+        if (sessionBean.getSessionHasTaskGroupRelationshipBean() == null && sessionBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
         List<SessionHasTaskGroup> toCreate = new ArrayList<>();
         List<SessionHasTaskGroup> toDelete = new ArrayList<>();
-        List<SessionHasTaskGroup> currentlySelected = listSessionHasTaskGroupBySessionId(studyBean.getId());
+        List<SessionHasTaskGroup> currentlySelected = listSessionHasTaskGroupBySessionId(sessionBean.getId());
 
         for (SessionHasTaskGroup rghau : currentlySelected) {
             boolean foundRGH = false;
-            for (String researchGroupId : studyBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues()) {
+            for (String researchGroupId : sessionBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues()) {
                 if (rghau.getTaskGroupId().longValue() == new Long(researchGroupId).longValue()) {
                     foundRGH = true;
                 }
@@ -315,7 +252,7 @@ public class SessionService {
 
         }
 
-        for (String taskGroupId : studyBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues()) {
+        for (String taskGroupId : sessionBean.getSessionHasTaskGroupRelationshipBean().getSelectedValues()) {
 
             boolean selectedAlreadyIn = false;
             for (SessionHasTaskGroup rghau : currentlySelected) {
@@ -325,7 +262,7 @@ public class SessionService {
             }
             if (!selectedAlreadyIn) {
                 SessionHasTaskGroup rghau = new SessionHasTaskGroup();
-                rghau.setSessionId(studyBean.getId());
+                rghau.setSessionId(sessionBean.getId());
                 rghau.setTaskGroupId(new Long(taskGroupId));
                 toCreate.add(rghau);
             }

@@ -7,6 +7,7 @@ import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurat
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfigurationHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
+import edu.mit.cci.pogs.service.base.ServiceBase;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.taskplugin.beans.TaskPluginConfigBean;
@@ -15,9 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class TaskConfigurationService {
+public class TaskConfigurationService extends ServiceBase {
 
     @Autowired
     private TaskExecutionAttributeDao taskExecutionAttributeDao;
@@ -44,45 +46,34 @@ public class TaskConfigurationService {
         if (taskPluginConfigurationBean.getResearchGroupRelationshipBean() == null && taskPluginConfigurationBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<TaskConfigurationHasResearchGroup> toCreate = new ArrayList<>();
-        List<TaskConfigurationHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<TaskConfigurationHasResearchGroup> currentlySelected = listTaskConfigurationyHasResearchGroupByTaskConfigurationId(taskPluginConfigurationBean.getId());
 
-        for (TaskConfigurationHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : taskPluginConfigurationBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(TaskConfigurationHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = taskPluginConfigurationBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            TaskConfigurationHasResearchGroup rghau = new TaskConfigurationHasResearchGroup();
+            rghau.setTaskConfigurationId(taskPluginConfigurationBean.getId());
+            rghau.setResearchGroupId(toCre);
+            taskConfigurationHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
+            TaskConfigurationHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getTaskConfigurationId() == taskPluginConfigurationBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-        for (String researchGroupId : taskPluginConfigurationBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-
-            boolean selectedAlreadyIn = false;
-            for (TaskConfigurationHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                TaskConfigurationHasResearchGroup rghau = new TaskConfigurationHasResearchGroup();
-                rghau.setTaskConfigurationId(taskPluginConfigurationBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for (TaskConfigurationHasResearchGroup toCre : toCreate) {
-            taskConfigurationHasResearchGroupDao.create(toCre);
-        }
-        for (TaskConfigurationHasResearchGroup toDel : toDelete) {
-            taskConfigurationHasResearchGroupDao.delete(toDel);
+            taskConfigurationHasResearchGroupDao.delete(rghau);
         }
 
     }

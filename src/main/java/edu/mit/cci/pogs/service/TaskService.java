@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.service.base.ServiceBase;
 import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskconfiguration.TaskConfigurationDao;
@@ -23,7 +25,7 @@ import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.view.task.bean.TaskBean;
 
 @Service
-public class TaskService {
+public class TaskService extends ServiceBase {
 
     private final TaskDao taskDao;
     private final TaskHasResearchGroupDao taskHasResearchGroupDao;
@@ -75,18 +77,6 @@ public class TaskService {
 
         ObjectUtils.Copy(tk, value);
 
-        if (tk.getShouldScore() == null) {
-            tk.setShouldScore(false);
-        }
-        if (tk.getInteractionTime() == null) {
-            tk.setInteractionTime(0);
-         }
-        if (tk.getIntroTime() == null) {
-            tk.setIntroTime(0);
-        }
-        if (tk.getPrimerTime() == null) {
-            tk.setPrimerTime(0);
-        }
         updateVideoPrimerUrl(tk);
         if (tk.getId() == null) {
             tk = taskDao.create(tk);
@@ -122,44 +112,34 @@ public class TaskService {
         if (taskBean.getResearchGroupRelationshipBean() == null && taskBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<TaskHasResearchGroup> toCreate = new ArrayList<>();
-        List<TaskHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<TaskHasResearchGroup> currentlySelected = listTaskHasResearchGroupByTaskId(taskBean.getId());
 
-        for (TaskHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : taskBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(TaskHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = taskBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            TaskHasResearchGroup rghau = new TaskHasResearchGroup();
+            rghau.setTaskId(taskBean.getId());
+            rghau.setResearchGroupId(toCre);
+            taskHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
-        for (String researchGroupId : taskBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+            TaskHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getTaskId() == taskBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-            boolean selectedAlreadyIn = false;
-            for (TaskHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                TaskHasResearchGroup rghau = new TaskHasResearchGroup();
-                rghau.setTaskId(taskBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for (TaskHasResearchGroup toCre : toCreate) {
-            taskHasResearchGroupDao.create(toCre);
-        }
-        for (TaskHasResearchGroup toDel : toDelete) {
-            taskHasResearchGroupDao.delete(toDel);
+            taskHasResearchGroupDao.delete(rghau);
         }
 
     }
