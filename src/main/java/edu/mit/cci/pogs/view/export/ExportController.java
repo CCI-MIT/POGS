@@ -29,7 +29,7 @@ import java.util.zip.ZipOutputStream;
 
 import static edu.mit.cci.pogs.constants.ApplicationConstants.*;
 
-@RestController
+//@RestController
 public class ExportController {
 
     @Autowired
@@ -44,7 +44,7 @@ public class ExportController {
     @Autowired
     private SessionDao sessionDao;
 
-    @GetMapping("/admin/export/session/{sessionId}")
+    //@GetMapping("/admin/export/session/{sessionId}")
     public void exportSessionData(HttpServletResponse response, @PathVariable("sessionId") Long sessionId) {
         try {
             response.setContentType("application/zip");
@@ -78,7 +78,7 @@ public class ExportController {
     //get subject contribution data no need for entry point.
 
 
-    @GetMapping("/admin/export/study/{studyId}")
+    //@GetMapping("/admin/export/study/{studyId}")
     public void getStudyData(HttpServletResponse response, @PathVariable("studyId") Long studyId) {
         List<Session> sessionInStudy = sessionDao.listByStudyId(studyId);
         try {
@@ -93,7 +93,7 @@ public class ExportController {
         }
     }
 
-    @GetMapping("/admin/export/subjectcontribution/{studyId}")
+    //@GetMapping("/admin/export/subjectcontribution/{studyId}")
     public void getSubjectContribution(HttpServletResponse response, @PathVariable("studyId") Long studyId) {
         StringBuilder val = new StringBuilder();
         val.append("Session Name,Task Name,Team Id,Number of Subjects,Task Group Name,Subject External Ids," +
@@ -171,7 +171,7 @@ public class ExportController {
         }
     }
 
-    @GetMapping("/admin/export/taskscore/{studyId}")
+    //@GetMapping("/admin/export/taskscore/{studyId}")
     public void getTaskScoreData(HttpServletResponse response, @PathVariable("studyId") Long studyId) {
         StringBuilder val = new StringBuilder();
         val.append("Session Name, Team Id, Task1, Task2, Task3, Task4");

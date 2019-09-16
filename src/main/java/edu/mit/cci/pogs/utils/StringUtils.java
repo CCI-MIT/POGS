@@ -1,5 +1,9 @@
 package edu.mit.cci.pogs.utils;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
@@ -32,6 +36,22 @@ public class StringUtils {
                 "psi",
                 "omega"
     };
+
+    public static boolean isJSONValid(String test) {
+        try {
+            if(test == null) return false;
+            new JSONObject(test);
+        } catch (JSONException ex) {
+            // edited, to include @Arthur's comment
+            // e.g. in case JSONArray is valid as well...
+            try {
+                new JSONArray(test);
+            } catch (JSONException ex1) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public static String[] getUniqueNamesOfSize(int size){
 
