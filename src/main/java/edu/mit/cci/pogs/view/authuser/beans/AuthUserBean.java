@@ -1,20 +1,19 @@
-package edu.mit.cci.pogs.view.study.beans;
+package edu.mit.cci.pogs.view.authuser.beans;
 
-
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
 
-public class StudyBean extends Study {
-
-    public StudyBean() {
-
-    }
-
-    public StudyBean(Study study) {
-        super(study);
-    }
+public class AuthUserBean extends AuthUser{
 
     private ResearchGroupRelationshipBean researchGroupRelationshipBean;
+
+    public AuthUserBean() {
+
+    }
+
+    public AuthUserBean(AuthUser pojo) {
+        super(pojo);
+    }
 
     public ResearchGroupRelationshipBean getResearchGroupRelationshipBean() {
         return researchGroupRelationshipBean;

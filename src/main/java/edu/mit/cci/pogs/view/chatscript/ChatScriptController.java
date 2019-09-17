@@ -79,7 +79,7 @@ public class ChatScriptController {
         ChatScriptBean chatScriptBean = new ChatScriptBean(chatScriptDao.get(chatscriptId));
         chatScriptBean.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
         List<ChatScriptHasResearchGroup> test = chatScriptService.listChatScriptHasResearchGroupByChatScriptId(chatscriptId);
-        chatScriptBean.getResearchGroupRelationshipBean().setChatScriptHasResearchSelectedValues(chatScriptService.listChatScriptHasResearchGroupByChatScriptId(chatscriptId));
+        chatScriptBean.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(chatScriptService.listChatScriptHasResearchGroupByChatScriptId(chatscriptId));
         chatScriptBean.setId(chatscriptId);
         model.addAttribute("chatscript", chatScriptBean);
         return "chatscript/chatscript-edit";

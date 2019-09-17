@@ -5,6 +5,8 @@ import edu.mit.cci.pogs.model.dao.chatscript.ChatScriptDao;
 import edu.mit.cci.pogs.model.dao.chatscripthasresearchgroup.ChatScriptHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScriptHasResearchGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
+import edu.mit.cci.pogs.service.base.ServiceBase;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.chatscript.beans.ChatScriptBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,9 +15,11 @@ import edu.mit.cci.pogs.view.chatscript.beans.ChatEntriesBean;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
-public class ChatScriptService {
+public class ChatScriptService extends ServiceBase {
 
     private ChatEntryDao chatEntryDao;
     private ChatScriptDao chatScriptDao;
@@ -63,45 +67,33 @@ public class ChatScriptService {
         if (chatScriptBean.getResearchGroupRelationshipBean() == null && chatScriptBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<ChatScriptHasResearchGroup> toCreate = new ArrayList<>();
-        List<ChatScriptHasResearchGroup> toDelete = new ArrayList<>();
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<ChatScriptHasResearchGroup> currentlySelected = listChatScriptHasResearchGroupByChatScript(chatScriptBean.getId());
 
-        for (ChatScriptHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : chatScriptBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(ChatScriptHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = chatScriptBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            ChatScriptHasResearchGroup rghau = new ChatScriptHasResearchGroup();
+            rghau.setChatScriptId(chatScriptBean.getId());
+            rghau.setResearchGroupId(toCre);
+            chatScriptHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
+            ChatScriptHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getChatScriptId() == chatScriptBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-        for (String researchGroupId : chatScriptBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-
-            boolean selectedAlreadyIn = false;
-            for (ChatScriptHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                ChatScriptHasResearchGroup rghau = new ChatScriptHasResearchGroup();
-                rghau.setChatScriptId(chatScriptBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for (ChatScriptHasResearchGroup toCre : toCreate) {
-            chatScriptHasResearchGroupDao.create(toCre);
-        }
-        for (ChatScriptHasResearchGroup toDel : toDelete) {
-            chatScriptHasResearchGroupDao.delete(toDel);
+            chatScriptHasResearchGroupDao.delete(rghau);
         }
 
     }
@@ -109,8 +101,8 @@ public class ChatScriptService {
     public ChatScript createOrUpdate(ChatScriptBean chatScriptBean) {
 
         ChatScript chatScript = new ChatScript();
-        chatScript.setId(chatScriptBean.getId());
-        chatScript.setChatScriptName(chatScriptBean.getChatScriptName());
+
+        ObjectUtils.Copy(chatScript, chatScriptBean);
 
         if (chatScript.getId() == null) {
             chatScript = chatScriptDao.create(chatScript);

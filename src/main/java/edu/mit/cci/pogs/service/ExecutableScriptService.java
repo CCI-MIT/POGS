@@ -5,15 +5,18 @@ import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.executablescripthasresearchgroup.ExecutableScriptHasResearchGroupDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScriptHasResearchGroup;
+import edu.mit.cci.pogs.service.base.ServiceBase;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.executablescript.beans.ExecutableScriptBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class ExecutableScriptService {
+public class ExecutableScriptService extends ServiceBase {
 
     private final ExecutableScriptHasResearchGroupDao executableScriptHasResearchGroupDao;
     private final ExecutableScriptDao executableScriptDao;
@@ -35,45 +38,34 @@ public class ExecutableScriptService {
         if (executableScriptBean.getResearchGroupRelationshipBean() == null && executableScriptBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<ExecutableScriptHasResearchGroup> toCreate = new ArrayList<>();
-        List<ExecutableScriptHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<ExecutableScriptHasResearchGroup> currentlySelected = listExecutableScriptHasResearchGroupByDictionaryId(executableScriptBean.getId());
 
-        for (ExecutableScriptHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : executableScriptBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(ExecutableScriptHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = executableScriptBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            ExecutableScriptHasResearchGroup rghau = new ExecutableScriptHasResearchGroup();
+            rghau.setExecutableScriptId(executableScriptBean.getId());
+            rghau.setResearchGroupId(toCre);
+            executableScriptHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
+            ExecutableScriptHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getExecutableScriptId() == executableScriptBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-        for (String researchGroupId : executableScriptBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-
-            boolean selectedAlreadyIn = false;
-            for (ExecutableScriptHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                ExecutableScriptHasResearchGroup rghau = new ExecutableScriptHasResearchGroup();
-                rghau.setExecutableScriptId(executableScriptBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for (ExecutableScriptHasResearchGroup toCre : toCreate) {
-            executableScriptHasResearchGroupDao.create(toCre);
-        }
-        for (ExecutableScriptHasResearchGroup toDel : toDelete) {
-            executableScriptHasResearchGroupDao.delete(toDel);
+            executableScriptHasResearchGroupDao.delete(rghau);
         }
 
     }
@@ -82,10 +74,8 @@ public class ExecutableScriptService {
     public ExecutableScript createOrUpdate(ExecutableScriptBean executableScriptBean) {
 
         ExecutableScript executableScript = new ExecutableScript();
-        executableScript.setId(executableScriptBean.getId());
-        executableScript.setScriptContent(executableScriptBean.getScriptContent());
-        executableScript.setScriptName(executableScriptBean.getScriptName());
-        executableScript.setScriptType(executableScriptBean.getScriptType());
+
+        ObjectUtils.Copy(executableScript, executableScriptBean);
 
         if (executableScript.getId() == null) {
             executableScript = executableScriptDao.create(executableScript);

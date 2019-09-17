@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.service.base.ServiceBase;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
@@ -18,7 +21,7 @@ import edu.mit.cci.pogs.view.study.beans.SessionBean;
 import edu.mit.cci.pogs.view.study.beans.StudyBean;
 
 @Service
-public class StudyService {
+public class StudyService extends ServiceBase {
 
     private final StudyDao studyDao;
 
@@ -44,10 +47,8 @@ public class StudyService {
     public Study createOrUpdate(StudyBean studyBean) {
 
         Study study = new Study();
-        study.setId(studyBean.getId());
-        study.setStudyDescription(studyBean.getStudyDescription());
-        study.setStudyName(studyBean.getStudyName());
-        study.setStudySessionPrefix(studyBean.getStudySessionPrefix());
+
+        ObjectUtils.Copy(study, studyBean);
 
         if (study.getId() == null) {
             study = studyDao.create(study);
@@ -65,46 +66,35 @@ public class StudyService {
         if (studyBean.getResearchGroupRelationshipBean() == null && studyBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<StudyHasResearchGroup> toCreate = new ArrayList<>();
-        List<StudyHasResearchGroup> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<StudyHasResearchGroup> currentlySelected = listStudyHasResearchGroupByStudy(studyBean.getId());
 
-        for (StudyHasResearchGroup rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : studyBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if (!foundRGH) {
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(StudyHasResearchGroup::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = studyBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            StudyHasResearchGroup rghau = new StudyHasResearchGroup();
+            rghau.setStudyId(studyBean.getId());
+            rghau.setResearchGroupId(toCre);
+            studyHasResearchGroupDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
-        for (String researchGroupId : studyBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+            StudyHasResearchGroup rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getStudyId() == studyBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-            boolean selectedAlreadyIn = false;
-            for (StudyHasResearchGroup rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if (!selectedAlreadyIn) {
-                StudyHasResearchGroup rghau = new StudyHasResearchGroup();
-                rghau.setStudyId(studyBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
+            studyHasResearchGroupDao.delete(rghau);
         }
-        for (StudyHasResearchGroup toCre : toCreate) {
-            studyHasResearchGroupDao.create(toCre);
-        }
-        for (StudyHasResearchGroup toDel : toDelete) {
-            studyHasResearchGroupDao.delete(toDel);
-        }
-
     }
 
     private List<StudyHasResearchGroup> listStudyHasResearchGroupByStudy(Long studyId) {

@@ -75,9 +75,7 @@ public class StudyController {
         StudyBean sb = new StudyBean(studyDao.get(studyId));
         sb.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
-        sb.getResearchGroupRelationshipBean()
-                .setStudyHasResearchSelectedValues(
-                        studyService.listStudyHasResearchGroupByStudyId(studyId));
+        sb.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(studyService.listStudyHasResearchGroupByStudyId(studyId));
 
         model.addAttribute("study", sb);
         return "study/study-edit";

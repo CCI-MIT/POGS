@@ -152,7 +152,7 @@ public class TaskPluginController {
 
         List<TaskConfigurationHasResearchGroup> test = taskConfigurationService.listTaskConfigurationyHasResearchGroupByTaskConfigurationId(configurationId);
         tpcb.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
-        tpcb.getResearchGroupRelationshipBean().setTaskConfigurationHasResearchSelectedValues(taskConfigurationService.listTaskConfigurationyHasResearchGroupByTaskConfigurationId(configurationId));
+        tpcb.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(taskConfigurationService.listTaskConfigurationyHasResearchGroupByTaskConfigurationId(configurationId));
 
         setupModelAttributesForPlugin(model, taskPlugin, tpcb);
 

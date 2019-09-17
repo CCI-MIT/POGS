@@ -122,11 +122,8 @@ public class TaskController {
     public String createTask(@PathVariable("id") Long id, Model model) {
         TaskBean tb = new TaskBean(taskDao.get(id));
 
-        tb.setResearchGroupRelationshipBean(
-                new ResearchGroupRelationshipBean());
-        tb.getResearchGroupRelationshipBean()
-                .setTaskyHasResearchSelectedValues(
-                        taskService.listTaskHasResearchGroupByTaskId(id));
+        tb.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
+        tb.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(taskService.listTaskHasResearchGroupByTaskId(id));
 
         TaskHasTaskConfiguration thtc = taskHasTaskConfigurationDao.getByTaskId(tb.getId());
         tb.setTaskConfigurationId(thtc.getTaskConfigurationId());

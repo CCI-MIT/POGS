@@ -131,11 +131,8 @@ public class DictionaryController {
     public String editDictionary(@PathVariable("dictionaryId") Long dictionaryId, Model model) {
 
         DictionaryBean dictionaryBean = new DictionaryBean(dictionaryDao.get(dictionaryId));
-        dictionaryBean.setResearchGroupRelationshipBean(
-                new ResearchGroupRelationshipBean());
-        dictionaryBean.getResearchGroupRelationshipBean()
-                .setDictionaryHasResearchSelectedValues(
-                        dictionaryService.listDictionaryHasResearchGroupByDictionaryId(dictionaryId));
+        dictionaryBean.setResearchGroupRelationshipBean(new ResearchGroupRelationshipBean());
+        dictionaryBean.getResearchGroupRelationshipBean().setObjectHasResearchSelectedValues(dictionaryService.listDictionaryHasResearchGroupByDictionaryId(dictionaryId));
 
         model.addAttribute("dictionary", dictionaryBean);
         return "dictionary/dictionary-edit";

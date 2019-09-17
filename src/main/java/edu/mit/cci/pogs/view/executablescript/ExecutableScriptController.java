@@ -78,7 +78,7 @@ public class ExecutableScriptController {
         executableScriptBean.setResearchGroupRelationshipBean(
                 new ResearchGroupRelationshipBean());
         executableScriptBean.getResearchGroupRelationshipBean()
-                .setExecutableScriptHasResearchSelectedValues(
+        .setObjectHasResearchSelectedValues(
                         executableScriptService.listExecutableScriptHasResearchGroupByDictionaryId(chatscriptId));
 
 

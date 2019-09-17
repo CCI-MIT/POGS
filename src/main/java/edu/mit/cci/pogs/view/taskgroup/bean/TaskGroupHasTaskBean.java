@@ -1,34 +1,23 @@
 package edu.mit.cci.pogs.view.taskgroup.bean;
 
-public class TaskGroupHasTaskBean {
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 
-    private Long taskId;
-
-    private Integer order;
+public class TaskGroupHasTaskBean extends TaskGroupHasTask {
 
     private String taskName;
 
-    public Long getTaskId() {
-        return taskId;
+    public TaskGroupHasTaskBean(TaskGroupHasTask base){
+        super(base);
+    }
+    public TaskGroupHasTaskBean(){
+
     }
 
-    public void setTaskId(Long taskId) {
-        this.taskId = taskId;
-    }
-
-    public Integer getOrder() {
-        return order;
-    }
-
-    public void setOrder(Integer order) {
-        this.order = order;
-    }
-
-    public String getTaskName() {
+    public String getTaskName(){
         return taskName;
     }
 
-    public void setTaskName(String taskName) {
+    public void setTaskName(String taskName){
         this.taskName = taskName;
     }
 }

@@ -5,8 +5,10 @@ import edu.mit.cci.pogs.model.dao.user.UserDao;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.AuthUser;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroupHasAuthUser;
+import edu.mit.cci.pogs.service.base.ServiceBase;
+import edu.mit.cci.pogs.utils.ObjectUtils;
 import edu.mit.cci.pogs.view.auth.beans.RegisterBean;
-import edu.mit.cci.pogs.view.authuser.AuthUserBean;
+import edu.mit.cci.pogs.view.authuser.beans.AuthUserBean;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,9 +16,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
-public class UserService {
+public class UserService extends ServiceBase {
 
     private UserDao userDao;
     private PasswordEncoder passwordEncoder;
@@ -32,23 +35,25 @@ public class UserService {
 
     public AuthUser createUser(RegisterBean registerBean) {
         AuthUser authUser = new AuthUser();
+
         authUser.setEmailAddress(registerBean.getEmailAddress());
         authUser.setPassword(passwordEncoder.encode(registerBean.getPassword()));
         authUser.setFirstName(registerBean.getFirstName());
         authUser.setLastName(registerBean.getLastName());
         authUser.setIsAdmin(false);
+
+        if(userDao.get(authUser.getEmailAddress())!= null){
+            return null;
+        }
         return userDao.create(authUser);
     }
 
 
     public AuthUser adminCreateOrUpdateUser(AuthUserBean authUserBean) {
         AuthUser authUser = new AuthUser();
-        authUser.setEmailAddress(authUserBean.getEmailAddress());
 
-        authUser.setFirstName(authUserBean.getFirstName());
-        authUser.setLastName(authUserBean.getLastName());
-        authUser.setIsAdmin(authUserBean.getAdmin());
-        authUser.setId(authUserBean.getId());
+
+        ObjectUtils.Copy(authUser, authUserBean);
 
         if (authUser.getId() == null) {
 
@@ -71,44 +76,34 @@ public class UserService {
         if (authUserBean.getResearchGroupRelationshipBean() == null && authUserBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;
         }
-        List<ResearchGroupHasAuthUser> toCreate = new ArrayList<>();
-        List<ResearchGroupHasAuthUser> toDelete = new ArrayList<>();
+
+        List<Long> toCreate = new ArrayList<>();
+        List<Long> toDelete = new ArrayList<>();
         List<ResearchGroupHasAuthUser> currentlySelected = listResearchGroupHasAuthUserByAuthUser(authUserBean.getId());
 
-        for (ResearchGroupHasAuthUser rghau : currentlySelected) {
-            boolean foundRGH = false;
-            for (String researchGroupId : authUserBean.getResearchGroupRelationshipBean().getSelectedValues()) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    foundRGH = true;
-                }
-            }
-            if(!foundRGH){
-                toDelete.add(rghau);
-            }
+        List<Long> currentResearchGroups = currentlySelected
+                .stream()
+                .map(ResearchGroupHasAuthUser::getResearchGroupId)
+                .collect(Collectors.toList());
 
+        String[] newSelectedValues = authUserBean.getResearchGroupRelationshipBean().getSelectedValues();
+
+        UpdateResearchGroups(toCreate, toDelete, currentResearchGroups, newSelectedValues);
+
+        for (Long toCre : toCreate) {
+            ResearchGroupHasAuthUser rghau = new ResearchGroupHasAuthUser();
+            rghau.setAuthUserId(authUserBean.getId());
+            rghau.setResearchGroupId(toCre);
+            researchGroupHasAuthUserDao.create(rghau);
         }
+        for (Long toDel : toDelete) {
 
-        for (String researchGroupId : authUserBean.getResearchGroupRelationshipBean().getSelectedValues()) {
+            ResearchGroupHasAuthUser rghau = currentlySelected
+                    .stream()
+                    .filter(a -> (a.getAuthUserId() == authUserBean.getId() && a.getResearchGroupId() == toDel))
+                    .findFirst().get();
 
-            boolean selectedAlreadyIn = false;
-            for (ResearchGroupHasAuthUser rghau : currentlySelected) {
-                if (rghau.getResearchGroupId().longValue() == new Long(researchGroupId).longValue()) {
-                    selectedAlreadyIn = true;
-                }
-            }
-            if(!selectedAlreadyIn){
-                ResearchGroupHasAuthUser rghau = new ResearchGroupHasAuthUser();
-                rghau.setAuthUserId(authUserBean.getId());
-                rghau.setResearchGroupId(new Long(researchGroupId));
-                toCreate.add(rghau);
-            }
-
-        }
-        for(ResearchGroupHasAuthUser toCre: toCreate){
-            researchGroupHasAuthUserDao.create(toCre);
-        }
-        for(ResearchGroupHasAuthUser toDel: toDelete){
-            researchGroupHasAuthUserDao.delete(toDel);
+            researchGroupHasAuthUserDao.delete(rghau);
         }
 
     }

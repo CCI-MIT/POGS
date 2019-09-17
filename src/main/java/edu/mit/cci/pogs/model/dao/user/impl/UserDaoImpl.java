@@ -9,6 +9,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,9 +29,16 @@ public class UserDaoImpl extends AbstractDao<AuthUser, Long, AuthUserRecord> imp
     }
 
     public AuthUser get(String emailAddress) {
-        return dslContext.selectFrom(AUTH_USER)
-                         .where(AUTH_USER.EMAIL_ADDRESS.eq(emailAddress))
-                         .fetchOne().into(AuthUser.class);
+
+        try
+        {
+            return dslContext.selectFrom(AUTH_USER)
+                    .where(AUTH_USER.EMAIL_ADDRESS.eq(emailAddress))
+                    .fetchOne().into(AuthUser.class);
+        }
+        catch (Exception e){
+            return null;
+        }
     }
 
     public List<AuthUser> list(){

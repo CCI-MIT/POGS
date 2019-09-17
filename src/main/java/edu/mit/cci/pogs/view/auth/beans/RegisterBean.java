@@ -2,13 +2,26 @@ package edu.mit.cci.pogs.view.auth.beans;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
 public class RegisterBean {
 
+    @NotNull
+    @NotEmpty
     private String emailAddress;
+
+    @NotNull
+    @NotEmpty
     private String firstName;
+
+    @NotNull
+    @NotEmpty
     private String lastName;
+
+    @NotNull
+    @NotEmpty
     private String password;
 
     public String getEmailAddress() {
