@@ -22,6 +22,7 @@ class EquationTypingTaskEdit {
         console.log(attribute.taskText);
         $("#taskText").val(attribute.taskText);
         $("#totalSum").val(attribute.totalSum);
+        $("#executionMode").val(attribute.executionMode);
         $("#shouldReuseMembers").attr("checked",attribute.shouldReuseMembers);
 
 
@@ -36,6 +37,7 @@ class EquationTypingTaskEdit {
         let bluePrint = {};
         bluePrint.taskText = $("#taskText").val();
         bluePrint.totalSum = $("#totalSum").val();
+        bluePrint.executionMode = $("#executionMode").val();
         bluePrint.shouldReuseMembers = $("#shouldReuseMembers").is(":checked");
 
 

@@ -1,6 +1,17 @@
 
 <div>
     <div class="form-group row">
+        <label class="col-sm-3 col-form-label" for="executionMode">Execution mode:</label>
+        <div class="col-sm-7">
+
+            <select class="custom-select"  id="executionMode">
+                <option value="1">Independent</option>
+                <option value="2">Interdependent</option>
+            </select>
+            <small  class="form-text text-muted">The independent version will not impose any restrictions on the subjects. The interdependent will enforce turn taking</small>
+        </div>
+    </div>
+    <div class="form-group row">
         <label class="col-sm-3 col-form-label" for="taskText">Task Text:</label>
         <div class="col-sm-9">
             <textarea class="form-control htmleditor" id="taskText" rows="3"></textarea>
@@ -17,7 +28,7 @@
             <label class="col-sm-3 col-form-label" for="shouldReuseMembers">Should reuse members:</label>
             <div class="col-sm-9">
                 <input type="checkbox" id="shouldReuseMembers"/>
-                <small id="" class="form-text text-muted">If checked the numbers used on the first line will be checked for using previous members.</small>
+                <small id class="form-text text-muted">If checked the numbers used on the first line will be checked for using previous members.</small>
             </div>
         </div>
 

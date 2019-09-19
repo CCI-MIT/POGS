@@ -15,7 +15,7 @@ class Countdown{
             }
         }
 
-        var x = setInterval(function () {
+        this.x = setInterval(function () {
 
             // Get todays date and time
             var now = new Date().getTime();
@@ -60,7 +60,7 @@ class Countdown{
 
             // If the count down is finished, write some text
             if (distance < 0) {
-                clearInterval(x);
+                clearInterval(this.x);
                 this.finalFunction.call(pogs);
             }
         }.bind(this), 1000);
@@ -70,5 +70,8 @@ class Countdown{
     }
     updateFinalMessage(msg){
         this.finalMessage = msg;
+    }
+    cancelCountDown(){
+        clearTimeout(this.x);
     }
 }

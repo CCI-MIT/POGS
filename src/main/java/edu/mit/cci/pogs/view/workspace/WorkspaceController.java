@@ -540,35 +540,37 @@ WorkspaceController {
                     "}]");
         }
 
-        org.json.JSONArray jo = new org.json.JSONArray(csr.getSubjectAttributesToAdd());
-        if (jo.length() > 0) {
-            org.json.JSONArray team2 = new org.json.JSONArray();
-            Map<String, JSONObject> users = new HashMap<>();
-            for (int j = 0; j < team.length(); j++) {
-                JSONObject su = team.getJSONObject(j);
-                users.put(su.getString("externalId"),su);
-            }
-            for (int i = 0; i < jo.length(); i++) {
-
-                JSONObject attributeToAdd = jo.getJSONObject(i);
+        if(csr.getSubjectAttributesToAdd()!=null) {
+            org.json.JSONArray jo = new org.json.JSONArray(csr.getSubjectAttributesToAdd());
+            if (jo.length() > 0) {
+                org.json.JSONArray team2 = new org.json.JSONArray();
+                Map<String, JSONObject> users = new HashMap<>();
                 for (int j = 0; j < team.length(); j++) {
-                    JSONObject subject = team.getJSONObject(j);
-                    if (subject.getString("externalId").equals(attributeToAdd.getString("externalId"))) {
+                    JSONObject su = team.getJSONObject(j);
+                    users.put(su.getString("externalId"), su);
+                }
+                for (int i = 0; i < jo.length(); i++) {
 
-                        org.json.JSONArray attributesToAdd = attributeToAdd.getJSONArray("attributes");
-                        org.json.JSONArray currentAttributes = subject.getJSONArray("attributes");
-                        for (int k = 0; k < attributesToAdd.length(); k++) {
-                            currentAttributes.put(attributesToAdd.getJSONObject(k));
+                    JSONObject attributeToAdd = jo.getJSONObject(i);
+                    for (int j = 0; j < team.length(); j++) {
+                        JSONObject subject = team.getJSONObject(j);
+                        if (subject.getString("externalId").equals(attributeToAdd.getString("externalId"))) {
+
+                            org.json.JSONArray attributesToAdd = attributeToAdd.getJSONArray("attributes");
+                            org.json.JSONArray currentAttributes = subject.getJSONArray("attributes");
+                            for (int k = 0; k < attributesToAdd.length(); k++) {
+                                currentAttributes.put(attributesToAdd.getJSONObject(k));
+                            }
+                            subject.put("attributes", currentAttributes);
+                            users.put(subject.getString("externalId"), subject);
                         }
-                        subject.put("attributes",currentAttributes);
-                        users.put(subject.getString("externalId"),subject);
                     }
                 }
+                for (String s : users.keySet()) {
+                    team2.put(users.get(s));
+                }
+                model.addAttribute("teammates", team2);
             }
-            for(String s: users.keySet()){
-                team2.put(users.get(s));
-            }
-            model.addAttribute("teammates", team2);
         }
     }
 
