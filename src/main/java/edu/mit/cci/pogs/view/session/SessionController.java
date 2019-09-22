@@ -22,6 +22,7 @@ import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.executablescript.ScriptType;
 import edu.mit.cci.pogs.model.dao.session.*;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
+import edu.mit.cci.pogs.model.dao.subject.NameGenerationType;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
@@ -97,6 +98,12 @@ public class SessionController {
     public List<SessionScheduleType> getSessionScheduleType() {
 
         return Arrays.asList(SessionScheduleType.values());
+    }
+
+    @ModelAttribute("nameGenerationType")
+    public List<NameGenerationType> getNameGenerationType() {
+
+        return Arrays.asList(NameGenerationType.values());
     }
 
     @ModelAttribute("executableScripts")

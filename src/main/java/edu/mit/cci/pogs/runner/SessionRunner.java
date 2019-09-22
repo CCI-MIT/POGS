@@ -491,14 +491,14 @@ public class SessionRunner implements Runnable {
 
         assignColorsToTeamMembers(round.getRoundTeams());
 
-        if(session.getDisplayNameGenerationEnabled()){
-            assignDisplayNamesToTeamMembers(round.getRoundTeams());
+        if(session.getDisplayNameGenerationEnabled() && session.getDisplayNameGenerationType()!=null){
+            assignDisplayNamesToTeamMembers(round.getRoundTeams(),session.getDisplayNameGenerationType().charAt(0));
         }
     }
-    private void assignDisplayNamesToTeamMembers(List<TeamWrapper> roundTeams) {
+    private void assignDisplayNamesToTeamMembers(List<TeamWrapper> roundTeams, char generationType) {
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
-            String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size());
+            String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size(),generationType);
             for(int i = 0; i <subjectList.size(); i ++){
                 Subject su = subjectList.get(i);
                 if(displayNames.length>i) {

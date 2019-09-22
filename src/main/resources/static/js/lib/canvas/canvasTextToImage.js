@@ -195,27 +195,38 @@ class CanvasTextToImage {
                 //words[0] = words[0].replace("\n\n","\\n \\n");
 
                 var possibleNewLines = words[0].word.split(/\r\n|\r|\n/g);
-
-                //console.log("Has ("+possibleNewLines.length+")new line -" + words[0] + "-")
+                console.log("WORDS:")
+                console.log(">"+words[0].word + "<");
+                console.log("Has ("+possibleNewLines.length+")");
+                for(let j=0; j< possibleNewLines.length; j ++){
+                    console.log(j + ": >" + possibleNewLines[j] + "<")
+                }
                 var oldWord = words.shift();
-                for (var i = possibleNewLines.length; i > 0; i--) {
-                    //console.log(">"+possibleNewLines[i-1]+"<")
-                    if (possibleNewLines[i - 1] != "") {
-                        words.unshift( new Word(possibleNewLines[i - 1],oldWord.backgroundColor, oldWord.fontColor));
-                        if (i != 1) {
-                            words.unshift(new Word("&&%%MUSTBREAKNEWLINE",oldWord.backgroundColor, oldWord.fontColor));
+                for (var i = possibleNewLines.length -1; i >= 0; i--) {
+                    console.log( i + ": >"+possibleNewLines[i]+"<")
+                    if (possibleNewLines[i] != "") {
+                        words.unshift( new Word(possibleNewLines[i],oldWord.backgroundColor, oldWord.fontColor));
+                        if(i!=0) {
+                            words.unshift(new Word("&&%%MUSTBREAKNEWLINE", oldWord.backgroundColor,
+                                                   oldWord.fontColor));
                         }
                     }
+
                 }
             }
 
-            if (this.ctx.measureText(line.line + words[0].word).width < maxWidth) {
+            let wordForWidth = words[0].word;
+            if (wordForWidth == ("&&%%MUSTBREAKNEWLINE")) {
+                wordForWidth = "";
+            }
+            if (this.ctx.measureText(line.line + wordForWidth).width < maxWidth) {
                 if (words[0].word != ("&&%%MUSTBREAKNEWLINE")) {
                     var wordToAdd = words.shift();
                     line.line += wordToAdd.word + " ";
                     line.words.push(wordToAdd);
                 } else {
-
+                    console.log(" - >" + line.line + "<");
+                    console.log("WORD WAS A NEW LINE BREAK");
                     var breakLineWord = words.shift();
                     breakLineWord.word = "";
                     line.shouldBreakLine = true;
@@ -225,7 +236,6 @@ class CanvasTextToImage {
                 }
 
             } else {
-
                 lines.push(line);
                 line = new Line("",[]);
 

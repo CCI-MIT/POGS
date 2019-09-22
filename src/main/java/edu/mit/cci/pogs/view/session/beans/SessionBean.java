@@ -63,6 +63,8 @@ public class SessionBean {
 
     private Boolean displayNameGenerationEnabled;
 
+    private String displayNameGenerationType;
+
 
 
     public SessionBean() {
@@ -506,5 +508,12 @@ public class SessionBean {
 
     public void setDisplayNameGenerationEnabled(Boolean displayNameGenerationEnabled) {
         this.displayNameGenerationEnabled = displayNameGenerationEnabled;
+    }
+    public String getDisplayNameGenerationType() {
+        return displayNameGenerationType;
+    }
+
+    public void setDisplayNameGenerationType(String displayNameGenerationType) {
+        this.displayNameGenerationType = displayNameGenerationType;
     }
 }
