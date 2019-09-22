@@ -76,8 +76,8 @@ class TypingTaskEdit {
             texts.push({textContent:this.dictionaries[$(inputsTxt[k]).val()].entryValue,
                     backgroundColor:newColor, fontColor:
                     generateFontColorBasedOnBackgroundColor(newColor)});
-            if(k==1)
-                break;
+            //if(k==1)
+              //  break;
         }
         $("#livePreviewContainer canvas").remove();
         this.canvasImage = new CanvasTextToImage(texts,"livePreviewContainer", 318);
