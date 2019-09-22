@@ -195,11 +195,11 @@ class CanvasTextToImage {
                 //words[0] = words[0].replace("\n\n","\\n \\n");
 
                 var possibleNewLines = words[0].word.split(/\r\n|\r|\n/g);
-                console.log("WORDS:")
-                console.log(">"+words[0].word + "<");
-                console.log("Has ("+possibleNewLines.length+")");
+                //console.log("WORDS:")
+                //console.log(">"+words[0].word + "<");
+                //console.log("Has ("+possibleNewLines.length+")");
                 for(let j=0; j< possibleNewLines.length; j ++){
-                    console.log(j + ": >" + possibleNewLines[j] + "<")
+                    //console.log(j + ": >" + possibleNewLines[j] + "<")
                 }
                 var oldWord = words.shift();
                 for (var i = possibleNewLines.length -1; i >= 0; i--) {
@@ -210,9 +210,14 @@ class CanvasTextToImage {
                             words.unshift(new Word("&&%%MUSTBREAKNEWLINE", oldWord.backgroundColor,
                                                    oldWord.fontColor));
                         }
+                    } else {
+                        if(i!=0) {
+                            words.unshift(new Word("&&%%MUSTBREAKNEWLINE", oldWord.backgroundColor,
+                                                   oldWord.fontColor));
+                        }
                     }
-
                 }
+
             }
 
             let wordForWidth = words[0].word;

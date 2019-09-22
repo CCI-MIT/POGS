@@ -77,7 +77,7 @@ class TypingTaskEdit {
                     backgroundColor:newColor, fontColor:
                     generateFontColorBasedOnBackgroundColor(newColor)});
             //if(k==1)
-              //  break;
+                //break;
         }
         $("#livePreviewContainer canvas").remove();
         this.canvasImage = new CanvasTextToImage(texts,"livePreviewContainer", 318);
