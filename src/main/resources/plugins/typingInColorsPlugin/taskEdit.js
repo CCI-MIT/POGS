@@ -52,10 +52,14 @@ class TypingTaskEdit {
     }
     setupHtmlFromAttributeString(attributez){
         if($("#dictionaryId").val()!="") {
-            this.getDictJson($("#dictionaryId").val(), function () {
+            this.getDictJson($("#dictionaryId").val(), function (dictionaries) {
 
-                for (let k = 0; k < attributez.length; k++) {
-                    this.createColorField(attributez[k].color, attributez[k].text);
+                for (let k = 0; k < dictionaries.length; k++) {
+                    if(k < attributez.length) {
+                        this.createColorField(attributez[k].color, attributez[k].text);
+                    } else {
+                        this.createColorField("#000000",dictionaries[i].id);
+                    }
                 }
                 this.refreshPreview();
 
