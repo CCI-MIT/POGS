@@ -56,9 +56,9 @@ class TypingTaskEdit {
 
                 for (let k = 0; k < dictionaries.length; k++) {
                     if(k < attributez.length) {
-                        this.createColorField(attributez[k].color, attributez[k].text);
+                        this.createColorField(attributez[k].color, dictionaries[k].id);
                     } else {
-                        this.createColorField("#000000",dictionaries[i].id);
+                        this.createColorField("#000000",dictionaries[k].id);
                     }
                 }
                 this.refreshPreview();
