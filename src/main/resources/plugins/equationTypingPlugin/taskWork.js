@@ -46,6 +46,9 @@ class EquationTypingTaskPlugin{
             }
         }
     }
+    setupVisibilityForIndependentVersion(){
+        $('#doneEquation_' + this.totalFieldIndex).show();
+    }
     createNextFieldAndWhoShouldBeAbleToEdit(){
 
         this.totalFieldIndex++;
@@ -126,6 +129,9 @@ class EquationTypingTaskPlugin{
 
         this.setupHooks();
 
+        if(this.executionMode == 1){
+            $('#doneEquation_' + this.totalFieldIndex).show();
+        }
 
     }
     setupWorkOn(){
@@ -294,6 +300,7 @@ class EquationTypingTaskPlugin{
         $("#editEquation_"+cellIndex).hide();
         $("#inputEquation_"+cellIndex).focus();
         $('#doneEquation_' + cellIndex).attr("value", "Done");
+        $('#doneEquation_' + this.totalFieldIndex).show();
     }
     broadcastReceived(message) {
         let attrName = message.content.attributeName;
