@@ -589,6 +589,7 @@ WorkspaceController {
 
             model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTaskPlugin(pluginConfigId));
 
+
             //get task html & js from plugin file system
             model.addAttribute("taskCss", pl.getTaskCSSContent());
             model.addAttribute("taskWorkJs", pl.getTaskWorkJsContent());

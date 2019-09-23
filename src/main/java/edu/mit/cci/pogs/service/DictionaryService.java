@@ -167,7 +167,7 @@ public class DictionaryService {
         TaskConfiguration tc = taskConfigurationDao.getByTaskPluginConfigurationId(pluginConfigId);
         JSONObject jo = getJsonObjectFromTaskConfig(tc);
         if (jo != null) return jo;
-        return null;
+        return new JSONObject();
     }
 
     public JSONObject getDictionaryJSONObjectForTask(Long taskId){
