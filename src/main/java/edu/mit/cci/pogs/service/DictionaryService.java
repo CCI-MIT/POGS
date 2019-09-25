@@ -176,7 +176,7 @@ public class DictionaryService {
         TaskConfiguration tg = taskConfigurationDao.get(configuration.getTaskConfigurationId());
         JSONObject jo = getJsonObjectFromTaskConfig(tg);
         if (jo != null) return jo;
-        return null;
+        return new JSONObject();
     }
 
     private JSONObject getJsonObjectFromTaskConfig(TaskConfiguration tg) {

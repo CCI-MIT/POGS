@@ -29,12 +29,15 @@ class Line {
     }
 
     allWordsHaveSameColor(){
+        if(this.words.length ==0 ) return true;
         if(this.words.length ==1 ) return true;
-        var color = this.words[0].backgroundColor;
-        for(var a in this.words){
+        if(this.words[0]!=null) {
+            var color = this.words[0].backgroundColor;
+            for (var a in this.words) {
 
-            if(this.words[a].backgroundColor != color){
-                return false;
+                if (this.words[a].backgroundColor != color) {
+                    return false;
+                }
             }
         }
         return true;

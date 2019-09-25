@@ -16,7 +16,7 @@ class InputField extends Field {
             str += new VideoInformation(this.jsonInfo.video_url).getHTML();
         }
 
-        str += '<input type="text" class="form-control row" id="answer'+this.index+'" data-cell-reference-index="'+this.index+'" placeholder="'+this.jsonInfo.placeholder+'">';
+        str += '<input type="text" class="form-control row" id="answer'+this.index+'" data-cell-reference-index="'+this.index+'" autocomplete="off" placeholder="'+this.jsonInfo.placeholder+'">';
         str += this.getInteractionIndicatorHTML();
 
         str += '</div> <br>';

@@ -42,12 +42,21 @@ public class UserService {
 
 
     public AuthUser adminCreateOrUpdateUser(AuthUserBean authUserBean) {
+
         AuthUser authUser = new AuthUser();
         authUser.setEmailAddress(authUserBean.getEmailAddress());
 
         authUser.setFirstName(authUserBean.getFirstName());
         authUser.setLastName(authUserBean.getLastName());
-        authUser.setIsAdmin(authUserBean.getAdmin());
+
+
+        if(authUserBean.getId()!=null){
+            AuthUser oldUser = userDao.get(authUserBean.getId());
+            if(oldUser!=null) {
+                authUser.setIsAdmin(oldUser.getIsAdmin());
+            }
+        }
+
         authUser.setId(authUserBean.getId());
 
         if (authUser.getId() == null) {

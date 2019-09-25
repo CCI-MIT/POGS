@@ -118,6 +118,7 @@ public class SessionBean {
         this.executableScriptId = value.getExecutableScriptId();
         this.sessionWideScriptId = value.getSessionWideScriptId();
         this.displayNameGenerationEnabled = value.getDisplayNameGenerationEnabled();
+        this.displayNameGenerationType = value.getDisplayNameGenerationType();
     }
 
     public String getScheduleConditionType() {

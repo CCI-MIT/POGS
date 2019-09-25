@@ -56,7 +56,7 @@ public class StringUtils {
     }
 
     public static String[] getUniqueNamesOfSize(int size, Character type){
-        if(type.equals(NameGenerationType.GREEK_LETTERS)) {
+        if(type.equals(NameGenerationType.GREEK_LETTERS.getId())) {
 
             Random random = new Random();
 
@@ -78,7 +78,7 @@ public class StringUtils {
             }
             return selectedNamesMaps.keySet().toArray(new String[selectedNamesMaps.keySet().size()]);
         }
-        if(type.equals(NameGenerationType.USER)) {
+        if(type.equals(NameGenerationType.USER.getId())) {
 
             Map<String, Integer> selectedNamesMaps = new LinkedHashMap<>();
             int counter = 0;

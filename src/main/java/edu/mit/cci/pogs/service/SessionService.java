@@ -195,6 +195,7 @@ public class SessionService {
         session.setExecutableScriptId(sessionBean.getExecutableScriptId());
         session.setSessionWideScriptId(sessionBean.getSessionWideScriptId());
         session.setDisplayNameGenerationEnabled(sessionBean.getDisplayNameGenerationEnabled());
+        session.setDisplayNameGenerationType(sessionBean.getDisplayNameGenerationType());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -281,6 +282,7 @@ public class SessionService {
         clonedNonPerpetualSession.setDoneUrlParameter(session.getDoneUrlParameter());
         clonedNonPerpetualSession.setSessionWideScriptId(session.getSessionWideScriptId());
         clonedNonPerpetualSession.setDisplayNameGenerationEnabled(session.getDisplayNameGenerationEnabled());
+        clonedNonPerpetualSession.setDisplayNameGenerationType(session.getDisplayNameGenerationType());
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
 
