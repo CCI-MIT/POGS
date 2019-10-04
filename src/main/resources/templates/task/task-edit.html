@@ -57,7 +57,12 @@
                                         th:if="${config.taskPluginName == rg.taskPluginName}"
                                         th:text="${config.configurationName}"></option>
                             </select>
+                            <small class="form-text text-muted">
+                                <a th:id="${rg.taskPluginName + '_configLink'}" class="pluginLinks" href="#" style="display:none">Go to plugin config page</a>
+                            </small>
                         </th:block>
+
+
                     </div>
                 </div>
 
@@ -74,15 +79,30 @@
                         $("#" + pluginName + "_configOptions").attr("name","taskConfigurationId");
                         $("#" + pluginName + "_configOptions").show();
 
+                        $(".pluginLinks").hide();
+                        $("#" + pluginName + "_configLink").show();
+
+                        $("#" + pluginName + "_configLink").unbind().click(function(){
+                            window.location = "/admin/taskplugins/" + pluginName + "/" + $("#" + pluginName + "_configOptions").val();
+                        });
+
+
                         $("#taskPluginType").change(function () {
 
                             var pluginNamez = $(this).val();
                             $(".pluginConfigSelect").hide();
                             $(".pluginConfigSelect").each(function(i,el){
                                 $(el).attr("name" , "");
-                            })
+                            });
+                            $("#" + pluginNamez + "_configLink").show();
+
                             $("#" + pluginNamez + "_configOptions").show();
                             $("#" + pluginNamez + "_configOptions").attr("name","taskConfigurationId");
+
+                            $(".pluginLinks").hide();
+                            $("#" + pluginNamez + "_configLink").unbind().click(function(){
+                                window.location = "/admin/taskplugins/" + pluginNamez + "/" + $("#" + pluginNamez + "_configOptions").val();
+                            });
                         })
                     });
                 </script>

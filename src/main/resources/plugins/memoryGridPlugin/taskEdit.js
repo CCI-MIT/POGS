@@ -73,7 +73,7 @@ class MemoryGridTaskEdit {
         $("#colorsInTask").attr("checked",bluePrint.colorsInTask);
         $("#headersInPrimer").attr("checked",bluePrint.headersInPrimer);
         $("#headersInTask").attr("checked",bluePrint.headersInTask);
-
+        $("#executionMode").val(bluePrint.executionMode);
         let total = 0;
         for(let i=0;i<bluePrint.rowsSize;i++){
             let tableRow = $('<tr/>');
@@ -107,7 +107,7 @@ class MemoryGridTaskEdit {
             bluePrint.columnColors.push($("#colorField"+ i + " input").val());
         }
 
-
+        bluePrint.executionMode = $("#executionMode").val();
         bluePrint.taskText = $("#taskText").val();
         bluePrint.colorsInPrimer = $("#colorsInPrimer").is(":checked");
         bluePrint.colorsInTask = $("#colorsInTask").is(":checked");

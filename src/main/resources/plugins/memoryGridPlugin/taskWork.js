@@ -6,6 +6,7 @@ class MemoryGridTask {
     }
     setupGrid(gridBluePrint){
 
+        this.executionMode = gridBluePrint.executionMode;
         console.log("setup grid blueprint: " + gridBluePrint.rowsSize + " - " + gridBluePrint.colsSize);
         let teamMates = this.pogsPlugin.getTeammates();
         let columnsUserCanChange = [];
@@ -35,15 +36,18 @@ class MemoryGridTask {
                 for (let k = 0; k < this.colorHasSubjects[j].length; k++) {
 
                     let sub = teamMates[this.colorHasSubjects[j][k]];
-                    if(sub.externalId == this.pogsPlugin.getSubjectId()){
-                        $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
-                          + '(you)</span>').appendTo(divSubj);
-                        columnsUserCanChange[j] = false;
-                    }else {
+                    if(this.executionMode == 2) {
+                        if (sub.externalId == this.pogsPlugin.getSubjectId()) {
+                            $('<span class="badge ' + sub.externalId + '_color username">'
+                              + sub.displayName
+                              + '(you)</span>').appendTo(divSubj);
+                            columnsUserCanChange[j] = false;
+                        } else {
 
-                        $('<span class="badge ' + sub.externalId + '_color username">'
-                          + sub.displayName
-                          + '</span>').appendTo(divSubj);
+                            $('<span class="badge ' + sub.externalId + '_color username">'
+                              + sub.displayName
+                              + '</span>').appendTo(divSubj);
+                        }
                     }
                 }
                 if(headersInTask){
@@ -83,16 +87,33 @@ class MemoryGridTask {
                         })
                     );
                 } else {
-                    td.append(
-                        $('<input/>', {
-                            'data-cell-reference-index': total,
-                            'disabled': 'disabled',
-                            'style': ((!colorsInTask)?(''): ('background-color: ' + gridBluePrint.columnColors[j]
-                                     + ';color:' +
-                                     generateFontColorBasedOnBackgroundColor(
-                                         gridBluePrint.columnColors[j]) + ';'))
-                        })
-                    );
+
+                    if(this.executionMode == 2) {
+                        td.append(
+                            $('<input/>', {
+                                'data-cell-reference-index': total,
+                                'disabled': ('disabled'),
+                                'style': ((!colorsInTask) ? ('') : ('background-color: '
+                                                                    + gridBluePrint.columnColors[j]
+                                                                    + ';color:' +
+                                                                    generateFontColorBasedOnBackgroundColor(
+                                                                        gridBluePrint.columnColors[j])
+                                                                    + ';'))
+                            })
+                        );
+                    } else {
+                        td.append(
+                            $('<input/>', {
+                                'data-cell-reference-index': total,
+                                'style': ((!colorsInTask) ? ('') : ('background-color: '
+                                                                    + gridBluePrint.columnColors[j]
+                                                                    + ';color:' +
+                                                                    generateFontColorBasedOnBackgroundColor(
+                                                                        gridBluePrint.columnColors[j])
+                                                                    + ';'))
+                            })
+                        );
+                    }
 
 
                 }
@@ -102,13 +123,16 @@ class MemoryGridTask {
                         'class': 'workingOn'
                     })
                 );
-                td.append(
-                    $('<div/>', {
-                        'style': 'color:black;font-size:10px',
-                         text: ((!columnsUserCanChange[j])?('Answer this field'):('You cannot edit this field!')),
-                        'class': 'cantEdit'
-                    })
-                );
+                if(this.executionMode == 2) {
+                    td.append(
+                        $('<div/>', {
+                            'style': 'color:black;font-size:10px',
+                            text: ((!columnsUserCanChange[j]) ? ('Answer this field')
+                                                              : ('You cannot edit this field!')),
+                            'class': 'cantEdit'
+                        })
+                    );
+                }
                 tableRow.append(td);
             }
             $("#gridTable").append(tableRow);
