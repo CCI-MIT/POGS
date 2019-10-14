@@ -225,19 +225,22 @@ class Wackamole {
         var self = this;
         var cell = parseInt($(event.target).data("cell-reference-index"));
 
-        setTimeout(function () {
+        var hasMole = $("#whack_cell" + cell).hasClass("hasMole");
+        var hasClicked = $("#whack_cell" + cell).hasClass("clicked");
+
+        //setTimeout(function () {
 
             // broadcast cell click
             self.pogsPlugin.saveCompletedTaskAttribute('clickInCell',
                 "", 0.0,
                 cell, false);
 
-            if (!($("#whack_cell" + cell).hasClass("clicked"))) {
+            if (!(hasClicked)) {
 
                 self.numberOfClicks++;
 
                 // increment score if a mole is present in cell
-                if ($("#whack_cell" + cell).hasClass("hasMole")) {
+                if (hasMole) {
                     self.totalHitOnTarget++;
                     self.playerHitOnTarget++;
                     $("#score").text(self.playerHitOnTarget);
@@ -267,7 +270,8 @@ class Wackamole {
                     $("#whack_cell" + cell).removeClass('clicked');
                 }, 500);
             }
-        }, self.clickDelay);
+        //}
+                   //self.clickDelay);
 
     }
 
