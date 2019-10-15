@@ -170,23 +170,28 @@ WorkspaceController {
 
         if (allSubAttr != null) {
             for (SubjectAttribute sa : allSubAttr) {
-                if (!(sa.getAttributeName().equals(
-                        ColorUtils.SUBJECT_DEFAULT_BACKGROUND_COLOR_ATTRIBUTE_NAME)
-                        || sa.getAttributeName().equals(
-                        ColorUtils.SUBJECT_DEFAULT_FONT_COLOR_ATTRIBUTE_NAME))) {
+                if (!(sa.getInternalAttribute())) {
                     SubjectAttribute subjectAttribute = new SubjectAttribute();
                     subjectAttribute.setSubjectId(su.getId());
                     subjectAttribute.setAttributeName(sa.getAttributeName());
                     subjectAttribute.setStringValue(sa.getStringValue());
                     subjectAttribute.setIntegerValue(sa.getIntegerValue());
                     subjectAttribute.setRealValue(sa.getRealValue());
+                    subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
                     subjectAttribute.setLatest(true);
                     subjectAttributeDao.create(subjectAttribute);
                 }
             }
         }
-        //go to pre-check-in page (wait)
-        return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
+        //Check in user in session runner for perpetual session.
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+        if (sr != null) {
+            sr.subjectCheckIn(su);
+        }
+        //go to pre-check-in page (wait for event CHECKIN OPEN)
+        //return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
+        model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
+        return checkExternalIdAndSessionRunningAndForward(su,model,"workspace/pre_check_in");
     }
 
 
@@ -194,20 +199,13 @@ WorkspaceController {
     public String register(@RequestParam("externalId") String externalId, Model model) {
 
         Subject su;
-        //check if subject is from perpetual session.
-        Session session = sessionService.getPerpetualSessionForSubject(externalId);
-        if (session != null) {
-            su = new Subject();
-            su.setSubjectExternalId(externalId);
-            su.setSessionId(session.getId());
-        } else {
 
-            su = workspaceService.getSubject(externalId);
-            if (su == null) {
-                model.addAttribute("errorMessage", "This id was not recognized.");
-                return "workspace/error";
-            }
+        su = workspaceService.getSubject(externalId);
+        if (su == null) {
+            model.addAttribute("errorMessage", "This id was not recognized.");
+            return "workspace/error";
         }
+
         SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr == null) {
             model.addAttribute("errorMessage", "Session id: " + su.getSessionId() + "  Too early.");

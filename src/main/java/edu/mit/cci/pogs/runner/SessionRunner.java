@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.runner;
 
+import org.json.JSONArray;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +147,8 @@ public class SessionRunner implements Runnable {
     private boolean shouldRun;
 
     private List<Thread> chatRunners = new ArrayList<>();
+
+    private JSONArray perpetualSubjectsMigratedToSpawnedSessions = new JSONArray();
 
     public void init() {
         _log.info("Configuring session: " + session.getSessionSuffix());
@@ -845,6 +848,7 @@ public class SessionRunner implements Runnable {
                     for (Subject s : sessionsRelatedToPerpetual.get(sessionId)) {
                         sr.subjectCheckIn(s);
                         _log.debug("Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
+                        perpetualSubjectsMigratedToSpawnedSessions.put(s.getSubjectExternalId());
 
                     }
                     sessionsMigratedToRightCheckinList.add(sessionId);
@@ -870,5 +874,9 @@ public class SessionRunner implements Runnable {
 
     public void setShouldRun(boolean shouldRun) {
         this.shouldRun = shouldRun;
+    }
+
+    public JSONArray getPerpetualSubjectsMigratedToSpawnedSessions() {
+        return perpetualSubjectsMigratedToSpawnedSessions;
     }
 }

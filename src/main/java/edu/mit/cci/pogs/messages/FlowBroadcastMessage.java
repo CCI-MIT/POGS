@@ -1,14 +1,16 @@
 package edu.mit.cci.pogs.messages;
 
 import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
+import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 
 public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageContent> {
 
     private SessionWrapper sessionWrapper;
 
-    public FlowBroadcastMessage(SessionWrapper sessionWrapper) {
-        this.sessionWrapper = sessionWrapper;
+    public FlowBroadcastMessage(SessionRunner sessionRunner) {
+
+        this.sessionWrapper = sessionRunner.getSession();
         this.setType(MessageType.FLOW_BROADCAST);
 
         this.setSender("server");
@@ -20,6 +22,9 @@ public class FlowBroadcastMessage extends PogsMessage<FlowBroadcastMessageConten
         this.content.setSecondsRemainingCurrentUrl(sessionWrapper.getSecondsRemainingForCurrentUrl().toString());
         this.content.setSecondsRemainingForSession(sessionWrapper.getSecondsRemainingForSession().toString());
         this.content.setSecondsRemainingForCurrentRound(sessionWrapper.getSecondsRemainingForCurrentRound().toString());
+        if(sessionWrapper.isSessionPerpetual()) {
+            this.content.setPerpetualSubjectsChosen(sessionRunner.getPerpetualSubjectsMigratedToSpawnedSessions().toString());
+        }
 
 
 
@@ -44,6 +49,16 @@ class FlowBroadcastMessageContent {
     private String secondsRemainingCurrentUrl;
     private String secondsRemainingForSession;
     private String secondsRemainingForCurrentRound;
+
+    private String perpetualSubjectsChosen;
+
+    public String getPerpetualSubjectsChosen() {
+        return perpetualSubjectsChosen;
+    }
+
+    public void setPerpetualSubjectsChosen(String perpetualSubjectsChosen) {
+        this.perpetualSubjectsChosen = perpetualSubjectsChosen;
+    }
 
     public String getNextUrl() {
         return nextUrl;

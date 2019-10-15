@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/workspace-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+
+
+        <div class="form-group waiting_message" th:if="${not pogsSessionPerpetual}">
+            <div class="message ">
+                Your session is scheduled to start in
+            </div>
+            <div id="countdown"></div>
+            <div id="caveat">(may start sooner if all participants are present)</div>
+        </div>
+        <div class="form-group waiting_message" th:if="${pogsSessionPerpetual}">
+            <div class="message ">
+                Waiting for other participants to join ...
+            </div>
+            <div id="countdown" style="display: none"></div>
+
+        </div>
+
+
+
+        <script>
+
+            $(function () {
+
+
+                pogs.setup({
+                               currentUrl: window.location,
+                               sessionId: '[(${pogsSession.id})]',
+                               sessionIsPerpetual : [(${pogsSessionPerpetual})],
+                               subjectId: '[(${subject.subjectExternalId})]',
+                               secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                               nextUrl : '[(${nextUrl})]',
+                               completedTaskId: null,
+                               hasCollaboration:false,
+                               hasChat: false
+                           });
+
+
+            });
+
+
+        </script>
+
+    </div>
+</div>
+<div layout:fragment="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</div>
+</body>
+</html>

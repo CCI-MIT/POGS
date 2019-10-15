@@ -139,7 +139,7 @@ class Pogs {
 
         this.initializeWebSockets();
         //window.location.href.indexOf("/w/")>=0
-        if(!(window.location.href.indexOf("/waiting_room")>=0)) {
+        if(!(window.location.href.indexOf("/waiting_room")>=0)&&!(window.location.href.indexOf("/sessions/start/")>=0)) {
             $('<div/>', {
                 id: "countdown",
                 'class': "float-right",
@@ -331,9 +331,15 @@ class Pogs {
                 message.content.secondsRemainingCurrentUrl));
             this.countDown.updateCountDownDate(finalDate)
         }
-
+        console.log(JSON.parse(message.content.perpetualSubjectsChosen));
         if(this.sessionIsPerpetual){
-            location.reload();
+            console.log(JSON.parse(message.content.perpetualSubjectsChosen));
+            this.perpetualSubjectsChosen = JSON.parse(message.content.perpetualSubjectsChosen);
+            for(var i = 0; i < this.perpetualSubjectsChosen.length ; i ++){
+                if(this.subjectId == this.perpetualSubjectsChosen[i]) {
+                    window.location.href = "/check_in?externalId=" + this.subjectId;
+                }
+            }
         }
 
     }

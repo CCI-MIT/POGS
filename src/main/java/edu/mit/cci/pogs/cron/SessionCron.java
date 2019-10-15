@@ -47,7 +47,8 @@ public class SessionCron {
     @Scheduled(fixedRate = RATE, initialDelay = RATE)
     public void sendSessionFlowBroadCastMessages(){
         for(SessionRunner runner : SessionRunnerManager.getLiveRunners()){
-            FlowBroadcastMessage pogsMessage = new FlowBroadcastMessage(runner.getSession());
+
+            FlowBroadcastMessage pogsMessage = new FlowBroadcastMessage(runner);
 
             messagingTemplate.convertAndSend(pogsMessage.getSpecificPublicTopic(), pogsMessage);
 
