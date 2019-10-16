@@ -83,7 +83,7 @@ class EquationTypingTaskPlugin{
 
         let workOn = $('<div/>', {
             'class': 'workingOn',
-            'style': 'margin-bottom: 5px;'
+            'style': 'margin-bottom: 5px;height: 20px;'
         });
 
 
@@ -135,7 +135,10 @@ class EquationTypingTaskPlugin{
 
     }
     setupWorkOn(){
-        let workOn = $('#cell_' + this.orderIndex + ' .workingOn');
+        if((this.totalFieldIndex -1) >= 0) {
+            $('#cell_' + (this.totalFieldIndex-1) + ' .workingOn span').hide();
+        }
+        let workOn = $('#cell_' + this.totalFieldIndex + ' .workingOn');
         workOn.empty();
 
         if(!this.isTaskSolo) {
