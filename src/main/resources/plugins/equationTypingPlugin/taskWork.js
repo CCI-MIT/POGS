@@ -386,9 +386,7 @@ class EquationTypingTaskPlugin{
                 if (message.sender != this.pogsPlugin.getSubjectId()) {
                     $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
                 }
-                if((this.totalFieldIndex) >= 0) {
-                    $('#cell_' + (this.totalFieldIndex) + ' .workingOn span').hide();
-                }
+
             }
             if(attrName.indexOf("equationAnswer")!= -1) {
 
@@ -404,7 +402,12 @@ class EquationTypingTaskPlugin{
 
                 if(this.executionMode == 1) {
                     $("#editEquation_" + index).show();
+                } else {
+                    if((this.totalFieldIndex) >= 0) {
+                        $('#cell_' + (this.totalFieldIndex) + ' .workingOn span').hide();
+                    }
                 }
+
 
                 if (this.totalFieldIndex == index) {
                     this.updateNextOrderIndex();
