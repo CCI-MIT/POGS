@@ -75,7 +75,7 @@ class EquationTypingTaskPlugin{
             "type": "button",
             "style": "display:none",
             'data-cell-reference-index': this.totalFieldIndex,
-            "value": "Done"
+            "value": "Submit"
         });
 
         div.append(inp);
@@ -135,9 +135,7 @@ class EquationTypingTaskPlugin{
 
     }
     setupWorkOn(){
-        if((this.totalFieldIndex -1) >= 0) {
-            $('#cell_' + (this.totalFieldIndex-1) + ' .workingOn span').hide();
-        }
+
         let workOn = $('#cell_' + this.totalFieldIndex + ' .workingOn');
         workOn.empty();
 
@@ -233,7 +231,7 @@ class EquationTypingTaskPlugin{
             $('#takeTurnEquation_' + this.totalFieldIndex).removeAttr("disabled");
             //show Done.
         } else {
-            $('#takeTurnEquation_' + this.totalFieldIndex).attr("value", "It is : " + sub.displayName + " 's turn");
+            $('#takeTurnEquation_' + this.totalFieldIndex).attr("value", "It is " + sub.displayName + " 's turn");
             $('#takeTurnEquation_' + this.totalFieldIndex).attr("disabled", true);
             $('doneEquation_' + this.totalFieldIndex).hide();
         }
@@ -388,6 +386,9 @@ class EquationTypingTaskPlugin{
                 if (message.sender != this.pogsPlugin.getSubjectId()) {
                     $('#cell_' + index + ' .doneInp').val(message.content.attributeStringValue);
                 }
+                if((this.totalFieldIndex) >= 0) {
+                    $('#cell_' + (this.totalFieldIndex) + ' .workingOn span').hide();
+                }
             }
             if(attrName.indexOf("equationAnswer")!= -1) {
 
@@ -407,7 +408,14 @@ class EquationTypingTaskPlugin{
 
                 if (this.totalFieldIndex == index) {
                     this.updateNextOrderIndex();
-                    this.createNextFieldAndWhoShouldBeAbleToEdit();
+                    if(this.executionMode == 2) {
+                        this.createNextFieldAndWhoShouldBeAbleToEdit();
+                    } else {
+                        const TOTAL_TOADD_AFTERLAST_DONE = 3;
+                        for(let i =0 ; i < TOTAL_TOADD_AFTERLAST_DONE; i ++){
+                            this.createNextFieldAndWhoShouldBeAbleToEdit();
+                        }
+                    }
                     this.sendTimerStartSetup();
                 }
             }

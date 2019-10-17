@@ -34,6 +34,7 @@ public class TaskBeforeWorkRunner extends TaskRelatedScriptRunner implements Run
                 System.out.println(" Time until Before Task id: "+taskWrapper.getId()+" starts : " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
             }
+
             System.out.println(" Task before work is starting for Task id: " + taskWrapper.getId());
             for(CompletedTask ct: taskWrapper.getCompletedTasks()){
                 if(taskConfiguration.getBeforeWorkScriptId()==null) {

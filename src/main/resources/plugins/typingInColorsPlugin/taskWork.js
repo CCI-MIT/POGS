@@ -23,8 +23,9 @@ class EtherpadWithColors {
         }
         this.setupDictionaryData();
         for(let k = 0; k < this.availableColors.length; k++) {
+            //btn-lg
             $('#colorPickerAndAssigner')
-                .append('<button type="button" class="btn btn-lg" data-color-index="'+k+'" style="margin:10px;background-color: '+
+                .append('<button type="button" class="btn " data-color-index="'+k+'" style="margin:10px;background-color: '+
                         this.availableColors[k]+';color:'+generateFontColorBasedOnBackgroundColor(this.availableColors[k])+'" >Choose this color</button>');
         }
         $("button").click(function (event) {

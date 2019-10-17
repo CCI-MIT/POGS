@@ -52,8 +52,20 @@ public class ColorUtils {
     private static Random rand = new Random(RAND_SEED);
 
 
-    private static Random random;
+    public static void main(String[] args) {
+        Color[] colors = ColorUtils.generateVisuallyDistinctColors(
+                ((4 > 10) ? (4) : (10)),
+                ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
 
+
+
+
+
+        for (int i =0 ; i < 4; i ++) {
+            System.out.println(""+ String.format("#%02x%02x%02x", colors[i].getRed(),
+                    colors[i].getGreen(), colors[i].getBlue()));
+        }
+    }
 
 
 
