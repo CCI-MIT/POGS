@@ -10,7 +10,7 @@ class Etherpad {
                 if(dictEntry) {
                     this._pogsPlugin.pogsRef.getDictionaryEntry(dictEntry,function(ret){
 
-                        $(".information").append('<div id="canvasText"></div>');
+                        $(".information").append('<div id="canvasText" style="margin-left: -15px"></div>');
 
 
                         let texts = [{textContent:atob(ret.entryValue),

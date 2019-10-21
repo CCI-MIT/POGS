@@ -78,6 +78,7 @@ class EtherpadWithColors {
         let textsToCanvas = [];
         let container = $('<div>',{
             id: 'typingInColorstaskText',
+            style : 'margin-left: -20px',
             class: 'rol col-12'
         });
 

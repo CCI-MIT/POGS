@@ -44,6 +44,8 @@ public class TaskDaoImpl extends AbstractDao<Task, Long, TaskRecord> implements 
                 .join(RESEARCH_GROUP_HAS_AUTH_USER).on(RESEARCH_GROUP_HAS_AUTH_USER
                         .RESEARCH_GROUP_ID.eq(TASK_HAS_RESEARCH_GROUP.RESEARCH_GROUP_ID))
                 .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
+                .groupBy(TASK.ID)
+                .orderBy(TASK.ID)
                 .getQuery();
 
         return query.fetchInto(Task.class);

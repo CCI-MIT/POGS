@@ -20,7 +20,7 @@ table td {
 }
 #taskText {
     color:black;
-    margin-bottom: 60px;
+    margin-bottom: 23px;
 }
 #optionList button {
     margin: 5px;
@@ -30,4 +30,7 @@ table td {
 }
 #noMoreRounds {
     color: black;
+}
+#yourPayoutInfo {
+    font-weight: 600;
 }

@@ -414,7 +414,7 @@ class EquationTypingTaskPlugin{
                     if(this.executionMode == 2) {
                         this.createNextFieldAndWhoShouldBeAbleToEdit();
                     } else {
-                        const TOTAL_TOADD_AFTERLAST_DONE = 3;
+                        const TOTAL_TOADD_AFTERLAST_DONE = this.teamMates.length;
                         for(let i =0 ; i < TOTAL_TOADD_AFTERLAST_DONE; i ++){
                             this.createNextFieldAndWhoShouldBeAbleToEdit();
                         }

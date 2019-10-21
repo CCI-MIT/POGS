@@ -51,7 +51,7 @@
             <br/>
             <ul class="list-group o-sortable list-group-sortable" id="listTaskGroup">
 
-                <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><span th:text="${'#' + rg.taskId + ' - ' + rg.taskName}"></span><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
+                <li  th:each="rg: ${currentTaskGroupHasTasks}" class="list-group-item" draggable="true"  ><span class="taskOrderNumber" th:text="${'#'+ rg.order}"></span><a target="_blank" th:href="${'/admin/tasks/' + rg.taskId+'/edit'}"><span th:text="${'#' + rg.taskId + ' - ' + rg.taskName}"></span></a><input th:value="${rg.taskId}" type="hidden" name="selectedTasks"><button type="button" class="pull-right fa fa-trash btn-danger deleteTask" th:data="${rg.taskId}"></button></li>
             </ul>
 
             <!-- Begin research group field -->
@@ -106,7 +106,7 @@
                         if (id == -1 ) return;
                         var txt = $("#tasks").find(":selected").text();
                         var index = $("#listTaskGroup li").length + 1;
-                        var toAdd = "<li class=\"list-group-item\" draggable=\"true\" data-task-id = \""+id+"\"><span class='taskOrderNumber'>#"+index+"</span><span>"+txt+"</span><input type='hidden' name='selectedTasks' value='"+id+"'/><button type='button' class=\"pull-right fa fa-trash btn-danger deleteTask\" data='"+id+"'></button></li>";
+                        var toAdd = "<li class=\"list-group-item\" draggable=\"true\" data-task-id = \""+id+"\"><span class='taskOrderNumber'>#"+index+"</span><a target='_blank' href='/admin/tasks/" +id+"/edit'><span>"+txt+"</span></a><input type='hidden' name='selectedTasks' value='"+id+"'/><button type='button' class=\"pull-right fa fa-trash btn-danger deleteTask\" data='"+id+"'></button></li>";
                         $("#listTaskGroup").append(toAdd);
                     });
                     sortable('.o-sortable', {
