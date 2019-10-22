@@ -17,7 +17,7 @@ class RadioField extends Field {
         str += '<div id="answer'+this.index+'">'
         if(this.jsonInfo.orientation == "vertical") {
             $.each(this.jsonInfo.value, function (j, choice) { // setup radio question
-                str += '<div class="form-check form-inline row">'
+                str += '<div class="form-check form-inline row" >'
                 str += '  <label class="form-check-label text-left text-dark">'
                 str +=
                     '    <input type="radio" class="form-check-input" name="answer' + this.index
@@ -27,7 +27,7 @@ class RadioField extends Field {
 
             }.bind(this));
         } else {
-            str += '<div class="form-check form-inline row">'
+            str += '<div class="form-check form-inline row" style="justify-content: center;">'
             $.each(this.jsonInfo.value, function (j, choice) { // setup radio question
 
                 str += '  <label class="form-check-label text-left text-dark" style="margin-right: 26px;">'
