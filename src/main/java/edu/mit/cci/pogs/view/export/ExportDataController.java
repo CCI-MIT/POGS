@@ -64,7 +64,7 @@ public class ExportDataController {
         if (path == null) {
             path = request.getSession().getServletContext().getRealPath("/");
         }
-        return path;
+        return path + "/";
     }
     @GetMapping("/admin/export/study/{studyId}")
     public void getStudyData(HttpServletRequest request,
