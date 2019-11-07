@@ -64,6 +64,11 @@ public class SessionBean {
     private Boolean displayNameGenerationEnabled;
 
     private String displayNameGenerationType;
+    private Long      beforeSessionScriptId;
+    private Long      afterSessionScriptId;
+    private Integer   perpetualSessionTimeoutLimit;
+    private String    perpetualSessionTimeoutMessage;
+    private Boolean   dispatcherSession;
 
 
 
@@ -119,6 +124,13 @@ public class SessionBean {
         this.sessionWideScriptId = value.getSessionWideScriptId();
         this.displayNameGenerationEnabled = value.getDisplayNameGenerationEnabled();
         this.displayNameGenerationType = value.getDisplayNameGenerationType();
+
+        this.beforeSessionScriptId= value.getBeforeSessionScriptId();
+        this.afterSessionScriptId = value.getAfterSessionScriptId();
+        this.perpetualSessionTimeoutLimit = value.getPerpetualSessionTimeoutLimit();
+        this.perpetualSessionTimeoutMessage = value.getPerpetualSessionTimeoutMessage();
+        this.dispatcherSession = value.getDispatcherSession();
+
     }
 
     public String getScheduleConditionType() {
@@ -175,6 +187,46 @@ public class SessionBean {
 
     public void setPerpetualSubjectsPrefix(String perpetualSubjectsPrefix) {
         this.perpetualSubjectsPrefix = perpetualSubjectsPrefix;
+    }
+
+    public Long getBeforeSessionScriptId() {
+        return beforeSessionScriptId;
+    }
+
+    public void setBeforeSessionScriptId(Long beforeSessionScriptId) {
+        this.beforeSessionScriptId = beforeSessionScriptId;
+    }
+
+    public Long getAfterSessionScriptId() {
+        return afterSessionScriptId;
+    }
+
+    public void setAfterSessionScriptId(Long afterSessionScriptId) {
+        this.afterSessionScriptId = afterSessionScriptId;
+    }
+
+    public Integer getPerpetualSessionTimeoutLimit() {
+        return perpetualSessionTimeoutLimit;
+    }
+
+    public void setPerpetualSessionTimeoutLimit(Integer perpetualSessionTimeoutLimit) {
+        this.perpetualSessionTimeoutLimit = perpetualSessionTimeoutLimit;
+    }
+
+    public String getPerpetualSessionTimeoutMessage() {
+        return perpetualSessionTimeoutMessage;
+    }
+
+    public void setPerpetualSessionTimeoutMessage(String perpetualSessionTimeoutMessage) {
+        this.perpetualSessionTimeoutMessage = perpetualSessionTimeoutMessage;
+    }
+
+    public Boolean getDispatcherSession() {
+        return dispatcherSession;
+    }
+
+    public void setDispatcherSession(Boolean dispatcherSession) {
+        this.dispatcherSession = dispatcherSession;
     }
 
     public Long getId() {

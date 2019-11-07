@@ -77,14 +77,9 @@ import edu.mit.cci.pogs.utils.StringUtils;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SessionRunner implements Runnable {
 
-
-
-
     private boolean sessionHasStarted = false;
 
     private static final Logger _log = LoggerFactory.getLogger(SessionRunner.class);
-
-
 
     private SessionWrapper session;
 
@@ -172,6 +167,7 @@ public class SessionRunner implements Runnable {
                 _log.info("Starting session: " + session.getFullSessionName());
                 sessionHasStarted = true;
                 startSession();
+                startSessionBeforeScriptIfAny();
             }
             if (session.getSessionSchedule() != null) {
                 for (int i = 0; i < session.getSessionSchedule().size(); i++) {
@@ -195,6 +191,7 @@ public class SessionRunner implements Runnable {
             }
             if (session.getSecondsRemainingForSession() < 0) {
                 shouldRun = false;
+                startSessionAfterScriptIfAny();
             }
 
         }
@@ -203,6 +200,30 @@ public class SessionRunner implements Runnable {
             th.interrupt();
         }
         _log.info("Exiting session runner for session" + session.getSessionSuffix());
+    }
+
+    private void startSessionAfterScriptIfAny() {
+        if(session.getAfterSessionScriptId()!=null){
+            SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
+            _log.debug("Added before session script : " + csr);
+            csr.setSession(session);
+            csr.setExecutableScriptId(session.getAfterSessionScriptId());
+
+
+            Thread thread = new Thread(csr);
+            thread.start();
+        }
+    }
+
+    private void startSessionBeforeScriptIfAny() {
+        if(session.getBeforeSessionScriptId()!=null){
+            SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
+            _log.debug("Added before session script : " + csr);
+            csr.setSession(session);
+            csr.setExecutableScriptId(session.getBeforeSessionScriptId());
+            Thread thread = new Thread(csr);
+            thread.start();
+        }
     }
 
 

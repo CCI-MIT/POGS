@@ -197,6 +197,13 @@ public class SessionService {
         session.setDisplayNameGenerationEnabled(sessionBean.getDisplayNameGenerationEnabled());
         session.setDisplayNameGenerationType(sessionBean.getDisplayNameGenerationType());
 
+        session.setBeforeSessionScriptId(sessionBean.getBeforeSessionScriptId());
+        session.setAfterSessionScriptId(sessionBean.getAfterSessionScriptId());
+        session.setPerpetualSessionTimeoutLimit(sessionBean.getPerpetualSessionTimeoutLimit());
+        session.setPerpetualSessionTimeoutMessage(sessionBean.getPerpetualSessionTimeoutMessage());
+        session.setDispatcherSession(sessionBean.getDispatcherSession());
+
+
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
 
@@ -283,6 +290,13 @@ public class SessionService {
         clonedNonPerpetualSession.setSessionWideScriptId(session.getSessionWideScriptId());
         clonedNonPerpetualSession.setDisplayNameGenerationEnabled(session.getDisplayNameGenerationEnabled());
         clonedNonPerpetualSession.setDisplayNameGenerationType(session.getDisplayNameGenerationType());
+
+        clonedNonPerpetualSession.setBeforeSessionScriptId(session.getBeforeSessionScriptId());
+        clonedNonPerpetualSession.setAfterSessionScriptId(session.getAfterSessionScriptId());
+        clonedNonPerpetualSession.setPerpetualSessionTimeoutLimit(session.getPerpetualSessionTimeoutLimit());
+        clonedNonPerpetualSession.setPerpetualSessionTimeoutMessage(session.getPerpetualSessionTimeoutMessage());
+        clonedNonPerpetualSession.setDispatcherSession(session.getDispatcherSession());
+
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
 

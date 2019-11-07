@@ -159,6 +159,7 @@ public class SessionWrapper extends Session {
         if (sessionScheduleIndex + 1 < this.sessionSchedule.size()) {
             return this.sessionSchedule.get(sessionScheduleIndex + 1).getUrl();
         }
+        //before getting the done, get the attributes ?
         return getDoneRedirectUrl();
 
     }

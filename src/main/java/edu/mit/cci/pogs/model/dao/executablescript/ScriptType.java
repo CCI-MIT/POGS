@@ -7,6 +7,8 @@ public enum ScriptType {
 
     PERPETUAL_INIT_CONDITION('P', "Condition script to start perpetual session"),
     SESSION_WIDE_OVERRIDE('W',"Session wide override script"),
+    SESSION_BEFORE_START('Z',"Before session starts script"),
+    SESSION_AFTER_END('X',"After session ends script"),
     TEAM_FORMATION_SCRIPT('W',"Team formation script"),
     BEFORE_WORK_SCRIPT('B', "Before work script"),
     AFTER_WORK_SCRIPT('A', "After work script"),

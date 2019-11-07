@@ -42,7 +42,7 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
     public List<ExecutableScript> listByScriptTypeWithUserGroup(ScriptType scriptType,Long userId) {
 
-        final SelectQuery<Record> query = dslContext.select()
+        final SelectQuery<Record> query = dslContext.select(EXECUTABLE_SCRIPT.fields())
                 .from(EXECUTABLE_SCRIPT)
                 .join(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP).on(EXECUTABLE_SCRIPT_HAS_RESEARCH_GROUP
                         .EXECUTABLE_SCRIPT_ID.eq(EXECUTABLE_SCRIPT.ID))
@@ -52,6 +52,7 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
 
         query.addConditions(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId));
         query.addConditions(EXECUTABLE_SCRIPT.SCRIPT_TYPE.eq(scriptType.getId().toString()));
+        query.addGroupBy(EXECUTABLE_SCRIPT.ID);
 
         return query.fetchInto(ExecutableScript.class);
 
@@ -68,6 +69,8 @@ public class ExecutableScriptDaoImpl extends AbstractDao<ExecutableScript, Long,
                                 .RESEARCH_GROUP_ID))
                 .where(RESEARCH_GROUP_HAS_AUTH_USER.AUTH_USER_ID.eq(userId))
                 .getQuery();
+
+            query.addGroupBy(EXECUTABLE_SCRIPT.ID);
 
         return query.fetchInto(ExecutableScript.class);
     }

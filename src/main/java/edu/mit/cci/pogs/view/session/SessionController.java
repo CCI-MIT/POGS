@@ -117,6 +117,16 @@ public class SessionController {
         return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_WIDE_OVERRIDE,
                 AuthUserDetailsService.getLoggedInUser());
     }
+    @ModelAttribute("sessionBeforeExecutableScripts")
+    public List<ExecutableScript> getSessionBeforeExecutableScripts() {
+        return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_BEFORE_START,
+                AuthUserDetailsService.getLoggedInUser());
+    }
+    @ModelAttribute("sessionAfterExecutableScripts")
+    public List<ExecutableScript> getSessionAfterExecutableScripts() {
+        return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_AFTER_END,
+                AuthUserDetailsService.getLoggedInUser());
+    }
 
     @ModelAttribute("sessionScheduleConditionType")
     public List<SessionScheduleConditionToStartType> getSessionScheduleConditionToStartType() {

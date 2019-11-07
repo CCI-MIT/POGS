@@ -72,15 +72,22 @@ public class TeamDaoImpl extends AbstractDao<Team, Long, TeamRecord> implements 
     }
 
     public Team getSubjectTeam(Long subjectId, Long sessionId, Long roundId, Long taskId) {
-        final SelectQuery<Record> query = dslContext.select(TEAM.fields())
-                .from(SUBJECT)
-                .join(TEAM_HAS_SUBJECT)
-                .on(TEAM_HAS_SUBJECT.SUBJECT_ID.eq(SUBJECT.ID))
-                .join(TEAM)
-                .on(TEAM.ID.eq(TEAM_HAS_SUBJECT.TEAM_ID))
-                .getQuery();
+        final SelectQuery<Record> query;
+        if(subjectId!=null){
+            query = dslContext.select(TEAM.fields())
+                    .from(TEAM)
+                    .join(TEAM_HAS_SUBJECT)
+                    .on(TEAM.ID.eq(TEAM_HAS_SUBJECT.TEAM_ID))
+                    .join(SUBJECT)
+                    .on(TEAM_HAS_SUBJECT.SUBJECT_ID.eq(SUBJECT.ID))
+                    .getQuery();
+            query.addConditions(SUBJECT.ID.eq(subjectId));
+        } else {
+            query = dslContext.select(TEAM.fields())
+                    .from(TEAM)
+                    .getQuery();
+        }
 
-        query.addConditions(SUBJECT.ID.eq(subjectId));
         if (sessionId != null) {
             query.addConditions(TEAM.SESSION_ID.eq(sessionId));
         }

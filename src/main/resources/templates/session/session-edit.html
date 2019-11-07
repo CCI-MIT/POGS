@@ -514,7 +514,7 @@
         </fieldset>
 
         <fieldset class="form-group row">
-                    <legend class="col-form-legend col-sm-8">Advanced - Session wide script </legend>
+                    <legend class="col-form-legend col-sm-8">Advanced - Scripts </legend>
                     <div class="container">
                         <div class="form-group row col-sm-12" id="sessionWideScriptId">
                             <label class="col-sm-5 col-form-label" for="sessionWideScriptIdSelect">Session wide script override:</label>
@@ -527,6 +527,44 @@
                                     <option
                                        th:if="${not #lists.isEmpty(sessionWideExecutableScripts) }"
                                             th:each="rg: ${sessionWideExecutableScripts}"
+                                            th:value="${rg.id}"
+                                            th:text="${rg.scriptName}" ></option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="form-group row col-sm-12" id="beforeSessionScriptId">
+                            <label class="col-sm-5 col-form-label" for="beforeSessionScriptIdSelect">Script that runs before the session start:</label>
+                            <div class="col-sm-7">
+                                <select class="custom-select" th:field="*{beforeSessionScriptId}" id="beforeSessionScriptIdSelect">
+
+                                    <option th:if="*{sessionWideScriptId==null}" selected="selected" value="">No script</option>
+                                    <option th:if="*{sessionWideScriptId!=null}"  value="">No script</option>
+
+                                    <option
+                                            th:if="${not #lists.isEmpty(sessionBeforeExecutableScripts) }"
+                                            th:each="rg: ${sessionBeforeExecutableScripts}"
+                                            th:value="${rg.id}"
+                                            th:text="${rg.scriptName}" ></option>
+                                </select>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="container">
+                        <div class="form-group row col-sm-12" id="afterSessionScriptId">
+                            <label class="col-sm-5 col-form-label" for="afterSessionScriptIdSelect">Script that runs after the session is done:</label>
+                            <div class="col-sm-7">
+                                <select class="custom-select" th:field="*{afterSessionScriptId}" id="afterSessionScriptIdSelect">
+
+                                    <option th:if="*{sessionWideScriptId==null}" selected="selected" value="">No script</option>
+                                    <option th:if="*{sessionWideScriptId!=null}"  value="">No script</option>
+
+                                    <option
+                                            th:if="${not #lists.isEmpty(sessionAfterExecutableScripts) }"
+                                            th:each="rg: ${sessionAfterExecutableScripts}"
                                             th:value="${rg.id}"
                                             th:text="${rg.scriptName}" ></option>
                                 </select>
