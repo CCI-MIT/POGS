@@ -244,9 +244,7 @@ public class SessionRunner implements Runnable {
                 //TODO:Handle before task , team and completed task creation
             }
 
-            if (session.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
-                session.randomizeTaskOrder();
-            }
+
 
             session.createSessionSchedule();
             checkAndScheduleChatScripts(session);
@@ -677,6 +675,11 @@ public class SessionRunner implements Runnable {
     private void setupTaskList(SessionWrapper sessionz) {
         List<Task> taskList = new ArrayList<>();
         List<SessionHasTaskGroup> taskGroupList = sessionService.listSessionHasTaskGroupBySessionId(sessionz.getId());
+
+
+        if (sessionz.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_TASKGROUP_RANDOM_ORDER.getId().toString())) {
+            Collections.shuffle(taskGroupList);
+        }
         for (SessionHasTaskGroup sshtg : taskGroupList) {
             List<TaskGroupHasTask> tghtList = taskGroupService.listTaskGroupHasTaskByTaskGroup(sshtg.getTaskGroupId());
             for (TaskGroupHasTask tght : tghtList) {
@@ -687,6 +690,9 @@ public class SessionRunner implements Runnable {
 
         for (Task t : taskList) {
             sessionz.getTaskList().add(new TaskWrapper(t));
+        }
+        if (sessionz.getTaskExecutionType().equals(TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())) {
+            sessionz.randomizeTaskOrder();
         }
 
         //TODO: Extract this method to task service

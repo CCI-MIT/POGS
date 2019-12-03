@@ -110,6 +110,9 @@ public class SessionWrapper extends Session {
     }
 
     public Boolean isSessionPerpetual(){
+        if(getParentSessionId()!=null) {
+            return false;
+        }
         return this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())||
                 this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString());
     }

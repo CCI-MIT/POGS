@@ -106,17 +106,19 @@ public class TaskGroupService {
             return;
         }
         List<TaskGroupHasTask> toCreate = new ArrayList<>();
-        List<TaskGroupHasTask> toUpdate = new ArrayList<>();
         List<TaskGroupHasTask> toDelete = new ArrayList<>();
         List<TaskGroupHasTask> currentlySelected = listTaskGroupHasTaskByTaskGroup(studyBean.getId());
 
 
         for (TaskGroupHasTask rghau : currentlySelected) {
             boolean foundRGH = false;
+            int selectedCounter = 0;
             for (Long taskId : studyBean.getSelectedTasks()) {
-                if (rghau.getTaskId().longValue() == new Long(taskId).longValue()) {
+                if ((rghau.getTaskId().longValue() == new Long(taskId).longValue())
+                        && (rghau.getOrder().intValue() == selectedCounter)) {
                     foundRGH = true;
                 }
+                selectedCounter++;
             }
             if (!foundRGH) {
                 toDelete.add(rghau);
@@ -128,13 +130,9 @@ public class TaskGroupService {
 
             boolean selectedAlreadyIn = false;
             for (TaskGroupHasTask rghau : currentlySelected) {
-                if (rghau.getTaskId().longValue() == new Long(taskId).longValue()) {
+                if ((rghau.getTaskId().longValue() == new Long(taskId).longValue())
+                && (rghau.getOrder().intValue() == new Integer(counter).intValue())) {
                     selectedAlreadyIn = true;
-
-                    if (rghau.getOrder().intValue() != new Integer(counter).intValue()) {
-                        rghau.setOrder(counter);
-                        toUpdate.add(rghau);
-                    }
                 }
             }
             if (!selectedAlreadyIn) {
@@ -149,9 +147,7 @@ public class TaskGroupService {
         for (TaskGroupHasTask toCre : toCreate) {
             taskGroupHasTaskDao.create(toCre);
         }
-        for (TaskGroupHasTask toUp : toUpdate) {
-            taskGroupHasTaskDao.update(toUp);
-        }
+
         for (TaskGroupHasTask toDel : toDelete) {
             taskGroupHasTaskDao.delete(toDel);
         }
