@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "autosize": "^4.0.2",
+    "fsevents":"^1.2.9",
     "blueimp-file-upload": "^9.19.3",
     "bootstrap": "^4.0.0",
     "bootstrap-colorpicker": "^3.0.3",
