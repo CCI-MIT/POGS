@@ -4,7 +4,7 @@ var npmDist = require('gulp-npm-dist');
 var postcss = require('gulp-postcss');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('autoprefixer');
-var mqpacker = require('css-mqpacker');
+//var mqpacker = require('css-mqpacker');
 var cssnano = require('cssnano');
 
 var sass = require("gulp-sass");

@@ -35,8 +35,8 @@
         <node.version>v9.11.1</node.version>
         <yarn.version>v1.5.1</yarn.version>
 		-->
-		<node.version>v9.11.1</node.version>
-		<yarn.version>v1.5.1</yarn.version>
+		<node.version>v12.13.1</node.version>
+		<yarn.version>v1.19.2</yarn.version>
     </properties>
 
 	<dependencies>

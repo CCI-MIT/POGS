@@ -43,7 +43,6 @@
   },
   "devDependencies": {
     "autoprefixer": "^9.7.3",
-    "css-mqpacker": "^7.0.0",
     "cssnano": "^4.1.10",
     "eyeglass": "^2.4.1",
     "gulp": "^4.0.2",
