@@ -1,14 +1,11 @@
 var gulp = require('gulp');
 var noop = require('gulp-noop');
-
 var npmDist = require('gulp-npm-dist');
 var postcss = require('gulp-postcss');
 var sourcemaps = require('gulp-sourcemaps');
 var autoprefixer = require('autoprefixer');
 var mqpacker = require('css-mqpacker');
-var cssnano = require('cssnano')({
-    preset: 'default'
-});
+var cssnano = require('cssnano');
 
 var sass = require("gulp-sass");
 var eyeglass = require("eyeglass");
@@ -47,9 +44,7 @@ var CONFIG = {
     }
 };
 
-//= Entry point
-gulp.task('default', ['copy-libs', 'sass']);
-gulp.task('build', ['copy-libs', 'sass-minified']);
+
 
 gulp.task('watch', function () {
     var watcher = gulp.watch(CONFIG.sass.sourcePath, ['sass']);
@@ -58,30 +53,38 @@ gulp.task('watch', function () {
     });
 });
 
+
 //=  Internal tasks
 gulp.task('copy-libs', function () {
-    gulp.src(npmDist({copyUnminified: true, excludes: CONFIG.libs.excludes}),
+    console.log("starting to copy files");
+    return gulp.src(npmDist({copyUnminified: true, excludes: CONFIG.libs.excludes}),
         {base: NODE_MODULES_PATH})
         .pipe(gulp.dest(CONFIG.libs.destPath));
 });
 
 gulp.task("sass", function () {
-    compileSass(false);
+   return compileSass(false);
 });
 
 gulp.task("sass-minified", function () {
-    compileSass(true);
+   return  compileSass(true);
 });
 
 function compileSass(shouldPostProcess) {
-    gulp.src(CONFIG.sass.sourcePath)
+    return gulp.src(CONFIG.sass.sourcePath)
         .pipe(sourcemaps.init())
         .pipe(sass(eyeglass(CONFIG.sass.options)).on("error", sass.logError))
         .pipe(shouldPostProcess ? postcss([
             autoprefixer(), // add vendor prefixes
-            mqpacker(), // combine media queries
-            cssnano // minify CSS
+            //mqpacker(), // combine media queries
+            cssnano() // minify CSS
         ]) : noop())
         .pipe(sourcemaps.write('.'))
         .pipe(gulp.dest(CONFIG.sass.destPath));
 }
+
+console.log("Before gulp tasks");
+//= Entry point
+//gulp.task('default', gulp.series(['copy-libs', 'sass']));
+console.log("Before gulp build");
+gulp.task('build', gulp.series(['copy-libs', 'sass-minified']));
