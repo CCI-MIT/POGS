@@ -104,6 +104,8 @@ public class SessionWrapper extends Session {
             return getTimeToStart();
         }
         Integer sessionScheduleIndex = getSessionScheduleIndex();
+        System.out.println("SESSION INDEX ----- " +sessionScheduleIndex  + " - " +(
+                this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now()));
 
         return this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now();
 
@@ -383,11 +385,11 @@ public class SessionWrapper extends Session {
     }
 
     public Integer getSessionScheduleIndex() {
-        Long now = DateUtils.now();
+
         if (this.sessionSchedule == null) return 0;
         for (int i = 0; i < this.sessionSchedule.size(); i++) {
             SessionSchedule ss = this.sessionSchedule.get(i);
-            if (ss.isHappeningNow(now)) {
+            if (ss.isHappeningNow(DateUtils.now())) {
                 return i;
             }
         }

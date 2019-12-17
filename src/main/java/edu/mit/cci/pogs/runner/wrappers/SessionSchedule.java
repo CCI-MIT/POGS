@@ -80,6 +80,11 @@ public class SessionSchedule {
         return currentTimestamp >= getStartTimestamp() && currentTimestamp > getEndTimestamp();
     }
 
+    public boolean isAlreadyPassed(Long currentTimestamp) {
+        //Long currentTimestamp = new Date().getTime();
+        return currentTimestamp >= getStartTimestamp() && currentTimestamp > getEndTimestamp();
+    }
+
     public boolean isToBeDone() {
         Long currentTimestamp = new Date().getTime();
         return currentTimestamp < getStartTimestamp();

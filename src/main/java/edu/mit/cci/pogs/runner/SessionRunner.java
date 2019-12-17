@@ -156,6 +156,7 @@ public class SessionRunner implements Runnable {
 
     }
 
+
     private void runSession() {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -171,22 +172,23 @@ public class SessionRunner implements Runnable {
             }
             if (session.getSessionSchedule() != null) {
                 for (int i = 0; i < session.getSessionSchedule().size(); i++) {
+
                     SessionSchedule ss = session.getSessionSchedule().get(i);
-                    _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
-                    if (ss.getTaskReference() != null) {
-                        /*if ((session.getTeamCreationMoment().equals(
-                                TeamCreationTime.BEGINING_TASK.getId().toString()))) {
-                            createTeams(session, null, session.getCurrentRound());
-                            createCompletedTasks(session, session.getCurrentRound(), true);
-                            //TODO handle team creation before task.
-                        }*/
+                    long nowTS = DateUtils.now();
+                    if(!ss.isAlreadyPassed(nowTS) && ss.isHappeningNow(nowTS)) {
+                        _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
+
+
+
+                            try{
+                                Thread.sleep(ss.getEndTimestamp()-nowTS + 500);
+                            }catch (InterruptedException inte){
+                                _log.info("Session schedule interrupted: (" + ss.getUrl() + "):" + simpleDateFormat.format(DateUtils.now()));
+                            }
+
+
+                        _log.info("Finishing session schedule: (" + ss.getUrl() + "):" + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
                     }
-                    while (ss.isHappeningNow(DateUtils.now())) {
-
-                    }
-                    _log.info("Finishing session schedule: " + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
-
-
                 }
             }
             if (session.getSecondsRemainingForSession() < 0) {
@@ -391,7 +393,7 @@ public class SessionRunner implements Runnable {
             tw.setCompletedTasks(tw.getCompletedTasks());
             round.getTasks().add(tw);
             tw.setTaskStartTimestamp(elapsedTime);
-            elapsedTime += tw.getTotalTaskTime();
+            elapsedTime += tw.getTotalTaskTime() - 1000;// 1 second shift so that tasks slightly overlap
         }
 
     }
