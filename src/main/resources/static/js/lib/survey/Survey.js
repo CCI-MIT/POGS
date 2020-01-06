@@ -242,12 +242,7 @@ class SurveyTaskEdit {
             });
 
         }
-        function resetOrder(){
-            $(".question_number").each(function( index ) {
-                console.log( index + ": " + $( this ).text() );
-                $( this ).text(+ (index + 1))
-            });
-        }
+
         $(".move_toggle").click(function(event){
             $(".content").toggle();
             let tx = $($(".move_toggle")[0]).text();
@@ -278,7 +273,7 @@ class SurveyTaskEdit {
                 this.fieldList.push(new RadioTableFieldEdit(question_number, "", withVideo, "", {columns: ["col 1","col 2"],rows: ["row 1","row 2"]},null));
             }
 
-
+            this.registerDeleteButton();
 
             sortable('#survey')[0].addEventListener('sortupdate', function(e) {
 
@@ -289,6 +284,7 @@ class SurveyTaskEdit {
             resetOrder();
 
         }.bind(this));
+        this.registerDeleteButton();
 
     }
 
@@ -334,7 +330,28 @@ class SurveyTaskEdit {
         }
 
     }
+    deleteItem(e) { //setup removeQuestion Button
+        var id = $(e.target).attr('id').match(/\d+/);
 
+        var question_set = "#question_set" + id;
+        var index = parseInt(id);
+
+        let newOrderFieldList = []
+        for(let i = 0 ; i < this.fieldList.length; i ++ ){
+            if((index -1) != i){
+                newOrderFieldList.push(this.fieldList[i]);
+            }
+        }
+        this.fieldList = newOrderFieldList;
+
+        $(question_set).remove();
+        resetOrder();
+    }
+    registerDeleteButton(){
+
+        $(".remove-question").unbind().click(this.deleteItem.bind(this));
+
+    }
     setupAttributesFromHtml(){
         var bluePrint = [], answerSheet = [];
 
@@ -343,6 +360,7 @@ class SurveyTaskEdit {
             let fielNewPosition = $('#question_set'+this.fieldList[i].questionNumber + ' .question_number').text();
             newOrderFieldList[(parseInt(fielNewPosition) -1)] = this.fieldList[i];
         }
+
         this.fieldList = newOrderFieldList;
 
         for(let i = 0 ; i < this.fieldList.length; i ++ ){
@@ -399,6 +417,14 @@ class SurveyTaskEdit {
     }
 
 }
+
+function resetOrder(){
+    $(".question_number").each(function( index ) {
+        //console.log( index + ": " + $( this ).text() );
+        $( this ).text(+ (index + 1))
+    });
+}
+
 function validateYoutubeURL(url){
     if(url == ""){
         return false;

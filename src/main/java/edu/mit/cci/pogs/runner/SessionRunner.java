@@ -393,7 +393,7 @@ public class SessionRunner implements Runnable {
             tw.setCompletedTasks(tw.getCompletedTasks());
             round.getTasks().add(tw);
             tw.setTaskStartTimestamp(elapsedTime);
-            elapsedTime += tw.getTotalTaskTime() - 1000;// 1 second shift so that tasks slightly overlap
+            elapsedTime += (tw.getTotalTaskTime());// 1 second shift so that tasks slightly overlap
         }
 
     }

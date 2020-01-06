@@ -80,11 +80,14 @@ public class SessionExportService {
             completedTaskIdToSessionId.put(el.getCompletedTaskId(), el.getSessionId());
         }
         List<Long> completedTaskIds = new ArrayList<>();
+        List<CompletedTask> completedTaskList = new ArrayList<>();
         for( Long id: completedTaskIdToSessionId.keySet()){
             completedTaskIds.add(id);
+            completedTaskList.add(completedTaskDao.get(id));
         }
 
-
+        ex.addAll(ExportUtils.getEntityDataExportFile(path,CompletedTask.class, completedTaskList, studyId,
+                sessionId, null, null));
 
         ex.addAll(ExportUtils.getEntityDataExportFile(path,EventLog.class, eventLogList, studyId,
                 sessionId, null, null));

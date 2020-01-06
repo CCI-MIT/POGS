@@ -104,8 +104,6 @@ public class SessionWrapper extends Session {
             return getTimeToStart();
         }
         Integer sessionScheduleIndex = getSessionScheduleIndex();
-        System.out.println("SESSION INDEX ----- " +sessionScheduleIndex  + " - " +(
-                this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now()));
 
         return this.sessionSchedule.get(sessionScheduleIndex).getEndTimestamp() - DateUtils.now();
 
@@ -250,7 +248,9 @@ public class SessionWrapper extends Session {
         return this.getTaskExecutionType().equals(
                 TaskExecutionType.SEQUENTIAL_FIXED_ORDER.getId().toString()) ||
                 this.getTaskExecutionType().equals(
-                        TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString());
+                        TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())||
+                                this.getTaskExecutionType().equals(
+                                        TaskExecutionType.SEQUENTIAL_TASKGROUP_RANDOM_ORDER.getId().toString());
     }
 
     public boolean isTaskExecutionModeParallel() {
@@ -319,8 +319,8 @@ public class SessionWrapper extends Session {
 
 
         if (this.getDonePageEnabled()) {
-            this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp
-                    , getDonePageEndTime(lastRoundEndTimestamp), null,
+            this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp + SCORING_TIME_PAGE
+                    , getDonePageEndTime(lastRoundEndTimestamp + SCORING_TIME_PAGE), null,
                     null, this, "/done"));
         }
 
@@ -333,8 +333,12 @@ public class SessionWrapper extends Session {
 
         System.out.println("Time of schedule creation : " + new Date());
 
+        long lastTimeStamp = 0l;
         for (SessionSchedule ss : this.sessionSchedule) {
-
+               if(lastTimeStamp!=0l) {
+                   ss.setStartTimestamp(lastTimeStamp);
+               }
+               lastTimeStamp = ss.getEndTimestamp() - 1000;//one second overlap
             System.out.println(simpleDateFormat.format(new Date(ss.getStartTimestamp())) + " - " + simpleDateFormat.format(new Date(ss.getEndTimestamp())) + " - " + ss.getUrl());
         }
     }

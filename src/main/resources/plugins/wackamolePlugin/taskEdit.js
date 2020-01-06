@@ -20,6 +20,8 @@ class WhackTaskEdit {
 
         if (whackBluePrint != null) {
             this.setupHtmlFromAttributeString(whackBluePrint);
+        } else {
+            this.addPlayer(1, 1,1,0);
         }
 
         $("#addPlayer").click(function () { //Setup add question button

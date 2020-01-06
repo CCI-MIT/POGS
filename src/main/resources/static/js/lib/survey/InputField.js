@@ -90,11 +90,7 @@ class InputFieldEdit {
 
         $("#survey").append(str);
 
-        $("#removeQuestion"+question_number).click(function () { //setup removeQuestion Button
-            let question_set = "#question_set" + $(this).attr('id').match(/\d+/);
 
-            $(question_set).remove();
-        });
 
 
     }

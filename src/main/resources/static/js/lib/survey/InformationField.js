@@ -29,7 +29,7 @@ class InformationFieldEdit {
         // add text area
         str += '<div class="form-group w_100 row"><label class="col-sm-1 col-form-label">Info:</label>'
                + '<div class="col-sm-9"><textarea class="form-control htmleditor" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea></div>'
-               + '<button type="button" class="btn btn-danger col-sm-1 btn-sm remove-intro" id="removeQuestion' + question_number + '">remove</button> </div>';
+               + '<button type="button" class="btn btn-danger col-sm-1 btn-sm remove-intro remove-question" id="removeQuestion' + question_number + '">remove</button> </div>';
         // str += '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class="form-control col-sm-8" type="text" id="question' + question_number + '" placeholder = "Put question here" value="'+question+'">  <button type="button" class="btn btn-danger remove-question btn-sm" id="removeQuestion' + question_number + '">remove</button> </div>';
 
         if(withVideo){ // add video url
@@ -41,11 +41,7 @@ class InformationFieldEdit {
         str += '</div>';
         $("#survey").append(str);
 
-        $("#removeQuestion"+question_number).click(function () { //setup removeQuestion Button
-            var question_set = "#question_set" + $(this).attr('id').match(/\d+/);
 
-            $(question_set).remove();
-        });
 
 
         $(".htmleditor").summernote(
