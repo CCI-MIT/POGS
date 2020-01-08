@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,9 +113,12 @@ public class ExportDataController {
     }
 
     private void filesToZip(HttpServletResponse response, List<ExportFile> files) throws IOException {
+        Map<String,ExportFile> uniqueFiles = new HashMap<>();
         for(ExportFile ef:files){
             ef.writeContents();
+            uniqueFiles.put(ef.getFileName(), ef);
         }
+        files = new ArrayList<>(uniqueFiles.values());
         // Create a buffer for reading the files
         byte[] buf = new byte[1024];
         // create the ZIP file
