@@ -52,6 +52,10 @@ public class PreviewTaskBeforeWorkRunner extends TaskBeforeWorkRunner {
                 "    \"stringValue\": \"TESTPAD\"" +
                 "}]");
 
+        System.out.println("taskConfigurationAttributes : " + executionAttributes);
+
+
+
     }
 
     @Override

@@ -18,7 +18,7 @@ public class ExportFile {
     private String fileType;
 
     public void deleteFile(){
-        File file = new File(this.fileName);
+        File file = new File(this.getFullFilePathAndName());
         if(file!=null && file.exists()){
             file.delete();
         }

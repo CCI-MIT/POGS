@@ -6,6 +6,7 @@ var _completedTaskAttributes = JSON.parse(completedTaskAttributes);
 
 
 var answerSheet;
+var bluePrint;
 
 var RIGHT_ANSWER_REWARD = 1;
 var WRONG_ANSWER_REWARD = 0;
@@ -14,7 +15,9 @@ var WRONG_ANSWER_REWARD = 0;
 for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
     if(_taskConfigurationAttributes[i].attributeName == "answerSheet"){
         answerSheet = _taskConfigurationAttributes[i].stringValue.split(",");
-        break;
+    }
+    if(_taskConfigurationAttributes[i].attributeName == "gridBluePrint"){
+        bluePrint = _taskConfigurationAttributes[i].stringValue.split(",");
     }
 }
 
@@ -44,14 +47,16 @@ for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
 
 for(var i=0 ;i < answerSheet.length; i++) {
 
-    _completedTaskScore.numberOfEntries++;
-    _completedTaskScore.numberOfProcessedEntries++;
-    if (answerSheet[i] == answerKeyMap[i]) {
-        _completedTaskScore.numberOfRightAnswers++;
-        _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
-    } else {
-        _completedTaskScore.numberOfWrongAnswers++;
-        _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+    if(bluePrint[i] == 0) {
+        _completedTaskScore.numberOfEntries++;
+        _completedTaskScore.numberOfProcessedEntries++;
+        if (answerSheet[i] == answerKeyMap[i]) {
+            _completedTaskScore.numberOfRightAnswers++;
+            _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
+        } else {
+            _completedTaskScore.numberOfWrongAnswers++;
+            _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+        }
     }
 }
 

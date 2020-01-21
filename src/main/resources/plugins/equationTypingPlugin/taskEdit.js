@@ -24,7 +24,9 @@ class EquationTypingTaskEdit {
         $("#totalSum").val(attribute.totalSum);
         $("#executionMode").val(attribute.executionMode);
         $("#shouldReuseMembers").attr("checked",attribute.shouldReuseMembers);
-
+        $("#shouldRestrictNumbers").attr("checked",attribute.shouldRestrictNumbers);
+        $("#shouldNotAllowRepetition").attr("checked",attribute.shouldNotAllowRepetition);
+        $("#allowedNumbers").val(attribute.allowedNumbers);
 
     }
 
@@ -40,7 +42,9 @@ class EquationTypingTaskEdit {
         bluePrint.executionMode = $("#executionMode").val();
         bluePrint.shouldReuseMembers = $("#shouldReuseMembers").is(":checked");
 
-
+        bluePrint.shouldRestrictNumbers = $("#shouldRestrictNumbers").is(":checked");
+        bluePrint.shouldNotAllowRepetition = $("#shouldNotAllowRepetition").is(":checked");
+        bluePrint.allowedNumbers = $("#allowedNumbers").val();
 
 
         return  {bluePrint: JSON.stringify(bluePrint)};

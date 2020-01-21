@@ -87,7 +87,7 @@ public class SessionExportService {
         }
 
         ex.addAll(ExportUtils.getEntityDataExportFile(path,CompletedTask.class, completedTaskList, studyId,
-                sessionId, null, null));
+                sessionId, completedTaskIdToSessionId, null));
 
         ex.addAll(ExportUtils.getEntityDataExportFile(path,EventLog.class, eventLogList, studyId,
                 sessionId, null, null));

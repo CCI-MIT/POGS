@@ -48,6 +48,7 @@ for(var i=0 ;i < answerSheet.length; i++) {
         _completedTaskScore.numberOfRightAnswers++;
         _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
     } else {
+        print("Original " + answerSheet[i] + " subject answer: " + answerKeyMap[i]);
         _completedTaskScore.numberOfWrongAnswers++;
         _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
     }

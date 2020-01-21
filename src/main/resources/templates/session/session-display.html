@@ -19,7 +19,12 @@
                 th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}"
                 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
     </ol>
-    <h2 th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></h2>
+    <h2><span th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></span>
+                <span  class="badge badge-primary" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).NOTSTARTED.getId().toString()}">Not started</span>
+                <span  class="badge badge-warning" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).STARTED.getId().toString()}">Running</span>
+                <span  class="badge badge-success" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).DONE.getId().toString()}">Done</span>
+                <span  class="badge badge-danger" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).ERROR.getId().toString()}">Status: Error</span>
+                </h2>
     <div class="col">
         <div class="col-12">
             <a th:unless="${sessionBean.hasSessionStarted}"
@@ -31,9 +36,14 @@
                 th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/export'}">
                                 Export session data</a -->
 
+
             <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-danger float-right"
                id="resetSession">
                 Reset session</a>
+
+            <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-outline-success float-right"
+               id="reScore">
+                Re score session</a>
 
             <a th:if="${sessionBean.hasSessionStarted}"
                th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}"
@@ -52,10 +62,22 @@
                 }
             })
         });
+        $(function () {
+                    $("#reScore").click(function () {
+                        var r = confirm(
+                            "Are you sure you want to re score this session, all saved scoring data will be replaced by the new calculations!");
+                        if (r == true) {
+                            $("#rescoreSessionForm").submit();
+                        }
+                    })
+                });
     </script>
     <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/reset'}"
           method="post" id="resetSessionForm">
     </form>
+    <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/rescore'}"
+              method="post" id="rescoreSessionForm">
+        </form>
 
     </form>
     <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>

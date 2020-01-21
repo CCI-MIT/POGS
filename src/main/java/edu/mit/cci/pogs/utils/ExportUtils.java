@@ -139,6 +139,7 @@ public class ExportUtils {
     }
 
     private static String getTimeFormatted(Timestamp timestamp){
+        if(timestamp== null) return "";
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 

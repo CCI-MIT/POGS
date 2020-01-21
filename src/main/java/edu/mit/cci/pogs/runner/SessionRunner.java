@@ -201,6 +201,7 @@ public class SessionRunner implements Runnable {
         for (Thread th : this.chatRunners) {
             th.interrupt();
         }
+        endSession();
         _log.info("Exiting session runner for session" + session.getSessionSuffix());
     }
 
@@ -706,6 +707,11 @@ public class SessionRunner implements Runnable {
         for (RoundWrapper rw : session.getSessionRounds()) {
             configureRound(session, rw);
         }
+    }
+
+    private void endSession() {
+        session.setStatus(SessionStatus.DONE.getId().toString());
+        sessionDao.update(session);
     }
 
     private void configureSession() {

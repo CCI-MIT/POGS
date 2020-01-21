@@ -32,4 +32,25 @@
             </div>
         </div>
 
+    <div class="form-group row">
+            <label class="col-sm-3 col-form-label" for="shouldRestrictNumbers">Should restrict usage of numbers:</label>
+            <div class="col-sm-9">
+                <input type="checkbox" id="shouldRestrictNumbers"/>
+                <small id class="form-text text-muted">If checked only the numbers in the allowed numbers will be allowed, if the subject adds one that is not in the list the answer will be WRONG.</small>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-3 col-form-label" for="allowedNumbers">Allowed numbers:</label>
+            <div class="col-sm-9">
+                <input type="text" id="allowedNumbers"/>
+                <small id class="form-text text-muted">If a subject use any other number the answer will be WRONG! Please list the numbers separated by comma. Ex.: 2,4,6,8</small>
+            </div>
+        </div>
+    <div class="form-group row">
+        <label class="col-sm-3 col-form-label" for="shouldNotAllowRepetition">Should not allow number repetition:</label>
+        <div class="col-sm-9">
+            <input type="checkbox" id="shouldNotAllowRepetition"/>
+            <small id class="form-text text-muted">If checked only for each answer only ONE usage of a number will be allowed.</small>
+        </div>
+    </div>
 </div>

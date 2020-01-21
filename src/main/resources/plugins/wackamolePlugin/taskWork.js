@@ -479,7 +479,7 @@ class Player {
 
     setUpPointer() {
         if (this.isCurrentPlayer) {
-            $("#myPointerColor").addClass(this.externalId + "_activecolor");
+            //$("#myPointerColor").addClass(this.externalId + "_activecolor");
         }
         else {
             $("#pointerContainer").append('<i id="' + this.externalId + 'Pointer" class="'+this.externalId+'_activecolor fa fa-mouse-pointer" style="display:none"></i>')

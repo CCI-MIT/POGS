@@ -28,7 +28,11 @@ import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
 import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
+import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
+import edu.mit.cci.pogs.runner.ScoringRunner;
+import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.ChatChannelService;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectCommunicationService;
@@ -240,6 +244,18 @@ public class SessionController {
         Session session = (sessionDao.get(id));
         Study study = studyDao.get(studyId);
         sessionService.resetSession(session);
+
+        return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
+    }
+
+    @PostMapping("/admin/studies/{studyId}/sessions/{id}/rescore")
+    public String rescoreSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Session session = (sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        sessionService.rescoreSession(session);
+
+
+        MessageUtils.addSuccessMessage("Session score initiated successfully, please beware it may take a while!", redirectAttributes);
 
         return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
     }

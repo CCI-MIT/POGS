@@ -12,11 +12,16 @@ import edu.mit.cci.pogs.model.dao.sessionhastaskgroup.SessionHasTaskGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
+import edu.mit.cci.pogs.model.dao.task.TaskDao;
+import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.dao.teamhassubject.TeamHasSubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
+import edu.mit.cci.pogs.runner.ScoringRunner;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
+import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
+import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.utils.DateUtils;
 import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.session.beans.SubjectBean;
@@ -44,6 +49,7 @@ public class SessionService {
     private final CompletedTaskDao completedTaskDao;
     private final TeamHasSubjectDao teamHasSubjectDao;
     private final TeamDao teamDao;
+    private final TaskDao taskDao;
     private final RoundDao roundDao;
     private final EventLogDao eventLogDao;
     private final SubjectCommunicationService subjectCommunicationService;
@@ -51,7 +57,11 @@ public class SessionService {
     private final CompletedTaskScoreDao completedTaskScoreDao;
     private final StudyDao studyDao;
 
+    private final TaskGroupService taskGroupService;
+
     private final TodoEntryService todoEntryService;
+
+
 
     private final VotingService votingService;
 
@@ -72,12 +82,14 @@ public class SessionService {
                           TeamDao teamDao,
                           StudyDao studyDao,
                           RoundDao roundDao,
+                          TaskDao taskDao,
                           EventLogDao eventLogDao,
                           SubjectCommunicationService subjectCommunicationService,
                           SubjectAttributeDao subjectAttributeDao,
                           TodoEntryService todoEntryService,
                           VotingService votingService,
-                          CompletedTaskScoreDao completedTaskScoreDao
+                          CompletedTaskScoreDao completedTaskScoreDao,
+                          TaskGroupService taskGroupService
     ) {
         this.todoEntryService = todoEntryService;
         this.votingService = votingService;
@@ -88,12 +100,16 @@ public class SessionService {
         this.completedTaskDao = completedTaskDao;
         this.teamHasSubjectDao = teamHasSubjectDao;
         this.teamDao = teamDao;
+        this.taskDao = taskDao;
         this.roundDao = roundDao;
         this.eventLogDao = eventLogDao;
         this.subjectCommunicationService = subjectCommunicationService;
         this.subjectAttributeDao = subjectAttributeDao;
         this.completedTaskScoreDao = completedTaskScoreDao;
         this.studyDao = studyDao;
+        this.taskGroupService = taskGroupService;
+
+
     }
 
     public List<SessionHasTaskGroup> listSessionHasTaskGroupBySessionId(Long sessionid) {
@@ -425,5 +441,37 @@ public class SessionService {
         session.setSessionStartDate(new Timestamp(session.getSessionStartDate().getTime() - 1000 * 60 * 10));
         sessionDao.update(session);
 
+    }
+
+    public void rescoreSession(Session session) {
+
+        List<TaskWrapper> taskList = new ArrayList<>();
+        List<SessionHasTaskGroup> taskGroupList = listSessionHasTaskGroupBySessionId(session.getId());
+        for (SessionHasTaskGroup sshtg : taskGroupList) {
+            List<TaskGroupHasTask> tghtList = this.taskGroupService.listTaskGroupHasTaskByTaskGroup(sshtg.getTaskGroupId());
+            for (TaskGroupHasTask tght : tghtList) {
+                Task task = taskDao.get(tght.getTaskId());
+                TaskWrapper tw = new TaskWrapper(task);
+                tw.setTaskStartTimestamp(DateUtils.now() - 1000*60*10);//schedule ALL TASKS TO ten minutes ago. to trigger scoring right now.
+                taskList.add(tw);
+            }
+        }
+
+        for (TaskWrapper task : taskList) {
+            if (task.getShouldScore()) {
+                TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+
+                if (pl != null) {
+                    ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                    _log.debug("Added task scoring: " + task.getId() + " - " + csr);
+                    csr.setSession(new SessionWrapper(session));
+                    csr.setTaskWrapper(task);
+                    csr.setTaskPlugin(pl);
+
+                    Thread thread = new Thread(csr);
+                    thread.start();
+                }
+            }
+        }
     }
 }
