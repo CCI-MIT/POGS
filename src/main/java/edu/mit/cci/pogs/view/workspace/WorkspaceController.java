@@ -2,9 +2,10 @@ package edu.mit.cci.pogs.view.workspace;
 
 import org.jooq.tools.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +47,6 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.runner.PreviewTaskBeforeWorkRunner;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
-import edu.mit.cci.pogs.runner.TaskBeforeWorkRunner;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
@@ -61,14 +61,11 @@ import edu.mit.cci.pogs.service.TaskScoreService;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.WorkspaceService;
-import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
-import io.netty.handler.codec.json.JsonObjectDecoder;
 
 
 @Controller
-public class
-WorkspaceController {
+public class WorkspaceController {
 
     @Autowired
     private WorkspaceService workspaceService;
@@ -121,11 +118,25 @@ WorkspaceController {
     @Autowired
     private DictionaryService dictionaryService;
 
+    private static final Logger _log = LoggerFactory.getLogger(WorkspaceController.class);
+
     @GetMapping("/sessions/{sessionId}")
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
                                    @RequestParam(name = "externalId", required = false) String externalId,
+                                   @RequestParam(name = "workerId", required = false) String workerId,
+                                   @RequestParam(name = "assignmentId", required = false) String assignmentId,
+                                   @RequestParam(name = "hitId", required = false) String hitId,
                                    Model model) {
         model.addAttribute("action", "/sessions/start/" + sessionId);
+        if (workerId != null) {
+            model.addAttribute("workerId", workerId);
+        }
+        if (assignmentId != null) {
+            model.addAttribute("assignmentId", assignmentId);
+        }
+        if (hitId != null) {
+            model.addAttribute("hitId", hitId);
+        }
         model.addAttribute("externalId", externalId);
         return "workspace/landing";
     }
@@ -133,6 +144,11 @@ WorkspaceController {
     @GetMapping("/sessions/start/{sessionId}")
     public String landingPageLoginPost(@PathVariable("sessionId") String sessionId,
                                        @RequestParam(name = "externalId", required = false) String externalId,
+
+                                       @RequestParam(name = "workerId", required = false) String workerId,
+                                       @RequestParam(name = "assignmentId", required = false) String assignmentId,
+                                       @RequestParam(name = "hitId", required = false) String hitId,
+
                                        Model model) {
 
         Session session = sessionService.getSessionByFullName(sessionId);
@@ -151,7 +167,7 @@ WorkspaceController {
 
         Subject su = new Subject();
         List<SubjectAttribute> allSubAttr = null;
-        if (externalId != null) {
+        if (externalId != null && !externalId.isEmpty()) {
             Subject ref = subjectDao.getByExternalId(externalId);
             if (ref != null) {
                 su.setPreviousSessionSubject(ref.getId());
@@ -167,6 +183,46 @@ WorkspaceController {
         su.setSessionId(session.getId());
 
         su = subjectDao.create(su);
+        if((workerId != null && !workerId.isEmpty())||
+                (assignmentId != null && !assignmentId.isEmpty())||
+                (hitId != null && !hitId.isEmpty())){
+            List<SubjectAttribute> allSubAttr2 = new ArrayList<>();
+            if(workerId != null && !workerId.isEmpty()){
+                SubjectAttribute sa = new SubjectAttribute();
+                sa.setInternalAttribute(true);
+                sa.setAttributeName("workerId");
+                sa.setStringValue(workerId);
+                sa.setLatest(true);
+                allSubAttr2.add(sa);
+            }
+            if(assignmentId != null && !assignmentId.isEmpty()){
+                SubjectAttribute sa = new SubjectAttribute();
+                sa.setInternalAttribute(true);
+                sa.setAttributeName("assignmentId");
+                sa.setStringValue(assignmentId);
+                sa.setLatest(true);
+                allSubAttr2.add(sa);
+            }
+            if(hitId != null && !hitId.isEmpty()){
+                SubjectAttribute sa = new SubjectAttribute();
+                sa.setInternalAttribute(true);
+                sa.setAttributeName("hitId");
+                sa.setStringValue(hitId);
+                sa.setLatest(true);
+                allSubAttr2.add(sa);
+            }
+            for (SubjectAttribute sa : allSubAttr2) {
+                    SubjectAttribute subjectAttribute = new SubjectAttribute();
+                    subjectAttribute.setSubjectId(su.getId());
+                    subjectAttribute.setAttributeName(sa.getAttributeName());
+                    subjectAttribute.setStringValue(sa.getStringValue());
+                    subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                    subjectAttribute.setRealValue(sa.getRealValue());
+                    subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
+                    subjectAttribute.setLatest(true);
+                    subjectAttributeDao.create(subjectAttribute);
+            }
+        }
 
         if (allSubAttr != null) {
             for (SubjectAttribute sa : allSubAttr) {
@@ -191,7 +247,7 @@ WorkspaceController {
         //go to pre-check-in page (wait for event CHECKIN OPEN)
         //return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
         model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
-        return checkExternalIdAndSessionRunningAndForward(su,model,"workspace/pre_check_in");
+        return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/pre_check_in");
     }
 
 
@@ -450,7 +506,7 @@ WorkspaceController {
             model.addAttribute("taskConfigurationAttributes",
                     executionAttributes);
 
-            model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
+            model.addAttribute("dictionary", dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
 
             JSONArray allLogs = new JSONArray();
             model.addAttribute("eventsUntilNow", allLogs);
@@ -529,7 +585,7 @@ WorkspaceController {
         csr.setTeam(team);
         csr.run();
 
-        if(csr.getCompletedTaskAttributesToAdd()!=null && ! csr.getCompletedTaskAttributesToAdd().isEmpty()) {
+        if (csr.getCompletedTaskAttributesToAdd() != null && !csr.getCompletedTaskAttributesToAdd().isEmpty()) {
             model.addAttribute("completedTaskAttributes", csr.getCompletedTaskAttributesToAdd());
         } else {
             model.addAttribute("completedTaskAttributes", "[{" +
@@ -538,7 +594,7 @@ WorkspaceController {
                     "}]");
         }
 
-        if(csr.getSubjectAttributesToAdd()!=null) {
+        if (csr.getSubjectAttributesToAdd() != null) {
             org.json.JSONArray jo = new org.json.JSONArray(csr.getSubjectAttributesToAdd());
             if (jo.length() > 0) {
                 org.json.JSONArray team2 = new org.json.JSONArray();
@@ -585,7 +641,7 @@ WorkspaceController {
             model.addAttribute("taskConfigurationAttributes",
                     taskExecutionAttributeService.listExecutionAttributesFromPluginConfigAsJsonArray(pluginConfigId));
 
-            model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTaskPlugin(pluginConfigId));
+            model.addAttribute("dictionary", dictionaryService.getDictionaryJSONObjectForTaskPlugin(pluginConfigId));
 
 
             //get task html & js from plugin file system
@@ -607,6 +663,7 @@ WorkspaceController {
 
         return "workspace/task_workplugin";
     }
+
     private void eraseCookies(HttpServletRequest req, HttpServletResponse resp) {
         Cookie[] cookies = req.getCookies();
         if (cookies != null)
@@ -625,7 +682,7 @@ WorkspaceController {
                            Model model) {
 
 
-        this.eraseCookies(request,response);
+        this.eraseCookies(request, response);
 
         Task task = taskDao.get(taskId);
         Subject su = workspaceService.getSubject(subjectExternalId);
@@ -651,12 +708,14 @@ WorkspaceController {
 
 
                 SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
-                SessionWrapper sessionWrapper = sr.getSession();
 
                 if (sr == null) {
+                    _log.info("Session with id: " + su.getSessionId() + "(" + round.getSessionId() + ")" + "URL:" + request.getRequestURI());
                     return handleErrorMessage("There was an error and your " +
                             "session has ended!", model);
                 }
+
+                SessionWrapper sessionWrapper = sr.getSession();
                 model.addAttribute("pogsSession", sessionWrapper);
 
                 if (sessionWrapper.isTaskExecutionModeParallel()) {
@@ -751,7 +810,7 @@ WorkspaceController {
                 model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(task, su, round)));
 
 
-                model.addAttribute("dictionary",dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
+                model.addAttribute("dictionary", dictionaryService.getDictionaryJSONObjectForTask(task.getId()));
 
                 model.addAttribute("taskConfigurationAttributes",
                         taskExecutionAttributeService.listExecutionAttributesAsJsonArray(task.getId()));

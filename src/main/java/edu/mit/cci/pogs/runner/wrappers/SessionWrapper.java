@@ -86,7 +86,7 @@ public class SessionWrapper extends Session {
 
         if (roundSize != 0) {
             long startRoundTime = this.getSessionStartDate().getTime();
-            return (startRoundTime + sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize) - DateUtils.now();
+            return (startRoundTime + sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize)  + 1000*60 - DateUtils.now();
         }
         return -1l;
     }

@@ -5,7 +5,11 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 
 @Service
@@ -60,5 +64,11 @@ public class CompletedTaskScoreService {
                 }
             }
         }
+    }
+
+    public List<CompletedTaskScore> listCompletedTaskScore(List<CompletedTask> allCompletedTasks){
+        List<Long> allCompletedTaskIds = new ArrayList<>();
+        allCompletedTasks.stream().forEach(a -> allCompletedTaskIds.add(a.getId()));
+        return this.completedTaskScoreDao.listByCompletedTasksIds(allCompletedTaskIds);
     }
 }

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Study </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin">Home</a></li>
+        <li class="breadcrumb-item"><a href="/admin/studies">Studies</a></li>
+        <li class="breadcrumb-item "><a th:href="${'/admin/studies/' + study.id}"
+                                        th:text="${study.studyName}"></a></li>
+        <li class="breadcrumb-item "><a
+                th:href="${'/admin/studies/' + study.id + '/sessions/'+ sessionBean.id}"
+                th:text="${study.studySessionPrefix + sessionBean.sessionSuffix}"></a></li>
+    </ol>
+    <h2><span th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></span></h2>
+
+    <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
+
+    <h3>Session scores: </h3>
+
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Task ID</th>
+            <th>Task name</th>
+            <th>Total score</th>
+            <th>Number of right answers</th>
+            <th>Number of wrong answers</th>
+            <th>Number of entries</th>
+            <th>Number of processed entries</th>
+            <th>Scoring data</th>
+        </tr>
+        </thead>
+        <tbody>
+        <th:block th:each="scoreBean : ${scoreBeans}">
+            <tr>
+                <td th:text="${scoreBean.taskId}"></td>
+                <td th:text="${scoreBean.taskName}"></td>
+                <td th:text="${scoreBean.totalScore}"></td>
+                <td th:text="${scoreBean.numberOfRightAnswers}"></td>
+                <td th:text="${scoreBean.numberOfWrongAnswers}"></td>
+                <td th:text="${scoreBean.numberOfEntries}"></td>
+                <td th:text="${scoreBean.numberOfProcessedEntries}"></td>
+                <td><button class="btn btn-sm btn-outline-info dataInfo" th:data="${scoreBean.id}">Show scoring data</button><textarea th:id="${scoreBean.id + '_data'}" style="display:none" th:text="${scoreBean.scoringData}"/></td>
+            </tr>
+        </th:block>
+        <script>
+        $(function(){
+            $('.dataInfo').click(function(d){
+               var id = $(this).attr('data');
+
+
+               let textArea = $('<textarea>', {id:id + "_coloredValue" });
+
+               let la = JSON.parse($('#'+id+'_data').val());
+
+               textArea.val(JSON.stringify(la, null, 4));
+               $("#modalTextContainer").empty();
+               $("#modalTextContainer").append(textArea);
+
+
+               var modal = $('#exampleModalScrollable').modal();
+               modal.on('shown.bs.modal', function() {
+                   var editor = CodeMirror.fromTextArea(document.getElementById(id + "_coloredValue"), {
+                                                          lineNumbers: true,
+                                                           matchBrackets: true,
+                                                           theme: 'darcula',
+                                                           readOnly: true,
+                                                            mode: 'javascript'
+                                                        });
+               });
+            });
+
+            });
+        </script>
+        </tbody>
+    </table>
+
+    <!-- Modal -->
+    <div class="modal fade " id="exampleModalScrollable" tabindex="-1" role="dialog" aria-labelledby="exampleModalScrollableTitle" aria-hidden="true">
+      <div class="modal-dialog modal-xl " role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalScrollableTitle">Scoring data</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalTextContainer">
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+</body>
+</html>

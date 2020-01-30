@@ -14,7 +14,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
@@ -27,13 +29,17 @@ import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.subjectattribute.SubjectAttributeDao;
 import edu.mit.cci.pogs.model.dao.subjectcommunication.SubjectCommunicationDao;
 import edu.mit.cci.pogs.model.dao.subjecthaschannel.SubjectHasChannelDao;
+import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskgroup.TaskGroupDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.ScoringRunner;
+import edu.mit.cci.pogs.runner.SessionRunner;
+import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.ChatChannelService;
+import edu.mit.cci.pogs.service.CompletedTaskScoreService;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectCommunicationService;
 import edu.mit.cci.pogs.utils.MessageUtils;
@@ -62,10 +68,16 @@ public class SessionController {
     private SubjectDao subjectDao;
 
     @Autowired
+    private TaskDao taskDao;
+
+    @Autowired
     private SubjectCommunicationDao subjectCommunicationDao;
 
     @Autowired
     private ChatChannelDao chatChannelDao;
+
+    @Autowired
+    private CompletedTaskScoreService completedTaskScoreService;
 
     @Autowired
     private ChatChannelService chatChannelService;
@@ -223,11 +235,46 @@ public class SessionController {
         return "session/session-display";
     }
 
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/score")
+    public String getScores(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
+        Study study = studyDao.get(studyId);
+
+        model.addAttribute("study", study);
+        model.addAttribute("sessionBean", new SessionBean(sessionDao.get(id)));
+
+        List<CompletedTask> completedTaskList = sessionService.listCompletedTasksOfSession(id);
+        List<CompletedTaskScore> completedTaskScores = completedTaskScoreService.listCompletedTaskScore(completedTaskList);
+        Map<Long, CompletedTask> completedTaskMap = new HashMap<>();
+        completedTaskList.stream().forEach(c -> completedTaskMap.put(c.getId(), c));
+        List<ScoreBean> scoreBeans = new ArrayList<>();
+        for(CompletedTaskScore cts: completedTaskScores){
+            ScoreBean scoreBean = new ScoreBean();
+            Task task = taskDao.get(completedTaskMap.get(cts.getCompletedTaskId()).getTaskId());
+            scoreBean.setId(cts.getId());
+            scoreBean.setTaskId(task.getId());
+            scoreBean.setTaskName(task.getTaskName());
+            scoreBean.setNumberOfEntries(cts.getNumberOfEntries());
+
+            scoreBean.setNumberOfProcessedEntries(cts.getNumberOfProcessedEntries());
+            scoreBean.setNumberOfRightAnswers(cts.getNumberOfRightAnswers());
+            scoreBean.setNumberOfWrongAnswers(cts.getNumberOfWrongAnswers());
+            scoreBean.setTotalScore(cts.getTotalScore());
+            scoreBean.setScoringData(cts.getScoringData());
+
+            scoreBeans.add(scoreBean);
+        }
+
+        model.addAttribute("scoreBeans", scoreBeans);
+
+        return "session/session-score";
+    }
+
     @GetMapping("/admin/studies/{studyId}/sessions/create")
     public String createSession(@PathVariable("studyId") Long studyId, Model model) {
         SessionBean session = new SessionBean();
         session.setRoundsEnabled(true);
         session.setNumberOfRounds(1);
+        session.setStatus(SessionStatus.NOTSTARTED.getId() + "");
         session.setSessionHasTaskGroupRelationshipBean(new SessionHasTaskGroupRelationshipBean());
         Study study = studyDao.get(studyId);
         session.setStudyId(study.getId());
@@ -259,6 +306,7 @@ public class SessionController {
 
         return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
     }
+
 
     @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {

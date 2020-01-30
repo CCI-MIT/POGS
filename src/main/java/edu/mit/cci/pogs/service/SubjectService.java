@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
@@ -18,6 +19,8 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectCommunication;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasChannel;
+import edu.mit.cci.pogs.view.session.beans.SubjectBean;
+import edu.mit.cci.pogs.view.session.beans.SubjectsBean;
 
 @Service
 public class SubjectService {
@@ -121,5 +124,110 @@ public class SubjectService {
                 }
             }
         }
+    }
+
+    public void createOrUpdateSubject(SubjectsBean subjectsBean){
+        List<Subject> currentSubjectList = subjectDao.listBySessionId(subjectsBean.getSessionId());
+        List<SubjectBean> subjectListToCreateOrUpdate = new ArrayList<>();
+        List<Subject> subjectListToDelete = new ArrayList<>();
+        List<SubjectBean> subjectBeanList = subjectsBean.getSubjectList();
+
+        if(subjectBeanList!=null){
+            for(SubjectBean sb: subjectBeanList) {
+                if(!sb.isNullEntry()) {
+                    subjectListToCreateOrUpdate.add(sb);
+                }
+            }
+            for(Subject current: currentSubjectList){
+                boolean shouldDelete = true;
+                for(Subject selected: subjectListToCreateOrUpdate){
+                    if(selected.getId()!=null) {
+                        if (selected.getId().longValue() == (current.getId().longValue())){
+                            shouldDelete = false;
+                        }
+                    }
+                }
+                if(shouldDelete){
+                    subjectListToDelete.add(current);
+                }
+            }
+        }else {
+            currentSubjectList.stream().forEach(e->subjectListToDelete.add(e));
+        }
+
+        for(SubjectBean createOrUpdate: subjectListToCreateOrUpdate){
+            createOrUpdate.setSessionId(subjectsBean.getSessionId());
+            if (createOrUpdate.getId() != null) {
+                subjectDao.update(createOrUpdate);
+            } else {
+                subjectDao.create(createOrUpdate);
+            }
+            List<SubjectAttribute> subjectAttributes = createOrUpdate.getSubjectAttributes();
+            this.createOrUpdateSubjectAttributes(subjectAttributes, createOrUpdate.getId());
+
+        }
+        subjectListToDelete.stream().forEach(a -> this.deleteSubject(a.getId()));
+
+
+    }
+
+    public void createOrUpdateSubjectAttributes(List<SubjectAttribute> updatedSubjectAttributes, Long subjectId){
+        List<SubjectAttribute> currentAttributes = this.subjectAttributeDao.listBySubjectId(subjectId);
+        List<SubjectAttribute> subjectAttributeListToCreateOrUpdate = new ArrayList<>();
+        List<SubjectAttribute> subjectAttributeListToDelete = new ArrayList<>();
+        if(updatedSubjectAttributes!=null){
+            for(SubjectAttribute curr : updatedSubjectAttributes){
+                if(!isNullSubjectAttr(curr)) {
+                    subjectAttributeListToCreateOrUpdate.add(curr);
+                }
+            }
+
+            for(SubjectAttribute currentSa: currentAttributes){
+                boolean shouldDelete = true;
+                for(SubjectAttribute updated: subjectAttributeListToCreateOrUpdate){
+                    if(updated.getId()!=null){
+                        if(updated.getId().longValue() == currentSa.getId().longValue()){
+                            shouldDelete = false;
+                        }
+                    }
+                }
+                if(shouldDelete){
+                    subjectAttributeListToDelete.add(currentSa);
+                }
+            }
+        }else{
+            currentAttributes.stream().forEach(e -> subjectAttributeListToDelete.add(e));
+        }
+        for (SubjectAttribute subjectAttribute : subjectAttributeListToCreateOrUpdate) {
+            subjectAttribute.setSubjectId(subjectId);
+            if (subjectAttribute.getId() != null) {
+                subjectAttributeDao.update(subjectAttribute);
+            } else {
+                subjectAttributeDao.create(subjectAttribute);
+            }
+        }
+        subjectAttributeListToDelete.stream().forEach(i->this.subjectAttributeDao.delete(i.getId()));
+
+    }
+
+    private boolean isNullSubjectAttr(SubjectAttribute curr) {
+        if(curr.getId()==null &&
+        curr.getInternalAttribute() == null&&
+        curr.getLatest() == null &&
+        curr.getAttributeName() == null &&
+        curr.getIntegerValue() == null &&
+        curr.getRealValue() == null &&
+        curr.getStringValue() == null &&
+        curr.getSubjectId()== null){
+            return true;
+        }
+        return false;
+
+    }
+
+    public void deleteSubject(Long subjectId){
+        this.subjectCommunicationDao.deleteBySubjectId(subjectId);
+        this.subjectAttributeDao.deleteBySubjectId(subjectId);
+        this.subjectDao.delete(subjectId);
     }
 }

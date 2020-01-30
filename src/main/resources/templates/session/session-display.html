@@ -21,6 +21,7 @@
     </ol>
     <h2><span th:text="${study.studySessionPrefix + sessionBean.sessionSuffix }"></span>
                 <span  class="badge badge-primary" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).NOTSTARTED.getId().toString()}">Not started</span>
+                <span  class="badge badge-warning" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).CONFIGURING.getId().toString()}">Starting soon</span>
                 <span  class="badge badge-warning" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).STARTED.getId().toString()}">Running</span>
                 <span  class="badge badge-success" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).DONE.getId().toString()}">Done</span>
                 <span  class="badge badge-danger" th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).ERROR.getId().toString()}">Status: Error</span>
@@ -36,18 +37,28 @@
                 th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/export'}">
                                 Export session data</a -->
 
+        <a th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).STARTED.getId().toString() or
+        sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).CONFIGURING.getId().toString() }"  style="margin:5px" class="btn btn-danger float-right"
+               id="stopSession">
+                STOP session</a>
 
-            <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-danger float-right"
+
+            <a th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).DONE.getId().toString()}"  style="margin:5px" class="btn btn-danger float-right"
                id="resetSession">
                 Reset session</a>
 
-            <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px" class="btn btn-outline-success float-right"
+            <a th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).DONE.getId().toString()}" class="btn btn-sm btn-outline-success float-right" style="margin:5px"
+            th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/score'}">
+                Score data</a>
+
+            <a th:if="${sessionBean.hasSessionStarted}"  style="margin:5px"
+            class="btn btn-sm btn-outline-success float-right"
                id="reScore">
                 Re score session</a>
 
             <a th:if="${sessionBean.hasSessionStarted}"
                th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/edit'}"
-               class="btn btn-outline-primary float-right" style="margin:5px">
+               class="btn btn-sm btn-outline-primary float-right" style="margin:5px">
                 View session details (read only)</a>
 
         </div>
@@ -61,15 +72,20 @@
                     $("#resetSessionForm").submit();
                 }
             })
-        });
-        $(function () {
-                    $("#reScore").click(function () {
-                        var r = confirm(
-                            "Are you sure you want to re score this session, all saved scoring data will be replaced by the new calculations!");
-                        if (r == true) {
-                            $("#rescoreSessionForm").submit();
-                        }
-                    })
+            $("#stopSession").click(function () {
+                var r = confirm(
+                    "Are you sure you want to STOP this session, all saved data like completed tasks and logs will be lost and users will face error messages!?");
+                if (r == true) {
+                    $("#resetSessionForm").submit();
+                }
+            });
+            $("#reScore").click(function () {
+                var r = confirm(
+                    "Are you sure you want to re score this session, all saved scoring data will be replaced by the new calculations!");
+                if (r == true) {
+                    $("#rescoreSessionForm").submit();
+                }
+            });
                 });
     </script>
     <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/reset'}"
@@ -77,9 +93,11 @@
     </form>
     <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/rescore'}"
               method="post" id="rescoreSessionForm">
+    </form>
+    <form th:action="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/stop'}"
+                  method="post" id="stopSessionForm">
         </form>
 
-    </form>
     <p th:text="${#dates.format(sessionBean.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></p>
 
     <h3>Session subjects: </h3>

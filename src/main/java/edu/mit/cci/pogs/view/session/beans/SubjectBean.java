@@ -36,4 +36,20 @@ public class SubjectBean extends Subject {
     public void setSubjectAttributes(List<SubjectAttribute> subjectAttributes) {
         this.subjectAttributes = subjectAttributes;
     }
+
+    public boolean isNullEntry() {
+        if (getId() == null &&
+                getSessionId() == null &&
+                getSubjectAttributes() == null &&
+                getSubjectCommunications() == null &&
+                getSubjectExternalId() == null &&
+                getSubjectDisplayName() == null &&
+                getPreviousSessionSubject() == null
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
 }

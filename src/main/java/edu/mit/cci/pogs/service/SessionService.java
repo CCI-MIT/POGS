@@ -45,6 +45,7 @@ public class SessionService {
     private final SessionHasTaskGroupDao sessionHasTaskGroupDao;
     private final SessionDao sessionDao;
     private final SubjectDao subjectDao;
+    private final SubjectService subjectService;
     private final CompletedTaskAttributeDao completedTaskAttributeDao;
     private final CompletedTaskDao completedTaskDao;
     private final TeamHasSubjectDao teamHasSubjectDao;
@@ -89,7 +90,8 @@ public class SessionService {
                           TodoEntryService todoEntryService,
                           VotingService votingService,
                           CompletedTaskScoreDao completedTaskScoreDao,
-                          TaskGroupService taskGroupService
+                          TaskGroupService taskGroupService,
+                          SubjectService subjectService
     ) {
         this.todoEntryService = todoEntryService;
         this.votingService = votingService;
@@ -108,6 +110,7 @@ public class SessionService {
         this.completedTaskScoreDao = completedTaskScoreDao;
         this.studyDao = studyDao;
         this.taskGroupService = taskGroupService;
+        this.subjectService = subjectService;
 
 
     }
@@ -378,26 +381,7 @@ public class SessionService {
 
 
     public void updateSubjectList(SubjectsBean subjectsBean) {
-        List<SubjectBean> subjectList = subjectsBean.getSubjectList();
-        for (SubjectBean subject : subjectList) {
-            subject.setSessionId(subjectsBean.getSessionId());
-            if (subject.getId() != null) {
-                subjectDao.update(subject);
-            } else {
-                subjectDao.create(subject);
-            }
-            List<SubjectAttribute> subjectAttributes = subject.getSubjectAttributes();
-            if (subjectAttributes != null) {
-                for (SubjectAttribute subjectAttribute : subjectAttributes) {
-                    subjectAttribute.setSubjectId(subject.getId());
-                    if (subjectAttribute.getId() != null) {
-                        subjectAttributeDao.update(subjectAttribute);
-                    } else {
-                        subjectAttributeDao.create(subjectAttribute);
-                    }
-                }
-            }
-        }
+        subjectService.createOrUpdateSubject(subjectsBean);
         subjectCommunicationService.createSubjectCommunications(subjectsBean.getSessionId(), true);
     }
 
@@ -431,7 +415,9 @@ public class SessionService {
 
         }
         roundDao.deleteBySessionId(session.getId());
-
+        stopSession(session);
+    }
+    public void stopSession(Session session){
         SessionRunner sr = SessionRunnerManager.getSessionRunner(session.getId());
         if (sr != null) {
             SessionRunnerManager.removeSessionRunner(session.getId());
@@ -440,7 +426,15 @@ public class SessionService {
         session.setStatus(SessionStatus.NOTSTARTED.getId().toString());
         session.setSessionStartDate(new Timestamp(session.getSessionStartDate().getTime() - 1000 * 60 * 10));
         sessionDao.update(session);
+    }
 
+    public List<CompletedTask> listCompletedTasksOfSession(Long sessionid){
+        List<Round> rounds = roundDao.listBySessionId(sessionid);
+        List<CompletedTask> completedTaskList = new ArrayList<>();
+        for(Round r: rounds){
+            completedTaskList.addAll(completedTaskDao.listByRoundId(r.getId()));
+        }
+        return completedTaskList;
     }
 
     public void rescoreSession(Session session) {

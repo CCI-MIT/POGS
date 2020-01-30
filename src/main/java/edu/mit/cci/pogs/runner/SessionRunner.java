@@ -202,7 +202,7 @@ public class SessionRunner implements Runnable {
             th.interrupt();
         }
         endSession();
-        _log.info("Exiting session runner for session" + session.getSessionSuffix());
+        _log.info("Exiting session runner for session: " + session.getSessionSuffix());
     }
 
     private void startSessionAfterScriptIfAny() {

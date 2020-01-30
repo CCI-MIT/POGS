@@ -46,6 +46,10 @@ public class SubjectAttributeDaoImpl extends AbstractDao<SubjectAttribute, Long,
                 .where(SUBJECT_ATTRIBUTE.SUBJECT_ID.eq(subjectId))
                 .execute();
     }
- 
+    public void delete(Long subjectAttributeId) {
+        dslContext.delete(SUBJECT_ATTRIBUTE)
+                .where(SUBJECT_ATTRIBUTE.ID.eq(subjectAttributeId))
+                .execute();
+    }
 }
  

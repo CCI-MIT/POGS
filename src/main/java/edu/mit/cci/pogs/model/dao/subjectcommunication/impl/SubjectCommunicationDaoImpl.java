@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
  
 import java.util.List;
- 
+
+import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT_ATTRIBUTE;
 import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT_COMMUNICATION;
  
 @Repository
@@ -41,6 +42,13 @@ public class SubjectCommunicationDaoImpl extends AbstractDao<SubjectCommunicatio
                 query.addOrderBy(SUBJECT_COMMUNICATION.TO_SUBJECT_ID);
 
         return query.fetchInto(SubjectCommunication.class);
+    }
+
+    public void deleteBySubjectId(Long subjectId) {
+        dslContext.delete(SUBJECT_COMMUNICATION)
+                .where(SUBJECT_COMMUNICATION.FROM_SUBJECT_ID.eq(subjectId))
+                .or(SUBJECT_COMMUNICATION.TO_SUBJECT_ID.eq(subjectId))
+                .execute();
     }
 
 }

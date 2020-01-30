@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.subject.impl;
  
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.records.SubjectRecord;
 import org.jooq.DSLContext;
@@ -11,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
  
 import java.util.List;
- 
+
+import static edu.mit.cci.pogs.model.jooq.Tables.SESSION_HAS_TASK_GROUP;
 import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT;
 import static edu.mit.cci.pogs.model.jooq.Tables.TEAM;
 import static edu.mit.cci.pogs.model.jooq.Tables.TEAM_HAS_SUBJECT;
@@ -74,7 +76,12 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         }
         return query.fetchInto(Subject.class);
     }
+    public void delete(Long subjectId) {
+        dslContext.delete(SUBJECT)
+                .where(SUBJECT.ID.eq(subjectId))
+                .execute();
 
+    }
 
 }
  
