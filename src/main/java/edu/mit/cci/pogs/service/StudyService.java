@@ -112,8 +112,7 @@ public class StudyService {
     }
 
 
-    public List<SessionBean> groupBessionsByBaseSessions(Long studyId) {
-        List<Session> sessions = listSessionsByStudyId(studyId);
+    public List<SessionBean> groupSessionsByBaseSession(List<Session> sessions){
         HashMap<Long, SessionBean> baseSessions = new LinkedHashMap<>();
         for(Session s: sessions){
             if(s.getParentSessionId()== null) {
@@ -135,8 +134,13 @@ public class StudyService {
                 baseSessionList.add(sb);
             }
         }
-
         return baseSessionList;
+    }
+    public List<SessionBean> listStudySessionsAndgroupByBaseSessions(Long studyId) {
+        List<Session> sessions = listSessionsByStudyId(studyId);
+
+
+        return groupSessionsByBaseSession(sessions);
 
     }
 

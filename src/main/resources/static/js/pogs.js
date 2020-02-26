@@ -84,6 +84,7 @@ class Pogs {
         this.sessionName = config.sessionName;
         this.chatBotName = config.chatBotName;
         this.sessionIsPerpetual = ((config.sessionIsPerpetual)?(config.sessionIsPerpetual):(false));
+        this.waitingRoomExpireTime = config.waitingRoomExpireTime;
         this.doneUrlParameter = config.doneUrlParameter;
         this.taskIsSolo = config.taskIsSolo;
         this.setupSubjectColors();
@@ -332,7 +333,7 @@ class Pogs {
             this.countDown.updateCountDownDate(finalDate)
         }
         console.log(JSON.parse(message.content.perpetualSubjectsChosen));
-        if(this.sessionIsPerpetual){
+        if(this.sessionIsPerpetual) {
             console.log(JSON.parse(message.content.perpetualSubjectsChosen));
             this.perpetualSubjectsChosen = JSON.parse(message.content.perpetualSubjectsChosen);
             for(var i = 0; i < this.perpetualSubjectsChosen.length ; i ++){
@@ -340,7 +341,16 @@ class Pogs {
                     window.location.href = "/check_in?externalId=" + this.subjectId;
                 }
             }
+
         }
+        //HANDLE EXPIRED WAITING ROOM.
+        if(this.sessionIsPerpetual && window.location.pathname.indexOf("/sessions/start/") >=0 ){
+            let now = new Date();
+            if(parseInt(this.waitingRoomExpireTime) < now){
+                window.location.href = "/expired?externalId=" + this.subjectId;
+            }
+        }
+
 
     }
     sendMessage(url, type, messageContent, sender, receiver, completedTaskId,

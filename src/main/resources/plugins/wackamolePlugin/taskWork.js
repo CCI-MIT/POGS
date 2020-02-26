@@ -15,8 +15,9 @@ class Wackamole {
         this.totalTarget = 0;
         this.multiplayerRound = 0;
         this.numberOfRounds = 0;
+        this.countdowns = {};
 
-        console.log(pogsPlugin);
+        //console.log(pogsPlugin);
     }
 
     setupGrid(title, teammates, whackBluePrint) {
@@ -138,14 +139,16 @@ class Wackamole {
                     // 5 seconds Count down, then display gameGrid
                     // and mole start popping up randomly
                     var countDownDate = new Date().getTime() + 5000;
-                    this.countDownTo(countDownDate, "loadingCountDown");
+                    this.countDownTo(countDownDate, "loadingCountDown",
+                    function() {
+                        setTimeout(function () {
+                            $("#countDownModal").modal("hide");
+                            $("#gameColumn").remove('.modal-backdrop');
+                            $("#gameColumn").removeClass("after_modal_appended");
+                            this.molePopUp();
+                        }.bind(this), 5000);
+                    }.bind(this));
 
-                    setTimeout(function () {
-                        $("#countDownModal").modal("hide");
-                        $("#gameColumn").remove('.modal-backdrop');
-                        $("#gameColumn").removeClass("after_modal_appended");
-                        self.molePopUp();
-                    }, 5000);
                 }
             }
 
@@ -207,16 +210,18 @@ class Wackamole {
             // 5 seconds Count down, then display gameGrid
             // and mole start popping up randomly
             var countDownDate = new Date().getTime() + 5000;
-            self.countDownTo(countDownDate, "loadingCountDown");
+            self.countDownTo(countDownDate, "loadingCountDown",
+            function () {
+                setTimeout(function () {
+                    $("#countDownModal").modal("hide");
+                    $("#gameColumn").remove('.modal-backdrop');
+                    $("#gameColumn").removeClass("after_modal_appended");
 
-            setTimeout(function () {
-                $("#countDownModal").modal("hide");
-                $("#gameColumn").remove('.modal-backdrop');
-                $("#gameColumn").removeClass("after_modal_appended");
+                    this.molePopUp();
 
-                self.molePopUp();
-
-            }, 5000);
+                }.bind(this), 5000)
+            }.bind(this)
+            );
         }
 
     }
@@ -301,9 +306,12 @@ class Wackamole {
             0, false);
     }
 
-    countDownTo(countDownDate, elementId) {
+    countDownTo(countDownDate, elementId, callback) {
         // Update the count down every 1 second
-        var x = setInterval(function () {
+        if(this.countdowns[elementId]) {
+            clearInterval(this.countdowns[elementId]);
+        }
+        this.countdowns[elementId] = setInterval(function () {
 
             // Get todays date and time
             var now = new Date().getTime();
@@ -319,10 +327,12 @@ class Wackamole {
 
             // If the count down is over, write some text
             if (distance < 0) {
-                clearInterval(x);
+                clearInterval(this.countdowns[elementId]);
                 document.getElementById(elementId).innerHTML = "0s";
+                if(callback)
+                    callback.call();
             }
-        }, 300);
+        }.bind(this), 300);
     }
 
     molePopUp() {

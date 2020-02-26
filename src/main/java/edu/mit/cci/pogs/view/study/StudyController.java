@@ -10,14 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.researchgroup.ResearchGroupDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
-import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.utils.MessageUtils;
@@ -51,7 +49,7 @@ public class StudyController {
         model.addAttribute("study", study);
 
 
-        List<SessionBean> sessions = studyService.groupBessionsByBaseSessions(study.getId());
+        List<SessionBean> sessions = studyService.listStudySessionsAndgroupByBaseSessions(study.getId());
 
         model.addAttribute("sessionsList", sessions);
 

@@ -10,14 +10,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
+
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasSessionCheckIn;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
 import edu.mit.cci.pogs.runner.wrappers.RoundWrapper;
@@ -25,12 +29,20 @@ import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
+import edu.mit.cci.pogs.service.StudyService;
+import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 
 @Controller
 public class DashboardController {
 
     @Autowired
     private StudyDao studyDao;
+
+    @Autowired
+    private StudyService studyService;
+
+    @Autowired
+    private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
 
     @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
@@ -39,17 +51,17 @@ public class DashboardController {
                 AuthUserDetailsService.getLoggedInUser());
 
         Collection<SessionRunner> liveSessionRunners = SessionRunnerManager.getLiveRunners();
-        List<SessionWrapper> liveSessionsResearcherCanSee = new ArrayList<>();
+        List<Session> liveSessionsResearcherCanSee = new ArrayList<>();
 
         for (SessionRunner sr : liveSessionRunners) {
-            for(Study study: studiesUserIsAllowedToSee) {
-                if(study.getId() == sr.getSession().getStudyId()){
+            for (Study study : studiesUserIsAllowedToSee) {
+                if (study.getId() == sr.getSession().getStudyId()) {
                     liveSessionsResearcherCanSee.add(sr.getSession());
                 }
             }
         }
 
-        model.addAttribute("liveSessionsResearcherCanSee",liveSessionsResearcherCanSee);
+        model.addAttribute("liveSessionsResearcherCanSee", studyService.groupSessionsByBaseSession(liveSessionsResearcherCanSee));
         return "dashboard/dashboard-home";
     }
 
@@ -59,29 +71,34 @@ public class DashboardController {
         SessionRunner sessionRunner = SessionRunnerManager.getSessionRunner(sessionId);
 
         List<RoundWrapper> rw = sessionRunner.getSession().getSessionRounds();
-        if(rw!=null && rw.size() > 0) {
+
+        if (sessionRunner.getSession().isSessionPerpetual()) {
+            model.addAttribute("sessionz", sessionRunner.getSession());
+            return dashboardForPerpetual(model, sessionId);
+        }
+        if (rw != null && rw.size() > 0) {
 
             List<TeamWrapper> teams = rw.get(0).getRoundTeams();
             model.addAttribute("teams", teams);
         }
 
         List<SessionSchedule> sessionSchedule = sessionRunner.getSession().getSessionSchedule();
-        if(sessionRunner.getSession().getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())) {
+        if (sessionRunner.getSession().getTaskExecutionType().equals(TaskExecutionType.PARALLEL_FIXED_ORDER.getId().toString())) {
             List<TaskWrapper> taskWrappers = sessionRunner.getSession().getTaskList();
 
-            for (int i =0; i < sessionSchedule.size(); i++){
+            for (int i = 0; i < sessionSchedule.size(); i++) {
                 SessionSchedule ss = sessionSchedule.get(i);
-                if(ss.getTaskReference()!=null){
+                if (ss.getTaskReference() != null) {
 
-                    for(TaskWrapper tw: taskWrappers){
-                        if(tw.getId() != ss.getTaskReference().getId()){
+                    for (TaskWrapper tw : taskWrappers) {
+                        if (tw.getId() != ss.getTaskReference().getId()) {
                             SessionSchedule schedule = new SessionSchedule(ss.getStartTimestamp(),
                                     ss.getEndTimestamp(),
                                     tw,
                                     ss.getRoundReference(),
                                     ss.getSessionReference(),
                                     tw.getTaskWorkUrl());
-                            sessionSchedule.add(i,schedule);
+                            sessionSchedule.add(i, schedule);
                         }
                     }
                     break;
@@ -89,28 +106,64 @@ public class DashboardController {
             }
         }
 
-        model.addAttribute("sessionz",sessionRunner.getSession());
+        model.addAttribute("sessionz", sessionRunner.getSession());
         model.addAttribute("sessionSchedule", sessionSchedule);
-        model.addAttribute("completedTasksByTeam",getCompletedTasksForTeamsByTask(
+        model.addAttribute("completedTasksByTeam", getCompletedTasksForTeamsByTask(
                 sessionRunner.getSession()).toString());
 
         return "dashboard/dashboard-session";
     }
 
-    private JSONObject getCompletedTasksForTeamsByTask(SessionWrapper sessionWrapper){
+    private String dashboardForPerpetual(Model model, Long sessionId) {
+
+        List<SubjectHasSessionCheckInBean> readyToJoinSubjects = subjectHasSessionCheckInService.listReadyToJoinSubjectsBean(sessionId);
+        List<SubjectHasSessionCheckInBean> lostSubjects = subjectHasSessionCheckInService.listLostSubjects(sessionId);
+
+        List<SubjectHasSessionCheckInBean> listCheckedInSubjects = subjectHasSessionCheckInService.listCheckedInSubjects(sessionId);
+        //group by session
+        // add session_list and subjects.
+
+        Map<Long, List<SubjectHasSessionCheckInBean>> sessionUser = new HashMap<>();
+        for (SubjectHasSessionCheckInBean shscib : listCheckedInSubjects) {
+            List<SubjectHasSessionCheckInBean> list = sessionUser.get(shscib.getJoinedSessionId());
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+            list.add(shscib);
+            sessionUser.put(shscib.getJoinedSessionId(), list);
+        }
+        List<SessionHasSubjects> sessionHasSubjectsList = new ArrayList<>();
+        for(Long sessId: sessionUser.keySet()){
+            SessionRunner sr = SessionRunnerManager.getSessionRunner(sessId);
+            if(sr!=null){
+                SessionHasSubjects shs = new SessionHasSubjects();
+                shs.setSession(sr.getSession());
+                shs.setSubjects(sessionUser.get(sessId));
+                sessionHasSubjectsList.add(shs);
+            }
+        }
+
+        model.addAttribute("readyToJoinSubjects", readyToJoinSubjects);
+        model.addAttribute("lostSubjects", lostSubjects);
+        model.addAttribute("sessionHasSubjectsList", sessionHasSubjectsList);
+
+        return "dashboard/dashboard-perpetual";
+    }
+
+    private JSONObject getCompletedTasksForTeamsByTask(SessionWrapper sessionWrapper) {
 
         JSONObject jo = new JSONObject();
-        for(TaskWrapper tw: sessionWrapper.getTaskList()){
+        for (TaskWrapper tw : sessionWrapper.getTaskList()) {
             JSONArray ja = new JSONArray();
 
-            for(CompletedTask ct: tw.getCompletedTasks()){
+            for (CompletedTask ct : tw.getCompletedTasks()) {
                 JSONObject ctJson = new JSONObject();
                 ctJson.put("teamId", ct.getTeamId());
                 ctJson.put("subjectId", ct.getSubjectId());
                 ctJson.put("completedTaskId", ct.getId());
                 ja.add(ctJson);
             }
-            jo.put(tw.getId(),ja);
+            jo.put(tw.getId(), ja);
         }
         return jo;
     }

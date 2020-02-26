@@ -54,6 +54,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasSessionCheckIn;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
@@ -66,6 +67,7 @@ import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectCommunicationService;
+import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 import edu.mit.cci.pogs.service.TaskGroupService;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
@@ -89,6 +91,8 @@ public class SessionRunner implements Runnable {
     private Map<String, Subject> checkedInWaitingSubjectList = new HashMap<>();
 
     private Map<Long, Subject> checkedInWaitingSubjectListById = new HashMap<>();
+
+    private List<SubjectHasSessionCheckIn> subjectCheckInList;
 
     private Map<Long, List<Subject>> sessionsRelatedToPerpetual = new HashMap<>();
 
@@ -137,17 +141,23 @@ public class SessionRunner implements Runnable {
     private TaskService taskService;
 
     @Autowired
+    private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
+
+    @Autowired
     private ApplicationContext context;
 
     private boolean shouldRun;
 
-    private List<Thread> chatRunners = new ArrayList<>();
+    private volatile boolean threadShouldStop;
+
+    private List<Thread> chatAndScriptRunners = new ArrayList<>();
 
     private JSONArray perpetualSubjectsMigratedToSpawnedSessions = new JSONArray();
 
     public void init() {
         _log.info("Configuring session: " + session.getSessionSuffix());
         shouldRun = true;
+        threadShouldStop = false;
         sessionHasStarted = false;
         configureSession();
         setupRounds(this.session);
@@ -161,7 +171,7 @@ public class SessionRunner implements Runnable {
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
-        while (shouldRun) {
+        while (shouldRun && !threadShouldStop) {
 
             if ((allSubjectsAreWaiting() || sessionIsReadyToStart())
                     && !sessionHasStarted) {
@@ -198,8 +208,10 @@ public class SessionRunner implements Runnable {
 
         }
         SessionRunnerManager.removeSessionRunner(session.getId());
-        for (Thread th : this.chatRunners) {
-            th.interrupt();
+        for (Thread th : this.chatAndScriptRunners) {
+            if(th!=null && th.isAlive()) {
+                th.interrupt();
+            }
         }
         endSession();
         _log.info("Exiting session runner for session: " + session.getSessionSuffix());
@@ -215,6 +227,7 @@ public class SessionRunner implements Runnable {
 
             Thread thread = new Thread(csr);
             thread.start();
+            chatAndScriptRunners.add(thread);
         }
     }
 
@@ -226,6 +239,7 @@ public class SessionRunner implements Runnable {
             csr.setExecutableScriptId(session.getBeforeSessionScriptId());
             Thread thread = new Thread(csr);
             thread.start();
+            chatAndScriptRunners.add(thread);
         }
     }
 
@@ -291,6 +305,7 @@ public class SessionRunner implements Runnable {
 
                     Thread thread = new Thread(csr);
                     thread.start();
+                    chatAndScriptRunners.add(thread);
                 }
             }
         }
@@ -309,6 +324,7 @@ public class SessionRunner implements Runnable {
 
                     Thread thread = new Thread(csr);
                     thread.start();
+                    chatAndScriptRunners.add(thread);
                 }
 
             }
@@ -328,6 +344,7 @@ public class SessionRunner implements Runnable {
 
                     Thread thread = new Thread(csr);
                     thread.start();
+                    chatAndScriptRunners.add(thread);
                 }
 
             }
@@ -346,7 +363,7 @@ public class SessionRunner implements Runnable {
                 csr.setChatEntryList(chatEntryDao.listChatEntryByChatScript(task.getChatScriptId()));
                 Thread thread = new Thread(csr);
                 thread.start();
-                chatRunners.add(thread);
+                chatAndScriptRunners.add(thread);
             }
         }
     }
@@ -670,8 +687,14 @@ public class SessionRunner implements Runnable {
     }
 
     public void subjectCheckIn(Subject subject) {
-        checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
-        checkedInWaitingSubjectListById.put(subject.getId(), subject);
+        synchronized (checkedInWaitingSubjectList) {
+            checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
+            checkedInWaitingSubjectListById.put(subject.getId(), subject);
+
+            if(this.session.isSessionPerpetual()){
+                subjectHasSessionCheckInService.checkSubjectIn(subject, session);
+            }
+        }
 
     }
 
@@ -768,130 +791,144 @@ public class SessionRunner implements Runnable {
 
     public void runPerpetual() {
         shouldRun = true;
+        threadShouldStop = false;
         checkedInWaitingSubjectList = new HashMap<>();
         checkedInWaitingSubjectListById = new HashMap<>();
         sessionsRelatedToPerpetual = new HashMap<>();
+        try {
+            while (shouldRun) {
 
-        while (shouldRun) {
+                Thread.sleep(1000);
+                if ((checkedInWaitingSubjectListById.size() > 0)) {
+                    if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
+                        subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
+                        for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
+                            if (subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
+                                checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
+                                continue;
+                            }
+                        }
+                        if ((subjectCheckInList.size() >= session.getPerpetualSubjectsNumber())) {
+
+                            synchronized (checkedInWaitingSubjectList) {
+                                Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
+                                List<Subject> subjectsInNewSession = new ArrayList<>();
+
+                                int subjsInNewSession = 0;
 
 
-            if((checkedInWaitingSubjectList.size() > 0 )) {
-                if(session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
-                    if ((checkedInWaitingSubjectList.keySet().size() >= session.getPerpetualSubjectsNumber())) {
+                                for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
 
-                        synchronized (checkedInWaitingSubjectList) {
-                            Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
-                            List<Subject> subjectsInNewSession = new ArrayList<>();
-                            Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
-                            int subjsInNewSession = 0;
-                            List<Subject> subjectsNotForThisSession = new ArrayList<>();
 
-                            while (it.hasNext()) {
-                                if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
-                                    String externalId = it.next();
-                                    Subject su = subjectDao.getByExternalId(externalId);
-                                    if(su== null) {
-                                        su = new Subject();
+                                    if (subjsInNewSession <= session.getPerpetualSubjectsNumber()) {
+                                        Long subjectId = shscI.getSubjectId();
+                                        Subject su = subjectDao.get(subjectId);
+//                                        if (su == null) {
+//                                            su = new Subject();
+//
+//                                            su.setSessionId(newSpawnedSession.getId());
+//                                            su.setSubjectExternalId(externalId);
+//                                            su.setSubjectDisplayName(externalId);
+//                                            su = subjectDao.create(su);
+//                                        } else {
+                                            su.setSessionId(newSpawnedSession.getId());
+                                            subjectDao.update(su);
+                                            checkedInWaitingSubjectListById.remove(su.getId());
+                                            shscI.setJoinedSessionId(newSpawnedSession.getId());
+                                            subjectHasSessionCheckInService.subjectJoinedSession(shscI);
+                                        //}
 
-                                        su.setSessionId(newSpawnedSession.getId());
-                                        su.setSubjectExternalId(externalId);
-                                        su.setSubjectDisplayName(externalId);
-                                        su = subjectDao.create(su);
-                                    } else {
-                                        su.setSessionId(newSpawnedSession.getId());
-                                        subjectDao.update(su);
+                                        subjectsInNewSession.add(su);
+
+                                        subjsInNewSession++;
                                     }
+                                }
+                                sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
 
-                                    subjectsInNewSession.add(su);
+                                subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
 
-                                    subjsInNewSession++;
-                                } else {
-                                    subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
+                            }
+                        }
+                    } else {
+
+                        if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
+
+                            List<Subject> checkedInSubjects = checkedInWaitingSubjectListById.values().stream().collect(Collectors.toList());
+                            String[] subjectsToJoin = shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
+                            if (subjectsToJoin != null) {
+                                for (String subjects : subjectsToJoin) {
+                                    _log.debug("Subject to join: " + subjects);
                                 }
                             }
-                            sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
+                            if (subjectsToJoin != null && subjectsToJoin.length > 0) {
+                                synchronized (checkedInWaitingSubjectList) {
+                                    Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
+                                    List<Subject> subjectsInNewSession = new ArrayList<>();
 
-                            subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
 
-                            checkedInWaitingSubjectList = new HashMap<>();
-                            for (Subject ext : subjectsNotForThisSession) {
-                                checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
-                            }
 
-                        }
-                    }
-                }
-                if(session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
-                    List<Subject> checkedInSubjects = checkedInWaitingSubjectList.values().stream().collect(Collectors.toList());
-                    String[] subjectsToJoin =  shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
-                    if(subjectsToJoin!=null) {
-                        for (String subjects : subjectsToJoin) {
-                            _log.debug("Subject to join: " + subjects);
-                        }
-                    }
-                    if(subjectsToJoin != null && subjectsToJoin.length > 0) {
-                        synchronized (checkedInWaitingSubjectList) {
-                            Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
-                            List<Subject> subjectsInNewSession = new ArrayList<>();
-                            List<Subject> subjectsNotForThisSession = new ArrayList<>();
+                                    for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
 
-                            Iterator<String> it = checkedInWaitingSubjectList.keySet().iterator();
-                            while (it.hasNext()) {
-                                String externalId = it.next();
-                                boolean subjectChosenForSession = false;
-                                for(String chosenExternalId: subjectsToJoin) {
-                                        if(chosenExternalId.equals(externalId)) {
-                                            Subject su = checkedInWaitingSubjectList.get(externalId);
-                                            if(su!=null) {
-                                                su.setSessionId(newSpawnedSession.getId());
-                                                subjectDao.update(su);
-                                                subjectsInNewSession.add(su);
-                                                subjectChosenForSession = true;
-                                                continue;
+                                        if(subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)){
+                                            checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
+                                            continue;
+                                        }
+                                        String externalId = checkedInWaitingSubjectListById.get(shscI.getSubjectId()).getSubjectExternalId();
+                                        for (String chosenExternalId : subjectsToJoin) {
+                                            if (chosenExternalId.equals(externalId)) {
+                                                Subject su = checkedInWaitingSubjectList.get(externalId);
+                                                if (su != null) {
+                                                    su.setSessionId(newSpawnedSession.getId());
+                                                    subjectDao.update(su);
+                                                    subjectsInNewSession.add(su);
+
+
+                                                    checkedInWaitingSubjectListById.remove(su.getId());
+                                                    shscI.setJoinedSessionId(newSpawnedSession.getId());
+                                                    subjectHasSessionCheckInService.subjectJoinedSession(shscI);
+
+                                                    continue;
+                                                }
                                             }
                                         }
-                                }
-                                if(!subjectChosenForSession) {
-                                    subjectsNotForThisSession.add(checkedInWaitingSubjectList.get(it.next()));
+                                    }
+                                    sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
+
+                                    subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
+
+
                                 }
                             }
-                            sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
-
-                            subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
-
-                            checkedInWaitingSubjectList = new HashMap<>();
-                            for (Subject ext : subjectsNotForThisSession) {
-                                checkedInWaitingSubjectList.put(ext.getSubjectExternalId(), ext);
-                            }
-
                         }
                     }
+
                 }
+                if (session.getSecondsRemainingForSession() < 0) {
+                    shouldRun = false;
+                }
+                if (!sessionsRelatedToPerpetual.isEmpty()) {
+                    sessionService.initializeSessionRunners();
+                }
+                List<Long> sessionsMigratedToRightCheckinList = new ArrayList<>();
+                for (Long sessionId : sessionsRelatedToPerpetual.keySet()) {
+                    SessionRunner sr = SessionRunnerManager.getSessionRunner(sessionId);
 
-            }
-            if (session.getSecondsRemainingForSession() < 0) {
-                shouldRun = false;
-            }
-            if(!sessionsRelatedToPerpetual.isEmpty()) {
-                sessionService.initializeSessionRunners();
-            }
-            List<Long> sessionsMigratedToRightCheckinList = new ArrayList<>();
-            for (Long sessionId : sessionsRelatedToPerpetual.keySet()) {
-                SessionRunner sr = SessionRunnerManager.getSessionRunner(sessionId);
+                    if (sr != null) {
+                        for (Subject s : sessionsRelatedToPerpetual.get(sessionId)) {
+                            sr.subjectCheckIn(s);
+                            _log.debug("Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
+                            perpetualSubjectsMigratedToSpawnedSessions.put(s.getSubjectExternalId());
 
-                if (sr != null) {
-                    for (Subject s : sessionsRelatedToPerpetual.get(sessionId)) {
-                        sr.subjectCheckIn(s);
-                        _log.debug("Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
-                        perpetualSubjectsMigratedToSpawnedSessions.put(s.getSubjectExternalId());
-
+                        }
+                        sessionsMigratedToRightCheckinList.add(sessionId);
                     }
-                    sessionsMigratedToRightCheckinList.add(sessionId);
+                }
+                for (Long sess : sessionsMigratedToRightCheckinList) {
+                    sessionsRelatedToPerpetual.remove(sess);
                 }
             }
-            for (Long sess : sessionsMigratedToRightCheckinList) {
-                sessionsRelatedToPerpetual.remove(sess);
-            }
+        }catch (InterruptedException ie){
+
         }
     }
 
@@ -909,9 +946,15 @@ public class SessionRunner implements Runnable {
 
     public void setShouldRun(boolean shouldRun) {
         this.shouldRun = shouldRun;
+
     }
 
     public JSONArray getPerpetualSubjectsMigratedToSpawnedSessions() {
         return perpetualSubjectsMigratedToSpawnedSessions;
+    }
+
+    public void shouldStop() {
+        this.threadShouldStop = true;
+        this.shouldRun = false;
     }
 }

@@ -31,9 +31,18 @@
            <tbody>
            <th:block th:each="sessionz : ${liveSessionsResearcherCanSee}">
                <tr>
-                   <td th:text="${sessionz.id}"></td>
-                   <td><a th:text="${sessionz.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionz.id} "></a></td>
-                   <td th:text="${#dates.format(sessionz.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+                   <td>Main session</td>
+                   <td th:text="${sessionz.baseSession.id}"></td>
+                   <td><a th:text="${sessionz.baseSession.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionz.baseSession.id} "></a></td>
+                   <td th:text="${#dates.format(sessionz.baseSession.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+
+               </tr>
+               <th:block th:each="childSession : ${sessionz.childSessions}" >
+                <tr>
+                   <td></td>
+                   <td th:text="${childSession.id}"></td>
+                   <td><a th:text="${childSession.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + childSession.id} "></a></td>
+                   <td th:text="${#dates.format(childSession.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
 
                </tr>
            </th:block>

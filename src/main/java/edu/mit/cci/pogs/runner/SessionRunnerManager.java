@@ -39,7 +39,7 @@ public class SessionRunnerManager {
         synchronized (liveRunners) {
             _log.info("Removing session runner for sessionId : "+ sessionId);
             if (liveRunners.get(sessionId) != null) {
-                liveRunners.get(sessionId).setShouldRun(false);
+                liveRunners.get(sessionId).shouldStop();
                 liveRunners.remove(sessionId);
             }
         }

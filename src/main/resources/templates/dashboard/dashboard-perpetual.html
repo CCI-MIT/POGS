@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dashboard </title>
+
+        <script src="../../js/Countdown.js" th:src="@{/js/Countdown.js}"></script>
+        <script src="../../js/pogsDashboard.js" th:src="@{/js/pogsDashboard.js}"></script>
+
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+        <li class="breadcrumb-item active">
+            <a
+            th:href="${'/admin/dashboard/sessions/' + sessionz.id}"
+            th:text="${sessionz.sessionSuffix}"></a>
+        </li>
+    </ol>
+    <h2 th:text="${'Live sessions ' + sessionz.sessionSuffix}" ></h2>
+    <br/>
+    <script>
+    $(function () {
+        pogsDashboard.setup({
+            sessionId: '[(${sessionz.id})]',
+            completedTasksByTeam: [(${completedTasksByTeam})]
+            }
+        );
+
+        });
+    </script>
+    <style>
+        .subjectpill {font-size: 12px; margin: 3px;}
+        .cardPassed {background-color: #5a6268}
+        .cardLive h1 small {color: #1c7430}
+    </style>
+    <div class="container">
+      <div class="row text-center" >
+         <div class="col-md-4">
+                <div class="card mb-4 box-shadow">
+                  <div class="card-header">
+                    <h4 class="my-0 font-weight-normal">Waiting room</h4>
+                  </div>
+                  <div class="card-body">
+                        <div class="subjectContainer">
+                            <div>
+                                <ul class="list-unstyled mt-3 mb-4">
+                                    <li th:each="checkIn : ${readyToJoinSubjects}">
+                                        <span>
+                                            <span th:class="${'badge-pill badge-dark badge-pill subjectpill ' +checkIn.subject.subjectExternalId+'_pill'} "
+                                            th:text="${checkIn.subject.subjectExternalId}" th:id="${checkIn.subject.subjectExternalId}"></span>
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                  </div>
+                </div>
+         </div>
+         <div class="col-md-4">
+                         <div class="card mb-4 box-shadow">
+                           <div class="card-header">
+                             <h4 class="my-0 font-weight-normal">Lost subjects</h4>
+                           </div>
+                           <div class="card-body">
+                                 <div class="subjectContainer">
+                                     <div>
+                                         <ul class="list-unstyled mt-3 mb-4">
+                                             <li th:each="checkIn : ${lostSubjects}">
+                                                 <span>
+                                                     <span th:class="${'badge-pill badge-dark badge-pill subjectpill ' +checkIn.subject.subjectExternalId+'_pill'} "
+                                                     th:text="${checkIn.subject.subjectExternalId}" th:id="${checkIn.subject.subjectExternalId}"></span>
+                                                 </span>
+                                             </li>
+                                         </ul>
+                                     </div>
+                                 </div>
+                           </div>
+                         </div>
+                  </div>
+
+          <div class="col-md-4" th:each="sessionSubjectList : ${sessionHasSubjectsList}">
+             <div class="card mb-4 box-shadow">
+               <div class="card-header">
+                 <h4 class="my-0 font-weight-normal" th:text="${sessionSubjectList.session.sessionSuffix  + ' ' + sessionSubjectList.session.sessionStartDate}"></h4>
+               </div>
+               <div class="card-body">
+                     <div class="subjectContainer">
+                         <div>
+                             <ul class="list-unstyled mt-3 mb-4">
+                                 <li th:each="checkIn : ${sessionSubjectList.subjects}">
+                                     <span>
+                                         <span th:class="${'badge-pill badge-dark badge-pill subjectpill ' +checkIn.subject.subjectExternalId+'_pill'} "
+                                         th:text="${checkIn.subject.subjectExternalId}" th:id="${checkIn.subject.subjectExternalId}"></span>
+                                     </span>
+                                 </li>
+                             </ul>
+                         </div>
+                     </div>
+               </div>
+             </div>
+      </div>
+           </div>
+
+    </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</div>
+</body>
+</html>

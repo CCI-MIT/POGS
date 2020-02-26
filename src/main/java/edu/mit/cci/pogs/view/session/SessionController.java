@@ -274,6 +274,7 @@ public class SessionController {
         SessionBean session = new SessionBean();
         session.setRoundsEnabled(true);
         session.setNumberOfRounds(1);
+        session.setWaitingRoomTime(5*60);
         session.setStatus(SessionStatus.NOTSTARTED.getId() + "");
         session.setSessionHasTaskGroupRelationshipBean(new SessionHasTaskGroupRelationshipBean());
         Study study = studyDao.get(studyId);

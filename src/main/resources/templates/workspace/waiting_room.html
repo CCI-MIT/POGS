@@ -21,6 +21,7 @@
         <div class="form-group waiting_message" th:if="${pogsSessionPerpetual}">
             <div class="message ">
                         Waiting for other participants to join ...
+                        <small>Max. waiting time: <b th:text="${pogsSession.waitingRoomTime}"></b></small>
                     </div>
                     <div id="countdown" style="display: none"></div>
 
@@ -37,6 +38,7 @@
                        currentUrl: window.location,
                        sessionId: '[(${pogsSession.id})]',
                        sessionIsPerpetual : [(${pogsSessionPerpetual})],
+                       waitingRoomExpireTime : '[(${waitingRoomExpireTime})]',
                        subjectId: '[(${subject.subjectExternalId})]',
                        secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
                        nextUrl : '[(${nextUrl})]',

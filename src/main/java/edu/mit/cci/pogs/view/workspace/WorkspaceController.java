@@ -42,6 +42,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasSessionCheckIn;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
 import edu.mit.cci.pogs.runner.PreviewTaskBeforeWorkRunner;
@@ -55,6 +56,7 @@ import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
 import edu.mit.cci.pogs.service.DictionaryService;
 import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.SessionService;
+import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
 import edu.mit.cci.pogs.service.TaskScoreService;
@@ -118,6 +120,9 @@ public class WorkspaceController {
     @Autowired
     private DictionaryService dictionaryService;
 
+    @Autowired
+    private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
+
     private static final Logger _log = LoggerFactory.getLogger(WorkspaceController.class);
 
     @GetMapping("/sessions/{sessionId}")
@@ -156,6 +161,7 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "This session url was not recognized.");
             return "workspace/error";
         }
+
 
         Long now = DateUtils.now();
         if (session.getPerpetualStartDate().getTime() > now ||
@@ -250,6 +256,13 @@ public class WorkspaceController {
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/pre_check_in");
     }
 
+    @RequestMapping(value = "/expired", method = {RequestMethod.GET, RequestMethod.POST})
+    public String expired(@RequestParam("externalId") String externalId, Model model) {
+        Subject su;
+        su = workspaceService.getSubject(externalId);
+
+        return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/expired");
+    }
 
     @RequestMapping(value = "/check_in", method = {RequestMethod.GET, RequestMethod.POST})
     public String register(@RequestParam("externalId") String externalId, Model model) {
@@ -305,11 +318,13 @@ public class WorkspaceController {
         if (su != null) {
 
             SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+
             if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
+                SessionWrapper session = sr.getSession();
                 model.addAttribute("subject", su);
-                model.addAttribute("pogsSession", sr.getSession());
+                model.addAttribute("pogsSession", session);
                 if (sr.getSession().getSessionWideScriptId() != null) {
-                    ExecutableScript es = executableScriptDao.get(sr.getSession().getSessionWideScriptId());
+                    ExecutableScript es = executableScriptDao.get(session.getSessionWideScriptId());
                     if (es != null) {
                         model.addAttribute("sessionWideScript", es.getScriptContent());
                     }
@@ -318,6 +333,9 @@ public class WorkspaceController {
 
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
+                if(session.isSessionPerpetual() && su.getId()!=null){
+                    model.addAttribute("waitingRoomExpireTime",subjectHasSessionCheckInService.getSubjectSessionCheckInExpireTime(su.getId(), session.getId()));
+                }
                 return forwardString;
             } else {
                 return handleErrorMessage("Your session has ended!", model);

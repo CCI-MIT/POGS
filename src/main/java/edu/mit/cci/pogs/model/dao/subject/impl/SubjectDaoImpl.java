@@ -47,7 +47,7 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         final SelectQuery<Record> query = dslContext.select()
                 .from(SUBJECT).getQuery();
         query.addConditions(SUBJECT.SUBJECT_EXTERNAL_ID.eq(externalId));
-        Record record =  query.fetchOne();
+        Record record =  query.fetchAny();
         if(record == null) {
             return null;
         }else{
