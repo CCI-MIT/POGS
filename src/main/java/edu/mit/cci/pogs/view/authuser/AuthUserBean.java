@@ -25,7 +25,7 @@ public class AuthUserBean {
         this.firstName = pojo.getFirstName();
         this.lastName = pojo.getLastName();
         this.password = pojo.getPassword();
-        this.isAdmin = pojo.getIsAdmin();
+        this.isAdmin = true;
     }
 
     public AuthUser getAuthUser() {

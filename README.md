@@ -39,3 +39,12 @@ mvn clean compile package install
 ```
 
 6 Go to Intellij and use RUN the configuration called "POGS (development)". If you don't see that configuration, you can also run the application directly from the `PlatformForOnlineGroupStudiesApplication` class. Make sure you set the active profile to development, which enables hot reloading of static files.
+
+or run as standalone server:
+
+7 Run as standalone server:
+
+In the root directory:
+```
+java -jar target/pogs-0.0.1-SNAPSHOT.jar
+```

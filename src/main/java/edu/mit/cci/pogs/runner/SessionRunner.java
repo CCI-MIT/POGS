@@ -855,7 +855,7 @@ public class SessionRunner implements Runnable {
                     } else {
 
                         if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
-
+                            subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
                             List<Subject> checkedInSubjects = checkedInWaitingSubjectListById.values().stream().collect(Collectors.toList());
                             String[] subjectsToJoin = shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
                             if (subjectsToJoin != null) {
