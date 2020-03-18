@@ -7,6 +7,8 @@ class Pogs {
         this.plugins = [];  // observers
         this.task = null;  // observers
         this.team = null;  // observers
+        this.firstLoad = true;
+        this.lastCheckInDate = new Date().getTime();
     }
     createPlugin(pluginName, initFunc, destroyFunct) {
         var pl = new PogsPlugin(pluginName, initFunc, this,destroyFunct);
@@ -305,10 +307,16 @@ class Pogs {
         this.fire(null, 'onError', this);
     }
     sendCheckInMessage(){
+        if(new Date().getTime() - this.lastCheckInDate >= 1000*60){
+            this.firstLoad = true;
+        }
+
         this.sendMessage("/pogsapp/checkIn.sendMessage", "CHECK_IN",
-                         {message: window.location.pathname, type: "CHECK_IN"},
+                         {message: window.location.pathname, type: "CHECK_IN", channel: this.firstLoad},
                                  this.subjectId, null, this.completedTaskId,
                                  this.sessionId);
+        this.firstLoad = false;
+
     }
     validateFinalUrl(newUrlToBeSet) {
         //check if there is HTTPS or HTTP in the URL.

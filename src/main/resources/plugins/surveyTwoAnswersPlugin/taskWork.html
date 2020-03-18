@@ -202,7 +202,11 @@ class Field {
             }
             this.getPogsPlugin().saveCompletedTaskAttribute(attributeName,
                                                             stringValue, doubleValue,
-                                                            intVal, loggable, fieldType);
+                                                            intVal, loggable, fieldType,
+                                                            'Subject selected in field '+this.index
+                                                            +' ' + ((intVal ==-1)?('(first answer)')
+                                                            :('(second answer)'))+' of type: '
+                                                            + fieldType +  ' :' + stringValue);
     }
 
 }

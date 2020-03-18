@@ -89,7 +89,7 @@ class MinimumEffortTask {
         this.pogsPlugin.saveCompletedTaskAttribute(
             'roundAnswer_' + this.rounds[this.currentRound].roundNumber+ '|' + this.pogsPlugin.getSubjectId(),
             this.pogsPlugin.getSubjectId(), 0.0,
-            $(event.target).data("option"), true);
+            $(event.target).data("option"), true, '', 'Round ' + this.rounds[this.currentRound].roundNumber + ' subject selected: ' +  $(event.target).data("option"));
 
     }
 

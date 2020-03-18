@@ -95,7 +95,7 @@ class SudokuGame {
             if(valueTyped != null && ! isNaN(valueTyped)) {
                 this.pogsPlugin.saveCompletedTaskAttribute('sudokuAnswer_' + cellIndex,
                     valueTyped, 0.0,
-                    0, true);
+                    0, true, null, "Typed in cell " +cellIndex+' :' +valueTyped);
             }
         }
     }

@@ -53,7 +53,8 @@ class Field {
 
         this.getPogsPlugin().saveCompletedTaskAttribute(attributeName,
                                                         stringValue, doubleValue,
-                                                        -1, loggable, fieldType);
+                                                        -1, loggable, fieldType,
+        'Subject selected in field '+this.index+ ' of type: ' + fieldType +  ' :' + stringValue);
     }
     getPogsPlugin(){
         return this.surveyRefence.getPogsPlugin();

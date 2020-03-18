@@ -56,6 +56,11 @@ public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageConten
         return content.getAttributeIntegerValue();
     }
 
+    @JsonIgnore
+    public String getSummaryDescription(){
+        return content.getSummaryDescription();
+    }
+
 
     public JSONObject toJSON() {return content.toJSON();}
 

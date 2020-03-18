@@ -32,7 +32,7 @@ public class WebSocketEventListener {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
 
         String externalUserId = (String) headerAccessor.getSessionAttributes().get("externalUserId");
-        String latestCompletedTaskId = (String) headerAccessor.getSessionAttributes()
+        Long latestCompletedTaskId = (Long) headerAccessor.getSessionAttributes()
                 .get("latestCompletedTaskId");
 
         if(externalUserId != null) {

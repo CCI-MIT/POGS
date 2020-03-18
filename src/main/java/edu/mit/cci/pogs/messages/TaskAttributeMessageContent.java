@@ -11,6 +11,7 @@ public class TaskAttributeMessageContent {
     private Boolean loggableAttribute;
     private Boolean mustCreateNewAttribute;
     private Boolean broadcastableAttribute;
+    private String summaryDescription;
 
     public TaskAttributeMessageContent() {
         mustCreateNewAttribute = false;
@@ -78,6 +79,14 @@ public class TaskAttributeMessageContent {
         this.broadcastableAttribute = broadcastableAttribute;
     }
 
+    public String getSummaryDescription() {
+        return summaryDescription;
+    }
+
+    public void setSummaryDescription(String summaryDescription) {
+        this.summaryDescription = summaryDescription;
+    }
+
     public String getExtraData() {
         return extraData;
     }
@@ -93,6 +102,7 @@ public class TaskAttributeMessageContent {
         jo.put("attributeDoubleValue",attributeDoubleValue);
         jo.put("attributeIntegerValue",attributeIntegerValue);
         jo.put("loggableAttribute",loggableAttribute);
+        jo.put("summaryDescription",summaryDescription);
         return jo;
     }
 }

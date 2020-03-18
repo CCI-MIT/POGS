@@ -206,7 +206,7 @@ class EquationTypingTaskPlugin{
     }
     onCountdownEnd(){
         this.pogsPlugin.saveCompletedTaskAttribute('timerTimedOutForIndex',
-                                                   "", 0.0, this.orderIndex, true, '');
+                                                   "", 0.0, this.orderIndex, true, '','Subject ' + this.teamMates[this.orderIndex] + 'Lost his turn for equation:' +  this.totalFieldIndex);
     };
     changeIndexCountDueToTimer(timerIndex) {
         if(this.countDown!=null) {
@@ -218,7 +218,7 @@ class EquationTypingTaskPlugin{
     }
     sendTimerStartSetup() {
         this.pogsPlugin.saveCompletedTaskAttribute('startTimerForUserTurn',
-                                                       "", 0.0, this.orderIndex, true, '');
+                                                       "", 0.0, this.orderIndex, true, 'Started timer for ' +  this.teamMates[this.orderIndex]  +  ' to take his turn for equation ' + this.totalFieldIndex);
     }
     setupCurrentFieldWithTimerInfo() {
 
@@ -257,7 +257,7 @@ class EquationTypingTaskPlugin{
 
             this.pogsPlugin.saveCompletedTaskAttribute('takeTurnInField',
                                                        "", 0.0,
-                                                       cellIndex, true, '');
+                                                       cellIndex, true, '', 'Took his turn for equation :' + cellIndex);
 
         }
     }
@@ -285,7 +285,7 @@ class EquationTypingTaskPlugin{
             if(valueTyped != null) {
                 this.pogsPlugin.saveCompletedTaskAttribute('equationAnswer' + cellIndex,
                                                            valueTyped, 0.0,
-                                                           0, true, '');
+                                                           0, true, '', 'Marked done equation '+cellIndex+' : ' + valueTyped);
                 if(this.executionMode == 2) {
                     $("#editEquation_" + cellIndex).show();
                 }

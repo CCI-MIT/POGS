@@ -34,12 +34,12 @@ public class WorkspaceCommunicationWSController {
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
 
-        if (pogsMessage.getContent().getType().equals(CommunicationMessage.CommunicationType.JOINED.name())) {
+        if (pogsMessage.getContent().getType().name().equals(CommunicationMessage.CommunicationType.JOINED.name())) {
             headerAccessor.getSessionAttributes().put("externalUserId", pogsMessage.getSender());
             headerAccessor.getSessionAttributes().put("latestCompletedTaskId", completedTaskId);
         } else {
             Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
-            if(sender!=null) {
+            if (sender != null) {
                 EventLog el = new EventLog();
                 el.setCompletedTaskId(completedTaskId);
                 el.setSessionId(sessionId);
@@ -49,6 +49,9 @@ public class WorkspaceCommunicationWSController {
                 el.setEventType(pogsMessage.getType().name().toString());
                 el.setEventContent(pogsMessage.toJSON().toString());
                 el.setSenderSubjectId(sender.getId());
+                if (pogsMessage != null && pogsMessage.getContent() != null && pogsMessage.getContent().getMessage() != null) {
+                    el.setSummaryDescription(pogsMessage.getContent().getMessage());
+                }
                 eventLogDao.create(el);
             }
         }

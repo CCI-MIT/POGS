@@ -5,6 +5,7 @@ class EtherpadWithColors {
         this.padID = padID;
         this.subjectsColors = [];
         this.availableColors = [];
+        this.selectedColors = []
         this.uniqueColors = {};
         this.textSections = [];
         this.dictionaryTexts = {};
@@ -23,6 +24,7 @@ class EtherpadWithColors {
         }
         this.setupDictionaryData();
         for(let k = 0; k < this.availableColors.length; k++) {
+            this.selectedColors[k] = false;
             //btn-lg
             $('#colorPickerAndAssigner')
                 .append('<button type="button" class="btn " data-color-index="'+k+'" style="margin:10px;background-color: '+
@@ -127,20 +129,28 @@ class EtherpadWithColors {
         let isCurrentSubject = (subject.externalId == this._pogsPlugin.getSubjectId())?(true):(false);
         for(let k = 0 ; k < allColorButtons.length; k++) {
             if($(allColorButtons[k]).data("color-index") == colorIndex) {
-                if(isCurrentSubject) {
-                    $(allColorButtons[k]).text("You chose this color!");
-                    //$("#padContent").attr("disabled", null);
+                if(!this.selectedColors[colorIndex]) {
+                    this.selectedColors[colorIndex] = true;
+                    if (isCurrentSubject) {
+                        $(allColorButtons[k]).text("You chose this color!");
+                        //$("#padContent").attr("disabled", null);
 
-                    $("#colorPickerAndAssigner button").addClass("disabled");
-                    $("#colorPickerAndAssigner button").unbind();
-                    this.setupPad(this.padID,this.availableColors[colorIndex]);
-                } else {
-                    $(allColorButtons[k]).text( subject.displayName+" chose this color!")
-                    $(allColorButtons[k]).addClass("disabled");
-                    $(allColorButtons[k]).unbind();
+                        $("#colorPickerAndAssigner button").addClass("disabled");
+                        $("#colorPickerAndAssigner button").unbind();
+                        this.setupPad(this.padID, this.availableColors[colorIndex]);
+                    } else {
+                        $(allColorButtons[k]).text(subject.displayName + " chose this color!")
+                        $(allColorButtons[k]).addClass("disabled");
+                        $(allColorButtons[k]).unbind();
+                    }
+
+                    this.subjectsColors.push({
+                                                 externalId: subject.externalId,
+                                                 backgroundColor: this.availableColors[colorIndex],
+                                                 fontColor: generateFontColorBasedOnBackgroundColor(
+                                                     this.availableColors[colorIndex])
+                                             });
                 }
-                this.subjectsColors.push({externalId: subject.externalId, backgroundColor:this.availableColors[colorIndex],
-                                             fontColor: generateFontColorBasedOnBackgroundColor(this.availableColors[colorIndex])});
 
             }
         }
@@ -174,7 +184,7 @@ class EtherpadWithColors {
     sendAssignedColorToSelf(colorIndex){
         this._pogsPlugin.saveCompletedTaskAttribute('subjectAssignedToColor_'+colorIndex,
                                                     this._pogsPlugin.getSubjectId(), 0.0,
-                                                    colorIndex, true, colorIndex);
+                                                    colorIndex, true, colorIndex, 'Subject selected color: ' + this.availableColors[colorIndex]);
     }
     sendOperation(operation) {
         if (log.getLevel() <= log.levels.DEBUG) {

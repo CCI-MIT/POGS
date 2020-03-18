@@ -72,6 +72,7 @@ public class WorkspaceTaskWSController {
                         el.setEventContent(taskAttributeMessage.toJSON().toString());
                         el.setSenderSubjectId(sender.getId());
                         el.setExtraData(taskAttributeMessage.getExtraData());
+                        el.setSummaryDescription(taskAttributeMessage.getSummaryDescription());
                         eventLogDao.create(el);
                     }
 

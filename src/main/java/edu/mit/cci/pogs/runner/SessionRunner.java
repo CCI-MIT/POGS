@@ -294,18 +294,21 @@ public class SessionRunner implements Runnable {
     private void scheduleTaskScoring(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             if (task.getShouldScore()) {
-                TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
-                TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
-                if (taskConfiguration.getScoreScriptId()!= null ||pl != null) {
-                    ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
-                    _log.debug("Added task scoring: " + task.getId() + " - " + csr);
-                    csr.setSession(session);
-                    csr.setTaskWrapper(task);
-                    csr.setTaskPlugin(pl);
+                for (CompletedTask ct : task.getCompletedTasks()) {
+                    TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+                    TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
+                    if (taskConfiguration.getScoreScriptId() != null || pl != null) {
+                        ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                        _log.debug("Added task scoring: " + task.getId() + " - " + csr);
+                        csr.setSession(session);
+                        csr.setTaskWrapper(task);
+                        csr.setTaskPlugin(pl);
+                        csr.setCompletedTask(ct);
 
-                    Thread thread = new Thread(csr);
-                    thread.start();
-                    chatAndScriptRunners.add(thread);
+                        Thread thread = new Thread(csr);
+                        thread.start();
+                        chatAndScriptRunners.add(thread);
+                    }
                 }
             }
         }

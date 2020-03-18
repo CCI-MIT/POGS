@@ -10,6 +10,7 @@ class PogsPlugin {
             this.destroyFunc = function(){ console.log("Plug in destroy method")};
         }
         this.pogsRef = pogsRef;
+
     }
     getSubjectId() {
         return this.pogsRef.subjectId;
@@ -106,7 +107,7 @@ class PogsPlugin {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
     saveCompletedTaskAttribute(attributeName, stringValue, floatValue, intValue,
-                                          loggable, extraData) {
+                                          loggable, extraData,summaryDescription) {
         var messageContent = {
             attributeName: attributeName,
             attributeStringValue: stringValue,
@@ -115,6 +116,7 @@ class PogsPlugin {
             loggableAttribute: loggable,
             mustCreateNewAttribute: false,
             broadcastableAttribute: true,
+            summaryDescription: summaryDescription,
             extraData: extraData
         };
 
@@ -125,7 +127,7 @@ class PogsPlugin {
 
 
     saveCompletedTaskAttributeWithoutBroadcast(attributeName, stringValue, floatValue, intValue,
-                               loggable, extraData) {
+                               loggable, extraData, summaryDescription) {
         var messageContent = {
             attributeName: attributeName,
             attributeStringValue: stringValue,
@@ -134,6 +136,7 @@ class PogsPlugin {
             loggableAttribute: loggable,
             mustCreateNewAttribute: false,
             broadcastableAttribute: false,
+            summaryDescription : summaryDescription,
             extraData: extraData
         };
 

@@ -23,7 +23,7 @@ import edu.mit.cci.pogs.service.export.exportBeans.ExportFile;
 public class ExportUtils {
 
 
-    private static String[] ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG = {"getEventContent", "getStringValue"};
+    private static String[] ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG = {"getEventContent", "getStringValue", "getScoringData"};
 
 
     public static <T> List<ExportFile> getEntityDataExportFile(String path, Class<T> clazz, List<T> list,
@@ -39,9 +39,9 @@ public class ExportUtils {
         if (studyId != null) {
             isStudyExport = true;
 
-            ef.setFileName(clazz.getSimpleName() +((entitySpecificId!=null)?("_"+entitySpecificId ):("")) +"_study_" + String.valueOf(studyId) + "_" + getTimeFormattedNoSpaces(now) + ".csv");
+            ef.setFileName(clazz.getSimpleName() + ((entitySpecificId != null) ? ("_" + entitySpecificId) : ("")) + "_study_" + String.valueOf(studyId) + "_" + getTimeFormattedNoSpaces(now) + ".csv");
         } else {
-            ef.setFileName(clazz.getSimpleName() +((entitySpecificId!=null)?("_"+entitySpecificId ):(""))+ "_session_" + String.valueOf(sessionId) + "_" + getTimeFormattedNoSpaces(now) + ".csv");
+            ef.setFileName(clazz.getSimpleName() + ((entitySpecificId != null) ? ("_" + entitySpecificId) : ("")) + "_session_" + String.valueOf(sessionId) + "_" + getTimeFormattedNoSpaces(now) + ".csv");
         }
 
         Method[] methods = clazz.getDeclaredMethods();
@@ -54,14 +54,15 @@ public class ExportUtils {
             for (Method method : methods) {
                 if (method.getName().startsWith("get")) {
                     try {
-                        if(method.getName().equals("getId")){
+                        if (method.getName().equals("getId")) {
                             entryId = (Long) method.invoke(element, null);
                         }
-                        if(method.getName().equals(ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG[0])||
-                                method.getName().equals(ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG[1])){
+                        if (method.getName().equals(ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG[0]) ||
+                                method.getName().equals(ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG[1]) ||
+                                method.getName().equals(ATTRIBUTES_TO_EXTERNALIZE_IF_JSON_OR_TOO_BIG[2])) {
                             String contentString = (String) method.invoke(element, null);
                             boolean isJson = StringUtils.isJSONValid(contentString);
-                            if(isJson || (contentString!=null && contentString.length() > 500)) {
+                            if (isJson || (contentString != null && contentString.length() > 500)) {
                                 ExportFile exportFile = new ExportFile();
                                 exportFile.setFileContent(contentString);
                                 exportFile.setFileRootPath(tmpdir);
@@ -71,16 +72,16 @@ public class ExportUtils {
                                     exportFile.setRelativeFolder(clazz.getSimpleName());
                                     exportFile.setFileName(
                                             clazz.getSimpleName()
-                                            +"_"+entryId+ "_study_" + String.valueOf(studyId)
-                                            + "_" + getTimeFormattedNoSpaces(now) +
-                                            ((isJson)?(".json"):(".txt")));
+                                                    + "_" + entryId + "_study_" + String.valueOf(studyId)
+                                                    + "_" + getTimeFormattedNoSpaces(now) +
+                                                    ((isJson) ? (".json") : (".txt")));
                                 } else {
                                     exportFile.setRelativeFolder(clazz.getSimpleName());
                                     exportFile.setFileName(
-                                            clazz.getSimpleName()+"_"+entryId +
-                                            "_session_" + String.valueOf(sessionId)
-                                            + "_" + getTimeFormattedNoSpaces(now) +
-                                            ((isJson)?(".json"):(".txt")));
+                                            clazz.getSimpleName() + "_" + entryId +
+                                                    "_session_" + String.valueOf(sessionId)
+                                                    + "_" + getTimeFormattedNoSpaces(now) +
+                                                    ((isJson) ? (".json") : (".txt")));
                                 }
                                 exportFile.setFileType(clazz.getSimpleName() + "_" + entryId);
                                 ret.add(exportFile);
@@ -90,7 +91,7 @@ public class ExportUtils {
                                 content.append(contentString);
                             }
                         } else {
-                            if(method.getReturnType() == Timestamp.class){
+                            if (method.getReturnType() == Timestamp.class) {
                                 Timestamp timestamp = (Timestamp) method.invoke(element, null);
                                 content.append(getTimeFormatted(timestamp));
                             } else {
@@ -131,19 +132,97 @@ public class ExportUtils {
 
     }
 
-    public static String getTimeFormattedNoSpaces(Timestamp timestamp){
+    public static <T> ExportFile getExportFileForSimplePojo(String path, String fileName ,
+                                                                  Class<T> clazz,
+                                                               List<T> list , List<String> methodOrder) {
+
+        String tmpdir = path;
+
+        ExportFile ef = new ExportFile();
+        Timestamp now = new Timestamp(new Date().getTime());
+
+        ef.setFileRootPath(tmpdir);
+
+
+        ef.setFileName(fileName+".csv");
+
+
+        Method[] methods = clazz.getDeclaredMethods();
+        StringBuffer header = getHeaderForMethods(methodOrder, false);
+
+        StringBuffer content = new StringBuffer();
+
+        for (T element : list) {
+            for(String metho: methodOrder) {
+                for (Method method : methods) {
+
+                    if(method.getName().equals("get"+ capitalizeFirst(metho))) {
+
+                        try {
+                            if (method.getReturnType() == Timestamp.class) {
+                                Timestamp timestamp = (Timestamp) method.invoke(element, null);
+                                content.append(getTimeFormatted(timestamp));
+                            } else {
+                                Object rv = method.invoke(element, null);
+                                if(rv!=null) {
+                                    content.append(rv);
+                                } else {
+                                    content.append("");
+                                }
+                            }
+
+                            content.append(";");
+                        } catch (InvocationTargetException ite) {
+                            ite.printStackTrace();
+                        } catch (IllegalAccessException iae) {
+                            iae.printStackTrace();
+                        }
+                    }
+                }
+            }
+            content.deleteCharAt(content.length() - 1);
+            content.append("\n");
+        }
+
+        ef.setFileHeader(header.toString());
+        ef.setFileType(clazz.getSimpleName());
+        ef.setFileContent(content.toString());
+
+        return ef;
+
+    }
+
+    private static String capitalizeFirst(String metho) {
+        return (metho.substring(0,1)).toUpperCase() + metho.substring(1,metho.length());
+    }
+
+    public static String getTimeFormattedNoSpaces(Timestamp timestamp) {
         String pattern = "yyyy_MM_dd_HH_mm_ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         return simpleDateFormat.format(new Date(timestamp.getTime()));
     }
 
-    private static String getTimeFormatted(Timestamp timestamp){
-        if(timestamp== null) return "";
+    private static String getTimeFormatted(Timestamp timestamp) {
+        if (timestamp == null) return "";
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         return simpleDateFormat.format(new Date(timestamp.getTime()));
+    }
+    public static StringBuffer getHeaderForMethods(List<String> methods, boolean isStudyExport) {
+
+
+        StringBuffer header = new StringBuffer();
+        for (int i = 0;i < methods.size(); i++) {
+            String s = methods.get(i);
+            header.append(capitalizeFirst(s));
+            if(i+1!=methods.size()){
+                header.append(";");
+            }
+        }
+
+        return header;
     }
 
     public static StringBuffer getHeaderForEntity(Method[] methods, boolean isStudyExport) {

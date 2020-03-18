@@ -135,7 +135,8 @@ class Wackamole {
             }
             else if (attrName == "memberReady") {
                 this.memberReady++;
-                if (self.pogsPlugin.getTeammates().length == self.memberReady) {
+
+                //if (self.pogsPlugin.getTeammates().length == self.memberReady) {
                     // 5 seconds Count down, then display gameGrid
                     // and mole start popping up randomly
                     var countDownDate = new Date().getTime() + 5000;
@@ -149,7 +150,7 @@ class Wackamole {
                         }.bind(this), 5000);
                     }.bind(this));
 
-                }
+                //}
             }
 
             else if (attrName == 'mouseMove') {
@@ -206,7 +207,7 @@ class Wackamole {
             "", 0.0,
             0, false);
 
-        if (this.pogsPlugin.getTeammates().length == self.memberReady) {
+        //if (this.pogsPlugin.getTeammates().length == self.memberReady) {
             // 5 seconds Count down, then display gameGrid
             // and mole start popping up randomly
             var countDownDate = new Date().getTime() + 5000;
@@ -222,7 +223,7 @@ class Wackamole {
                 }.bind(this), 5000)
             }.bind(this)
             );
-        }
+        //}
 
     }
 
@@ -254,7 +255,7 @@ class Wackamole {
                     // and mole might disappear when cell click broadcast is received
                     self.pogsPlugin.saveCompletedTaskAttribute('targetHit',
                         "", 0.0,
-                        0, false);
+                        0, true, '', 'Subject hit mole in cell: ' + cell);
                     //TODO: add animation
                     $("#whack_cell" + cell)
                         .addClass("hit_color")

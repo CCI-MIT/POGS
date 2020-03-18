@@ -211,7 +211,7 @@ class MemoryGridTask {
             if(valueTyped != null) {
                 this.pogsPlugin.saveCompletedTaskAttribute('memoryGridAnswer' + cellIndex,
                     valueTyped, 0.0,
-                    0, true, '');
+                    0, true, '', 'Answered for cell ' + cellIndex + ' :' + valueTyped);
             }
         }
     }

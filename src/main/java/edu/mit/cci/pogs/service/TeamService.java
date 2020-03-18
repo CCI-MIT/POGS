@@ -66,7 +66,7 @@ public class TeamService {
         return null;
     }
 
-    private List<Subject> getSubjectsFromTeam(Team team) {
+    public List<Subject> getSubjectsFromTeam(Team team) {
         if(team!=null) {
             List<Subject> ret = new ArrayList<>();
             for (TeamHasSubject teamHasSub : teamHasSubjectDao.listByTeamId(team.getId())) {

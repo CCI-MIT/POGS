@@ -13,6 +13,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
+import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
 import edu.mit.cci.pogs.service.TaskService;
@@ -30,6 +31,9 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
     @Autowired
     protected CompletedTaskAttributeService completedTaskAttributeService;
+
+    @Autowired
+    protected EventLogService eventLogService;
 
     @Autowired
     protected TaskExecutionAttributeService taskExecutionAttributeService;
@@ -103,6 +107,12 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
                 ScriptContext.ENGINE_SCOPE).get("completedTaskAttributesToAdd");
         completedTaskAttributeService.createCompletedTaskAttributesFromJsonString(
                 attributesToAddJson,this.getCompletedTask().getId());
+    }
+    protected void retrieveEventLogsToAdd() {
+        String attributesToAddJson = (String) this.getEngine().getBindings(
+                ScriptContext.ENGINE_SCOPE).get("eventLogsToAdd");
+        eventLogService.createEventLogFromJsonString(
+                attributesToAddJson,this.getCompletedTask().getId(), this.getSession().getId());
     }
 
     public TaskWrapper getTaskWrapper() {

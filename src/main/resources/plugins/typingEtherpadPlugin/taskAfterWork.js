@@ -137,6 +137,7 @@ if(padID!= null){
     var fullText = getPadText(padID);
     var htmlText = getPadHTML(padID);
     var attributesToAddz = [];
+    var eventLogsToAddz = [];
     attributesToAddz.push({
                               "attributeName": "fullText",
                               "stringValue": fullText
@@ -165,9 +166,16 @@ if(padID!= null){
                                       {changeset: changeset, typedValue: typedValue,
                                           author: author, timestamp: timestamp, index: i}
                                   )
-                              })
-    }
+                              });
 
+        eventLogsToAddz.push({ "eventType" : "TASK_ATTRIBUTE", "eventContent": "",
+                                 "timestamp" : timestamp, "sender" : author,
+                                "summaryDescription" : typedValue
+
+                             }
+        )
+    }
+    eventLogsToAdd = JSON.stringify(eventLogsToAddz);
     completedTaskAttributesToAdd = JSON.stringify(attributesToAddz);
 }
 

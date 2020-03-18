@@ -28,6 +28,9 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
     @Autowired
     private CompletedTaskScoreService completedTaskScoreService;
 
+    private CompletedTask completedTask;
+
+
     private static final Logger _log = LoggerFactory.getLogger(ScoringRunner.class);
 
 
@@ -43,23 +46,23 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
                 Thread.sleep(timeBeforeStarts);
             }
             System.out.println(" Score is starting for Task id: " + taskWrapper.getId() + " (" + taskWrapper.getTaskName()+" )");
-            for (CompletedTask ct : taskWrapper.getCompletedTasks()) {
-                if (this.taskPlugin.isScriptType()) {
-                    if(taskConfiguration.getScoreScriptId()==null) {
-                        this.runScript(this.taskPlugin.getTaskScoreJsContent(), ct);
-                    } else {
-                        ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
-                        this.runScript(es.getScriptContent(),ct);
-                    }
+
+            if (this.taskPlugin.isScriptType()) {
+                if(taskConfiguration.getScoreScriptId()==null) {
+                    this.runScript(this.taskPlugin.getTaskScoreJsContent(), getCompletedTask());
                 } else {
-                    if(taskConfiguration.getScoreScriptId()==null) {
-                         completedTaskService.scoreCompletedTask(ct, taskWrapper);
-                    } else {
-                        ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
-                        this.runScript(es.getScriptContent(),ct);
-                    }
+                    ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
+                    this.runScript(es.getScriptContent(),getCompletedTask());
+                }
+            } else {
+                if(taskConfiguration.getScoreScriptId()==null) {
+                     completedTaskService.scoreCompletedTask(getCompletedTask(), taskWrapper);
+                } else {
+                    ExecutableScript es = executableScriptDao.get(taskConfiguration.getScoreScriptId());
+                    this.runScript(es.getScriptContent(),getCompletedTask());
                 }
             }
+
 
         } catch (InterruptedException ie) {
             _log.info("Stopping scoring script for task : " + taskWrapper.getId());
@@ -89,6 +92,7 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
     public void handleScriptFailure(ScriptException se) {
         _log.error("Before work script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
     }
+
 
 
 }

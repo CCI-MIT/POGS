@@ -53,6 +53,7 @@ public class TaskAfterWorkRunner extends TaskRelatedScriptRunner implements Runn
 
         retreiveSubjectAttributesToAdd();
         retrieveCompletedTaskAttributesToAdd();
+        retrieveEventLogsToAdd();
     }
 
     @Override

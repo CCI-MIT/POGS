@@ -43,6 +43,23 @@ public class WorkspaceCheckinWSController {
         }
 
 
+        //save only first checkin to database
+        if(!pogsMessage.getContent().getChannel().isEmpty() && pogsMessage.getContent().getChannel().equals("true")){
+            Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
+            EventLog el = new EventLog();
+            el.setCompletedTaskId(completedTaskId);
+            el.setSessionId(sessionId);
+            el.setSender(pogsMessage.getSender());
+            el.setReceiver(pogsMessage.getReceiver());
+            el.setTimestamp(new Timestamp(new Date().getTime()));
+            el.setEventType(pogsMessage.getType().name().toString());
+            el.setEventContent(pogsMessage.toJSON().toString());
+            el.setSenderSubjectId(sender.getId());
+            el.setExtraData("");
+            el.setSummaryDescription("Subject loaded : " + pogsMessage.getContent().getMessage());
+            eventLogDao.create(el);
+        }
+
         //save in the logs what kinds of events?
 
         messagingTemplate.convertAndSend("/topic/public/checkin/" + sessionId, pogsMessage);
