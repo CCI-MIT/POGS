@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.completedtaskattribute.CompletedTaskAttributeDao;
+import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskExecutionAttribute;
 
 @Service
@@ -17,8 +19,11 @@ public class CompletedTaskAttributeService {
     @Autowired
     private CompletedTaskAttributeDao completedTaskAttributeDao;
 
+    @Autowired
+    private SubjectDao subjectDao;
+
     public void createOrUpdate(String attributeName, String stringValue, Double doubleValue,
-                               Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute) {
+                               Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute, Long author) {
 
         CompletedTaskAttribute cta;
         if(mustCreateNewAttribute){
@@ -36,6 +41,9 @@ public class CompletedTaskAttributeService {
             }
         }
 
+        if(author!=null) {
+            cta.setLastAuthorSubjectId(author);
+        }
         cta.setExtraData(extraData);
         cta.setStringValue(stringValue);
         cta.setDoubleValue(doubleValue);
@@ -46,7 +54,6 @@ public class CompletedTaskAttributeService {
         } else{
             completedTaskAttributeDao.update(cta);
         }
-        //TODO: Log in the log export
 
 
     }
@@ -66,6 +73,16 @@ public class CompletedTaskAttributeService {
             teaJson.put("doubleValue", tea.getDoubleValue());
             teaJson.put("integerValue", tea.getIntegerValue());
             teaJson.put("extraData", tea.getExtraData());
+            if(tea.getLastAuthorSubjectId()!=null) {
+                Subject su = subjectDao.get(tea.getLastAuthorSubjectId());
+                if(su!=null) {
+                    teaJson.put("lastAuthorSubject", su.getSubjectExternalId());
+                } else {
+                    teaJson.put("lastAuthorSubject","");
+                }
+            } else {
+                teaJson.put("lastAuthorSubject","");
+            }
             configurationArray.put(teaJson);
         }
         return configurationArray;
@@ -89,6 +106,9 @@ public class CompletedTaskAttributeService {
                     }
                     if (jo.has("doubleValue")) {
                         tea.setDoubleValue(jo.getDouble("doubleValue"));
+                    }
+                    if(jo.has("lastAuthorSubjectId")){
+                        tea.setLastAuthorSubjectId(jo.getLong("lastAuthorSubjectId"));
                     }
                     boolean alreadyExist = false;
                     List<CompletedTaskAttribute> list = completedTaskAttributeDao.listByCompletedTaskId(completedTaskId);

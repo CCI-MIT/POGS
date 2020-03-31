@@ -13,6 +13,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
+import edu.mit.cci.pogs.service.DictionaryService;
 import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TaskExecutionAttributeService;
@@ -53,6 +54,9 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
     @Autowired
     protected ExecutableScriptDao executableScriptDao;
 
+    @Autowired
+    protected DictionaryService dictionaryService;
+
     @Override
     public void setupVariableBindings() {
         //get all subjects + subjects attributes
@@ -79,6 +83,7 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         this.getEngine().put("teammates", teamMates.toString());
 
+        System.out.println("teammates : " + teamMates.toString());
 
         JSONArray taskAttr = taskExecutionAttributeService.
                 listExecutionAttributesAsJsonArray(taskWrapper.getId());
@@ -92,6 +97,11 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         this.getEngine().put("completedTaskAttributes", completedTaskAttributes.toString());
         System.out.println("completedTaskAttributes : " + completedTaskAttributes.toString());
+
+        if(taskConfiguration.getDictionaryId()!=null){
+            this.getEngine().put("dictionary", dictionaryService.getDictionaryJSONObjectForTask(taskWrapper.getId()));
+
+        }
 
 
     }

@@ -165,7 +165,8 @@ if(padID!= null){
                                   "stringValue": JSON.stringify(
                                       {changeset: changeset, typedValue: typedValue,
                                           author: author, timestamp: timestamp, index: i}
-                                  )
+                                  ),
+                                "lastAuthorSubjectId" : author
                               });
 
         eventLogsToAddz.push({ "eventType" : "TASK_ATTRIBUTE", "eventContent": "",

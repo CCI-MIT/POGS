@@ -132,6 +132,84 @@ public class ExportUtils {
 
     }
 
+    public static <T> ExportFile getExportFileForSimplePojoWithExtraColumns(String path, String fileName ,
+                                                            Class<T> clazz,
+                                                            List<T> list ,
+                                                            List<String> methodOrder,
+                                                            List<String> extraColumns) {
+
+        String tmpdir = path;
+
+        ExportFile ef = new ExportFile();
+        Timestamp now = new Timestamp(new Date().getTime());
+
+        ef.setFileRootPath(tmpdir);
+
+
+        ef.setFileName(fileName+".csv");
+
+
+        Method[] methods = clazz.getDeclaredMethods();
+        StringBuffer header = getHeaderForMethods(methodOrder, false);
+
+        StringBuffer content = new StringBuffer();
+
+        for (T element : list) {
+            for(String metho: methodOrder) {
+                for (Method method : methods) {
+
+                    if(method.getName().equals("get"+ capitalizeFirst(metho))) {
+
+                        try {
+                            if (method.getReturnType() == Timestamp.class) {
+                                Timestamp timestamp = (Timestamp) method.invoke(element, null);
+                                content.append(getTimeFormatted(timestamp));
+                            } else {
+                                Object rv = method.invoke(element, null);
+                                if(rv!=null) {
+                                    content.append(rv);
+                                } else {
+                                    content.append("");
+                                }
+                            }
+
+                            content.append(";");
+                        } catch (InvocationTargetException ite) {
+                            ite.printStackTrace();
+                        } catch (IllegalAccessException iae) {
+                            iae.printStackTrace();
+                        }
+                    }
+                }
+            }
+            for (Method method : methods) {
+                if(method.getName().equals("getExtraColumns")){
+                    try {
+                        Object rv = method.invoke(element, null);
+                        if (rv != null) {
+                            content.append(rv);
+                        }
+                    }catch (InvocationTargetException ite){
+
+                    }catch (IllegalAccessException ite){
+
+                    }
+                }
+            }
+
+            content.deleteCharAt(content.length() - 1);
+            content.append("\n");
+        }
+        header.append(";");
+        for(String column: extraColumns ) {
+            header.append(column + ";");
+        }
+        ef.setFileHeader(header.toString());
+        ef.setFileType(clazz.getSimpleName());
+        ef.setFileContent(content.toString());
+
+        return ef;
+    }
     public static <T> ExportFile getExportFileForSimplePojo(String path, String fileName ,
                                                                   Class<T> clazz,
                                                                List<T> list , List<String> methodOrder) {

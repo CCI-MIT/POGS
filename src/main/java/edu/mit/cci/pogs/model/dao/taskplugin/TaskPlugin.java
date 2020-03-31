@@ -154,6 +154,9 @@ public class TaskPlugin {
     public String getTaskAfterWorkJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskAfterWork.js");
     }
+    public String getTaskExportJsContent() {
+        return readFile(this.pluginRootFolder + File.separatorChar + "taskExport.js");
+    }
 
     public String getTaskWorkJsContent() {
         return readFile(this.pluginRootFolder + File.separatorChar + "taskWork.js");

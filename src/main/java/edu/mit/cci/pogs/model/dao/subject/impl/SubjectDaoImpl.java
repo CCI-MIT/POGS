@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.subject.impl;
  
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.jooq.tables.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.records.SubjectRecord;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository;
  
 import java.util.List;
 
+import static edu.mit.cci.pogs.model.jooq.Tables.SESSION;
 import static edu.mit.cci.pogs.model.jooq.Tables.SESSION_HAS_TASK_GROUP;
 import static edu.mit.cci.pogs.model.jooq.Tables.SUBJECT;
 import static edu.mit.cci.pogs.model.jooq.Tables.TEAM;
@@ -40,6 +42,20 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         final SelectQuery<Record> query = dslContext.select()
                 .from(SUBJECT).getQuery();
         query.addConditions(SUBJECT.SESSION_ID.eq(sessionId));
+        return query.fetchInto(Subject.class);
+    }
+
+    public List<Subject> listBySessionIdOrParentSessionId( Long sessionId){
+
+        edu.mit.cci.pogs.model.jooq.tables.Subject subject = edu.mit.cci.pogs.model.jooq.tables.Subject.SUBJECT.as("su");
+        edu.mit.cci.pogs.model.jooq.tables.Session session = Session.SESSION.as("se");
+        final SelectQuery<Record> query = dslContext.select(subject.fields())
+                .from(subject)
+                .innerJoin(session).on(session.ID.eq(subject.SESSION_ID))
+                .getQuery();
+
+        query.addConditions(session.ID.eq(sessionId).or(session.PARENT_SESSION_ID.eq(sessionId)));
+
         return query.fetchInto(Subject.class);
     }
 

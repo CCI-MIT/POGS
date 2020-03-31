@@ -16,5 +16,7 @@ public interface SessionDao extends Dao<Session, Long> {
     List<Session> listPerpetualCurrentlyAccpeting(long initWindow);
 
     Session getSessionByFullName(String fullName);
+
+    List<Session> listByParentSessionId(Long id);
 }
  

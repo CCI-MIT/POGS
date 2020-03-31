@@ -88,5 +88,14 @@ public class SessionDaoImpl extends AbstractDao<Session, Long, SessionRecord> im
         return null;
     }
 
+    @Override
+    public List<Session> listByParentSessionId(Long id) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SESSION).getQuery();
+        query.addConditions(SESSION.PARENT_SESSION_ID.eq(id));
+        query.addOrderBy(SESSION.SESSION_START_DATE);
+        return query.fetchInto(Session.class);
+    }
+
 }
  

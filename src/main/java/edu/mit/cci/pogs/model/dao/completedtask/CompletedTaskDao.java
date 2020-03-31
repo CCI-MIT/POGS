@@ -21,5 +21,7 @@ public interface CompletedTaskDao extends Dao<CompletedTask, Long> {
     List<CompletedTask> listByCompletedTaskIds(List<Long> completedTaskIds);
 
     List<Long> listSubjectIds(Long teamId);
+
+    List<CompletedTask> listBySessionId(List<Long> sessionIds);
 }
  

@@ -34,19 +34,93 @@ public class SummaryController {
     @Autowired
     private SummaryExportService summaryExportService;
 
+    @GetMapping("/admin/export/summary/subject/study/{studyId}")
+    public void exportSessionSubjectSummaryForStudy(HttpServletRequest request, HttpServletResponse response,
+                                                 @PathVariable("studyId") Long studyId) {
+        generateSubjectSummary(request,response,null,studyId);
+    }
+    @GetMapping("/admin/export/summary/subject/session/{sessionId}")
+    public void exportSessionSubjectSummaryForSessions(HttpServletRequest request, HttpServletResponse response,
+                                                    @PathVariable("sessionId") Long sessionId) {
+        generateSubjectSummary(request,response,sessionId,null);
+    }
 
-    @GetMapping("/admin/export/summary/tasks/study/{studyId}")
+    private void generateSubjectSummary(HttpServletRequest request, HttpServletResponse response,
+                                     Long sessionId, Long studyId){
+        ExportFile ef = summaryExportService.exportSubjectSummaryFiles(studyId,
+                sessionId, getPath(request));
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=Subjects_"+
+                            ((studyId!=null)?("study["+studyId+"]"):("session["+sessionId+"]"))+"__" +
+                            ExportUtils.getTimeFormattedNoSpaces(new
+                                    Timestamp(new Date().getTime())) + ".zip");
+
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            sessionExportFiles.add(ef);
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/admin/export/summary/snapshot/study/{studyId}")
+    public void exportSessionTaskFinalSnapshotForStudy(HttpServletRequest request, HttpServletResponse response,
+                                                 @PathVariable("studyId") Long studyId) {
+        generateTaskFinalSnapshotSummary(request,response,null,studyId);
+    }
+    @GetMapping("/admin/export/summary/snapshot/session/{sessionId}")
+    public void exportSessionTaskFinalSnapshotForSessions(HttpServletRequest request, HttpServletResponse response,
+                                                    @PathVariable("sessionId") Long sessionId) {
+        generateTaskFinalSnapshotSummary(request,response,sessionId,null);
+    }
+
+    private void generateTaskFinalSnapshotSummary(HttpServletRequest request, HttpServletResponse response,
+                                          Long sessionId, Long studyId){
+
+        List<ExportFile> efs = summaryExportService.exportTaskSnapshotSummaryFiles(studyId,
+                sessionId, getPath(request));
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=TaskSnapshot_"+
+                            ((studyId!=null)?("study["+studyId+"]"):("session["+sessionId+"]"))+"__" +
+                            ExportUtils.getTimeFormattedNoSpaces(new
+                                    Timestamp(new Date().getTime())) + ".zip");
+
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            for(ExportFile ef: efs) {
+                sessionExportFiles.add(ef);
+            }
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @GetMapping("/admin/export/summary/score/study/{studyId}")
     public void exportSessionTaskSummaryForStudy(HttpServletRequest request, HttpServletResponse response,
                                            @PathVariable("studyId") Long studyId) {
-        generateTaskSummary(request,response,null,studyId);
+        generateTaskScoreSummary(request,response,null,studyId);
     }
-    @GetMapping("/admin/export/summary/tasks/session/{sessionId}")
+    @GetMapping("/admin/export/summary/score/session/{sessionId}")
     public void exportSessionTaskSummaryForSessions(HttpServletRequest request, HttpServletResponse response,
                                              @PathVariable("sessionId") Long sessionId) {
-        generateTaskSummary(request,response,sessionId,null);
+        generateTaskScoreSummary(request,response,sessionId,null);
     }
-    private void generateTaskSummary(HttpServletRequest request, HttpServletResponse response,
-                                         Long sessionId, Long studyId){
+    private void generateTaskScoreSummary(HttpServletRequest request, HttpServletResponse response,
+                                          Long sessionId, Long studyId){
         ExportFile ef = summaryExportService.exportTaskScoreSummaryFiles(studyId,
                 sessionId, getPath(request));
         try {

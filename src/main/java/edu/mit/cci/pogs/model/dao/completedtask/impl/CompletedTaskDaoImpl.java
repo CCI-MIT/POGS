@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.completedtask.impl;
 
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.jooq.tables.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.records.CompletedTaskRecord;
 import org.jooq.DSLContext;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static edu.mit.cci.pogs.model.jooq.Tables.COMPLETED_TASK;
+import static edu.mit.cci.pogs.model.jooq.Tables.ROUND;
 
 @Repository
 public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, CompletedTaskRecord> implements CompletedTaskDao {
@@ -39,6 +41,19 @@ public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, Compl
                 .from(COMPLETED_TASK).getQuery();
         query.addConditions(COMPLETED_TASK.ROUND_ID.eq(roundId));
 
+        return query.fetchInto(CompletedTask.class);
+
+    }
+
+    public List<CompletedTask> listBySessionId(List<Long> sessionIds) {
+        edu.mit.cci.pogs.model.jooq.tables.CompletedTask completedTask = COMPLETED_TASK.as("CT");
+        Round round = ROUND.as("r");
+        final SelectQuery<Record> query = dslContext.select(completedTask.fields())
+                .from(completedTask)
+                .innerJoin(round).on(round.ID.eq(completedTask.ROUND_ID))
+                .getQuery();
+
+        query.addConditions(round.SESSION_ID.in(sessionIds));
         return query.fetchInto(CompletedTask.class);
 
     }

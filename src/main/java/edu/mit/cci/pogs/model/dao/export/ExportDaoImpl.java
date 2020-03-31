@@ -64,6 +64,7 @@ public class ExportDaoImpl implements ExportDao {
         inner join study as st on st.id = s.study_id
         inner join task as t on t.id = c.task_id
      */
+
     public List<CompletedTaskScoreExport> getCompletedTaskScoreExportInfo(List<Long> sessionIds) {
         CompletedTaskScore cts = COMPLETED_TASK_SCORE.as("cts");
         CompletedTask ct = COMPLETED_TASK.as("ct");

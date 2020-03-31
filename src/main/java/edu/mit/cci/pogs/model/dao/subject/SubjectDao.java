@@ -12,5 +12,6 @@ public interface SubjectDao extends Dao<Subject, Long> {
     Subject getByExternalId(String externalId);
     List<Subject> getTeammates(Long sessionId, Long roundId, Long taskId);
     void delete(Long subjectId);
+    List<Subject> listBySessionIdOrParentSessionId( Long sessionId);
 }
  

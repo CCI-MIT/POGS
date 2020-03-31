@@ -171,6 +171,10 @@ public class SubjectService {
 
     }
 
+    public List<SubjectAttribute> getSubjectAttributes(Long subjectId){
+        List<SubjectAttribute> currentAttributes = this.subjectAttributeDao.listBySubjectId(subjectId);
+        return currentAttributes;
+    }
     public void createOrUpdateSubjectAttributes(List<SubjectAttribute> updatedSubjectAttributes, Long subjectId){
         List<SubjectAttribute> currentAttributes = this.subjectAttributeDao.listBySubjectId(subjectId);
         List<SubjectAttribute> subjectAttributeListToCreateOrUpdate = new ArrayList<>();

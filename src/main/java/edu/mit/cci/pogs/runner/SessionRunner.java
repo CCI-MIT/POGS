@@ -856,6 +856,14 @@ public class SessionRunner implements Runnable {
 
                         if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
                             subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
+
+                            for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
+
+                                if (subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
+                                    checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
+                                }
+
+                            }
                             List<Subject> checkedInSubjects = checkedInWaitingSubjectListById.values().stream().collect(Collectors.toList());
                             String[] subjectsToJoin = shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
                             if (subjectsToJoin != null) {
@@ -872,10 +880,7 @@ public class SessionRunner implements Runnable {
 
                                     for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
 
-                                        if(subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)){
-                                            checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
-                                            continue;
-                                        }
+
                                         String externalId = checkedInWaitingSubjectListById.get(shscI.getSubjectId()).getSubjectExternalId();
                                         for (String chosenExternalId : subjectsToJoin) {
                                             if (chosenExternalId.equals(externalId)) {

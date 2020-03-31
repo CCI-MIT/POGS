@@ -50,6 +50,7 @@ public class WorkspaceTaskWSController {
 
                     sr.getSession().addSubjectContribution(completedTaskId, externalId, 1);
 
+                    Subject sender = subjectDao.getByExternalId(taskAttributeMessage.getSender());
 
                     completedTaskAttributeService.createOrUpdate(
                             taskAttributeMessage.getAttributeName(),
@@ -58,9 +59,10 @@ public class WorkspaceTaskWSController {
                             taskAttributeMessage.getAttributeIntegerValue(),
                             Long.parseLong(taskAttributeMessage.getCompletedTaskId()),
                             taskAttributeMessage.getExtraData(),
-                            taskAttributeMessage.getMustCreateNewAttribute()
+                            taskAttributeMessage.getMustCreateNewAttribute(),
+                            sender.getId()
                     );
-                    Subject sender = subjectDao.getByExternalId(taskAttributeMessage.getSender());
+
                     if (sender != null) {
                         EventLog el = new EventLog();
                         el.setCompletedTaskId(completedTaskId);
