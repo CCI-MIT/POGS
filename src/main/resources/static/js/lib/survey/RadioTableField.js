@@ -51,10 +51,11 @@ class RadioTableField extends Field {
     setupHooks(){
 
         super.setupHooks();
-        $('#answer'+this.index+' input').on('focusin', this.handleFocusIn.bind(this));
-        $('#answer'+this.index+' input').on('change', this.handleFocusOut.bind(this));
+        //$('#answer'+this.index+' input').on('focusin', this.handleFocusIn.bind(this));
+        $('#answer'+this.index+' input').on('change', this.handleChange.bind(this));
     }
     handleFocusIn(event){
+        console.log("Handle Focus IN" );
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         let subIndex = parseInt($(event.target).data( "cell-reference-subindex"));
 
@@ -64,8 +65,10 @@ class RadioTableField extends Field {
                                                             "", 0.0,
                                                             subIndex, false, null);
         }
+
     }
-    handleFocusOut(event){
+    handleChange(event){
+        console.log("Handle Focus OUT" );
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
 
         let subIndex = parseInt($(event.target).data( "cell-reference-subindex"));
@@ -73,6 +76,8 @@ class RadioTableField extends Field {
 
         let answer = [];
         let answerz = $('#answer'+this.index+' input');
+
+
 
         let columns = []
         $.each($('#answer'+this.index+ ' thead th'),function(j,input){
@@ -92,7 +97,7 @@ class RadioTableField extends Field {
             if(answer != null) {
                 this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
                                                                 JSON.stringify(answer), 0.0,
-                                                                0, true, SURVEY_CONST.RADIO_FIELD);
+                                                                0, true, SURVEY_CONST.RADIO_TABLE_FIELD);
             }
         }
     }

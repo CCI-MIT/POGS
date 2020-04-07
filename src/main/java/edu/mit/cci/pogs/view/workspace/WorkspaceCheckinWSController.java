@@ -54,10 +54,14 @@ public class WorkspaceCheckinWSController {
             el.setTimestamp(new Timestamp(new Date().getTime()));
             el.setEventType(pogsMessage.getType().name().toString());
             el.setEventContent(pogsMessage.toJSON().toString());
-            el.setSenderSubjectId(sender.getId());
+            if(sender!=null) {//handle non users (task preview)
+                el.setSenderSubjectId(sender.getId());
+            }
             el.setExtraData("");
             el.setSummaryDescription("Subject loaded : " + pogsMessage.getContent().getMessage());
-            eventLogDao.create(el);
+            if(sender!=null) {
+                eventLogDao.create(el);
+            }
         }
 
         //save in the logs what kinds of events?

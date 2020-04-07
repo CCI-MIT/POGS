@@ -2,6 +2,7 @@ const SURVEY_CONST = {
     FIELD_NAME: "surveyAnswer",
     INPUT_FIELD: "InputField",
     RADIO_FIELD: "RadioField",
+    RADIO_TABLE_FIELD: "RadioTableField",
     SELECT_FIELD: "SelectField",
     CHECKBOX_FIELD: "CheckBoxField",
     CHECKBOX_FIELD_SELECT: "checkboxSelect",

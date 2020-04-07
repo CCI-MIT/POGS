@@ -52,6 +52,7 @@ class RadioField extends Field {
         $('#answer'+this.index+' input').on('change',this.handleRadioOnClick.bind(this));
     }
     handleRadioOnClick(event){
+        console.log("Radio on change called");
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
         //console.log("answer " + cellIndex);
         if(!isNaN(cellIndex)) {

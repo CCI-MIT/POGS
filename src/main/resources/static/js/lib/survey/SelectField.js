@@ -117,33 +117,33 @@ class SelectFieldEdit {
             $(".remove-select-choice").click(function () {
                 var valueOfDeletedField = $(this).siblings('input').val();
                 if (valueOfDeletedField != "") {
-                    ($("#answer" + questionNum + " option[value=" + this.escapeValueStringsInQuotes(
+                    ($("#answer" + questionNum + " option[value=" + escapeValueStringsInQuotes(
                         valueOfDeletedField) + "]")).remove();
                 }
                 ($(this).parent()).remove();
-            }.bind(this));
+            });
 
             $("#answerChoices" + questionNum).find("input").on("blur", function () {
                 $("#answer" + questionNum).empty();
                 $.each($("#answerChoices" + questionNum).find("input"), function (i, e) {
                     if (e.value != "") {
                         $("#answer" + questionNum).append(
-                            '<option value="' + this.escapeValueStringsInQuotes(e.value) + '">'
+                            '<option value="' + escapeValueStringsInQuotes(e.value) + '">'
                             + e.value + '</option>');
                     }
-                }.bind(this));
-            }.bind(this));
-        }.bind(this));
+                });
+            });
+        });
 
         $(".remove-select-choice").click(function () {
             var questionNum = $(this).parents("div[id*=question_set]").attr("id").match(/\d+/);
             var valueOfDeletedField = $(this).siblings('input').val();
             if (valueOfDeletedField != "") {
-                ($("#answer" + questionNum + " option[value=" + this.escapeValueStringsInQuotes(
+                ($("#answer" + questionNum + " option[value=" + escapeValueStringsInQuotes(
                     valueOfDeletedField) + "]")).remove();
             }
             ($(this).parent()).remove();
-        }.bind(this));
+        });
 
         $("#answerChoices" + question_number).find("input").on("blur", function () {
             var questionNum = $(this).parents("div[id*=question_set]").attr("id").match(/\d+/);
@@ -151,11 +151,11 @@ class SelectFieldEdit {
             $.each($("#answerChoices" + questionNum).find("input"), function (i, e) {
                 if (e.value != "") {
                     $("#answer" + questionNum).append(
-                        '<option value="' + this.escapeValueStringsInQuotes(e.value) + '">'
+                        '<option value="' + escapeValueStringsInQuotes(e.value) + '">'
                         + e.value + '</option>');
                 }
-            }.bind(this));
-        }.bind(this));
+            });
+        });
 
 
         if(answer!=null) {
@@ -169,9 +169,7 @@ class SelectFieldEdit {
         }
 
     }
-    escapeValueStringsInQuotes(string) {
-        return string.replace(/"/g, '\\"').replace(/'/g, '\\\'');
-    }
+
     composeFieldFromHTML(){
         let question_set = {};
 
@@ -198,4 +196,7 @@ class SelectFieldEdit {
         answer = $("#question_set"+this.questionNumber+" option:checked").val();
         return answer;
     }
+}
+function escapeValueStringsInQuotes(string) {
+    return string.replace(/"/g, '\\"').replace(/'/g, '\\\'');
 }
