@@ -132,6 +132,7 @@ class RadioTableField extends Field {
                         $(allInputs[k]).prop("checked", true);
                     }
                 }
+                this.setFinalAnswer(message.sender);
             }
         }
     }
