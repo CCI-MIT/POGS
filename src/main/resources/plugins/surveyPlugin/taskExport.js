@@ -76,6 +76,7 @@ for(var i=0; i < _completedTaskAttributes.length; i++){
 
 function cleanEntry(summaryDescription) {
     if (summaryDescription === null) return "";
+    if (summaryDescription === undefined) return "";
     summaryDescription = summaryDescription.replace(/\n/g, "¶");
     summaryDescription = summaryDescription.replace(/\r/g, "");
     summaryDescription = summaryDescription.replace(/,/g, "|");

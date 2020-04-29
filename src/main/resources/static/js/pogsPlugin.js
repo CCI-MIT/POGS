@@ -106,6 +106,24 @@ class PogsPlugin {
     subscribeTaskAttributeBroadcast (funct) {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
+    saveCompletedTaskAttributeMustCreateNew(attributeName, stringValue, floatValue, intValue,
+                               loggable, extraData,summaryDescription) {
+        var messageContent = {
+            attributeName: attributeName,
+            attributeStringValue: stringValue,
+            attributeDoubleValue: floatValue,
+            attributeIntegerValue: intValue,
+            loggableAttribute: loggable,
+            mustCreateNewAttribute: true,
+            broadcastableAttribute: true,
+            summaryDescription: summaryDescription,
+            extraData: extraData
+        };
+
+        this.pogsRef.sendMessage("/pogsapp/task.saveAttribute", "TASK_ATTRIBUTE", messageContent,
+                                 this.getSubjectId(), null, this.getCompletedTaskId(),
+                                 this.getSessionId());
+    }
     saveCompletedTaskAttribute(attributeName, stringValue, floatValue, intValue,
                                           loggable, extraData,summaryDescription) {
         var messageContent = {

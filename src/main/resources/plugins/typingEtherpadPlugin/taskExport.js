@@ -12,6 +12,8 @@ var API_ADDRESS = "http://localhost:8080";
 var dicionaryContents = "";
 
 
+
+
 if(_dictionary){
     if(_dictionary.hasGroundTruth){
         var dictEntryId = _dictionary.dictionaryEntries[0];

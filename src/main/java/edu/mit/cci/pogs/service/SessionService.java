@@ -450,20 +450,27 @@ public class SessionService {
                 taskList.add(tw);
             }
         }
+        List<Round> rounds = roundDao.listBySessionId(session.getId());
 
         for (TaskWrapper task : taskList) {
             if (task.getShouldScore()) {
                 TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
 
                 if (pl != null) {
-                    ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
-                    _log.debug("Added task scoring: " + task.getId() + " - " + csr);
-                    csr.setSession(new SessionWrapper(session));
-                    csr.setTaskWrapper(task);
-                    csr.setTaskPlugin(pl);
+                    List<CompletedTask> completedTaskList = completedTaskDao.listByRoundIdTeamId(rounds.get(0).getId(), task.getId());
 
-                    Thread thread = new Thread(csr);
-                    thread.start();
+                    for(CompletedTask ct: completedTaskList) {
+                        ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
+                        _log.debug("Added task scoring: TaskId:" + task.getId() + " CompletedTaskId: "+ct.getId());
+                        csr.setSession(new SessionWrapper(session));
+                        csr.setTaskWrapper(task);
+                        csr.setTaskPlugin(pl);
+                        csr.setCompletedTask(ct);
+
+                        Thread thread = new Thread(csr);
+                        thread.start();
+                    }
+
                 }
             }
         }

@@ -113,18 +113,20 @@ for(var i=0; i < _completedTaskAttributes.length; i++){
     }
 }
 var textsByAuthor = [];
-for(var j=0; j< spans.length; j++){
-    var aut = getAuthorOfSpan(spans[j]);
+if(spans != null) {
+    for (var j = 0; j < spans.length; j++) {
+        var aut = getAuthorOfSpan(spans[j]);
 
-    if(!textsByAuthor[aut]){
-        textsByAuthor[aut]= {
-          texts:[],
-          author: aut,
-          subject: null,
-          fullText: ''
-        };
+        if (!textsByAuthor[aut]) {
+            textsByAuthor[aut] = {
+                texts: [],
+                author: aut,
+                subject: null,
+                fullText: ''
+            };
+        }
+        textsByAuthor[aut].texts.push(spans[j]);
     }
-    textsByAuthor[aut].texts.push(spans[j]);
 }
 for(var te in  textsByAuthor){
 

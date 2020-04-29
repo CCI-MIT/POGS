@@ -62,11 +62,22 @@ public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, Compl
         final SelectQuery<Record> query = dslContext.select()
                 .from(COMPLETED_TASK).getQuery();
         query.addConditions(COMPLETED_TASK.ROUND_ID.eq(roundId));
-        query.addConditions(COMPLETED_TASK.TEAM_ID.eq(teamId));
+        query.addConditions(COMPLETED_TASK.TASK_ID.eq(teamId));
 
         return query.fetchInto(CompletedTask.class);
 
     }
+
+    public List<CompletedTask> listByRoundIdTaskId(Long roundId, Long taskId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(COMPLETED_TASK).getQuery();
+        query.addConditions(COMPLETED_TASK.ROUND_ID.eq(roundId));
+        query.addConditions(COMPLETED_TASK.TASK_ID.eq(taskId));
+
+        return query.fetchInto(CompletedTask.class);
+
+    }
+
 
 
     public CompletedTask getBySubjectIdTaskId(Long subjectId, Long taskId) {

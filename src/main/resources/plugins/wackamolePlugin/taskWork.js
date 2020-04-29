@@ -390,24 +390,24 @@ class Wackamole {
                 console.log("Player hitOnTarget: " + self.playerHitOnTarget);
                 console.log("total hitOnTarget: " + self.totalHitOnTarget);
 
-                self.pogsPlugin.saveCompletedTaskAttribute('totalOfRounds',
+                self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('totalOfRounds',
                                                            "", 0.0,
                                                            self.multiplayerRound, true,"");
 
 
-                self.pogsPlugin.saveCompletedTaskAttribute('teamScoreRound' + self.multiplayerRound,
+                self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('teamScoreRound' + self.multiplayerRound,
                                                            "", 0.0,
                                                            self.totalHitOnTarget, true,"");
 
-                self.pogsPlugin.saveCompletedTaskAttribute('totalTargetsAppearedRound' + self.multiplayerRound,
+                self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('totalTargetsAppearedRound' + self.multiplayerRound,
                                                            "", 0.0,
                                                            self.totalTarget, true,"");
 
-                self.pogsPlugin.saveCompletedTaskAttribute('subjectScoreRound' + self.multiplayerRound,
+                self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('subjectScoreRound' + self.multiplayerRound,
                                                            "", 0.0,
                                                            self.playerHitOnTarget, true,self.subjectId);
 
-                self.pogsPlugin.saveCompletedTaskAttribute('subjectNumberOfClicksRound' + self.multiplayerRound,
+                self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('subjectNumberOfClicksRound' + self.multiplayerRound,
                                                            "", 0.0,
                                                            self.numberOfClicks, true,self.subjectId);
 

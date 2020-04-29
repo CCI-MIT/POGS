@@ -206,7 +206,7 @@ class EquationTypingTaskPlugin{
     }
     onCountdownEnd(){
         this.pogsPlugin.saveCompletedTaskAttribute('timerTimedOutForIndex',
-                                                   "", 0.0, this.orderIndex, true, '','Subject ' + this.teamMates[this.orderIndex] + 'Lost his turn for equation:' +  this.totalFieldIndex);
+                                                   "", 0.0, this.orderIndex, true, '','Subject ' + this.teamMates[this.orderIndex].externalId + 'Lost his turn for equation:' +  this.totalFieldIndex);
     };
     changeIndexCountDueToTimer(timerIndex) {
         if(this.countDown!=null) {

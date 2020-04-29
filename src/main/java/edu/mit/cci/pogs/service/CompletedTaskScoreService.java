@@ -33,7 +33,7 @@ public class CompletedTaskScoreService {
 
             if (object.has("totalScore")) {
 
-                cts = new CompletedTaskScore();
+
                 cts.setTotalScore(object.getDouble("totalScore"));
 
                 if (object.has("numberOfRightAnswers")) {
@@ -60,6 +60,7 @@ public class CompletedTaskScoreService {
                 if(shouldCreate) {
                     completedTaskScoreDao.create(cts);
                 } else {
+
                     completedTaskScoreDao.update(cts);
                 }
             }

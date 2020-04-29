@@ -14,7 +14,6 @@ var totalOfRounds = 0;
 for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
     if(_completedTaskAttributes[i].attributeName == "totalOfRounds"){
         totalOfRounds = parseInt(_completedTaskAttributes[i].integerValue);
-        break;
     }
 }
 
@@ -28,7 +27,16 @@ var _completedTaskScore = {
     "numberOfProcessedEntries" : 0,
     "scoringData" : ""
 };
-var subjects = [];
+function newRound(){
+    return {
+        "teamScoreRound" : 0,
+        "totalTargetsAppearedRound" : 0,
+        "subjectScoreRound" : [],
+        "subjectNumberOfClicksRound" : []
+
+    };
+}
+var subjects = {};
 for(var k = 0; k <= totalOfRounds; k++) {
     var round = newRound();
     var roundIndex = k +1;
@@ -50,9 +58,27 @@ for(var k = 0; k <= totalOfRounds; k++) {
     rounds.push(round);
 }
 
+
 print(JSON.stringify(rounds));
-_headerColumns = "Cell Index;Last subject author; Answer;Ground Truth";
-_exportRecordLines = ["a;b;c;d"];
+
+_headerColumns = "RoundIndex;Subject author; NumberOfClicks;HitsInMoles;TotalTargetsAppeared";
+//_exportRecordLines = ["a;b;c;d"];
+for(var i =0 ; i < rounds.length; i++){
+    var round = rounds[i];
+    for(var j=0; j < round.subjectScoreRound.length ; j ++){
+        var su = round.subjectScoreRound[j];
+        _exportRecordLines.push(i + ";" + su.external_id + ";" + getNumberOfClicks(round,su.external_id) + ";" +su.subject_score+ ";" +  round.totalTargetsAppearedRound)
+
+    }
+}
+function getNumberOfClicks(round, externalId){
+    for(var k=0; k < round.subjectNumberOfClicksRound.length; k ++){
+        if(round.subjectNumberOfClicksRound[k].external_id == externalId){
+            return round.subjectNumberOfClicksRound[k].subject_score;
+        }
+    }
+    return 0;
+}
 /*
 _headerColumns = "Cell Index;Last subject author; Answer;Ground Truth";
 

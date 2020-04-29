@@ -11,6 +11,7 @@ public interface CompletedTaskDao extends Dao<CompletedTask, Long> {
 
     List<CompletedTask> listByRoundId(Long roundId);
     List<CompletedTask> listByRoundIdTeamId(Long roundId, Long teamId);
+    List<CompletedTask> listByRoundIdTaskId(Long roundId, Long taskId);
 
     CompletedTask getByRoundIdTaskIdTeamId(Long roundId, Long teamId, Long taskId);
 

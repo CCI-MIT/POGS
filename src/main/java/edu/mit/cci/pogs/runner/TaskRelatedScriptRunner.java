@@ -100,7 +100,8 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         if(taskConfiguration.getDictionaryId()!=null){
             this.getEngine().put("dictionary", dictionaryService.getDictionaryJSONObjectForTask(taskWrapper.getId()));
-
+        } else {
+            this.getEngine().put("dictionary","{}");
         }
 
 
