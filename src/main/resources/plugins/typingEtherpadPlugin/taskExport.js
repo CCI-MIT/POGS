@@ -7,7 +7,7 @@ var _dictionary = JSON.parse(dictionary);
 var _exportRecordLines = []
 var _headerColumns = "";
 
-_headerColumns = "Answer;Ground Truth";
+_headerColumns = "Author;Answer;Ground Truth";
 var API_ADDRESS = "http://localhost:8080";
 var dicionaryContents = "";
 
@@ -19,7 +19,7 @@ if(_dictionary){
         var dictEntryId = _dictionary.dictionaryEntries[0];
         var ret = getDictionaryEntry(_dictionary.id,dictEntryId );
         if(ret) {
-            print(ret);
+            //print(ret);
             dicionaryContents = (atob(ret.entryValue));
         }
     }
@@ -70,15 +70,84 @@ function cleanEntry(summaryDescription) {
     summaryDescription = summaryDescription.replace(/;/g, "|");
     return summaryDescription;
 }
-
+var spans  ;
 for(var i=0; i < _completedTaskAttributes.length; i++){
 
     if(_completedTaskAttributes[i].attributeName ==("fullText")) {
 
-        _exportRecordLines.push(cleanEntry(_completedTaskAttributes[i].stringValue) + ";" + cleanEntry(dicionaryContents))
+        _exportRecordLines.push("GROUP;" + cleanEntry(_completedTaskAttributes[i].stringValue) + ";" + cleanEntry(dicionaryContents))
+    }
+    if(_completedTaskAttributes[i].attributeName ==("fullTextHTML")) {
+
+        spans = getAllSpansInText(_completedTaskAttributes[i].stringValue);
+    }
+
+}
+
+var textsByAuthor = [];
+if(spans != null) {
+    for (var j = 0; j < spans.length; j++) {
+        var aut = getAuthorOfSpan(spans[j]);
+
+        if (!textsByAuthor[aut]) {
+            textsByAuthor[aut] = {
+                texts: [],
+                author: aut,
+                subject: null,
+                fullText: ''
+            };
+        }
+        textsByAuthor[aut].texts.push(spans[j]);
+    }
+}
+var userFullText = "";
+var tx = null;
+for(var te in  textsByAuthor){
+
+    userFullText = "";
+
+    for(var j=0; j< textsByAuthor[te].texts.length; j++){
+        tx = getTextInSpans(textsByAuthor[te].texts[j]);
+        userFullText += tx;
+
+    }
+
+    textsByAuthor[te].fullText = cleanEntry(userFullText);
+    textsByAuthor[te].subject = getAuthorSubject(te);
+
+    _exportRecordLines.push(textsByAuthor[te].subject.externalId + ";"+
+                            cleanEntry(userFullText)
+                            + ";" + "EQUAL TO GROUP");
+
+    print(textsByAuthor[te].subject.externalId + ";"+
+          cleanEntry(userFullText)
+          + ";" + "EQUAL TO GROUP")
+}
+
+function getAuthorSubject(author){
+    for(var i=0;i< _teammates.length; i++){
+        for(var j=0; j< _teammates[i].attributes.length; j++){
+            if(_teammates[i].attributes[j].attributeName =="ETHERPAD_AUTHOR_ID"){
+                if(_teammates[i].attributes[j].stringValue == author){
+                    return _teammates[i];
+                } else {
+                    break;
+                }
+            }
+        }
     }
 }
 
+function getAuthorOfSpan(span){
+    return span.match(/class="(.*?)"/i)[1].replace("author","").replace("_",".");
+}
+function getTextInSpans(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/i)[1];
+}
+function getAllSpansInText(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g);
+
+}
 
 exportRecordLines = JSON.stringify(_exportRecordLines);
 headerColumns = _headerColumns;

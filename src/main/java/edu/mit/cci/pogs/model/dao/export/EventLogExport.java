@@ -6,7 +6,9 @@ public class EventLogExport  {
 
     private String studyPrefix;
     private String sessionSuffix;
-    private String subjectExternalId;
+    private String senderSubjectExternalId;
+    private String receiverSubjectExternalId;
+    private Long receiverId;
     private String taskName;
     private Boolean soloTask;
     private Timestamp timestamp;
@@ -30,12 +32,12 @@ public class EventLogExport  {
         this.sessionSuffix = sessionSuffix;
     }
 
-    public String getSubjectExternalId() {
-        return subjectExternalId;
+    public String getSenderSubjectExternalId() {
+        return senderSubjectExternalId;
     }
 
-    public void setSubjectExternalId(String subjectExternalId) {
-        this.subjectExternalId = subjectExternalId;
+    public void setSenderSubjectExternalId(String senderSubjectExternalId) {
+        this.senderSubjectExternalId = senderSubjectExternalId;
     }
 
     public String getTaskName() {
@@ -86,5 +88,20 @@ public class EventLogExport  {
         this.summaryDescription = summaryDescription;
     }
 
+    public String getReceiverSubjectExternalId() {
+        return receiverSubjectExternalId;
+    }
+
+    public void setReceiverSubjectExternalId(String receiverSubjectExternalId) {
+        this.receiverSubjectExternalId = receiverSubjectExternalId;
+    }
+
+    public Long getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
+    }
 
 }

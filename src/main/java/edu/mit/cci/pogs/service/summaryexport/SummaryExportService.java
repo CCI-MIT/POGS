@@ -103,6 +103,13 @@ public class SummaryExportService {
         for (EventLogExport ele : eventLogExports) {
             ele.setEventContent("");
             ele.setSummaryDescription(validateSummary(ele.getSummaryDescription()));
+            if(ele.getReceiverId()!=null){
+                Subject su = subjectdao.get(ele.getReceiverId());
+                ele.setReceiverSubjectExternalId(su.getSubjectExternalId());
+            } else {
+                ele.setReceiverSubjectExternalId("");
+            }
+            
         }
 
         String[] fieldOrder = {
@@ -113,7 +120,8 @@ public class SummaryExportService {
                 "eventType",
                 "eventContent",
                 "timestamp",
-                "subjectExternalId",
+                "senderSubjectExternalId",
+                "receiverSubjectExternalId",
                 "summaryDescription"
         };
 

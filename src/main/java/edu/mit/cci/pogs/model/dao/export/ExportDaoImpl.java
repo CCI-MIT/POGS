@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.export;
 
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Record10;
 import org.jooq.Record11;
 import org.jooq.Record7;
 import org.jooq.Record9;
@@ -111,10 +112,11 @@ public class ExportDaoImpl implements ExportDao {
         Session s = SESSION.as("s");
         Study st = STUDY.as("st");
         Subject su = SUBJECT.as("su");
-        final SelectQuery<Record9<String, String, String, String, Boolean, Timestamp, String, String, String>> query = dslContext.select(
+        final SelectQuery<Record10<String, String, String,Long, String, Boolean, Timestamp, String, String, String>> query = dslContext.select(
                 st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                 s.SESSION_SUFFIX.as("sessionSuffix"),
-                su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
+                su.SUBJECT_EXTERNAL_ID.as("senderSubjectExternalId"),
+                el.RECEIVER_SUBJECT_ID.as("receiverId"),
                 t.TASK_NAME.as("taskName"),
                 t.SOLO_TASK.as("soloTask"),
                 el.TIMESTAMP.as("timestamp"),
@@ -160,7 +162,7 @@ public class ExportDaoImpl implements ExportDao {
                 query = dslContext.select(
                     st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                     s.SESSION_SUFFIX.as("sessionSuffix"),
-                    su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
+                    su.SUBJECT_EXTERNAL_ID.as("senderSubjectExternalId"),
                     el.TIMESTAMP.as("timestamp"),
                     el.EVENT_TYPE.as("eventType"),
                     el.EVENT_CONTENT.as("eventContent"),
