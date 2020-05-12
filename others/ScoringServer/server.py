@@ -6,7 +6,7 @@ from typingTask import score_typing_task
 from typingInColorsTask import score_typing_in_colors_task
 
 PORT_NUMBER = 8082
-DEBUG = False 
+DEBUG = True
 #This class will handles any incoming request from
 #the browser 
 class myHandler(BaseHTTPRequestHandler):

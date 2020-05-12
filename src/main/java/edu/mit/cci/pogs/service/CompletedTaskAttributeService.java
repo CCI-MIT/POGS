@@ -108,7 +108,14 @@ public class CompletedTaskAttributeService {
                         tea.setDoubleValue(jo.getDouble("doubleValue"));
                     }
                     if(jo.has("lastAuthorSubjectId")){
-                        tea.setLastAuthorSubjectId(jo.getLong("lastAuthorSubjectId"));
+                        if(jo.optLong("lastAuthorSubjectId")!=0l) {
+                            tea.setLastAuthorSubjectId(jo.getLong("lastAuthorSubjectId"));
+                        }else {
+                            Subject su = subjectDao.getByExternalId(jo.getString("lastAuthorSubjectId"));
+                            if(su!=null){
+                                tea.setLastAuthorSubjectId(su.getId());
+                            }
+                        }
                     }
                     boolean alreadyExist = false;
                     List<CompletedTaskAttribute> list = completedTaskAttributeDao.listByCompletedTaskId(completedTaskId);

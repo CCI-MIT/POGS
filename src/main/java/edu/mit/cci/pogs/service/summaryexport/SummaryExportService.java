@@ -109,7 +109,7 @@ public class SummaryExportService {
             } else {
                 ele.setReceiverSubjectExternalId("");
             }
-            
+
         }
 
         String[] fieldOrder = {
