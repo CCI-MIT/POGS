@@ -309,6 +309,19 @@ public class SessionController {
     }
 
 
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/reruntaskafterwork")
+    public String reRunTaskAfterWorkSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+        Session session = (sessionDao.get(id));
+        Study study = studyDao.get(studyId);
+        sessionService.reRunTaskAfterWorkInSession(session);
+
+
+        MessageUtils.addSuccessMessage("Session after work scripts initiated successfully, please beware it may take a while!", redirectAttributes);
+
+        return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
+    }
+
+
     @GetMapping("/admin/studies/{studyId}/sessions/{id}/edit")
     public String editSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, Model model) {
         SessionBean session = new SessionBean(sessionDao.get(id));

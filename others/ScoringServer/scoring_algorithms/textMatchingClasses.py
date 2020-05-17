@@ -55,7 +55,10 @@ class typingMatcher:
 		if not hitCounter or uniqueItemsCopied == 0:
 			score = 0
 		else:
-			score = uniqueItemsCopied * (1- float(numberOfHoles)/len(hitCounter)) * (1- float(numberOfMisplacedItems)/uniqueItemsCopied)
+		    if flagIgnorePenalty:
+		        score = uniqueItemsCopied
+		    else:
+			    score = uniqueItemsCopied * (1- float(numberOfHoles)/len(hitCounter)) * (1- float(numberOfMisplacedItems)/uniqueItemsCopied)
 
 		#return it all
 		return score, [itemsCopied, uniqueItemsCopied, repeatedItems, numberOfHoles, numberOfMisplacedItems]

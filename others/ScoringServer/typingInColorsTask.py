@@ -7,7 +7,7 @@ def score_typing_in_colors_task(request_parameters):
 	
 	if request_parameters['completedTaskAttributes'][0] is not None:
 		
-		typed_text = get_string_value_completed_task_attribute(request_parameters,'fullText')
+		typed_text = get_string_value_completed_task_attribute(request_parameters,'fullText') #fullTextHTML
 		
 		sections = get_text_sections_by_color_in_order(request_parameters)
 
@@ -31,7 +31,10 @@ def score_typing_in_colors_task(request_parameters):
 		total_typed_score_ground_truth = calculate_score_for_text_segment(full_ground_truth,full_ground_truth )
 		finalscoretruth += total_typed_score_ground_truth
 		print finalscoretruth
-		normalized_total_score = (finalscore/finalscoretruth)*100
+		if finalscoretruth != 0:
+		    normalized_total_score = (finalscore/finalscoretruth)*100
+		else:
+		    normalized_total_score = finalscore
 
 	resp = { 'completedTaskScore': {
 		'numberOfProcessedEntries' : 100,

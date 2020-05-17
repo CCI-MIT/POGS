@@ -1,3 +1,7 @@
+var _teammates = JSON.parse(teammates);
+var _subject = JSON.parse(subject);
+var _isSoloTask = isSoloTask;
+var _taskConfigurationAttributes = JSON.parse(taskConfigurationAttributes);
 
 
 function newConnection(url, method){
@@ -125,6 +129,16 @@ var SUBJECT_ETHERPAD_AUTHOR_ID = "ETHERPAD_AUTHOR_ID";
 
 if(padID!= null){
 
+    print("Task After work for typing in colors is starting! ")
+    var colorAssignments = [];
+    for(var i=0; i < _completedTaskAttributes.length; i++){
+        if(_completedTaskAttributes[i].attributeName.indexOf("subjectAssignedToColor_")!= -1){
+            colorAssignments.push({
+                                      subjectExternalId :_completedTaskAttributes[i].stringValue,
+                                      colorIndex: _completedTaskAttributes[i].extraData})
+        }
+    }
+
     var teammatez = JSON.parse(teammates);
     var etherpadAuthorMap = {};
     for(var k=0; k < teammatez.length; k++) {
@@ -135,7 +149,53 @@ if(padID!= null){
 
     var fullText = getPadText(padID);
     var htmlText = getPadHTML(padID);
+
+    var spans = getAllSpansInText(htmlText);
+
     var attributesToAddz = [];
+
+
+    var textsByAuthor = [];
+    var colorArray=[];
+    if(spans != null) {
+        for (var j = 0; j < spans.length; j++) {
+            var aut = getAuthorOfSpan(spans[j]);
+
+            if (!textsByAuthor[aut]) {
+                textsByAuthor[aut] = {
+                    texts: [],
+                    author: aut,
+                    subject: null,
+                    fullText: ''
+                };
+            }
+            textsByAuthor[aut].texts.push(spans[j]);
+        }
+    }
+    for(var te in  textsByAuthor){
+
+        var userFullText = "";
+        for(var j=0; j< textsByAuthor[te].texts.length; j++){
+            userFullText+=getTextInSpans(textsByAuthor[te].texts[j]);
+        }
+        textsByAuthor[te].fullText = cleanEntry(userFullText);
+        textsByAuthor[te].subject = getAuthorSubject(te);
+
+
+        var ass = getAuthorChosenColor(textsByAuthor[te].subject.externalId);
+
+
+        print("Added new attribute for " + "fullTextAuthor_" +textsByAuthor[te].subject.externalId);
+
+        attributesToAddz.push({
+                                  "attributeName": "fullTextAuthor_" +textsByAuthor[te].subject.externalId,
+                                  "stringValue": cleanEntry(textsByAuthor[te].fullText)
+                              });
+    }
+
+
+
+
     attributesToAddz.push({
                               "attributeName": "fullText",
                               "stringValue": fullText
@@ -186,4 +246,46 @@ function getTypedValueFromRevisionChangeset(changeset){
     if(index == -1) return "";
     return changeset.substring((index + 1),changeset.length);
 
+}
+
+function getAllSpansInText(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g);
+
+}
+function getAuthorOfSpan(span){
+    return span.match(/class="(.*?)"/i)[1].replace("author","").replace("_",".");
+}
+function getTextInSpans(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/i)[1];
+}
+function getAuthorChosenColor(sub){
+
+    for(var i=0;i<colorAssignments.length;i++){
+
+        if(colorAssignments[i].subjectExternalId == sub){
+            return colorAssignments[i];
+        }
+    }
+    return null;
+}
+function getAuthorSubject(author){
+    for(var i=0;i< _teammates.length; i++){
+        for(var j=0; j< _teammates[i].attributes.length; j++){
+            if(_teammates[i].attributes[j].attributeName =="ETHERPAD_AUTHOR_ID"){
+                if(_teammates[i].attributes[j].stringValue == author){
+                    return _teammates[i];
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+function cleanEntry(summaryDescription) {
+    if (summaryDescription === null) return "";
+    summaryDescription = summaryDescription.replace(/\n/g, "¶");
+    summaryDescription = summaryDescription.replace(/\r/g, "");
+    summaryDescription = summaryDescription.replace(/,/g, "|");
+    summaryDescription = summaryDescription.replace(/;/g, "|");
+    return summaryDescription;
 }

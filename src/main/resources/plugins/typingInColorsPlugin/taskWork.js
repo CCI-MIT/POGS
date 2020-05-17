@@ -103,7 +103,7 @@ class EtherpadWithColors {
                                                     true, '');
 
         //this.subjectsColors[i].externalId
-
+/*
         let team = this._pogsPlugin.getTeammates()
         let canvas = $('#padContent_mirror');
         for(var i = 0; i < team.length; i ++) {
@@ -122,6 +122,8 @@ class EtherpadWithColors {
             }
 
         }
+
+ */
         console.log('Before leave');
     }
     handleAssignedColor(colorIndex, subject){

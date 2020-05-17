@@ -38,7 +38,7 @@ class myHandler(BaseHTTPRequestHandler):
 
 		if DEBUG:
 			for param in params :
-				print 'paramName: ' + str(param) +' - paramValue:' + str(params[param][0])
+				print 'paramName: ' + str(param) +' - paramValue:' #+ str(params[param][0])
 
 
 		if self.path != None:

@@ -8,6 +8,8 @@ def score_typing_task(request_parameters):
 	if request_parameters['dictionaryHasGroundTruth'] != None and request_parameters['dictionaryHasGroundTruth'][0] == "true":
 		has_groud_truth = True
 
+	print ' Has Ground Truth: '
+	print str(has_groud_truth)
 	if has_groud_truth:
 		return calculate_text_has_ground_truth(request_parameters)
 	else:

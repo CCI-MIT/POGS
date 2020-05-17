@@ -20,6 +20,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.*;
 import edu.mit.cci.pogs.runner.ScoringRunner;
 import edu.mit.cci.pogs.runner.SessionRunner;
 import edu.mit.cci.pogs.runner.SessionRunnerManager;
+import edu.mit.cci.pogs.runner.TaskAfterWorkRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.utils.DateUtils;
@@ -62,7 +63,7 @@ public class SessionService {
 
     private final TodoEntryService todoEntryService;
 
-
+    private final TaskService taskService;
 
     private final VotingService votingService;
 
@@ -91,7 +92,8 @@ public class SessionService {
                           VotingService votingService,
                           CompletedTaskScoreDao completedTaskScoreDao,
                           TaskGroupService taskGroupService,
-                          SubjectService subjectService
+                          SubjectService subjectService,
+                          TaskService taskService
     ) {
         this.todoEntryService = todoEntryService;
         this.votingService = votingService;
@@ -111,6 +113,7 @@ public class SessionService {
         this.studyDao = studyDao;
         this.taskGroupService = taskGroupService;
         this.subjectService = subjectService;
+        this.taskService = taskService;
 
 
     }
@@ -124,14 +127,15 @@ public class SessionService {
         initiateThreadsForSessions(sessions);
 
     }
-    public Session getSessionByFullName(String fullName){
+
+    public Session getSessionByFullName(String fullName) {
         return sessionDao.getSessionByFullName(fullName);
     }
 
     public Session getPerpetualSessionForSubject(String externalId) {
         List<Session> sessions = sessionDao.listPerpetualCurrentlyAccpeting(WAITING_ROOM_OPEN_INIT_WINDOW);
         for (Session s : sessions) {
-            if(s.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
+            if (s.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())) {
                 if (externalId.startsWith(s.getPerpetualSubjectsPrefix())) {
                     return s;
                 }
@@ -149,7 +153,7 @@ public class SessionService {
         for (Session s : sessions) {
 
             if (SessionRunnerManager.getSessionRunner(s.getId()) == null) {
-                _log.debug(" Session runner starting: PREFIX(" + s.getFullSessionName()+") - ID(" + s.getId() + ")");
+                _log.debug(" Session runner starting: PREFIX(" + s.getFullSessionName() + ") - ID(" + s.getId() + ")");
                 SessionRunner sessionRunner = (SessionRunner) context.getBean("sessionRunner");
                 sessionRunner.setSession(s);
                 SessionRunnerManager.addSessionRunner(s.getId(), sessionRunner);
@@ -245,7 +249,7 @@ public class SessionService {
             session.setDisplayNameChangeTime(0);
         }
 
-        if(sessionBean.getSessionScheduleType().equals(SessionScheduleType.SCHEDULED_DATE.getId())){
+        if (sessionBean.getSessionScheduleType().equals(SessionScheduleType.SCHEDULED_DATE.getId())) {
             session.setPerpetualStartDate(null);
             session.setPerpetualEndDate(null);
         }
@@ -268,7 +272,7 @@ public class SessionService {
 
 
         clonedNonPerpetualSession.setSessionSuffix(session.getSessionSuffix());
-        clonedNonPerpetualSession.setSessionStartDate(new Timestamp(new Date().getTime() + 500 * 60 ));
+        clonedNonPerpetualSession.setSessionStartDate(new Timestamp(new Date().getTime() + 500 * 60));
         clonedNonPerpetualSession.setStatus(SessionStatus.NOTSTARTED.getId().toString());
         clonedNonPerpetualSession.setWaitingRoomTime(session.getWaitingRoomTime());
         clonedNonPerpetualSession.setIntroPageEnabled(session.getIntroPageEnabled());
@@ -303,7 +307,7 @@ public class SessionService {
         clonedNonPerpetualSession.setFixedInteractionTime(session.getFixedInteractionTime());
         clonedNonPerpetualSession.setStudyId(session.getStudyId());
         clonedNonPerpetualSession.setParentSessionId(session.getId());
-        clonedNonPerpetualSession.setFullSessionName(session.getFullSessionName()+"_" + DateUtils.now());
+        clonedNonPerpetualSession.setFullSessionName(session.getFullSessionName() + "_" + DateUtils.now());
         clonedNonPerpetualSession.setSessionScheduleType(SessionScheduleType.SCHEDULED_DATE.getId().toString());
         clonedNonPerpetualSession.setDoneUrlParameter(session.getDoneUrlParameter());
         clonedNonPerpetualSession.setSessionWideScriptId(session.getSessionWideScriptId());
@@ -417,7 +421,8 @@ public class SessionService {
         roundDao.deleteBySessionId(session.getId());
         stopSession(session);
     }
-    public void stopSession(Session session){
+
+    public void stopSession(Session session) {
         SessionRunner sr = SessionRunnerManager.getSessionRunner(session.getId());
         if (sr != null) {
             SessionRunnerManager.removeSessionRunner(session.getId());
@@ -428,10 +433,10 @@ public class SessionService {
         sessionDao.update(session);
     }
 
-    public List<CompletedTask> listCompletedTasksOfSession(Long sessionid){
+    public List<CompletedTask> listCompletedTasksOfSession(Long sessionid) {
         List<Round> rounds = roundDao.listBySessionId(sessionid);
         List<CompletedTask> completedTaskList = new ArrayList<>();
-        for(Round r: rounds){
+        for (Round r : rounds) {
             completedTaskList.addAll(completedTaskDao.listByRoundId(r.getId()));
         }
         return completedTaskList;
@@ -446,7 +451,7 @@ public class SessionService {
             for (TaskGroupHasTask tght : tghtList) {
                 Task task = taskDao.get(tght.getTaskId());
                 TaskWrapper tw = new TaskWrapper(task);
-                tw.setTaskStartTimestamp(DateUtils.now() - 1000*60*10);//schedule ALL TASKS TO ten minutes ago. to trigger scoring right now.
+                tw.setTaskStartTimestamp(DateUtils.now() - 1000 * 60 * 10);//schedule ALL TASKS TO ten minutes ago. to trigger scoring right now.
                 taskList.add(tw);
             }
         }
@@ -459,10 +464,53 @@ public class SessionService {
                 if (pl != null) {
                     List<CompletedTask> completedTaskList = completedTaskDao.listByRoundIdTeamId(rounds.get(0).getId(), task.getId());
 
-                    for(CompletedTask ct: completedTaskList) {
+                    for (CompletedTask ct : completedTaskList) {
                         ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
-                        _log.debug("Added task scoring: TaskId:" + task.getId() + " CompletedTaskId: "+ct.getId());
+                        _log.debug("Added task scoring: TaskId:" + task.getId() + " CompletedTaskId: " + ct.getId());
                         csr.setSession(new SessionWrapper(session));
+                        csr.setTaskWrapper(task);
+                        csr.setTaskPlugin(pl);
+                        csr.setCompletedTask(ct);
+
+                        Thread thread = new Thread(csr);
+                        thread.start();
+                    }
+
+                }
+            }
+        }
+    }
+
+    public void reRunTaskAfterWorkInSession(Session session) {
+
+        List<TaskWrapper> taskList = new ArrayList<>();
+        List<SessionHasTaskGroup> taskGroupList = listSessionHasTaskGroupBySessionId(session.getId());
+        for (SessionHasTaskGroup sshtg : taskGroupList) {
+            List<TaskGroupHasTask> tghtList = this.taskGroupService.listTaskGroupHasTaskByTaskGroup(sshtg.getTaskGroupId());
+            for (TaskGroupHasTask tght : tghtList) {
+                Task task = taskDao.get(tght.getTaskId());
+                TaskWrapper tw = new TaskWrapper(task);
+                tw.setTaskStartTimestamp(DateUtils.now() - 1000 * 60 * 10);//schedule ALL TASKS TO ten minutes ago. to trigger scoring right now.
+                taskList.add(tw);
+            }
+        }
+        List<Round> rounds = roundDao.listBySessionId(session.getId());
+
+        for (TaskWrapper task : taskList) {
+
+            TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
+            TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
+            if (pl != null) {
+                if (taskConfiguration.getAfterWorkScriptId() != null || (pl.getTaskAfterWorkJsContent() != null)) {
+                    List<CompletedTask> completedTaskList = completedTaskDao.listByRoundIdTeamId(rounds.get(0).getId(), task.getId());
+
+                    for (CompletedTask ct : completedTaskList) {
+                        TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
+                        _log.debug("Added task before working: TaskId:" + task.getId() + " CompletedTaskId: " + ct.getId());
+                        csr.setSession(new SessionWrapper(session));
+                        List<CompletedTask> list = new ArrayList<>();
+                        list.add(ct);
+                        task.setCompletedTasks(list);
                         csr.setTaskWrapper(task);
                         csr.setTaskPlugin(pl);
                         csr.setCompletedTask(ct);
