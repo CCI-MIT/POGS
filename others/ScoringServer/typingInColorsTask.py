@@ -11,6 +11,7 @@ def score_typing_in_colors_task(request_parameters):
 		
 		sections = get_text_sections_by_color_in_order(request_parameters)
 
+		print sections
 		scores = []
 		finalscore = 0.0
 		full_ground_truth = ''

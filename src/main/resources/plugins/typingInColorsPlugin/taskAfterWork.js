@@ -186,6 +186,9 @@ if(padID!= null){
 
 
         print("Added new attribute for " + "fullTextAuthor_" +textsByAuthor[te].subject.externalId);
+        print("<TEXT BEGIN>")
+        print(textsByAuthor[te].fullText)
+        print("</TEXT END>")
 
         attributesToAddz.push({
                                   "attributeName": "fullTextAuthor_" +textsByAuthor[te].subject.externalId,
