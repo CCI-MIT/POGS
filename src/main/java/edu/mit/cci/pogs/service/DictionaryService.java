@@ -88,6 +88,7 @@ public class DictionaryService {
         JSONArray configurationArray = new JSONArray();
         for (DictionaryEntry tea : taskExecutionAttributes) {
             JSONObject teaJson = new JSONObject();
+            teaJson.put("id", tea.getId());
             teaJson.put("entryType", tea.getEntryType());
             teaJson.put("entryCategory", tea.getEntryCategory());
             teaJson.put("entryValue", tea.getEntryValue());

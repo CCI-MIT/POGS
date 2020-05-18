@@ -1,4 +1,5 @@
 from scoring_algorithms.typing_task_evaluator import typingTaskEvaluator
+from HTMLParser import HTMLParser
 import json
 DEBUG = True
 def score_typing_in_colors_task(request_parameters):
@@ -11,20 +12,22 @@ def score_typing_in_colors_task(request_parameters):
 		
 		sections = get_text_sections_by_color_in_order(request_parameters)
 
-		print sections
+		#print sections
 		scores = []
 		finalscore = 0.0
 		full_ground_truth = ''
 		finalscoretruth = 0.0
 		color_score = []
 		counter = 0
+		h = HTMLParser()
 		for section in sections:
 			full_ground_truth = full_ground_truth + str(section['ground_truth'])
-			section_score = (calculate_score_for_text_segment(section['typed_value'],section['ground_truth']))
+			section_score = (calculate_score_for_text_segment(h.unescape(section['typed_value']),section['ground_truth']))
+			print section_score
 			finalscore += section_score
 			section_ground_score = (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
 			finalscoretruth+=section_ground_score
-			color_score.append({'color': section['color'],'color_score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
+			color_score.append({'color': section['color'],'author': section['author'], 'score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
 			counter +=1
 	
 		total_typed_score = calculate_score_for_text_segment(typed_text,full_ground_truth )
@@ -44,7 +47,7 @@ def score_typing_in_colors_task(request_parameters):
 		'completedTaskId' :  request_parameters['completedTaskId'][0],
 		'numberOfEntries' :  0, 
 		'scoringData' : json.dumps(
-			{'colors_score': color_score, 'total_text': {
+			{'individual_subject_scores': color_score, 'total_text': {
 				'total_text_score' : total_typed_score,
 			 	'total_text_ground_truth_score':total_typed_score_ground_truth },
 			 'final_score_number': finalscore,
@@ -71,25 +74,40 @@ def get_text_sections_by_color_in_order(request_parameters):
 	sections = get_text_sections(request_parameters)
 	colors = {}
 	colorOrder = []
-
+	#print "GET TXT SECTIONS BY COLOR "
 	for section in list(sections):
 		#print section
 		if section['color'] in colors:
-			colors[section['color']]['ground_truth'] = colors[section['color']]['ground_truth'] + section['text']
+			colors[section['color']]['ground_truth'] = str(colors[section['color']]['ground_truth']) + str(get_dict_value(request_parameters,section['text']))
 		else:
-			colors[section['color']] = {'ground_truth': section['text'], 'typed_value' : '', 'author': '', 'color': section['color']}
+			colors[section['color']] = {'ground_truth': str(get_dict_value(request_parameters,section['text'])), 'typed_value' : '', 'author': '', 'color': section['color']}
 			colorOrder.append(section['color'])
 
 	counter = 0
 	finalDict = []
+	h = HTMLParser()
+	print h.unescape(
 	for se in colorOrder :
 		#print se
 		colors[se]['author'] = get_string_value_completed_task_attribute(request_parameters, str('subjectAssignedToColor_'+str(counter)))
 		colors[se]['typed_value'] = get_string_value_completed_task_attribute(request_parameters,str('fullTextAuthor_'+str(colors[se]['author'])))
+		print colors[se]['author']
+		print " ########################################################################################################################"
+		print h.unescape(colors[se]['typed_value'])
+		print " ########################################################################################################################"
+		print colors[se]['ground_truth']
 		finalDict.append(colors[se])
 		counter+=1
-	return finalDict
 
+	return finalDict
+def get_dict_value(request_parameters, id):
+	if request_parameters['dictionaryEntries'][0] != None:
+		task_execution_attributes = json.loads(str(request_parameters['dictionaryEntries'][0]))
+		for attribute in task_execution_attributes:
+			if str(attribute['id']) == id:
+				return attribute['entryValue']
+
+	return None
 def get_text_sections(request_parameters):
 	if request_parameters['taskExecutionAttibutes'][0] != None:
 		task_execution_attributes = json.loads(str(request_parameters['taskExecutionAttibutes'][0]))

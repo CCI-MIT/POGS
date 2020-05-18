@@ -178,7 +178,7 @@ if(padID!= null){
         for(var j=0; j< textsByAuthor[te].texts.length; j++){
             userFullText+=getTextInSpans(textsByAuthor[te].texts[j]);
         }
-        textsByAuthor[te].fullText = cleanEntry(userFullText);
+        textsByAuthor[te].fullText = (userFullText);
         textsByAuthor[te].subject = getAuthorSubject(te);
 
 
@@ -192,7 +192,7 @@ if(padID!= null){
 
         attributesToAddz.push({
                                   "attributeName": "fullTextAuthor_" +textsByAuthor[te].subject.externalId,
-                                  "stringValue": cleanEntry(textsByAuthor[te].fullText)
+                                  "stringValue": (textsByAuthor[te].fullText)
                               });
     }
 
@@ -283,12 +283,4 @@ function getAuthorSubject(author){
             }
         }
     }
-}
-function cleanEntry(summaryDescription) {
-    if (summaryDescription === null) return "";
-    summaryDescription = summaryDescription.replace(/\n/g, "¶");
-    summaryDescription = summaryDescription.replace(/\r/g, "");
-    summaryDescription = summaryDescription.replace(/,/g, "|");
-    summaryDescription = summaryDescription.replace(/;/g, "|");
-    return summaryDescription;
 }

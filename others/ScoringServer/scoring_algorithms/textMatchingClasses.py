@@ -24,6 +24,7 @@ class typingMatcher:
 		return overallScore
 
 	def computeScores( self, hitCounter, hitSequence ):
+		flagIgnorePenalty = True
 		#count the number of words copied
 		itemsCopied = sum(hitCounter)
 
