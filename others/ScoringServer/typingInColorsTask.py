@@ -22,19 +22,20 @@ def score_typing_in_colors_task(request_parameters):
 		h = HTMLParser()
 		for section in sections:
 			full_ground_truth = full_ground_truth + str(section['ground_truth'])
-			section_score = (calculate_score_for_text_segment(h.unescape(section['typed_value']),section['ground_truth']))
-			print section_score
+			unescape = h.unescape(section['typed_value'])
+			section_score = (calculate_score_for_text_segment(unescape,section['ground_truth']))
+			#print section_score
 			finalscore += section_score
 			section_ground_score = (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
 			finalscoretruth+=section_ground_score
 			color_score.append({'color': section['color'],'author': section['author'], 'score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
 			counter +=1
 	
-		total_typed_score = calculate_score_for_text_segment(typed_text,full_ground_truth )
+		total_typed_score = calculate_score_for_text_segment(h.unescape(typed_text),full_ground_truth )
 		finalscore +=total_typed_score
 		total_typed_score_ground_truth = calculate_score_for_text_segment(full_ground_truth,full_ground_truth )
 		finalscoretruth += total_typed_score_ground_truth
-		print finalscoretruth
+		#print finalscoretruth
 		if finalscoretruth != 0:
 		    normalized_total_score = (finalscore/finalscoretruth)*100
 		else:
@@ -86,16 +87,15 @@ def get_text_sections_by_color_in_order(request_parameters):
 	counter = 0
 	finalDict = []
 	h = HTMLParser()
-	print h.unescape(
 	for se in colorOrder :
 		#print se
 		colors[se]['author'] = get_string_value_completed_task_attribute(request_parameters, str('subjectAssignedToColor_'+str(counter)))
 		colors[se]['typed_value'] = get_string_value_completed_task_attribute(request_parameters,str('fullTextAuthor_'+str(colors[se]['author'])))
-		print colors[se]['author']
-		print " ########################################################################################################################"
-		print h.unescape(colors[se]['typed_value'])
-		print " ########################################################################################################################"
-		print colors[se]['ground_truth']
+		#print colors[se]['author']
+		#print " ########################################################################################################################"
+		#print h.unescape(colors[se]['typed_value'])
+		#print " ########################################################################################################################"
+		#print colors[se]['ground_truth']
 		finalDict.append(colors[se])
 		counter+=1
 
@@ -113,7 +113,7 @@ def get_text_sections(request_parameters):
 		task_execution_attributes = json.loads(str(request_parameters['taskExecutionAttibutes'][0]))
 		for attribute in task_execution_attributes:
 			if attribute['attributeName'] == 'gridBluePrint':
-				return json.loads(str(attribute['stringValue']))
+				return json.loads((attribute['stringValue']).encode('utf-8'))
 
 	return None
 
@@ -126,8 +126,8 @@ def calculate_score_for_text_segment(subject_text,ground_truth):
 	#print str(ground_truth)
 	#print "]"
 
-	settings['groupTypedText'] = str(subject_text)
-	settings['groundTruth'] = str(ground_truth)
+	settings['groupTypedText'] = (subject_text).encode('utf-8')
+	settings['groundTruth'] = (ground_truth).encode('utf-8')
 		
 	evaluator = typingTaskEvaluator(settings)
 
