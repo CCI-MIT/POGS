@@ -1,8 +1,10 @@
 package edu.mit.cci.pogs.model.dao.eventlog.impl;
  
+import edu.mit.cci.pogs.messages.PogsMessage;
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.records.EventLogRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -32,6 +34,17 @@ public class EventLogDaoImpl extends AbstractDao<EventLog, Long, EventLogRecord>
         final SelectQuery<Record> query = dslContext.select()
                 .from(EVENT_LOG).getQuery();
  
+        return query.fetchInto(EventLog.class);
+    }
+
+    public List<EventLog> listCheckInSubjectLogs(Long subjectId) {
+
+        final SelectQuery<Record> query = dslContext.select()
+                .from(EVENT_LOG).getQuery();
+        query.addConditions(EVENT_LOG.SENDER_SUBJECT_ID.eq(subjectId));
+        query.addConditions(EVENT_LOG.EVENT_TYPE.eq(PogsMessage.MessageType.CHECK_IN.name()));
+        query.addOrderBy(EVENT_LOG.TIMESTAMP.desc());
+        query.addLimit(0,3);
         return query.fetchInto(EventLog.class);
     }
 

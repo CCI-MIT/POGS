@@ -22,6 +22,10 @@ public class SubjectExport {
 
     private Subject subject;
 
+    private String lastCheckInPage;
+
+    private String lastCheckInTime;
+
     private List<String> attributes;
 
 
@@ -85,7 +89,21 @@ public class SubjectExport {
         }
     }
 
+    public String getLastCheckInPage() {
+        return lastCheckInPage;
+    }
 
+    public void setLastCheckInPage(String lastCheckInPage) {
+        this.lastCheckInPage = lastCheckInPage;
+    }
+
+    public String getLastCheckInTime() {
+        return lastCheckInTime;
+    }
+
+    public void setLastCheckInTime(String lastCheckInTime) {
+        this.lastCheckInTime = lastCheckInTime;
+    }
 
     public String getExtraColumns() {
         String ret = "";

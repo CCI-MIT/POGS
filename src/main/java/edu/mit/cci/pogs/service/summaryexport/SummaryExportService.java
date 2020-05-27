@@ -4,14 +4,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreExport;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreSubjectTeamExport;
 import edu.mit.cci.pogs.model.dao.export.EventLogExport;
@@ -25,6 +29,7 @@ import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
@@ -40,7 +45,9 @@ import edu.mit.cci.pogs.service.CompletedTaskService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.export.exportBeans.ExportFile;
+import edu.mit.cci.pogs.utils.DateUtils;
 import edu.mit.cci.pogs.utils.ExportUtils;
+import edu.mit.cci.pogs.utils.StringUtils;
 
 @Service
 public class SummaryExportService {
@@ -59,6 +66,9 @@ public class SummaryExportService {
 
     @Autowired
     private TeamDao teamDao;
+
+    @Autowired
+    private EventLogDao eventLogDao;
 
     @Autowired
     private SubjectService subjectService;
@@ -164,6 +174,14 @@ public class SummaryExportService {
                 SubjectExport se = new SubjectExport(su);
                 se.setStudyPrefix(study.getStudySessionPrefix());
                 se.setSessionSuffix(session.getSessionSuffix());
+                List<EventLog> eventLogs = eventLogDao.listCheckInSubjectLogs(su.getId());
+                if(eventLogs!=null && eventLogs.size()>0){
+                    se.setLastCheckInPage(eventLogs.get(0).getSummaryDescription());
+                    se.setLastCheckInTime(getTimeFormatted(eventLogs.get(0).getTimestamp()));
+                } else {
+                    se.setLastCheckInPage("");
+                    se.setLastCheckInTime("");
+                }
 
                 Team team = teamDao.getSubjectTeam(su.getId(), null, null, null);
                 if (team != null) {
@@ -193,7 +211,9 @@ public class SummaryExportService {
                 "subjectId",
                 "subjectExternalId",
                 "subjectDisplayName",
-                "subjectPreviousSessionSubjectId"
+                "subjectPreviousSessionSubjectId",
+                "lastCheckInPage",
+                "lastCheckInTime"
         };
 
 
@@ -206,6 +226,14 @@ public class SummaryExportService {
                 list);
 
 
+    }
+
+    private static String getTimeFormatted(Timestamp timestamp) {
+        if (timestamp == null) return "";
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        return simpleDateFormat.format(new Date(timestamp.getTime()));
     }
 
     public ExportFile exportTaskScoreSummaryFiles(Long studyId, Long sessionId, String path) {
