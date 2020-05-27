@@ -25,17 +25,17 @@ def score_typing_in_colors_task(request_parameters):
 				section['typed_value'] = ""
 			full_ground_truth = full_ground_truth + str(section['ground_truth'])
 			unescape = h.unescape(section['typed_value'])
-			section_score = (calculate_score_for_text_segment(unescape,section['ground_truth']))
+			section_score = (calculate_score_for_text_segment(False,unescape,section['ground_truth']))
 			#print section_score
 			finalscore += section_score
-			section_ground_score = (calculate_score_for_text_segment(section['ground_truth'],section['ground_truth']))
+			section_ground_score = (calculate_score_for_text_segment(False,section['ground_truth'],section['ground_truth']))
 			finalscoretruth+=section_ground_score
 			color_score.append({'color': section['color'],'author': section['author'], 'score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
 			counter +=1
 	
-		total_typed_score = calculate_score_for_text_segment(h.unescape(typed_text),full_ground_truth )
+		total_typed_score = calculate_score_for_text_segment(True,h.unescape(typed_text),full_ground_truth )
 		finalscore +=total_typed_score
-		total_typed_score_ground_truth = calculate_score_for_text_segment(full_ground_truth,full_ground_truth )
+		total_typed_score_ground_truth = calculate_score_for_text_segment(True,full_ground_truth,full_ground_truth )
 		finalscoretruth += total_typed_score_ground_truth
 		#print finalscoretruth
 		if finalscoretruth != 0:
@@ -119,7 +119,7 @@ def get_text_sections(request_parameters):
 
 	return None
 
-def calculate_score_for_text_segment(subject_text,ground_truth):
+def calculate_score_for_text_segment(punish_error,subject_text,ground_truth):
 	settings = {}
 	
 	#print "["
@@ -130,9 +130,10 @@ def calculate_score_for_text_segment(subject_text,ground_truth):
 
 	settings['groupTypedText'] = (subject_text).encode('utf-8')
 	settings['groundTruth'] = (ground_truth).encode('utf-8')
-		
+	settings['punishError'] = punish_error
 	evaluator = typingTaskEvaluator(settings)
 
 	parameters = {}
 	parameters['TypingTaskType'] = 'typingText'
+
 	return evaluator.computeScores(parameters)

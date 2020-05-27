@@ -30,11 +30,11 @@ def calculate_text_has_ground_truth(request_parameters):
 		dictionary_entries = json.loads(str(request_parameters['dictionaryEntries'][0]))
 		
 		ground_truth_dictionary_entry = dictionary_entries[0]['entryValue']
-		finalscore = calculate_score(typed_text, ground_truth_dictionary_entry)
-		max_score = calculate_score(ground_truth_dictionary_entry, ground_truth_dictionary_entry)
+		finalscore = calculate_score(True,typed_text, ground_truth_dictionary_entry)
+		max_score = calculate_score(True, ground_truth_dictionary_entry, ground_truth_dictionary_entry)
 		final_ind_score = []
 		for individual_text_contribution in individual_text_contributions:
-			individual_text_contribution['score'] = calculate_score(individual_text_contribution['typed_text'],ground_truth_dictionary_entry)
+			individual_text_contribution['score'] = calculate_score(False, individual_text_contribution['typed_text'],ground_truth_dictionary_entry)
 			individual_text_contribution['max_score'] = max_score
 			final_ind_score.append({'author':individual_text_contribution['subject_external_id'], 'score': individual_text_contribution['score'], max_score: individual_text_contribution['max_score'] })
 		normalized = (finalscore/max_score)*100.0
@@ -54,11 +54,11 @@ def calculate_text_has_ground_truth(request_parameters):
 	}}
 	return resp
 
-def calculate_score(typed_text,ground_truth_dictionary_entry):
+def calculate_score(punish_error,typed_text,ground_truth_dictionary_entry):
 	settings = {}
 	settings['groupTypedText'] = str(typed_text)
 	settings['groundTruth'] = str(ground_truth_dictionary_entry)
-
+	settings['punishError'] = punish_error
 	evaluator = typingTaskEvaluator(settings)
 
 	parameters = {}
