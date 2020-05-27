@@ -71,6 +71,18 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         }
     }
 
+    public Subject getByPogsUniqueHashId(String pogsUniqueHash) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(SUBJECT).getQuery();
+        query.addConditions(SUBJECT.POGS_UNIQUE_HASH.eq(pogsUniqueHash));
+        Record record =  query.fetchAny();
+        if(record == null) {
+            return null;
+        }else{
+            return record.into(Subject.class);
+        }
+    }
+
     public List<Subject> getTeammates(Long sessionId, Long roundId, Long taskId) {
         final SelectQuery<Record> query = dslContext.select(SUBJECT.fields())
                 .from(SUBJECT)

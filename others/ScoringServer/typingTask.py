@@ -1,4 +1,6 @@
+from __future__ import division
 from scoring_algorithms.typing_task_evaluator import typingTaskEvaluator
+
 import json
 DEBUG = False
 
@@ -16,43 +18,69 @@ def score_typing_task(request_parameters):
 		return calculate_text_does_not_have_ground_truth(request_parameters)
 
 def calculate_text_has_ground_truth(request_parameters):
-	settings = {}
-	
+
+	finalscore = 0.0
+	normalized = 0.0
 	if request_parameters['completedTaskAttributes'][0] != None and request_parameters['dictionaryEntries'][0] != None:
 		
 		typed_text = extract_typed_text_from_completed_task_attributes(request_parameters)
 
+		individual_text_contributions = extract_individual_typed_text_from_completed_task_attributes(request_parameters)
+
 		dictionary_entries = json.loads(str(request_parameters['dictionaryEntries'][0]))
 		
 		ground_truth_dictionary_entry = dictionary_entries[0]['entryValue']
-
-
-		settings['groupTypedText'] = str(typed_text)
-		settings['groundTruth'] = str(ground_truth_dictionary_entry)
-		
-		evaluator = typingTaskEvaluator(settings)
-
-		parameters = {}
-		parameters['TypingTaskType'] = 'typingText'
-		finalscore = evaluator.computeScores(parameters)
-	
-
+		finalscore = calculate_score(typed_text, ground_truth_dictionary_entry)
+		max_score = calculate_score(ground_truth_dictionary_entry, ground_truth_dictionary_entry)
+		final_ind_score = []
+		for individual_text_contribution in individual_text_contributions:
+			individual_text_contribution['score'] = calculate_score(individual_text_contribution['typed_text'],ground_truth_dictionary_entry)
+			individual_text_contribution['max_score'] = max_score
+			final_ind_score.append({'author':individual_text_contribution['subject_external_id'], 'score': individual_text_contribution['score'], max_score: individual_text_contribution['max_score'] })
+		normalized = (finalscore/max_score)*100.0
 
 	resp = { 'completedTaskScore': {
 		'numberOfProcessedEntries' : 100,
 		'numberOfWrongAnswers' : 0, 
 		'numberOfRightAnswers' : 0, 
 		'completedTaskId' :  request_parameters['completedTaskId'][0],
-		'numberOfEntries' :  0, 
-		'totalScore' : finalscore
+		'numberOfEntries' :  0,
+		'scoringData' : json.dumps({'individual_subject_scores': final_ind_score,
+		'total_text': {
+					 'final_score_number': finalscore,
+					 'final_score_ground_truth_number': max_score,
+					 'normalized_total_score': normalized}}),
+		'totalScore' : normalized
 	}}
 	return resp
+
+def calculate_score(typed_text,ground_truth_dictionary_entry):
+	settings = {}
+	settings['groupTypedText'] = str(typed_text)
+	settings['groundTruth'] = str(ground_truth_dictionary_entry)
+
+	evaluator = typingTaskEvaluator(settings)
+
+	parameters = {}
+	parameters['TypingTaskType'] = 'typingText'
+	finalscore = evaluator.computeScores(parameters)
+	return finalscore
 def extract_typed_text_from_completed_task_attributes(request_parameters):
 	completed_task_attributes = json.loads(str(request_parameters['completedTaskAttributes'][0]))
 	typed_text = ''
 	for attribute in completed_task_attributes:
 		if attribute['attributeName'] == 'fullText':
 			return attribute['stringValue']
+
+def extract_individual_typed_text_from_completed_task_attributes(request_parameters):
+	completed_task_attributes = json.loads(str(request_parameters['completedTaskAttributes'][0]))
+	typed_text = ''
+	entries = []
+	for attribute in completed_task_attributes:
+		if 'fullTextAuthor_' in attribute['attributeName'] :
+			print attribute['attributeName']
+			entries.append({ 'subject_external_id' : attribute['attributeName'].replace('fullTextAuthor_',''), 'typed_text':attribute['stringValue'], 'score': 0.0, 'max_score': 0.0 })
+	return entries
 
 def calculate_text_does_not_have_ground_truth(request_parameters):
 

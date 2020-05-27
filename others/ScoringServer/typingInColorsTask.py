@@ -21,6 +21,8 @@ def score_typing_in_colors_task(request_parameters):
 		counter = 0
 		h = HTMLParser()
 		for section in sections:
+			if section['typed_value'] is None:
+				section['typed_value'] = ""
 			full_ground_truth = full_ground_truth + str(section['ground_truth'])
 			unescape = h.unescape(section['typed_value'])
 			section_score = (calculate_score_for_text_segment(unescape,section['ground_truth']))

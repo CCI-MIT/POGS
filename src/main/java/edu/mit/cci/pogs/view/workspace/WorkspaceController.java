@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -131,7 +132,9 @@ public class WorkspaceController {
                                    @RequestParam(name = "workerId", required = false) String workerId,
                                    @RequestParam(name = "assignmentId", required = false) String assignmentId,
                                    @RequestParam(name = "hitId", required = false) String hitId,
-                                   Model model) {
+                                   Model model,
+                                   HttpServletRequest request,
+                                   HttpServletResponse response) {
         model.addAttribute("action", "/sessions/start/" + sessionId);
         if (workerId != null) {
             model.addAttribute("workerId", workerId);
@@ -143,6 +146,20 @@ public class WorkspaceController {
             model.addAttribute("hitId", hitId);
         }
         model.addAttribute("externalId", externalId);
+
+        boolean alreadyHasCookie = false;
+        if (request.getCookies() != null && request.getCookies().length > 0) {
+            for (Cookie co : request.getCookies()) {
+                if (co.getName().equals("unique_pogs_id")) {
+                    alreadyHasCookie = true;
+                }
+            }
+        }
+        if (!alreadyHasCookie) {
+            Cookie co = new Cookie("unique_pogs_id", UUID.randomUUID().toString());
+            response.addCookie(co);
+        }
+
         return "workspace/landing";
     }
 
@@ -153,7 +170,7 @@ public class WorkspaceController {
                                        @RequestParam(name = "workerId", required = false) String workerId,
                                        @RequestParam(name = "assignmentId", required = false) String assignmentId,
                                        @RequestParam(name = "hitId", required = false) String hitId,
-
+                                       HttpServletRequest request,
                                        Model model) {
 
         Session session = sessionService.getSessionByFullName(sessionId);
@@ -170,8 +187,29 @@ public class WorkspaceController {
             return "workspace/error";
         }
 
+        boolean alreadyHasCookie = false;
+        String cookieHash = null;
+        if (request.getCookies() != null && request.getCookies().length > 0) {
+            for (Cookie co : request.getCookies()) {
+                if (co.getName().equals("unique_pogs_id")) {
+                    alreadyHasCookie = true;
+                    cookieHash = co.getValue();
+                }
+            }
+        }
 
-        Subject su = new Subject();
+        Subject su;
+        if (alreadyHasCookie) {
+            su = subjectDao.getByPogsUniqueHashId(cookieHash);
+            if (su != null) {
+                SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+
+                model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
+                return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/pre_check_in");
+            }
+        }
+
+        su = new Subject();
         List<SubjectAttribute> allSubAttr = null;
         if (externalId != null && !externalId.isEmpty()) {
             Subject ref = subjectDao.getByExternalId(externalId);
@@ -189,11 +227,11 @@ public class WorkspaceController {
         su.setSessionId(session.getId());
 
         su = subjectDao.create(su);
-        if((workerId != null && !workerId.isEmpty())||
-                (assignmentId != null && !assignmentId.isEmpty())||
-                (hitId != null && !hitId.isEmpty())){
+        if ((workerId != null && !workerId.isEmpty()) ||
+                (assignmentId != null && !assignmentId.isEmpty()) ||
+                (hitId != null && !hitId.isEmpty())) {
             List<SubjectAttribute> allSubAttr2 = new ArrayList<>();
-            if(workerId != null && !workerId.isEmpty()){
+            if (workerId != null && !workerId.isEmpty()) {
                 SubjectAttribute sa = new SubjectAttribute();
                 sa.setInternalAttribute(true);
                 sa.setAttributeName("workerId");
@@ -201,7 +239,7 @@ public class WorkspaceController {
                 sa.setLatest(true);
                 allSubAttr2.add(sa);
             }
-            if(assignmentId != null && !assignmentId.isEmpty()){
+            if (assignmentId != null && !assignmentId.isEmpty()) {
                 SubjectAttribute sa = new SubjectAttribute();
                 sa.setInternalAttribute(true);
                 sa.setAttributeName("assignmentId");
@@ -209,7 +247,7 @@ public class WorkspaceController {
                 sa.setLatest(true);
                 allSubAttr2.add(sa);
             }
-            if(hitId != null && !hitId.isEmpty()){
+            if (hitId != null && !hitId.isEmpty()) {
                 SubjectAttribute sa = new SubjectAttribute();
                 sa.setInternalAttribute(true);
                 sa.setAttributeName("hitId");
@@ -218,15 +256,15 @@ public class WorkspaceController {
                 allSubAttr2.add(sa);
             }
             for (SubjectAttribute sa : allSubAttr2) {
-                    SubjectAttribute subjectAttribute = new SubjectAttribute();
-                    subjectAttribute.setSubjectId(su.getId());
-                    subjectAttribute.setAttributeName(sa.getAttributeName());
-                    subjectAttribute.setStringValue(sa.getStringValue());
-                    subjectAttribute.setIntegerValue(sa.getIntegerValue());
-                    subjectAttribute.setRealValue(sa.getRealValue());
-                    subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
-                    subjectAttribute.setLatest(true);
-                    subjectAttributeDao.create(subjectAttribute);
+                SubjectAttribute subjectAttribute = new SubjectAttribute();
+                subjectAttribute.setSubjectId(su.getId());
+                subjectAttribute.setAttributeName(sa.getAttributeName());
+                subjectAttribute.setStringValue(sa.getStringValue());
+                subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                subjectAttribute.setRealValue(sa.getRealValue());
+                subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
+                subjectAttribute.setLatest(true);
+                subjectAttributeDao.create(subjectAttribute);
             }
         }
 
@@ -253,6 +291,8 @@ public class WorkspaceController {
         //go to pre-check-in page (wait for event CHECKIN OPEN)
         //return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();
         model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
+
+
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/pre_check_in");
     }
 
@@ -332,9 +372,38 @@ public class WorkspaceController {
                 model.addAttribute("pogsSessionPerpetual", sr.getSession().isSessionPerpetual());
 
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
-                model.addAttribute("nextUrl", sr.getSession().getNextUrl());
-                if(session.isSessionPerpetual() && su.getId()!=null){
-                    model.addAttribute("waitingRoomExpireTime",subjectHasSessionCheckInService.getSubjectSessionCheckInExpireTime(su.getId(), session.getId()));
+                String url = sr.getSession().getNextUrl();
+
+                if(url.contains("qualtrix")){
+                    //add parameters
+                    String workerId = "";
+                    String assignmentId = "";
+                    String hitId = "";
+                    List<SubjectAttribute> subjectAttributes = subjectAttributeDao.listBySubjectId(su.getId());
+
+
+                    for (SubjectAttribute sa : subjectAttributes) {
+                        if (sa.getAttributeName().equals("workerId")) {
+                            workerId = sa.getStringValue();
+                        }
+                        if (sa.getAttributeName().equals("assignmentId")) {
+                            assignmentId = sa.getStringValue();
+                        }
+                        if (sa.getAttributeName().equals("hitId")) {
+                            hitId = sa.getStringValue();
+                        }
+                    }
+                    if(url.contains("?")){
+                        url = url + "&workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                    } else {
+                        url = url + "?workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                    }
+                }
+                model.addAttribute("nextUrl", url);
+
+
+                if (session.isSessionPerpetual() && su.getId() != null) {
+                    model.addAttribute("waitingRoomExpireTime", subjectHasSessionCheckInService.getSubjectSessionCheckInExpireTime(su.getId(), session.getId()));
                 }
                 return forwardString;
             } else {
@@ -880,6 +949,8 @@ public class WorkspaceController {
                         }
                     }
                 }
+
+
                 model.addAttribute("subjectsTeamIndex", subjectsTeam);
                 model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
                 model.addAttribute("showScore", true);

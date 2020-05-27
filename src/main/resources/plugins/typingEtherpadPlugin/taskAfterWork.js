@@ -1,3 +1,7 @@
+var _teammates = JSON.parse(teammates);
+var _subject = JSON.parse(subject);
+var _isSoloTask = isSoloTask;
+var _taskConfigurationAttributes = JSON.parse(taskConfigurationAttributes);
 
 
 function newConnection(url, method){
@@ -130,12 +134,13 @@ if(padID!= null){
     var etherpadAuthorMap = {};
     for(var k=0; k < teammatez.length; k++) {
         var subjectEtherpadId = getSubjectAttribute(teammatez[k], SUBJECT_ETHERPAD_AUTHOR_ID);
-        print("Etherpad author id : " + subjectEtherpadId.stringValue +" for subject : " + teammatez[k].id );
+        //print("Etherpad author id : " + subjectEtherpadId.stringValue +" for subject : " + teammatez[k].id );
         etherpadAuthorMap[subjectEtherpadId.stringValue] = teammatez[k];
     }
 
     var fullText = getPadText(padID);
     var htmlText = getPadHTML(padID);
+    var spans = getAllSpansInText(htmlText)
     var attributesToAddz = [];
     var eventLogsToAddz = [];
     attributesToAddz.push({
@@ -146,6 +151,43 @@ if(padID!= null){
                               "attributeName": "fullTextHTML",
                               "stringValue": htmlText
                           });
+    var textsByAuthor = [];
+
+    if(spans != null) {
+        for (var j = 0; j < spans.length; j++) {
+            var aut = getAuthorOfSpan(spans[j]);
+
+            if (!textsByAuthor[aut]) {
+                textsByAuthor[aut] = {
+                    texts: [],
+                    author: aut,
+                    subject: null,
+                    fullText: ''
+                };
+            }
+            textsByAuthor[aut].texts.push(spans[j]);
+        }
+    }
+    var userFullText = "";
+    var tx = null;
+    for(var te in  textsByAuthor){
+
+        userFullText = "";
+
+        for(var j=0; j< textsByAuthor[te].texts.length; j++){
+            tx = getTextInSpans(textsByAuthor[te].texts[j]);
+            userFullText += tx;
+
+        }
+
+        textsByAuthor[te].fullText = (userFullText);
+        textsByAuthor[te].subject = getAuthorSubject(te);
+
+        attributesToAddz.push({
+          "attributeName": "fullTextAuthor_" + textsByAuthor[te].subject.externalId ,
+          "stringValue": userFullText
+                              });
+    }
 
     var revCount = parseInt(getRevisionsCount(padID));
     var revisions = [];
@@ -194,5 +236,29 @@ function getTypedValueFromRevisionChangeset(changeset){
     var index = changeset.indexOf("$");
     if(index == -1) return "";
     return changeset.substring((index + 1),changeset.length);
+
+}
+function getAuthorSubject(author){
+    for(var i=0;i< _teammates.length; i++){
+        for(var j=0; j< _teammates[i].attributes.length; j++){
+            if(_teammates[i].attributes[j].attributeName =="ETHERPAD_AUTHOR_ID"){
+                if(_teammates[i].attributes[j].stringValue == author){
+                    return _teammates[i];
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+}
+
+function getAuthorOfSpan(span){
+    return span.match(/class="(.*?)"/i)[1].replace("author","").replace("_",".");
+}
+function getTextInSpans(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/i)[1];
+}
+function getAllSpansInText(fullTextHTML){
+    return fullTextHTML.match(/<\s*span[^>]*>(.*?)<\s*\/\s*span>/g);
 
 }

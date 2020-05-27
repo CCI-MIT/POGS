@@ -74,6 +74,7 @@ class MemoryGridTaskPrimer{
                 total++;
             }
             $("#gridTable").append(tableRow);
+            $("#defaultPrimerText").remove();
         }
 
         //let scheduleTimeTo = (1000 * (Math.floor(Math.random() * 11) + 1));
@@ -107,6 +108,8 @@ let memoryGridTaskPrimerPlugin = pogs.createPlugin('memoryGridTaskPrimerPlugin',
 
     var elem = document.getElementById("gridTable");
     elem.unselectable = "on"; // For IE and Opera
+
+
 
 });
 
