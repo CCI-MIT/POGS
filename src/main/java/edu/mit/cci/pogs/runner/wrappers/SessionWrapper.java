@@ -305,13 +305,13 @@ public class SessionWrapper extends Session {
                     null, this, "/roster"));
         }
         Long lastRoundEndTimestamp = -1l;
+
         for (RoundWrapper rw : sessionRounds) {
             ArrayList<SessionSchedule> rounds = rw.getSessionSchedules();
             rounds.stream().forEach(t -> t.setSessionReference(this));
             this.sessionSchedule.addAll(rounds);
             lastRoundEndTimestamp = rw.getRoundFinishTimestamp();
         }
-
 
         this.sessionSchedule.add(new SessionSchedule(lastRoundEndTimestamp
                 , lastRoundEndTimestamp + SCORING_TIME_PAGE, null,
@@ -360,6 +360,11 @@ public class SessionWrapper extends Session {
                     }
                 }
             } else {
+                if (ss.getUrl().endsWith("/scoring")) {
+                    long scoringTime = ss.getEndTimestamp() - ss.getStartTimestamp();
+                    ss.setStartTimestamp(taskFinalTimestamp);
+                    ss.setEndTimestamp(taskFinalTimestamp + scoringTime);
+                }
                 if (ss.getUrl().endsWith("/done")) {
                     long doneTime = ss.getEndTimestamp() - ss.getStartTimestamp();
                     ss.setStartTimestamp(taskFinalTimestamp);

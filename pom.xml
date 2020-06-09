@@ -121,7 +121,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
-
+		<dependency>
+			<groupId>com.blueconic</groupId>
+			<artifactId>browscap-java</artifactId>
+			<version>1.2.17</version>
+		</dependency>
         <!-- Misc dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

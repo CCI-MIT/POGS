@@ -39,6 +39,7 @@ atlassian-ide-plugin.xml
 ### Maven ###
 target/
 
+.mysql/*
 ### Other ###
 *.jar
 *.zip

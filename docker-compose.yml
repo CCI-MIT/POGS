@@ -1,0 +1,86 @@
+version: '2'
+services:
+  database:
+    image: mysql:5.7
+    container_name: pogsmysql
+    ports:
+      - "3307:3306"
+    volumes:
+      - .mysql:/var/lib/mysql
+      - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: 1234
+      MYSQL_DATABASE: pogs
+      MYSQL_USER: root
+      #MYSQL_PASSWORD: 1234
+    networks:
+      - test-network
+
+  nodeserver:
+    build :
+      context: ./src/main/resources/plugins/typingEtherpadPlugin/etherpad-server/
+      dockerfile: Dockerfile
+    environment:
+      - ALLOW_OVERRIDE=true
+    ports:
+      - "9001:9001"
+    links:
+      - database
+      - redisserver
+    #volumes:
+    #  - mci-sync:/home/mci:nocopy
+    networks:
+      - test-network
+    depends_on:
+      - database
+      - redisserver
+  pogsserver:
+    build :
+      context: .
+      dockerfile: .docker/pogsserver/Dockerfile
+    environment:
+      - ALLOW_OVERRIDE=true
+    ports:
+      - "8080:8080"
+    links:
+      - database
+      - redisserver
+      #restart: unless-stopped
+      #volumes:
+      # - mci-sync:/home/mci:nocopy
+    networks:
+      - test-network
+    depends_on:
+      - database
+      - redisserver
+  pythonserver:
+    build :
+      context: .
+      dockerfile: .docker/pythonserver/Dockerfile
+    environment:
+      - ALLOW_OVERRIDE=true
+    ports:
+      - "8000:8000"
+    links:
+      - database
+      - redisserver
+      #restart: unless-stopped
+      #volumes:
+      # - mci-sync:/home/mci:nocopy
+    networks:
+      - test-network
+    depends_on:
+      - database
+      - redisserver
+  redisserver:
+    image: redis
+    ports:
+      - "6380:6379"
+    networks:
+      - test-network
+
+
+
+networks:
+  test-network:
+    driver: bridge

@@ -42,6 +42,9 @@ public class ApplicationStartup {
             TaskPlugin.addTaskPlugin(tp.getTaskPluginName(), tp);
 
         }
+        String pathToPlugins = env.getProperty("spring.datasource.url");
+        System.out.println("JDBC URL: " + pathToPlugins);
+
 
     }
 

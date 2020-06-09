@@ -1,0 +1,13 @@
+database:
+  host: database:3306
+  schema: pogs
+  url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
+  username: root
+  password: 1234
+plugin:
+  dir: /app/plugins
+
+spring:
+  redis:
+    host: redisserver
+    port: 6379

@@ -1,5 +1,11 @@
 package edu.mit.cci.pogs.view.workspace;
 
+import com.blueconic.browscap.BrowsCapField;
+import com.blueconic.browscap.Capabilities;
+import com.blueconic.browscap.ParseException;
+import com.blueconic.browscap.UserAgentParser;
+import com.blueconic.browscap.UserAgentService;
+
 import org.jooq.tools.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -15,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -124,6 +132,8 @@ public class WorkspaceController {
     @Autowired
     private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
 
+
+
     private static final Logger _log = LoggerFactory.getLogger(WorkspaceController.class);
 
     @GetMapping("/sessions/{sessionId}")
@@ -135,6 +145,30 @@ public class WorkspaceController {
                                    Model model,
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
+
+        try {
+            final UserAgentParser parser =
+                    new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
+                            BrowsCapField.BROWSER_MAJOR_VERSION,
+                            BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
+                            BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
+                            BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
+            String userAgent = request.getHeader("User-Agent");
+            final Capabilities capabilities = parser.parse(userAgent);
+
+            // the default fields have getters
+            final String browser = capabilities.getBrowser();
+            final String deviceType = capabilities.getDeviceType();
+
+            //System.out.println("Browser:" + browser + " - " + deviceType);
+            if(browser.equals("Firefox")){
+                return "workspace/unsupported";
+            }
+
+        }catch (IOException  |ParseException o){
+            o.printStackTrace();
+        }
+
         model.addAttribute("action", "/sessions/start/" + sessionId);
         if (workerId != null) {
             model.addAttribute("workerId", workerId);
