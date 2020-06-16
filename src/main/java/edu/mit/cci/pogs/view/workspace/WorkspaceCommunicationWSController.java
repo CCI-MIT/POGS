@@ -32,6 +32,7 @@ public class WorkspaceCommunicationWSController {
     public void getCheckin(@Payload CommunicationMessage pogsMessage, SimpMessageHeaderAccessor headerAccessor) {
 
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
+
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
 
         if (pogsMessage.getContent().getType().name().equals(CommunicationMessage.CommunicationType.JOINED.name())) {
@@ -41,6 +42,7 @@ public class WorkspaceCommunicationWSController {
             Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
             if (sender != null) {
                 EventLog el = new EventLog();
+
                 el.setCompletedTaskId(completedTaskId);
                 el.setSessionId(sessionId);
                 el.setSender(pogsMessage.getSender());

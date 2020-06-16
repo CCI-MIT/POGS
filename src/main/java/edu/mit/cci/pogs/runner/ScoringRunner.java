@@ -31,15 +31,24 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
     private CompletedTask completedTask;
 
 
+
+
     private static final Logger _log = LoggerFactory.getLogger(ScoringRunner.class);
 
 
     @Override
     public void run() {
-        Long timeBeforeStarts = taskWrapper.getTaskEndTimestamp() - DateUtils.now();
 
-        taskPlugin =  TaskPlugin.getTaskPlugin(taskWrapper.getTaskPluginType());
+        Long bufferForAfterWork = 0l;
         taskConfiguration = taskService.getTaskConfiguration(taskWrapper.getId());
+
+        if(taskConfiguration.getAfterWorkScriptId()!=null || this.taskPlugin.getTaskAfterWorkJsContent()!=null){
+            bufferForAfterWork = 10*1000l;
+        }
+
+        Long timeBeforeStarts = taskWrapper.getTaskEndTimestamp() + bufferForAfterWork - DateUtils.now();
+        taskPlugin =  TaskPlugin.getTaskPlugin(taskWrapper.getTaskPluginType());
+
         try {
             if (timeBeforeStarts > 0) {
                 System.out.println(" Time until score for Task id: " + taskWrapper.getId() + " starts : " + timeBeforeStarts);
@@ -92,7 +101,5 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
     public void handleScriptFailure(ScriptException se) {
         _log.error("Before work script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
     }
-
-
 
 }

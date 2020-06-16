@@ -60,7 +60,7 @@ services:
     environment:
       - ALLOW_OVERRIDE=true
     ports:
-      - "8000:8000"
+      - "8082:8082"
     links:
       - database
       - redisserver

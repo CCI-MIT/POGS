@@ -537,7 +537,7 @@ CREATE TABLE `research_group` (
 
 LOCK TABLES `research_group` WRITE;
 /*!40000 ALTER TABLE `research_group` DISABLE KEYS */;
-INSERT INTO `research_group` VALUES (1,'superAdminGroup'),(2,'muriResearchGroup'),(3,'SynergyGroup'),(4,'NoahResearchGroup'),(5,'1234'),(6,'MITaffiliates'),(7,'CMU_Int_Qs'),(8,'CMU_Glow'),(9,'admin_group');
+INSERT INTO `research_group` VALUES (9,'admin_group');
 /*!40000 ALTER TABLE `research_group` ENABLE KEYS */;
 UNLOCK TABLES;
 

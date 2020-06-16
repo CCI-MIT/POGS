@@ -1,6 +1,28 @@
 # POGS
 The Platform for Online Group Studies (POGS) is a tool to study collective learning.
 
+## Simple download and play procedure
+1 Install [Docker](https://docs.docker.com/get-docker/)
+2. Clone this repository, and at the root directory run:
+
+```
+docker-compose up
+```
+Open a browser window at :
+```http://localhost:8080/admin```
+```
+User: admin@pogs.info
+
+Password: pogs1234
+```
+The first time docker will install everything we need to run POGS, it may take a while.
+The next executions will be a lot faster. The .mysql/ dir will save database changes between server restarts.
+
+To stop it just hit
+```
+ctrl + c
+```
+
 ## Development install procedure
 
 1 Install all dependencies
@@ -48,3 +70,4 @@ In the root directory:
 ```
 java -jar target/pogs-0.0.1-SNAPSHOT.jar
 ```
+
