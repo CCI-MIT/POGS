@@ -28,7 +28,7 @@ ctrl + c
 1 Install all dependencies
  
  - Install Java 8 JRE
- - Install mysql-server
+ - Install mysql-server 5.7
  - Install nodejs (used for sass) version v9.11.1
  
 2 On mysql create a new database:
