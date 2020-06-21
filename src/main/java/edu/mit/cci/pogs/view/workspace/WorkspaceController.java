@@ -133,7 +133,6 @@ public class WorkspaceController {
     private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
 
 
-
     private static final Logger _log = LoggerFactory.getLogger(WorkspaceController.class);
 
     @GetMapping("/sessions/{sessionId}")
@@ -161,11 +160,11 @@ public class WorkspaceController {
             final String deviceType = capabilities.getDeviceType();
 
             //System.out.println("Browser:" + browser + " - " + deviceType);
-            if(browser.equals("Firefox")){
+            if (browser.equals("Firefox")) {
                 return "workspace/unsupported";
             }
 
-        }catch (IOException  |ParseException o){
+        } catch (IOException | ParseException o) {
             o.printStackTrace();
         }
 
@@ -364,7 +363,32 @@ public class WorkspaceController {
         }
 
         sr.subjectCheckIn(su);
-        return "redirect:/waiting_room/" + su.getSubjectExternalId();
+
+        if (sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId())) {
+            return "redirect:/waiting_room/" + su.getSubjectExternalId();
+        } else {
+            return "redirect:/start_session/" + su.getSubjectExternalId();
+        }
+    }
+    @GetMapping("/start_session/{externalId}")
+    public String startSessionGlobalChatPanel(@PathVariable("externalId") String externalId, Model model) {
+        Subject su = workspaceService.getSubject(externalId);
+        if (su == null) {
+            Session session = sessionService.getPerpetualSessionForSubject(externalId);
+
+            if (session != null) {
+                su = new Subject();
+                su.setSubjectExternalId(externalId);
+                su.setSessionId(session.getId());
+            } else {
+                model.addAttribute("errorMessage", "There was an error and your session has ended!");
+                return "workspace/error";
+            }
+        }
+        model.addAttribute("iframe_url","/waiting_room/" + su.getSubjectExternalId());
+
+
+        return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/waiting_room_global_chat");
     }
 
     @GetMapping("/waiting_room/{externalId}")
@@ -408,7 +432,7 @@ public class WorkspaceController {
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
                 String url = sr.getSession().getNextUrl();
 
-                if(url.contains("qualtrix")){
+                if (url.contains("qualtrix")) {
                     //add parameters
                     String workerId = "";
                     String assignmentId = "";
@@ -427,10 +451,10 @@ public class WorkspaceController {
                             hitId = sa.getStringValue();
                         }
                     }
-                    if(url.contains("?")){
-                        url = url + "&workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                    if (url.contains("?")) {
+                        url = url + "&workerId=" + workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
                     } else {
-                        url = url + "?workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                        url = url + "?workerId=" + workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
                     }
                 }
                 model.addAttribute("nextUrl", url);

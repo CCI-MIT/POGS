@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/iframe-layout.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+
+<div layout:fragment="content">
+    <iframe th:src="${iframe_url}" id="workspace" width="100%" height="100%"></iframe>
+</div>
+<div layout:fragment="communication" th:if="${hasChat}">
+    <div class="container-fluid h-100" style="width:350px;">
+
+        <div class="row h-100">
+            <div class="col-3 border-chat-lightgray px-0" style="" id="subjectContainer">
+                <div id="sidebar-content" class="h-100 w-100">
+                    <div class=" p-0 d-xs-none w-100">
+                        <div class="col-1 w-100 sidebarSubDivisionTitle">
+                            Teammates:
+                        </div>
+                    </div>
+                    <div class="sidebar-scroll" id="list-group">
+                        <ul class="list-group w-100" id="friend-list">
+
+                        </ul>
+                    </div>
+
+                    <div class=" p-0 d-xs-none w-100 d-none" id="channelDivision">
+                        <div class="col-1 w-100 sidebarSubDivisionTitle">
+                            #Channels:
+                        </div>
+                    </div>
+                    <div class="sidebar-scroll d-none" id="list-group2">
+                        <ul class="list-group w-100" id="channel-list">
+
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card-body border-chat-window  d-flex flex-column p-0 col-9" style="flex: 9 1;height: 535px;" id="chatContainer"><!--  -->
+                <div class="d-flex flex-row justify-content-start" style="background-color: #0E5EA9;color:white">
+                    <div class="col-1 p-1">
+                        <i class="fa fa-address-book subject-icon" style="font-size:30px;" id="toggleTrigger"></i>
+                    </div>
+                    <div class="col">
+                        <div class="my-0">
+                            <b id="channelDisplayName"></b>
+                        </div>
+                        <div class="my-0">
+                            <small id="statusMessages"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="container-fluid message-scroll" style="flex: 1 1;padding-bottom: 10px;" id="channelMessageBody">
+
+                </div>
+                <div class="input-group" id="sendForm">
+                    <input type="text" class="form-control border-0" placeholder="Input message..." id="messageInput" autocomplete="off">
+                    <span class="input-group-addon">
+                        <button class="btn border-0 bg-white text-primary hover-color-darkblue" type="button" id="messageSubmitButton">Send</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>
