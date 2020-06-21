@@ -160,8 +160,9 @@ public class WorkspaceController {
             final String browser = capabilities.getBrowser();
             final String deviceType = capabilities.getDeviceType();
 
-            //System.out.println("Browser:" + browser + " - " + deviceType);
-            if(browser.equals("Firefox")){
+            System.out.println("Browser:" + browser + " - " + deviceType);
+            if(browser.equals("Firefox") || browser.equals("IE")){
+                model.addAttribute("browser", browser);
                 return "workspace/unsupported";
             }
 
