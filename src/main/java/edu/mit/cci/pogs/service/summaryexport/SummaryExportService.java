@@ -18,6 +18,7 @@ import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreExport;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreSubjectTeamExport;
+import edu.mit.cci.pogs.model.dao.export.EventLogCheckingSummary;
 import edu.mit.cci.pogs.model.dao.export.EventLogExport;
 import edu.mit.cci.pogs.model.dao.export.ExportDao;
 import edu.mit.cci.pogs.model.dao.export.SubjectExport;
@@ -103,6 +104,58 @@ public class SummaryExportService {
             sessionList.add(session.getId());
         }
         return sessionList;
+    }
+
+    public ExportFile getPresenceSummaryTable(Long studyId,Long sessionId, String path) {
+        List<Long> sessionList = getSessionIds(studyId, sessionId);
+        List<EventLogCheckingSummary> eventLogList = exportDao.getEventLogCheckIn(sessionList);
+        List<EventLogCheckingSummary> eventLogExports = new ArrayList<>();
+        Map<Long,Map<Long,EventLogCheckingSummary>> groupedByTask = new HashMap<>();
+
+        Map<Long, String> subjectIds = new HashMap<>();
+        for(EventLogCheckingSummary elcs: eventLogList){
+            if(groupedByTask.get(elcs.getCompletedTaskId())==null){
+                groupedByTask.put(elcs.getCompletedTaskId(), new HashMap<>());
+            }
+            groupedByTask.get(elcs.getCompletedTaskId()).put(elcs.getSubjectId(),elcs);
+            if(subjectIds.get(elcs.getSubjectId())==null){
+                subjectIds.put(elcs.getSubjectId(), elcs.getSubjectExternalId());
+            }
+        }
+
+        for(Long compTaskId: groupedByTask.keySet()){
+            Map<Long, EventLogCheckingSummary> summaryMapBySubject = groupedByTask.get(compTaskId);
+            EventLogCheckingSummary elcs = null;
+
+            for(Long subjectId: subjectIds.keySet()) {
+                EventLogCheckingSummary subjectEventLog = summaryMapBySubject.get(subjectId);
+                if(subjectEventLog != null) {
+                    if (elcs == null) {
+                        elcs = subjectEventLog;
+                        elcs.setSubjectsNames(new ArrayList<>());
+                        elcs.setSubjectsPingCount(new ArrayList<>());
+                    }
+                    elcs.getSubjectsNames().add(subjectEventLog.getSubjectExternalId());
+                    elcs.getSubjectsPingCount().add(subjectEventLog.getSubjectCount() + "");
+                }
+            }
+            eventLogExports.add(elcs);
+
+        }
+
+
+        String[] fieldOrder = {
+        "studyPrefix",
+        "sessionSuffix",
+        "taskName",
+        "subjectsNames",
+        "subjectsPingCount"
+        };
+
+        return ExportUtils.getExportFileForSimplePojo(path, "EventLogCheckIns_" +
+                        ((studyId != null) ? (studyId) : (sessionId)), EventLogCheckingSummary.class, eventLogExports,
+                Arrays.asList(fieldOrder));
+
     }
 
     public ExportFile exportEventLog(Long studyId, Long sessionId, String path) {

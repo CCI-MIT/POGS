@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.model.dao.eventlog.impl;
  
+import edu.mit.cci.pogs.messages.CommunicationMessage;
 import edu.mit.cci.pogs.messages.PogsMessage;
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
@@ -70,6 +71,7 @@ public class EventLogDaoImpl extends AbstractDao<EventLog, Long, EventLogRecord>
                 where(EVENT_LOG.SESSION_ID.eq(sessionId)).getQuery();
         return query.fetchInto(EventLog.class);
     }
+
 
     public Integer getCountOfSubjectContribution(Long subjectId, Long completedTaskId, String eventType){
         return dslContext.selectCount().from(EVENT_LOG).where(EVENT_LOG.SENDER_SUBJECT_ID.eq(subjectId)

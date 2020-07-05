@@ -7,4 +7,6 @@ public interface ExportDao {
     List<EventLogExport> getEventLogExportInfo(List<Long> sessionIds);
 
     List<CompletedTaskScoreExport> getCompletedTaskScoreExportInfo(List<Long> sessionIds);
+
+    List<EventLogCheckingSummary> getEventLogCheckIn(List<Long> sessionIds);
 }

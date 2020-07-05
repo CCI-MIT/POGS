@@ -70,6 +70,7 @@ public class SessionExportService {
     private TeamDao teamDao;
 
 
+
     public List<ExportFile> getSessionExportFiles(Long sessionId, Long studyId, String path) {
         List<ExportFile> ex = new ArrayList<>();
 
@@ -81,29 +82,29 @@ public class SessionExportService {
         }
         List<Long> completedTaskIds = new ArrayList<>();
         List<CompletedTask> completedTaskList = new ArrayList<>();
-        for( Long id: completedTaskIdToSessionId.keySet()){
+        for (Long id : completedTaskIdToSessionId.keySet()) {
             completedTaskIds.add(id);
             completedTaskList.add(completedTaskDao.get(id));
         }
 
-        ex.addAll(ExportUtils.getEntityDataExportFile(path,CompletedTask.class, completedTaskList, studyId,
+        ex.addAll(ExportUtils.getEntityDataExportFile(path, CompletedTask.class, completedTaskList, studyId,
                 sessionId, completedTaskIdToSessionId, null));
 
-        ex.addAll(ExportUtils.getEntityDataExportFile(path,EventLog.class, eventLogList, studyId,
+        ex.addAll(ExportUtils.getEntityDataExportFile(path, EventLog.class, eventLogList, studyId,
                 sessionId, null, null));
 
         List<CompletedTaskScore> completedTaskScoreList =
                 completedTaskScoreDao.listByCompletedTasksIds(completedTaskIds);
 
         ex.addAll(ExportUtils.getEntityDataExportFile(path, CompletedTaskScore.class, completedTaskScoreList,
-                studyId, sessionId,completedTaskIdToSessionId,null));
+                studyId, sessionId, completedTaskIdToSessionId, null));
 
 
         List<CompletedTaskAttribute> completedTaskAttributesList =
                 completedTaskAttributeDao.listByCompletedTasksIds(completedTaskIds);
         ex.addAll(ExportUtils.getEntityDataExportFile(path, CompletedTaskAttribute.class,
                 completedTaskAttributesList,
-                studyId, sessionId, completedTaskIdToSessionId,null));
+                studyId, sessionId, completedTaskIdToSessionId, null));
 
         //ONE FILE
 
@@ -116,7 +117,7 @@ public class SessionExportService {
         return ex;
     }
 
-    public ExportFile exportAggregateSubjectParticipation(Long studyId, String path){
+    public ExportFile exportAggregateSubjectParticipation(Long studyId, String path) {
         StringBuilder val = new StringBuilder();
         StringBuilder header = new StringBuilder();
         header.append("Session Name,Task Name,Team Id,Number of Subjects,Task Group Name,Subject External Ids," +
@@ -175,7 +176,7 @@ public class SessionExportService {
             val.append("\n");
         }
 
-        String fileName = "SubjectContribution_Aggregate_" + String.valueOf(studyId) + "_" + ExportUtils.getTimeFormattedNoSpaces(new Timestamp(new Date().getTime()))  + ".csv";
+        String fileName = "SubjectContribution_Aggregate_" + String.valueOf(studyId) + "_" + ExportUtils.getTimeFormattedNoSpaces(new Timestamp(new Date().getTime())) + ".csv";
 
         ExportFile ex = new ExportFile();
         ex.setFileContent(val.toString());
@@ -188,13 +189,11 @@ public class SessionExportService {
     }
 
 
-
-    public ExportFile exportAggregateStudyScoreReport(Long studyId, String path){
+    public ExportFile exportAggregateStudyScoreReport(Long studyId, String path) {
 
         StringBuilder val = new StringBuilder();
         StringBuilder header = new StringBuilder();
         header.append("Session Name, Team Id");
-
 
 
         //for all sessions
@@ -202,32 +201,31 @@ public class SessionExportService {
 
         boolean allSessionHaveTheSameTaskGroupConfig = true;
 
-        Map<Long,Integer> tasksMapCount = new LinkedHashMap<>();
-        Map<Long,Task> tasksMap = new LinkedHashMap<>();
-        if(sessionInStudy!=null && ! sessionInStudy.isEmpty()){
-            for(Session s : sessionInStudy) {
+        Map<Long, Integer> tasksMapCount = new LinkedHashMap<>();
+        Map<Long, Task> tasksMap = new LinkedHashMap<>();
+        if (sessionInStudy != null && !sessionInStudy.isEmpty()) {
+            for (Session s : sessionInStudy) {
                 List<Task> tasksInOrder = taskExportService
                         .getTaskListInOrderOfTaskGroupForSession(sessionInStudy.get(0));
 
-                for(Task t: tasksInOrder){
+                for (Task t : tasksInOrder) {
 
                     Integer count = tasksMapCount.get(t.getId());
-                    if(count  == null){
+                    if (count == null) {
                         tasksMap.put(t.getId(), t);
-                        tasksMapCount.put(t.getId(),0);
+                        tasksMapCount.put(t.getId(), 0);
                         count = 0;
                     }
-                    tasksMapCount.put(t.getId(),(count + 1));
+                    tasksMapCount.put(t.getId(), (count + 1));
                 }
 
             }
         }
 
 
-
         for (Session session : sessionInStudy) {
 
-                val.append(calculateScoresForTasksInMap(tasksMap,session));
+            val.append(calculateScoresForTasksInMap(tasksMap, session));
 
         }
 
@@ -249,28 +247,28 @@ public class SessionExportService {
         List<SubjectExport> subjectExports = new ArrayList<>();
         List<ExportFile> exportFiles = new ArrayList<>();
         StringBuilder scores = new StringBuilder();
-        for(Round round: rounds) {
+        for (Round round : rounds) {
             List<Team> teams = teamDao.listByRoundId(round.getId());
 
             for (Team team : teams) {
                 List<CompletedTask> completedTasks =
                         completedTaskDao.listByRoundIdTeamId(round.getId(), team.getId());
 
-                Map<Long,Double> scoreMap = new LinkedHashMap<>();
-                for(Long taskId : tasksMap.keySet()){
-                    scoreMap.put(taskId,0d);
+                Map<Long, Double> scoreMap = new LinkedHashMap<>();
+                for (Long taskId : tasksMap.keySet()) {
+                    scoreMap.put(taskId, 0d);
                 }
-                for(CompletedTask ct: completedTasks){
+                for (CompletedTask ct : completedTasks) {
                     Double score = completedTaskScoreDao.getScore(ct.getId());
-                    if(score == null){
+                    if (score == null) {
                         score = 0.0;
                     }
-                    scoreMap.put(ct.getTaskId(),score);
+                    scoreMap.put(ct.getTaskId(), score);
                 }
                 scores.append(session.getFullSessionName() + ",");
                 scores.append(team.getId() + ",");
-                for(Long taskId : tasksMap.keySet()){
-                    scores.append(tasksMap.get(taskId)+ ",");
+                for (Long taskId : tasksMap.keySet()) {
+                    scores.append(tasksMap.get(taskId) + ",");
                 }
                 scores.append("\n");
             }

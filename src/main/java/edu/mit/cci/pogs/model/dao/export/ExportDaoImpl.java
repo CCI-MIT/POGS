@@ -4,9 +4,12 @@ import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.Record10;
 import org.jooq.Record11;
+import org.jooq.Record6;
 import org.jooq.Record7;
+import org.jooq.Record8;
 import org.jooq.Record9;
 import org.jooq.SelectQuery;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import edu.mit.cci.pogs.messages.CommunicationMessage;
 import edu.mit.cci.pogs.model.jooq.tables.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.EventLog;
@@ -181,29 +185,44 @@ public class ExportDaoImpl implements ExportDao {
         return query.fetchInto(EventLogExport.class);
 
     }
-    /*
+    public List<EventLogCheckingSummary> getEventLogCheckIn(List<Long> sessionIds) {
 
-  SELECT
+        EventLog el = EVENT_LOG.as("el");
+        CompletedTask ct = COMPLETED_TASK.as("ct");
+        Task t = TASK.as("t");
+        Round r = ROUND.as("r");
+        Session s = SESSION.as("s");
+        Study st = STUDY.as("st");
+        Subject su = SUBJECT.as("su");
+        final SelectQuery<Record8<String, String, String,Long, Long, String,  Timestamp, Integer>> query = dslContext.select(
+                st.STUDY_SESSION_PREFIX.as("studyPrefix"),
+                s.SESSION_SUFFIX.as("sessionSuffix"),
+                su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
+                t.ID.as("completedTaskId"),
+                su.ID.as("subjectId"),
+                t.TASK_NAME.as("taskName"),
+                el.TIMESTAMP.as("timestamp"),
+                DSL.count().as("subjectCount")
 
-    st.study_session_prefix,
-    s.session_suffix,
-    su.subject_external_id,
-    t.task_name,
-    t.solo_task,
-    el.timestamp,
-    el.event_type,
-    el.event_content,
-    el.summary_description
+        )
+                .from(el)
+                .innerJoin(ct).on(ct.ID.eq(el.COMPLETED_TASK_ID))
+                .innerJoin(t).on(t.ID.eq(ct.TASK_ID))
+                .innerJoin(r).on(r.ID.eq(ct.ROUND_ID))
+                .innerJoin(s).on(s.ID.eq(r.SESSION_ID))
+                .innerJoin(st).on(st.ID.eq(s.STUDY_ID))
+                .innerJoin(su).on(su.ID.eq(el.SENDER_SUBJECT_ID))
+                .getQuery();
 
- FROM pogs.event_log as el
-  inner join completed_task as ct on ct.id = el.completed_task_id
-  inner join task as t on t.id = ct.task_id
-  inner join round as r on r.id = ct.round_id
-  inner join session as s on s.id = r.session_id
-  inner join study as st on st.id = s.study_id
-  inner join subject as su on su.id = el.sender_subject_id
-  where r.session_id in (608) order by el.timestamp;
+        query.addConditions(s.ID.in(sessionIds));
+        query.addConditions(el.COMPLETED_TASK_ID.isNotNull());
+        query.addConditions(el.EVENT_TYPE.eq(CommunicationMessage.CommunicationType.CHECK_IN.name()));
+        query.addGroupBy(el.COMPLETED_TASK_ID, el.SENDER_SUBJECT_ID);
 
-    * */
+        List<EventLogCheckingSummary> withCompletedTaskIds = query.fetchInto(EventLogCheckingSummary.class);
+
+        return withCompletedTaskIds;
+
+    }
 
 }

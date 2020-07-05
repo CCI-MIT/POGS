@@ -20,5 +20,6 @@ public interface EventLogDao extends Dao<EventLog, Long> {
 
     List<EventLog> listCheckInSubjectLogs(Long subjectId);
 
+
 }
  

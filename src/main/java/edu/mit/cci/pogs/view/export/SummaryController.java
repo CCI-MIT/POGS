@@ -144,6 +144,49 @@ public class SummaryController {
         }
     }
 
+
+
+
+    @GetMapping("/admin/export/summary/eventlog/checkin/study/{studyId}")
+    public void exportEventLogCheckInDataForStudy(HttpServletRequest request, HttpServletResponse response,
+                                           @PathVariable("studyId") Long studyId) {
+        generateEventLogCheckInSummary(request,response, null, studyId);
+    }
+    @GetMapping("/admin/export/summary/eventlog/checkin/session/{sessionId}")
+    public void exportEventLogCheckInDataForSession(HttpServletRequest request, HttpServletResponse response,
+                                             @PathVariable("sessionId") Long sessionId) {
+        generateEventLogCheckInSummary(request,response, sessionId, null);
+    }
+
+
+    private void generateEventLogCheckInSummary(HttpServletRequest request, HttpServletResponse response,
+                                         Long sessionId, Long studyId){
+
+        ExportFile ef = summaryExportService.getPresenceSummaryTable(studyId,sessionId, getPath(request));
+
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=Event_Log_Check_in_Session_"+
+                            ((studyId!=null)?("study["+studyId+"]"):("session["+sessionId+"]"))
+                            +"__" + ExportUtils.getTimeFormattedNoSpaces(
+                            new Timestamp(new Date().getTime())) + ".zip");
+
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            sessionExportFiles.add(ef);
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
     @GetMapping("/admin/export/summary/eventlog/study/{studyId}")
     public void exportEventLogDataForStudy(HttpServletRequest request, HttpServletResponse response,
                                   @PathVariable("studyId") Long studyId) {
