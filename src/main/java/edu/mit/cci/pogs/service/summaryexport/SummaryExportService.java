@@ -101,7 +101,13 @@ public class SummaryExportService {
 
         } else {
             Session session = sessionDao.get(sessionId);
-            sessionList.add(session.getId());
+            if(session.getParentSessionId()== null){
+                //handle the parent id
+                List<Session> sessions = sessionDao.listByParentSessionId(session.getId());
+                sessions.forEach((se)-> sessionList.add(se.getId()));
+            } else {
+                sessionList.add(session.getId());
+            }
         }
         return sessionList;
     }

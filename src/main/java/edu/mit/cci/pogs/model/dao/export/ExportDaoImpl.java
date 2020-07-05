@@ -198,7 +198,7 @@ public class ExportDaoImpl implements ExportDao {
                 st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                 s.SESSION_SUFFIX.as("sessionSuffix"),
                 su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
-                t.ID.as("completedTaskId"),
+                el.COMPLETED_TASK_ID.as("completedTaskId"),
                 su.ID.as("subjectId"),
                 t.TASK_NAME.as("taskName"),
                 el.TIMESTAMP.as("timestamp"),
@@ -217,7 +217,7 @@ public class ExportDaoImpl implements ExportDao {
         query.addConditions(s.ID.in(sessionIds));
         query.addConditions(el.COMPLETED_TASK_ID.isNotNull());
         query.addConditions(el.EVENT_TYPE.eq(CommunicationMessage.CommunicationType.CHECK_IN.name()));
-        query.addGroupBy(el.COMPLETED_TASK_ID, el.SENDER_SUBJECT_ID);
+        query.addGroupBy(el.SESSION_ID, el.COMPLETED_TASK_ID, el.SENDER_SUBJECT_ID);
 
         List<EventLogCheckingSummary> withCompletedTaskIds = query.fetchInto(EventLogCheckingSummary.class);
 
