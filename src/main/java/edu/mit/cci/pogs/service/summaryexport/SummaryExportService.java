@@ -153,6 +153,8 @@ public class SummaryExportService {
         String[] fieldOrder = {
         "studyPrefix",
         "sessionSuffix",
+        "sessionStartDate",
+        "teamId",
         "taskName",
         "subjectsNames",
         "subjectsPingCount"

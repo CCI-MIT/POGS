@@ -194,9 +194,11 @@ public class ExportDaoImpl implements ExportDao {
         Session s = SESSION.as("s");
         Study st = STUDY.as("st");
         Subject su = SUBJECT.as("su");
-        final SelectQuery<Record8<String, String, String,Long, Long, String,  Timestamp, Integer>> query = dslContext.select(
+        final SelectQuery<Record10<String, String,Timestamp, Long, String,Long, Long, String,  Timestamp, Integer>> query = dslContext.select(
                 st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                 s.SESSION_SUFFIX.as("sessionSuffix"),
+                s.SESSION_START_DATE.as("sessionStartDate"),
+                ct.TEAM_ID.as("teamId"),
                 su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
                 el.COMPLETED_TASK_ID.as("completedTaskId"),
                 su.ID.as("subjectId"),
