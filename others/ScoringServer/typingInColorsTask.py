@@ -30,7 +30,10 @@ def score_typing_in_colors_task(request_parameters):
 			finalscore += section_score
 			section_ground_score = (calculate_score_for_text_segment(False,section['ground_truth'],section['ground_truth']))
 			finalscoretruth+=section_ground_score
-			color_score.append({'color': section['color'],'author': section['author'], 'score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
+			aut = section['author']
+			if aut == None:
+				aut = ''
+			color_score.append({'color': section['color'],'author': aut, 'score': section_score, 'ground_text_score': section_ground_score , 'color_index': counter})
 			counter +=1
 	
 		total_typed_score = calculate_score_for_text_segment(True,h.unescape(typed_text),full_ground_truth )
@@ -89,6 +92,7 @@ def get_text_sections_by_color_in_order(request_parameters):
 	counter = 0
 	finalDict = []
 	h = HTMLParser()
+	print " ((()()()()()()"
 	for se in colorOrder :
 		#print se
 		colors[se]['author'] = get_string_value_completed_task_attribute(request_parameters, str('subjectAssignedToColor_'+str(counter)))

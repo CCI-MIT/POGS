@@ -1,8 +1,11 @@
 package edu.mit.cci.pogs.model.dao.export;
 
+import java.sql.Timestamp;
+
 public class CompletedTaskScoreExport {
     private String studyPrefix;
     private String sessionSuffix;
+    private Timestamp sessionStartDate;
     private String taskName;
     private Boolean soloTask;
     private Long soloSubject;
@@ -99,5 +102,13 @@ public class CompletedTaskScoreExport {
 
     public void setNumberOfWrongAnswers(Integer numberOfWrongAnswers) {
         this.numberOfWrongAnswers = numberOfWrongAnswers;
+    }
+
+    public Timestamp getSessionStartDate() {
+        return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Timestamp sessionStartDate) {
+        this.sessionStartDate = sessionStartDate;
     }
 }

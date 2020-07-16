@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.model.dao.export;
 
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ public class SubjectExport {
 
     private String sessionSuffix;
 
+    private Timestamp sessionStartDate;
 
     private String teamId;
 
@@ -127,5 +129,13 @@ public class SubjectExport {
 
         }
         return ret;
+    }
+
+    public Timestamp getSessionStartDate() {
+        return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Timestamp sessionStartDate) {
+        this.sessionStartDate = sessionStartDate;
     }
 }

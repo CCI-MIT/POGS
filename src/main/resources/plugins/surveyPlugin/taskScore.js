@@ -16,6 +16,15 @@ for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
         break;
     }
 }
+var _individualSubjectScore = {};
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+        "subjectExternalId" :  _teammates[i].externalId,
+        "individualScore" : 0.0,
+        "scoringData" : ""
+    };
+}
+var answerAuthorMap = [];
 
 var answerKeyMap = [];
 
@@ -41,6 +50,7 @@ for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
 
             var answer = _completedTaskAttributes[i].stringValue;
             answerKeyMap[index] = answer;
+            answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
 
         }
     }
@@ -62,20 +72,38 @@ for(var i=0 ;i < answerSheet.length; i++) {
         if(isRight) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
+            }
         }else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+            }
         }
     } else {
 
         if (answerKeyMap[i] == answerSheet[i]) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
+            }
         } else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+            }
         }
     }
 }
 
 completedTaskScore = JSON.stringify(_completedTaskScore);
+
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);

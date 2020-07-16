@@ -1,13 +1,11 @@
 package edu.mit.cci.pogs.model.dao.export;
 
 import org.jooq.DSLContext;
-import org.jooq.Record;
 import org.jooq.Record10;
 import org.jooq.Record11;
-import org.jooq.Record6;
+import org.jooq.Record12;
 import org.jooq.Record7;
 import org.jooq.Record8;
-import org.jooq.Record9;
 import org.jooq.SelectQuery;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +20,7 @@ import edu.mit.cci.pogs.messages.CommunicationMessage;
 import edu.mit.cci.pogs.model.jooq.tables.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.EventLog;
+import edu.mit.cci.pogs.model.jooq.tables.IndividualSubjectScore;
 import edu.mit.cci.pogs.model.jooq.tables.Round;
 import edu.mit.cci.pogs.model.jooq.tables.Session;
 import edu.mit.cci.pogs.model.jooq.tables.Study;
@@ -31,6 +30,7 @@ import edu.mit.cci.pogs.model.jooq.tables.Task;
 import static edu.mit.cci.pogs.model.jooq.Tables.COMPLETED_TASK;
 import static edu.mit.cci.pogs.model.jooq.Tables.COMPLETED_TASK_SCORE;
 import static edu.mit.cci.pogs.model.jooq.Tables.EVENT_LOG;
+import static edu.mit.cci.pogs.model.jooq.Tables.INDIVIDUAL_SUBJECT_SCORE;
 import static edu.mit.cci.pogs.model.jooq.Tables.ROUND;
 import static edu.mit.cci.pogs.model.jooq.Tables.SESSION;
 import static edu.mit.cci.pogs.model.jooq.Tables.STUDY;
@@ -78,9 +78,10 @@ public class ExportDaoImpl implements ExportDao {
         Session s = SESSION.as("s");
         Study st = STUDY.as("st");
 
-        final SelectQuery<Record11<String, String, String, Boolean, Long, Long, Double, Integer, Integer, Integer, Integer>> query = dslContext.select(
+        final SelectQuery<Record12<String, String, Timestamp, String, Boolean, Long, Long, Double, Integer, Integer, Integer, Integer>> query = dslContext.select(
                 st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                 s.SESSION_SUFFIX.as("sessionSuffix"),
+                s.SESSION_START_DATE.as("sessionStartDate"),
                 t.TASK_NAME.as("taskName"),
                 t.SOLO_TASK.as("soloTask"),
                 ct.SUBJECT_ID.as("soloSubject"),
@@ -107,6 +108,43 @@ public class ExportDaoImpl implements ExportDao {
 
     }
 
+    public List<IndividualSubjectScoreExport> getIndividualSubjectScoreExportInfo(List<Long> sessionIds) {
+        IndividualSubjectScore cts = INDIVIDUAL_SUBJECT_SCORE.as("cts");
+        CompletedTask ct = COMPLETED_TASK.as("ct");
+        Task t = TASK.as("t");
+        Round r = ROUND.as("r");
+        Session s = SESSION.as("s");
+        Study st = STUDY.as("st");
+        Subject su = SUBJECT.as("su");
+
+        final SelectQuery<Record8<String, String,Timestamp,  String, Boolean, Long, String, Double>> query = dslContext.select(
+                st.STUDY_SESSION_PREFIX.as("studyPrefix"),
+                s.SESSION_SUFFIX.as("sessionSuffix"),
+                s.SESSION_START_DATE.as("sessionStartDate"),
+                t.TASK_NAME.as("taskName"),
+                t.SOLO_TASK.as("soloTask"),
+                su.ID.as("subjectId"),
+                su.SUBJECT_EXTERNAL_ID.as("subjectExternalId"),
+                cts.INDIVIDUAL_SCORE.as("totalScore")
+
+        )
+                .from(cts)
+                .innerJoin(ct).on(ct.ID.eq(cts.COMPLETED_TASK_ID))
+                .innerJoin(t).on(t.ID.eq(ct.TASK_ID))
+                .innerJoin(su).on(su.ID.eq(cts.SUBJECT_ID))
+                .innerJoin(r).on(r.ID.eq(ct.ROUND_ID))
+                .innerJoin(s).on(s.ID.eq(r.SESSION_ID))
+                .innerJoin(st).on(st.ID.eq(s.STUDY_ID))
+                .getQuery();
+
+        query.addConditions(s.ID.in(sessionIds));
+        query.addOrderBy(ct.START_TIME);
+
+
+        return query.fetchInto(IndividualSubjectScoreExport.class);
+
+    }
+
     public List<EventLogExport> getEventLogExportInfo(List<Long> sessionIds) {
 
         EventLog el = EVENT_LOG.as("el");
@@ -116,9 +154,10 @@ public class ExportDaoImpl implements ExportDao {
         Session s = SESSION.as("s");
         Study st = STUDY.as("st");
         Subject su = SUBJECT.as("su");
-        final SelectQuery<Record10<String, String, String,Long, String, Boolean, Timestamp, String, String, String>> query = dslContext.select(
+        final SelectQuery<Record11<String, String,Timestamp, String,Long, String, Boolean, Timestamp, String, String, String>> query = dslContext.select(
                 st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                 s.SESSION_SUFFIX.as("sessionSuffix"),
+                s.SESSION_START_DATE.as("sessionStartDate"),
                 su.SUBJECT_EXTERNAL_ID.as("senderSubjectExternalId"),
                 el.RECEIVER_SUBJECT_ID.as("receiverId"),
                 t.TASK_NAME.as("taskName"),
@@ -162,10 +201,11 @@ public class ExportDaoImpl implements ExportDao {
         Session s = SESSION.as("s");
         Study st = STUDY.as("st");
         Subject su = SUBJECT.as("su");
-        final SelectQuery<Record7<String, String, String,  Timestamp, String, String, String>>
+        final SelectQuery<Record8<String, String,Timestamp, String,  Timestamp, String, String, String>>
                 query = dslContext.select(
                     st.STUDY_SESSION_PREFIX.as("studyPrefix"),
                     s.SESSION_SUFFIX.as("sessionSuffix"),
+                    s.SESSION_START_DATE.as("sessionStartDate"),
                     su.SUBJECT_EXTERNAL_ID.as("senderSubjectExternalId"),
                     el.TIMESTAMP.as("timestamp"),
                     el.EVENT_TYPE.as("eventType"),

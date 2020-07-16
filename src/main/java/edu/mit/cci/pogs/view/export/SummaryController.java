@@ -108,6 +108,42 @@ public class SummaryController {
             e.printStackTrace();
         }
     }
+    @GetMapping("/admin/export/summary/individualscore/study/{studyId}")
+    public void exportSessionIndividualScoresSummaryForStudy(HttpServletRequest request, HttpServletResponse response,
+                                                 @PathVariable("studyId") Long studyId) {
+        generateIndividualScoreSummary(request,response,null,studyId);
+    }
+    @GetMapping("/admin/export/summary/individualscore/session/{sessionId}")
+    public void exportSessionIndividualScoresSummaryForSession(HttpServletRequest request, HttpServletResponse response,
+                                                    @PathVariable("sessionId") Long sessionId) {
+        generateIndividualScoreSummary(request,response,sessionId,null);
+    }
+
+    private void generateIndividualScoreSummary(HttpServletRequest request, HttpServletResponse response,
+                                          Long sessionId, Long studyId){
+        ExportFile ef = summaryExportService.exportSubjectIndividualScoreSummaryFiles(studyId,
+                sessionId, getPath(request));
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=IndividualSubjectScore_"+
+                            ((studyId!=null)?("study["+studyId+"]"):("session["+sessionId+"]"))+"__" +
+                            ExportUtils.getTimeFormattedNoSpaces(new
+                                    Timestamp(new Date().getTime())) + ".zip");
+
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            sessionExportFiles.add(ef);
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @GetMapping("/admin/export/summary/score/study/{studyId}")
     public void exportSessionTaskSummaryForStudy(HttpServletRequest request, HttpServletResponse response,

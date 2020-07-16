@@ -21,6 +21,7 @@ import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreSubjectTeamExport;
 import edu.mit.cci.pogs.model.dao.export.EventLogCheckingSummary;
 import edu.mit.cci.pogs.model.dao.export.EventLogExport;
 import edu.mit.cci.pogs.model.dao.export.ExportDao;
+import edu.mit.cci.pogs.model.dao.export.IndividualSubjectScoreExport;
 import edu.mit.cci.pogs.model.dao.export.SubjectExport;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
@@ -186,6 +187,7 @@ public class SummaryExportService {
         String[] fieldOrder = {
                 "studyPrefix",
                 "sessionSuffix",
+                "sessionStartDate",
                 "taskName",
                 "soloTask",
                 "eventType",
@@ -235,6 +237,7 @@ public class SummaryExportService {
                 SubjectExport se = new SubjectExport(su);
                 se.setStudyPrefix(study.getStudySessionPrefix());
                 se.setSessionSuffix(session.getSessionSuffix());
+                se.setSessionStartDate(session.getSessionStartDate());
                 List<EventLog> eventLogs = eventLogDao.listCheckInSubjectLogs(su.getId());
                 if(eventLogs!=null && eventLogs.size()>0){
                     se.setLastCheckInPage(eventLogs.get(0).getSummaryDescription());
@@ -269,6 +272,7 @@ public class SummaryExportService {
 
         String[] fieldOrder = {"studyPrefix",
                 "sessionSuffix",
+                "sessionStartDate",
                 "subjectId",
                 "subjectExternalId",
                 "subjectDisplayName",
@@ -297,6 +301,27 @@ public class SummaryExportService {
         return simpleDateFormat.format(new Date(timestamp.getTime()));
     }
 
+    public ExportFile exportSubjectIndividualScoreSummaryFiles(Long studyId, Long sessionId, String path) {
+
+        List<Long> sessionList = getSessionIds(studyId, sessionId);
+
+        List<IndividualSubjectScoreExport> eventLogExports = exportDao.getIndividualSubjectScoreExportInfo(sessionList);
+
+
+        String[] fieldOrder = {"studyPrefix",
+                "sessionSuffix",
+                "sessionStartDate",
+                "taskName",
+                "soloTask",
+                "subjectId",
+                "subjectExternalId",
+                "totalScore"};
+
+        return ExportUtils.getExportFileForSimplePojo(path,
+                "IndividualSubjectScore_" + ((studyId != null) ? (studyId) : (sessionId)),
+                IndividualSubjectScoreExport.class, eventLogExports, Arrays.asList(fieldOrder));
+    }
+
     public ExportFile exportTaskScoreSummaryFiles(Long studyId, Long sessionId, String path) {
 
         List<Long> sessionList = getSessionIds(studyId, sessionId);
@@ -306,6 +331,7 @@ public class SummaryExportService {
         for (CompletedTaskScoreExport ctse : eventLogExports) {
             CompletedTaskScoreSubjectTeamExport ctsste = new CompletedTaskScoreSubjectTeamExport(ctse.getStudyPrefix(),
                     ctse.getSessionSuffix(),
+                    ctse.getSessionStartDate(),
                     ctse.getTaskName(),
                     ctse.getSoloTask(),
                     ctse.getTotalScore(),
@@ -331,6 +357,7 @@ public class SummaryExportService {
         }
         String[] fieldOrder = {"studyPrefix",
                 "sessionSuffix",
+                "sessionStartDate",
                 "taskName",
                 "soloTask",
                 "soloSubject",
@@ -377,7 +404,7 @@ public class SummaryExportService {
         String header = null;
         Task task = taskDao.get(taskId);
         StringBuffer records = new StringBuffer();
-        String fixedHeader = "Study prefix; Session name; Session id; Task Name;Is solo;Team;Subject;";
+        String fixedHeader = "Study prefix; Session name;Session id;Session start date; Task Name;Is solo;Team;Subject;";
         for (CompletedTask ct : completedTasks) {
             TaskSnapshotExportRunner csr = (TaskSnapshotExportRunner) context.getBean("taskSnapshotExportRunner");
             Round round = roundDao.get(ct.getRoundId());
@@ -390,7 +417,9 @@ public class SummaryExportService {
                 subject = sub.getSubjectExternalId();
             }
             String rec = study.getStudySessionPrefix() + ";" + session.getSessionSuffix() + ";" +
-                    session.getId() + ";" + task.getTaskName() + ";" + task.getSoloTask() + ";" +
+                    session.getId() + ";" +
+                    session.getSessionStartDate() + ";" +
+                    task.getTaskName() + ";" + task.getSoloTask() + ";" +
                     ct.getTeamId() + ";" +  subject + ";";
 
             csr.setSession(new SessionWrapper(session));

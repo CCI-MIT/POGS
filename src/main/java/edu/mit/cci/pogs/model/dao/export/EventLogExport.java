@@ -6,6 +6,7 @@ public class EventLogExport  {
 
     private String studyPrefix;
     private String sessionSuffix;
+    private Timestamp sessionStartDate;
     private String senderSubjectExternalId;
     private String receiverSubjectExternalId;
     private Long receiverId;
@@ -104,4 +105,11 @@ public class EventLogExport  {
         this.receiverId = receiverId;
     }
 
+    public Timestamp getSessionStartDate() {
+        return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Timestamp sessionStartDate) {
+        this.sessionStartDate = sessionStartDate;
+    }
 }

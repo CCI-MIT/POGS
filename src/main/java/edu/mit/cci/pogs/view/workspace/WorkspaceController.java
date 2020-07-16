@@ -305,7 +305,12 @@ public class WorkspaceController {
 
         if (allSubAttr != null) {
             for (SubjectAttribute sa : allSubAttr) {
-                if (!(sa.getInternalAttribute())) {
+
+                if ((sa.getAttributeName().equals("workerId") ||
+                        sa.getAttributeName().equals("hitId")||
+                        sa.getAttributeName().equals("assignmentId"))
+                    ||!(sa.getInternalAttribute())) {
+
                     SubjectAttribute subjectAttribute = new SubjectAttribute();
                     subjectAttribute.setSubjectId(su.getId());
                     subjectAttribute.setAttributeName(sa.getAttributeName());

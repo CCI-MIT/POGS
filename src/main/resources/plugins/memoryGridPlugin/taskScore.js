@@ -16,6 +16,16 @@ for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
         break;
     }
 }
+
+var _individualSubjectScore = {};
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+        "subjectExternalId" :  _teammates[i].externalId,
+        "individualScore" : 0.0,
+        "scoringData" : ""
+    };
+}
+
 var _completedTaskScore = {
     "totalScore" : 0,
     "numberOfRightAnswers" : 0,
@@ -27,9 +37,11 @@ var _completedTaskScore = {
 
 var answerKeyMap = [];
 
+var answerAuthorMap = [];
 
 for(var k =0 ; k < answerSheet.length; k ++ ) {
     answerKeyMap[k] = "";
+    answerAuthorMap[k] = "";
 }
 for (var i = 0; i < _completedTaskAttributes.length; i++) {
     if (_completedTaskAttributes[i].attributeName.indexOf("memoryGridAnswer") != -1) {
@@ -37,6 +49,8 @@ for (var i = 0; i < _completedTaskAttributes.length; i++) {
             _completedTaskAttributes[i].attributeName.replace("memoryGridAnswer", ""));
         var answer = _completedTaskAttributes[i].stringValue;
         answerKeyMap[index] = answer;
+        print("   >>>   " + _completedTaskAttributes[i].lastAuthorSubject)
+        answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
     }
 }
 for(var i=0 ;i < answerSheet.length; i++) {
@@ -47,11 +61,23 @@ for(var i=0 ;i < answerSheet.length; i++) {
     if (answerSheet[i] == answerKeyMap[i]) {
         _completedTaskScore.numberOfRightAnswers++;
         _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
+        if(answerAuthorMap[i]!= "") {
+            _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
+        }
+
     } else {
         print("Original " + answerSheet[i] + " subject answer: " + answerKeyMap[i]);
         _completedTaskScore.numberOfWrongAnswers++;
         _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+        if(answerAuthorMap[i]!= "") {
+            _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+        }
     }
 
 }
 completedTaskScore = JSON.stringify(_completedTaskScore);
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);

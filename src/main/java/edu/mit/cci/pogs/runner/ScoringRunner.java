@@ -15,6 +15,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.service.CompletedTaskScoreService;
 import edu.mit.cci.pogs.service.CompletedTaskService;
+import edu.mit.cci.pogs.service.IndividualSubjectScoreService;
 import edu.mit.cci.pogs.utils.DateUtils;
 
 @Component
@@ -27,6 +28,9 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
 
     @Autowired
     private CompletedTaskScoreService completedTaskScoreService;
+
+    @Autowired
+    private IndividualSubjectScoreService individualSubjectScoreService;
 
     private CompletedTask completedTask;
 
@@ -85,6 +89,12 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
 
         completedTaskScoreService.createCompletedTaskScoreFromScript(
                 attributesToAddJson,this.getCompletedTask().getId());
+
+        String individualScoreJson = (String) this.getEngine().getBindings(
+                ScriptContext.ENGINE_SCOPE).get("individualSubjectScores");
+
+        individualSubjectScoreService.createIndividualSubjectScoreFromScript(individualScoreJson,
+                this.getCompletedTask().getId());
 
 
     }

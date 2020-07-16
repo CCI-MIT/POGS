@@ -21,6 +21,15 @@ for(var i=0 ; i < _taskConfigurationAttributes.length; i ++) {
     }
 }
 
+var _individualSubjectScore = {};
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+     "subjectExternalId" :  _teammates[i].externalId,
+     "individualScore" : 0.0,
+     "scoringData" : ""
+ };
+}
+
 var _completedTaskScore = {
     "totalScore" : 0,
     "numberOfRightAnswers" : 0,
@@ -36,12 +45,13 @@ var answerKeyMap = [];
 for(var k =0 ; k < answerSheet.length; k ++ ) {
     answerKeyMap[k] = "";
 }
-
+var answerAuthorMap = [];
 for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
     if(_completedTaskAttributes[i].attributeName.indexOf("sudokuAnswer_") != -1){
         var index = parseInt(_completedTaskAttributes[i].attributeName.replace("sudokuAnswer_",""));
         var answer = _completedTaskAttributes[i].stringValue;
         answerKeyMap[index] = answer;
+        answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
     }
 }
 
@@ -53,12 +63,23 @@ for(var i=0 ;i < answerSheet.length; i++) {
         if (answerSheet[i] == answerKeyMap[i]) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
+            }
         } else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+            if(i < answerAuthorMap.length) {
+                _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+            }
         }
     }
 }
 
 
 completedTaskScore = JSON.stringify(_completedTaskScore);
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);

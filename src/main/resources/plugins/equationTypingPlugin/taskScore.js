@@ -23,7 +23,14 @@ var allowedNumbers = (gridBluePrint.allowedNumbers != null) ? (gridBluePrint.all
     ",")) : ([]);
 
 
-
+var _individualSubjectScore = {};
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+        "subjectExternalId" :  _teammates[i].externalId,
+        "individualScore" : 0.0,
+        "scoringData" : ""
+    };
+}
 
 
 var previous_Equations_Permutations = [];
@@ -38,12 +45,15 @@ var _completedTaskScore = {
 
 var equations = [];
 
+var answerAuthorMap = [];
+
 for (var i = 0; i < _completedTaskAttributes.length; i++) {
     if (_completedTaskAttributes[i].attributeName.indexOf("equationAnswer") != -1) {
         var index = parseInt(
             _completedTaskAttributes[i].attributeName.replace("equationAnswer", ""));
         var answer = _completedTaskAttributes[i].stringValue;
         equations[index] = answer;
+        answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
     }
 }
 var lastRoundMembers = [];
@@ -144,6 +154,8 @@ for (var i = 0; i < equations.length; i++) {
 
         _completedTaskScore.numberOfWrongAnswers++;
         _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+        _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+
         if((shouldRestrictNumbers && !usedOnlyAllowedNumbers)){
             _completedTaskScore.scoringData.push("Eq. ("+i+") Not allowed numbers used : "+ current_equation );
         }
@@ -164,11 +176,15 @@ for (var i = 0; i < equations.length; i++) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
 
+            _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
+
             var permuts = generateValidEquationPermutations(current_equation, totalSum);
             previous_Equations_Permutations.push(permuts);
         } else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+            _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
+
             _completedTaskScore.scoringData.push("Eq. ("+i+") Equation is a permutation of other answer : "+ current_equation + " -- " + isPermutation[0]);
         }
     }
@@ -252,3 +268,9 @@ function generateValidEquationPermutations(equation, totalSum){
 }
 _completedTaskScore.scoringData = JSON.stringify(_completedTaskScore.scoringData);
 completedTaskScore = JSON.stringify(_completedTaskScore);
+
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);

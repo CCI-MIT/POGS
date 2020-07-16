@@ -1,9 +1,12 @@
 package edu.mit.cci.pogs.model.dao.export;
 
+import java.sql.Timestamp;
+
 public class CompletedTaskScoreSubjectTeamExport {
 
     private String studyPrefix;
     private String sessionSuffix;
+    private Timestamp sessionStartDate;
     private String taskName;
     private Boolean soloTask;
     private String soloSubject;
@@ -17,9 +20,10 @@ public class CompletedTaskScoreSubjectTeamExport {
     public CompletedTaskScoreSubjectTeamExport() {
     }
 
-    public CompletedTaskScoreSubjectTeamExport(String studyPrefix, String sessionSuffix, String taskName, Boolean soloTask, Double totalScore, Integer numberOfEntries, Integer numberOfProcessedEntries, Integer numberOfRightAnswers, Integer numberOfWrongAnswers) {
+    public CompletedTaskScoreSubjectTeamExport(String studyPrefix, String sessionSuffix, Timestamp sessionStartDate, String taskName, Boolean soloTask, Double totalScore, Integer numberOfEntries, Integer numberOfProcessedEntries, Integer numberOfRightAnswers, Integer numberOfWrongAnswers) {
         this.studyPrefix = studyPrefix;
         this.sessionSuffix = sessionSuffix;
+        this.sessionStartDate = sessionStartDate;
         this.taskName = taskName;
         this.soloTask = soloTask;
         this.totalScore = totalScore;
@@ -115,5 +119,13 @@ public class CompletedTaskScoreSubjectTeamExport {
 
     public void setNumberOfWrongAnswers(Integer numberOfWrongAnswers) {
         this.numberOfWrongAnswers = numberOfWrongAnswers;
+    }
+
+    public Timestamp getSessionStartDate() {
+        return sessionStartDate;
+    }
+
+    public void setSessionStartDate(Timestamp sessionStartDate) {
+        this.sessionStartDate = sessionStartDate;
     }
 }

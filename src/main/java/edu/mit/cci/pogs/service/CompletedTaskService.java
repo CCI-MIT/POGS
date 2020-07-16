@@ -75,6 +75,9 @@ public class CompletedTaskService {
     @Autowired
     protected TaskExecutionAttributeService taskExecutionAttributeService;
 
+    @Autowired
+    protected IndividualSubjectScoreService individualSubjectScoreService;
+
     public void scoreCompletedTask(CompletedTask ct, TaskWrapper tw) {
 
         TaskPlugin pl = TaskPlugin.getTaskPlugin(tw.getTaskPluginType());
@@ -164,6 +167,19 @@ public class CompletedTaskService {
                 }
                 if(completedTaskScore.has("scoringData")) {
                     cts.setScoringData(completedTaskScore.getString("scoringData"));
+                    //individual_subject_scores
+                    JSONObject joz = new JSONObject(completedTaskScore.getString("scoringData"));
+                    if(joz!=null && joz.has("individual_subject_scores")) {
+
+                        JSONArray ja = joz.getJSONArray("individual_subject_scores");
+                        if(ja!=null){
+                            for(int i =0 ; i < ja.length(); i++){
+                                individualSubjectScoreService
+                                        .createIndividualSubjectScoreFromJsonObject(
+                                                ja.getJSONObject(i),ct.getId());
+                            }
+                        }
+                    }
                 }
 
                 cts.setCompletedTaskId(ct.getId());
