@@ -31,6 +31,7 @@ var answerKeyMap = [];
 
 for(var k =0 ; k < answerSheet.length; k ++ ) {
     answerKeyMap[k] = "";
+    answerAuthorMap[k] = ""
 }
 
 var _completedTaskScore = {
@@ -78,7 +79,7 @@ for(var i=0 ;i < answerSheet.length; i++) {
         }else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
-            if(i < answerAuthorMap.length) {
+            if(answerAuthorMap[i]!= "") {
                 _individualSubjectScore[answerAuthorMap[i]].individualScore += WRONG_ANSWER_REWARD
             }
         }
@@ -87,7 +88,7 @@ for(var i=0 ;i < answerSheet.length; i++) {
         if (answerKeyMap[i] == answerSheet[i]) {
             _completedTaskScore.numberOfRightAnswers++;
             _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
-            if(i < answerAuthorMap.length) {
+            if(answerAuthorMap[i]!= "") {
                 _individualSubjectScore[answerAuthorMap[i]].individualScore += RIGHT_ANSWER_REWARD
             }
         } else {

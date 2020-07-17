@@ -33,7 +33,7 @@ class EtherpadWithColors {
         $("button").click(function (event) {
             var r = confirm("Are you sure you want to select this color? You won't be able to change colors!");
             if (r == true) {
-                this.sendAssignedColorToSelf($(event.target).data("color-index"));
+                this.sendAssignedColorToSelf(parseInt($(event.target).data("color-index")));
             }
         }.bind(this));
 
