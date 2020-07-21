@@ -994,7 +994,7 @@ public class WorkspaceController {
                 model.addAttribute("subjectsTeamIndex", subjectsTeam);
                 model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
                 model.addAttribute("showScore", true);
-                model.addAttribute("taskScoreWrappers", taskScoreService.getTaskScoreWrappers(
+                model.addAttribute("taskScoreWrappers", taskScoreService.getTaskScoreWrappers(sr.getSession().getScoreboardAverageSoloSession(),
                         sr.getSession().getTaskList(), teamWrappers, su.getId()));
                 model.addAttribute("teamWrappers", teamWrappers);
 

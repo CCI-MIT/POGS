@@ -207,6 +207,7 @@ public class SessionService {
         session.setTeamCreationMethod(sessionBean.getTeamCreationMethod());
         session.setTeamCreationMatrix(sessionBean.getTeamCreationMatrix());
         session.setFixedInteractionTime(sessionBean.getFixedInteractionTime());
+        session.setScoreboardAverageSoloSession(sessionBean.getScoreboardAverageSoloSession());
 
         session.setSessionScheduleType(sessionBean.getSessionScheduleType());
         session.setPerpetualStartDate(sessionBean.getPerpetualStartDate());
@@ -313,7 +314,7 @@ public class SessionService {
         clonedNonPerpetualSession.setSessionWideScriptId(session.getSessionWideScriptId());
         clonedNonPerpetualSession.setDisplayNameGenerationEnabled(session.getDisplayNameGenerationEnabled());
         clonedNonPerpetualSession.setDisplayNameGenerationType(session.getDisplayNameGenerationType());
-
+        clonedNonPerpetualSession.setScoreboardAverageSoloSession(session.getScoreboardAverageSoloSession());
         clonedNonPerpetualSession.setBeforeSessionScriptId(session.getBeforeSessionScriptId());
         clonedNonPerpetualSession.setAfterSessionScriptId(session.getAfterSessionScriptId());
         clonedNonPerpetualSession.setPerpetualSessionTimeoutLimit(session.getPerpetualSessionTimeoutLimit());

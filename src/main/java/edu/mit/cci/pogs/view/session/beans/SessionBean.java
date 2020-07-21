@@ -34,6 +34,7 @@ public class SessionBean {
     private Boolean scoreboardEnabled;
     private String scoreboardDisplayType;
     private Boolean scoreboardUseDisplayNames;
+    private Boolean scoreboardAverageSoloSession;
     private Boolean collaborationTodoListEnabled;
     private Boolean collaborationFeedbackWidgetEnabled;
     private Boolean collaborationVotingWidgetEnabled;
@@ -103,6 +104,7 @@ public class SessionBean {
         this.scoreboardEnabled = value.getScoreboardEnabled();
         this.scoreboardDisplayType = value.getScoreboardDisplayType();
         this.scoreboardUseDisplayNames = value.getScoreboardUseDisplayNames();
+        this.scoreboardAverageSoloSession = value.getScoreboardAverageSoloSession();
         this.collaborationTodoListEnabled = value.getCollaborationTodoListEnabled();
         this.collaborationFeedbackWidgetEnabled = value.getCollaborationFeedbackWidgetEnabled();
         this.collaborationVotingWidgetEnabled = value.getCollaborationVotingWidgetEnabled();
@@ -568,5 +570,13 @@ public class SessionBean {
 
     public void setDisplayNameGenerationType(String displayNameGenerationType) {
         this.displayNameGenerationType = displayNameGenerationType;
+    }
+
+    public Boolean getScoreboardAverageSoloSession() {
+        return scoreboardAverageSoloSession;
+    }
+
+    public void setScoreboardAverageSoloSession(Boolean scoreboardAverageSoloSession) {
+        this.scoreboardAverageSoloSession = scoreboardAverageSoloSession;
     }
 }
