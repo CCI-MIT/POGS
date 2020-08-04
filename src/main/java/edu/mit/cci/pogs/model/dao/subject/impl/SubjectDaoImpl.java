@@ -45,6 +45,19 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         return query.fetchInto(Subject.class);
     }
 
+    public List<Subject> listBySessionList( List<Long> sessionList){
+
+        edu.mit.cci.pogs.model.jooq.tables.Subject subject = edu.mit.cci.pogs.model.jooq.tables.Subject.SUBJECT.as("su");
+
+        final SelectQuery<Record> query = dslContext.select(subject.fields())
+                .from(subject)
+                .getQuery();
+
+        query.addConditions(subject.SESSION_ID.in(sessionList));
+
+        return query.fetchInto(Subject.class);
+    }
+
     public List<Subject> listBySessionIdOrParentSessionId( Long sessionId){
 
         edu.mit.cci.pogs.model.jooq.tables.Subject subject = edu.mit.cci.pogs.model.jooq.tables.Subject.SUBJECT.as("su");
@@ -83,6 +96,9 @@ public class SubjectDaoImpl extends AbstractDao<Subject, Long, SubjectRecord> im
         }
     }
 
+    //select * from subject where session_id in(
+    //select id from session where study_id = 24
+    //) order by id;
     public List<Subject> getTeammates(Long sessionId, Long roundId, Long taskId) {
         final SelectQuery<Record> query = dslContext.select(SUBJECT.fields())
                 .from(SUBJECT)

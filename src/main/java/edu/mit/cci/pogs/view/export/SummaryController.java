@@ -259,6 +259,38 @@ public class SummaryController {
         }
 
     }
+
+    @GetMapping("/admin/export/summary/subject/study/score/{studyId}")
+    public void exportStudySummary(HttpServletRequest request, HttpServletResponse response,
+                                             @PathVariable("studyId") Long studyId) {
+        generateStudySummary(request,response, studyId);
+    }
+    private void generateStudySummary(HttpServletRequest request, HttpServletResponse response,
+                                          Long studyId){
+
+        ExportFile ef = summaryExportService.exportStudySubjectSummary(studyId,getPath(request));
+
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=SubjectScoreStudySummary"+
+                            (("study["+studyId+"]"))
+                            +"__" + ExportUtils.getTimeFormattedNoSpaces(
+                            new Timestamp(new Date().getTime())) + ".zip");
+
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            sessionExportFiles.add(ef);
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
     private String getPath(HttpServletRequest request){
         String path = env.getProperty("images.dir");
         if (path == null) {

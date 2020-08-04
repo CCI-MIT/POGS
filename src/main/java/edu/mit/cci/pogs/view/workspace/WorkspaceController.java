@@ -253,15 +253,80 @@ public class WorkspaceController {
                 su.setSubjectDisplayName(ref.getSubjectDisplayName());
                 allSubAttr = subjectAttributeDao.listBySubjectId(ref.getId());
             }
-
-
         }
+
+
+
         String newSubjectExtId = session.getFullSessionName() + "_" + now;
         su.setSubjectExternalId(newSubjectExtId);
         su.setSubjectDisplayName(newSubjectExtId);
         su.setSessionId(session.getId());
 
         su = subjectDao.create(su);
+
+        try {
+            final UserAgentParser parser =
+                    new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
+                            BrowsCapField.BROWSER_MAJOR_VERSION,
+                            BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
+                            BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
+                            BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
+            String userAgent = request.getHeader("User-Agent");
+            final Capabilities capabilities = parser.parse(userAgent);
+
+            // the default fields have getters
+            final String browser = capabilities.getBrowser();
+            final String browserVersion = capabilities.getBrowserMajorVersion();
+            final String deviceType = capabilities.getDeviceType();
+            final String platform = capabilities.getPlatform();
+            final String platformVersion = capabilities.getPlatformVersion();
+            
+
+            SubjectAttribute subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName("browser");
+            subjectAttribute.setStringValue(browser);
+            subjectAttribute.setInternalAttribute(true);
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+
+            subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName("browserVersion");
+            subjectAttribute.setStringValue(browserVersion);
+            subjectAttribute.setInternalAttribute(true);
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+
+            subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName("deviceType");
+            subjectAttribute.setStringValue(deviceType);
+            subjectAttribute.setInternalAttribute(true);
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+
+            subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName("platform");
+            subjectAttribute.setStringValue(platform);
+            subjectAttribute.setInternalAttribute(true);
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+
+            subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName("platformVersion");
+            subjectAttribute.setStringValue(platformVersion);
+            subjectAttribute.setInternalAttribute(true);
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+
+
+        }catch (IOException  |ParseException o){
+            o.printStackTrace();
+        }
+
         if ((workerId != null && !workerId.isEmpty()) ||
                 (assignmentId != null && !assignmentId.isEmpty()) ||
                 (hitId != null && !hitId.isEmpty())) {

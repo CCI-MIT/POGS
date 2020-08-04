@@ -48,7 +48,10 @@ window.NREUM||(NREUM={}),__nr_require=function(t,e,n){function r(n){if(!e[n]){va
 <body>
 <div class="flexbox">
     <div class="header">
-        <img src="../../static/img/POGS_Acronym_Logo.png" th:src="@{/img/POGS_Acronym_Logo.png}" height="35"/>
+        <div class="headers">
+            <img src="../../static/img/POGS_Acronym_Logo.png" th:src="@{/img/POGS_Acronym_Logo.png}" height="35"/>
+        </div>
+        <small class="float-right">If you experience technical problems, please click <a href="#" id="error">here</a></small>
     </div>
     <div class="main flexbox-row">
 
@@ -86,15 +89,63 @@ window.NREUM||(NREUM={}),__nr_require=function(t,e,n){function r(n){if(!e[n]){va
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Error report</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <h6>Please describe the problem you have encountered, <br/>then use the Send button to send your message.<br/>Thank you!</h6>
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Message:</label>
+            <textarea class="form-control" id="messageText"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" id="sendErrorMessage">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script src="../../dist/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"
         th:src="@{/vendor/bootstrap/dist/js/bootstrap.bundle.min.js}"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script src="https://browser.sentry-cdn.com/5.20.1/bundle.min.js"
+integrity="sha384-O8HdAJg1h8RARFowXd2J/r5fIWuinSBtjhwQoPesfVILeXzGpJxvyY/77OaPPXUo"
+crossorigin="anonymous"></script>
 
+<script>
+Sentry.init({ dsn: 'https://7ce62a1dec4c4f368cb81862110cd405@o192087.ingest.sentry.io/5367722' });
+$(function () {
+   $("#error").click(function(){
+       $('#exampleModal').on('show.bs.modal', function (event) {
+          $('#messageText').trigger('focus');
+       });
+       $('#exampleModal').modal();
+   })
+   $("#sendErrorMessage").click(function(){
+       let typed = $("#messageText").val();
+       if(typed==""){
+           alert("Please describe the the problem!");
+           return
+       }
+       alert("Thanks for the error report.\n We will refresh this workspace!")
+       window.pogs.handleBlockingError(typed);
 
-
+   });
+});
+</script>
 </body>
 </html>

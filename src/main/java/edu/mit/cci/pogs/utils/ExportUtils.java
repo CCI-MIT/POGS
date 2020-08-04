@@ -190,9 +190,9 @@ public class ExportUtils {
                             content.append(rv);
                         }
                     }catch (InvocationTargetException ite){
-
+                        ite.printStackTrace();;
                     }catch (IllegalAccessException ite){
-
+                        ite.printStackTrace();
                     }
                 }
             }
@@ -281,7 +281,7 @@ public class ExportUtils {
         return simpleDateFormat.format(new Date(timestamp.getTime()));
     }
 
-    private static String getTimeFormatted(Timestamp timestamp) {
+    public static String getTimeFormatted(Timestamp timestamp) {
         if (timestamp == null) return "";
         String pattern = "yyyy-MM-dd HH:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);

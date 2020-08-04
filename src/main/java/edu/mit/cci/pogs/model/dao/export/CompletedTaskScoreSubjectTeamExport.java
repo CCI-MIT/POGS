@@ -7,6 +7,7 @@ public class CompletedTaskScoreSubjectTeamExport {
     private String studyPrefix;
     private String sessionSuffix;
     private Timestamp sessionStartDate;
+    private Long sessionId;
     private String taskName;
     private Boolean soloTask;
     private String soloSubject;
@@ -20,10 +21,14 @@ public class CompletedTaskScoreSubjectTeamExport {
     public CompletedTaskScoreSubjectTeamExport() {
     }
 
-    public CompletedTaskScoreSubjectTeamExport(String studyPrefix, String sessionSuffix, Timestamp sessionStartDate, String taskName, Boolean soloTask, Double totalScore, Integer numberOfEntries, Integer numberOfProcessedEntries, Integer numberOfRightAnswers, Integer numberOfWrongAnswers) {
+    public CompletedTaskScoreSubjectTeamExport(String studyPrefix, String sessionSuffix,
+                                               Timestamp sessionStartDate,
+                                               Long sessionId,
+                                               String taskName, Boolean soloTask, Double totalScore, Integer numberOfEntries, Integer numberOfProcessedEntries, Integer numberOfRightAnswers, Integer numberOfWrongAnswers) {
         this.studyPrefix = studyPrefix;
         this.sessionSuffix = sessionSuffix;
         this.sessionStartDate = sessionStartDate;
+        this.sessionId = sessionId;
         this.taskName = taskName;
         this.soloTask = soloTask;
         this.totalScore = totalScore;
@@ -127,5 +132,13 @@ public class CompletedTaskScoreSubjectTeamExport {
 
     public void setSessionStartDate(Timestamp sessionStartDate) {
         this.sessionStartDate = sessionStartDate;
+    }
+
+    public Long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
     }
 }

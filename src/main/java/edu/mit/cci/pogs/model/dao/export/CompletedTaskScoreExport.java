@@ -6,6 +6,7 @@ public class CompletedTaskScoreExport {
     private String studyPrefix;
     private String sessionSuffix;
     private Timestamp sessionStartDate;
+    private Long sessionId;
     private String taskName;
     private Boolean soloTask;
     private Long soloSubject;
@@ -110,5 +111,13 @@ public class CompletedTaskScoreExport {
 
     public void setSessionStartDate(Timestamp sessionStartDate) {
         this.sessionStartDate = sessionStartDate;
+    }
+
+    public Long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
     }
 }

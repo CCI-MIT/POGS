@@ -146,7 +146,7 @@ class Pogs {
             $('<div/>', {
                 id: "countdown",
                 'class': "float-right",
-            }).appendTo(".header");
+            }).appendTo(".headers");
         }
 
         this.countDown = new Countdown(this.secondsRemainingCurrentUrl,
@@ -164,6 +164,13 @@ class Pogs {
                 this.subscribe('onReady', this.processOldEventsUntilNow.bind(this));
             }
         }
+
+
+        var x = setInterval(function () {
+
+            this.checkForFlowSyncIssue();
+
+        }.bind(this), 15000);// 15 seconds
 
     }
     getDictionary(){
@@ -232,12 +239,16 @@ class Pogs {
         }
     }
     initializeWebSockets () {
+        try {
+            var socket = new SockJS('/ws');
+            this.stompClient = Stomp.over(socket);
+            this.stompClient.debug = () => {
+            };
 
-        var socket = new SockJS('/ws');
-        this.stompClient = Stomp.over(socket);
-        this.stompClient.debug = () => {};
-
-        this.stompClient.connect({}, this.onConnected.bind(this), this.onError.bind(this));
+            this.stompClient.connect({}, this.onConnected.bind(this), this.onError.bind(this));
+        } catch (error){
+            this.handleSocketError("Error in socket initialization, STOMP exception:" + error);
+        }
     }
     subscribe(eventName, fn) {
         if (!(eventName in this.handlers)) {
@@ -267,6 +278,11 @@ class Pogs {
                                            this.fire(message, eventName, this);
                                        }
                                    }.bind(this));
+    }
+    handleSocketError(msg) {
+        $.getJSON('/log/' +this.sessionId + "?externalId="+ this.subjectId+"&errorMessage="+ msg + "&url"+window.location.href);
+
+        location.reload();
     }
     onConnected() {
 
@@ -305,6 +321,7 @@ class Pogs {
     }
     onError(error) {
         this.fire(null, 'onError', this);
+        this.handleSocketError(error);
     }
     sendCheckInMessage(){
         if(new Date().getTime() - this.lastCheckInDate >= 1000*60){
@@ -331,7 +348,15 @@ class Pogs {
 
 
     }
+    checkForFlowSyncIssue(){
+        let now = new Date().getTime();
+        if((now - this.latestFlowMessage) > 1000*10 ){
+            this.handleSocketError("Have not received a flow in 10 seconds");
+        }
+    }
     onFlowBroadcastReceived(message) {
+
+        this.latestFlowMessage = new Date().getTime();
 
         if((message.content.currentUrl + "/" +this.subjectId == window.location.pathname)) {
             this.nextUrl = message.content.nextUrl;
@@ -374,7 +399,11 @@ class Pogs {
                 sessionId: sessionId
 
             };
-            this.stompClient.send(url, {}, JSON.stringify(chatMessage));
+            try {
+                this.stompClient.send(url, {}, JSON.stringify(chatMessage));
+            } catch (exp){
+                this.handleSocketError("Error in sending websocket message: " + exp);
+            }
         }
         if (typeof event !== 'undefined') {
             event.preventDefault()

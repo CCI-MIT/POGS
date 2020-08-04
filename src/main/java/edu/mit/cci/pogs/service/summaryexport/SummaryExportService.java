@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
+import edu.mit.cci.pogs.model.dao.completedtaskscore.CompletedTaskScoreDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreExport;
 import edu.mit.cci.pogs.model.dao.export.CompletedTaskScoreSubjectTeamExport;
@@ -23,6 +24,7 @@ import edu.mit.cci.pogs.model.dao.export.EventLogExport;
 import edu.mit.cci.pogs.model.dao.export.ExportDao;
 import edu.mit.cci.pogs.model.dao.export.IndividualSubjectScoreExport;
 import edu.mit.cci.pogs.model.dao.export.SubjectExport;
+import edu.mit.cci.pogs.model.dao.individualsubjectscore.IndividualSubjectScoreDao;
 import edu.mit.cci.pogs.model.dao.round.RoundDao;
 import edu.mit.cci.pogs.model.dao.session.SessionDao;
 import edu.mit.cci.pogs.model.dao.session.SessionScheduleType;
@@ -31,25 +33,32 @@ import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.team.TeamDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.IndividualSubjectScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionHasTaskGroup;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskGroupHasTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Team;
-import edu.mit.cci.pogs.runner.TaskAfterWorkRunner;
 import edu.mit.cci.pogs.runner.TaskSnapshotExportRunner;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
-import edu.mit.cci.pogs.service.CompletedTaskService;
+import edu.mit.cci.pogs.service.CompletedTaskScoreService;
+import edu.mit.cci.pogs.service.IndividualSubjectScoreService;
+import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectService;
+import edu.mit.cci.pogs.service.TaskGroupService;
+import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.service.export.exportBeans.ExportFile;
-import edu.mit.cci.pogs.utils.DateUtils;
+import edu.mit.cci.pogs.service.export.exportBeans.SessionRelatedScore;
+import edu.mit.cci.pogs.service.export.exportBeans.SubjectStudyScore;
 import edu.mit.cci.pogs.utils.ExportUtils;
-import edu.mit.cci.pogs.utils.StringUtils;
 
 @Service
 public class SummaryExportService {
@@ -61,7 +70,7 @@ public class SummaryExportService {
     private SessionDao sessionDao;
 
     @Autowired
-    private SubjectDao subjectdao;
+    private SubjectDao subjectDao;
 
     @Autowired
     private TeamService teamService;
@@ -79,6 +88,12 @@ public class SummaryExportService {
     private StudyDao studyDao;
 
     @Autowired
+    private CompletedTaskScoreDao completedTaskScoreDao;
+
+    @Autowired
+    private IndividualSubjectScoreDao individualSubjectScoreDao;
+
+    @Autowired
     private CompletedTaskDao completedTaskDao;
 
     @Autowired
@@ -90,6 +105,11 @@ public class SummaryExportService {
     @Autowired
     private TaskDao taskDao;
 
+    @Autowired
+    private SessionService sessionService;
+
+    @Autowired
+    private TaskGroupService taskGroupService;
 
     private List<Long> getSessionIds(Long studyId, Long sessionId) {
         List<Long> sessionList = new ArrayList<>();
@@ -102,10 +122,10 @@ public class SummaryExportService {
 
         } else {
             Session session = sessionDao.get(sessionId);
-            if(session.getParentSessionId()== null){
+            if (session.getParentSessionId() == null) {
                 //handle the parent id
                 List<Session> sessions = sessionDao.listByParentSessionId(session.getId());
-                sessions.forEach((se)-> sessionList.add(se.getId()));
+                sessions.forEach((se) -> sessionList.add(se.getId()));
             } else {
                 sessionList.add(session.getId());
             }
@@ -113,30 +133,30 @@ public class SummaryExportService {
         return sessionList;
     }
 
-    public ExportFile getPresenceSummaryTable(Long studyId,Long sessionId, String path) {
+    public ExportFile getPresenceSummaryTable(Long studyId, Long sessionId, String path) {
         List<Long> sessionList = getSessionIds(studyId, sessionId);
         List<EventLogCheckingSummary> eventLogList = exportDao.getEventLogCheckIn(sessionList);
         List<EventLogCheckingSummary> eventLogExports = new ArrayList<>();
-        Map<Long,Map<Long,EventLogCheckingSummary>> groupedByTask = new HashMap<>();
+        Map<Long, Map<Long, EventLogCheckingSummary>> groupedByTask = new HashMap<>();
 
         Map<Long, String> subjectIds = new HashMap<>();
-        for(EventLogCheckingSummary elcs: eventLogList){
-            if(groupedByTask.get(elcs.getCompletedTaskId())==null){
+        for (EventLogCheckingSummary elcs : eventLogList) {
+            if (groupedByTask.get(elcs.getCompletedTaskId()) == null) {
                 groupedByTask.put(elcs.getCompletedTaskId(), new HashMap<>());
             }
-            groupedByTask.get(elcs.getCompletedTaskId()).put(elcs.getSubjectId(),elcs);
-            if(subjectIds.get(elcs.getSubjectId())==null){
+            groupedByTask.get(elcs.getCompletedTaskId()).put(elcs.getSubjectId(), elcs);
+            if (subjectIds.get(elcs.getSubjectId()) == null) {
                 subjectIds.put(elcs.getSubjectId(), elcs.getSubjectExternalId());
             }
         }
 
-        for(Long compTaskId: groupedByTask.keySet()){
+        for (Long compTaskId : groupedByTask.keySet()) {
             Map<Long, EventLogCheckingSummary> summaryMapBySubject = groupedByTask.get(compTaskId);
             EventLogCheckingSummary elcs = null;
 
-            for(Long subjectId: subjectIds.keySet()) {
+            for (Long subjectId : subjectIds.keySet()) {
                 EventLogCheckingSummary subjectEventLog = summaryMapBySubject.get(subjectId);
-                if(subjectEventLog != null) {
+                if (subjectEventLog != null) {
                     if (elcs == null) {
                         elcs = subjectEventLog;
                         elcs.setSubjectsNames(new ArrayList<>());
@@ -152,13 +172,14 @@ public class SummaryExportService {
 
 
         String[] fieldOrder = {
-        "studyPrefix",
-        "sessionSuffix",
-        "sessionStartDate",
-        "teamId",
-        "taskName",
-        "subjectsNames",
-        "subjectsPingCount"
+                "studyPrefix",
+                "sessionSuffix",
+                "sessionStartDate",
+                "sessionId",
+                "teamId",
+                "taskName",
+                "subjectsNames",
+                "subjectsPingCount"
         };
 
         return ExportUtils.getExportFileForSimplePojo(path, "EventLogCheckIns_" +
@@ -175,8 +196,8 @@ public class SummaryExportService {
         for (EventLogExport ele : eventLogExports) {
             ele.setEventContent("");
             ele.setSummaryDescription(validateSummary(ele.getSummaryDescription()));
-            if(ele.getReceiverId()!=null){
-                Subject su = subjectdao.get(ele.getReceiverId());
+            if (ele.getReceiverId() != null) {
+                Subject su = subjectDao.get(ele.getReceiverId());
                 ele.setReceiverSubjectExternalId(su.getSubjectExternalId());
             } else {
                 ele.setReceiverSubjectExternalId("");
@@ -188,6 +209,7 @@ public class SummaryExportService {
                 "studyPrefix",
                 "sessionSuffix",
                 "sessionStartDate",
+                "sessionId",
                 "taskName",
                 "soloTask",
                 "eventType",
@@ -227,7 +249,7 @@ public class SummaryExportService {
             study = studyDao.get(studyId);
         }
         for (Long sessionIdz : sessionList) {
-            List<Subject> subjects = subjectdao.listBySessionIdOrParentSessionId(sessionIdz);
+            List<Subject> subjects = subjectDao.listBySessionIdOrParentSessionId(sessionIdz);
             Session session = sessionDao.get(sessionIdz);
             if (studyId == null) {
                 study = studyDao.get(session.getStudyId());
@@ -238,8 +260,9 @@ public class SummaryExportService {
                 se.setStudyPrefix(study.getStudySessionPrefix());
                 se.setSessionSuffix(session.getSessionSuffix());
                 se.setSessionStartDate(session.getSessionStartDate());
+                se.setSessionId(session.getId());
                 List<EventLog> eventLogs = eventLogDao.listCheckInSubjectLogs(su.getId());
-                if(eventLogs!=null && eventLogs.size()>0){
+                if (eventLogs != null && eventLogs.size() > 0) {
                     se.setLastCheckInPage(eventLogs.get(0).getSummaryDescription());
                     se.setLastCheckInTime(getTimeFormatted(eventLogs.get(0).getTimestamp()));
                 } else {
@@ -273,6 +296,7 @@ public class SummaryExportService {
         String[] fieldOrder = {"studyPrefix",
                 "sessionSuffix",
                 "sessionStartDate",
+                "sessionId",
                 "subjectId",
                 "subjectExternalId",
                 "subjectDisplayName",
@@ -311,6 +335,7 @@ public class SummaryExportService {
         String[] fieldOrder = {"studyPrefix",
                 "sessionSuffix",
                 "sessionStartDate",
+                "sessionId",
                 "taskName",
                 "soloTask",
                 "subjectId",
@@ -332,6 +357,7 @@ public class SummaryExportService {
             CompletedTaskScoreSubjectTeamExport ctsste = new CompletedTaskScoreSubjectTeamExport(ctse.getStudyPrefix(),
                     ctse.getSessionSuffix(),
                     ctse.getSessionStartDate(),
+                    ctse.getSessionId(),
                     ctse.getTaskName(),
                     ctse.getSoloTask(),
                     ctse.getTotalScore(),
@@ -340,7 +366,7 @@ public class SummaryExportService {
                     ctse.getNumberOfRightAnswers(),
                     ctse.getNumberOfWrongAnswers());
             if (ctsste.getSoloTask()) {
-                Subject su = subjectdao.get(ctse.getSoloSubject());
+                Subject su = subjectDao.get(ctse.getSoloSubject());
                 ctsste.setSoloSubject(su.getSubjectExternalId());
                 ctsste.setTeamSubjects("");
             } else {
@@ -358,6 +384,7 @@ public class SummaryExportService {
         String[] fieldOrder = {"studyPrefix",
                 "sessionSuffix",
                 "sessionStartDate",
+                "sessionId",
                 "taskName",
                 "soloTask",
                 "soloSubject",
@@ -412,15 +439,15 @@ public class SummaryExportService {
             Study study = studyDao.get(session.getStudyId());
             ct.getTeamId();
             String subject = "";
-            if(task.getSoloTask()){
-                Subject sub = subjectdao.get(ct.getSubjectId());
+            if (task.getSoloTask()) {
+                Subject sub = subjectDao.get(ct.getSubjectId());
                 subject = sub.getSubjectExternalId();
             }
             String rec = study.getStudySessionPrefix() + ";" + session.getSessionSuffix() + ";" +
                     session.getId() + ";" +
                     session.getSessionStartDate() + ";" +
                     task.getTaskName() + ";" + task.getSoloTask() + ";" +
-                    ct.getTeamId() + ";" +  subject + ";";
+                    ct.getTeamId() + ";" + subject + ";";
 
             csr.setSession(new SessionWrapper(session));
             csr.setTaskWrapper(new TaskWrapper(task));
@@ -428,8 +455,8 @@ public class SummaryExportService {
             csr.run();
             List<String> recordLines = csr.getExportLines();
             if (recordLines != null) {
-                for(String line: recordLines)
-                entries.add( rec + line);
+                for (String line : recordLines)
+                    entries.add(rec + line);
             }
             if (header == null) {
                 header = fixedHeader + csr.getHeaderColumns();
@@ -449,4 +476,209 @@ public class SummaryExportService {
         return ef;
 
     }
+
+    public ExportFile exportStudySubjectSummary(Long studyId, String path) {
+
+        //get all sessions for study
+        List<Session> sessionList = sessionDao.listByStudyId(studyId);
+        Map<Long, Session> sessionMap = new HashMap<>();
+        List<Long> sessionIdList = new ArrayList<>();
+        sessionList.forEach(session -> {
+            sessionIdList.add(session.getId());
+            sessionMap.put(session.getId(), session);
+        });
+        List<Subject> subjects = subjectDao.listBySessionList(sessionIdList);
+        Map<Long, SubjectStudyScore> subjectStudyScores = new HashMap<>();
+        for (Subject su : subjects) {
+            SubjectStudyScore sss = new SubjectStudyScore();
+            sss.setSubject(su);
+            SessionRelatedScore srs = new SessionRelatedScore();
+            srs.setSubject(su);
+            srs.setSession(sessionMap.get(su.getSessionId()));
+            sss.setRelatedScoreList(new ArrayList<>());
+            sss.getRelatedScoreList().add(srs);
+            subjectStudyScores.put(sss.getSubject().getId(), sss);
+        }
+
+        Map<Long, SubjectStudyScore> subjectListGrouped = groupSubjectsByPreviousSubjectId(
+                sessionMap, subjectStudyScores);
+
+
+        Map<Long, List<Task>> taskListBySessionId = new HashMap<>();
+
+        for (SubjectStudyScore sss : subjectListGrouped.values()) {
+            List<SubjectAttribute> attributes = subjectService.getSubjectAttributes(sss.getSubject().getId());
+            sss.setSubjectAttribute(attributes);
+            for (SessionRelatedScore srs : sss.getRelatedScoreList()) {
+                List<Task> taskList = new ArrayList<>();
+                Long sessionId = (srs.getSession().getParentSessionId() != null) ?
+                        (srs.getSession().getParentSessionId()) : (srs.getSession().getId());
+                if (taskListBySessionId.get(sessionId) == null) {
+                    List<SessionHasTaskGroup> taskGroupList = sessionService.listSessionHasTaskGroupBySessionId(sessionId);
+                    for (SessionHasTaskGroup sshtg : taskGroupList) {
+                        List<TaskGroupHasTask> tghtList = taskGroupService.listTaskGroupHasTaskByTaskGroup(sshtg.getTaskGroupId());
+                        for (TaskGroupHasTask tght : tghtList) {
+                            Task task = taskDao.get(tght.getTaskId());
+                            taskList.add(task);
+                        }
+                    }
+                    taskListBySessionId.put(sessionId, taskList);
+                }
+
+                List<Task> tasks = taskListBySessionId.get(sessionId);
+                if (tasks != null) {
+                    srs.setTaskNames(new ArrayList<>());
+                    srs.setTaskIndividualScores(new ArrayList<>());
+                    srs.setTaskGroupScores(new ArrayList<>());
+
+                    for (Task t : tasks) {
+                        if (t.getShouldScore()) {
+                            srs.getTaskNames().add(t.getTaskName());
+                            if (t.getSoloTask()) {
+                                CompletedTask ct = completedTaskDao.getBySubjectIdTaskId(srs.getSubject().getId(), t.getId());
+                                if (ct != null) {
+                                    CompletedTaskScore cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
+                                    if (cts != null) {
+                                        srs.getTaskGroupScores().add(cts.getTotalScore());
+                                        srs.getTaskIndividualScores().add(cts.getTotalScore());
+                                    } else {
+                                        srs.getTaskGroupScores().add(0.0);
+                                        srs.getTaskIndividualScores().add(0.0);
+                                    }
+                                }
+                            } else {
+                                List<Round> roundList = roundDao.listBySessionId(srs.getSession().getId());
+                                if (roundList != null && roundList.size() > 0) {
+                                    Round round = roundList.get(0);
+                                    Team team = teamDao.getSubjectTeam(srs.getSubject().getId(),
+                                            srs.getSession().getId(), round.getId(), t.getId());
+                                    if (team != null) {
+                                        CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(
+                                                round.getId(),
+                                                team.getId(), t.getId());
+                                        CompletedTaskScore cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
+                                        if (cts != null) {
+                                            srs.getTaskGroupScores().add(cts.getTotalScore());
+                                        } else {
+                                            srs.getTaskGroupScores().add(0.0);
+                                        }
+                                        IndividualSubjectScore iss =
+                                                individualSubjectScoreDao.getByGiven(srs.getSubject().getId(), ct.getId());
+                                        if (iss != null) {
+                                            srs.getTaskIndividualScores().add(iss.getIndividualScore());
+                                        } else {
+                                            srs.getTaskIndividualScores().add(0.0);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+        List<SubjectStudyScore> allSSS = new ArrayList<>();
+        subjectListGrouped.values().forEach( subjectStudyScore -> allSSS.add(subjectStudyScore));
+
+        String[] fieldOrder = {
+                "workerId"
+        };
+
+        Map<Integer, Integer> mapOfNumberDepth = new HashMap<>();
+        for(SubjectStudyScore sss: allSSS) {
+            Integer currCount = mapOfNumberDepth.get(sss.getRelatedScoreList().size());
+            if (currCount == null) {
+                currCount = 0;
+            }
+            mapOfNumberDepth.put(sss.getRelatedScoreList().size(), currCount + 1);
+        }
+        Integer mostFrequentNumberDepth = 0;
+        for (Integer value : mapOfNumberDepth.values()) {
+            if(value > mostFrequentNumberDepth){
+                mostFrequentNumberDepth = value;
+            }
+        }
+        Integer chosenDepth = 0;
+        for(Integer number : mapOfNumberDepth.keySet()){
+            if(mostFrequentNumberDepth == mapOfNumberDepth.get(number)){
+                chosenDepth = number;
+            }
+        }
+        List<SubjectStudyScore> finalSSS = new ArrayList<>();
+        for(SubjectStudyScore sss: allSSS) {
+            if(chosenDepth == sss.getRelatedScoreList().size()) {
+                finalSSS.add(sss);
+            }
+        }
+
+        List<String> extraColumns = new ArrayList<>();
+
+        if(finalSSS.get(0).getRelatedScoreList() != null &&
+                finalSSS.get(0).getRelatedScoreList().size() > 0){
+
+            for(int i =0; i < finalSSS.get(0).getRelatedScoreList().size(); i++){
+                SessionRelatedScore ssz =finalSSS.get(0).getRelatedScoreList().get(i);
+                extraColumns.add("#"+ (i+1) + " session id");
+                extraColumns.add("#"+ (i+1) + " session name");
+                extraColumns.add("#"+ (i+1) + " session start date");
+                for(int j=0; j < ssz.getTaskNames().size(); j ++){
+                    extraColumns.add("#"+ (j+1) + " task - " + ssz.getTaskNames().get(j) + " individual score");
+                    extraColumns.add("#"+ (j+1) + " task - " + ssz.getTaskNames().get(j) + " group score");
+                }
+            }
+        }
+
+        return ExportUtils.getExportFileForSimplePojoWithExtraColumns(path,
+                "SubjectScoreStudySummary" + ((studyId)),
+                SubjectStudyScore.class, finalSSS, Arrays.asList(fieldOrder), extraColumns);
+
+    }
+
+    private static Map<Long, SubjectStudyScore> groupSubjectsByPreviousSubjectId(Map<Long, Session> sessionMap, Map<Long, SubjectStudyScore> subjectStudyScores) {
+        Map<Long, SubjectStudyScore> firstSessionSubjects = new HashMap<>();
+        Map<Long, SubjectStudyScore> nonFirstSessionSubjects = new HashMap<>();
+
+        for (SubjectStudyScore sss : subjectStudyScores.values()) {
+            if (sss.getSubject().getPreviousSessionSubject() == null) {
+                firstSessionSubjects.put(sss.getSubject().getId(), sss);
+            } else {
+                nonFirstSessionSubjects.put(sss.getSubject().getId(), sss);
+            }
+        }
+        //resolveMainSubject
+        for (SubjectStudyScore sss : nonFirstSessionSubjects.values()) {
+            SubjectStudyScore ssu = resolveMainSubject(sss, subjectStudyScores);
+            if (ssu != null) {
+                //ADD TO original subject list.
+                if (firstSessionSubjects.get(ssu.getSubject().getId()) != null) {
+                    if(sss.getRelatedScoreList() != null && sss.getRelatedScoreList().size() > 0) {
+                        firstSessionSubjects.get(ssu.getSubject().getId())
+                                .getRelatedScoreList().add(sss.getRelatedScoreList().get(0));
+                    }
+                }
+            }
+        }
+        return firstSessionSubjects;
+    }
+
+    private static SubjectStudyScore resolveMainSubject(SubjectStudyScore sss,
+                                                        Map<Long, SubjectStudyScore> subjectStudyScores) {
+
+        if (subjectStudyScores.get(sss.getSubject().getPreviousSessionSubject()) != null) {
+            SubjectStudyScore ssOrigin = subjectStudyScores.get(
+                    sss.getSubject().getPreviousSessionSubject());
+
+            if (ssOrigin.getSubject().getPreviousSessionSubject() == null) {
+                return ssOrigin;
+            } else {
+                return resolveMainSubject(ssOrigin, subjectStudyScores);
+
+            }
+        } else {
+            return null;
+        }
+    }
+
+
 }

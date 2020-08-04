@@ -14,5 +14,6 @@ public interface SubjectDao extends Dao<Subject, Long> {
     void delete(Long subjectId);
     List<Subject> listBySessionIdOrParentSessionId( Long sessionId);
     Subject getByPogsUniqueHashId(String pogsUniqueHash);
+    List<Subject> listBySessionList( List<Long> sessionList);
 }
  

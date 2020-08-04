@@ -20,6 +20,8 @@ public class SubjectExport {
 
     private Timestamp sessionStartDate;
 
+    private Long sessionId;
+
     private String teamId;
 
     private Subject subject;
@@ -137,5 +139,13 @@ public class SubjectExport {
 
     public void setSessionStartDate(Timestamp sessionStartDate) {
         this.sessionStartDate = sessionStartDate;
+    }
+
+    public Long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
     }
 }

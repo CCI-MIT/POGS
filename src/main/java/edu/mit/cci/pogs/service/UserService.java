@@ -48,6 +48,7 @@ public class UserService {
 
         authUser.setFirstName(authUserBean.getFirstName());
         authUser.setLastName(authUserBean.getLastName());
+        authUser.setIsAdmin(true);
 
 
         if(authUserBean.getId()!=null){

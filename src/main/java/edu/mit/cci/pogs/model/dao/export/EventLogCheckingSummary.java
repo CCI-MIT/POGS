@@ -9,6 +9,7 @@ public class EventLogCheckingSummary {
     private String sessionSuffix;
     private String taskName;
     private Timestamp sessionStartDate;
+    private Long sessionId;
     private Long teamId;
     private Long completedTaskId;
     private String subjectExternalId;
@@ -146,5 +147,13 @@ public class EventLogCheckingSummary {
 
     public void setTeamId(Long teamId) {
         this.teamId = teamId;
+    }
+
+    public Long getSessionId() {
+        return sessionId;
+    }
+
+    public void setSessionId(Long sessionId) {
+        this.sessionId = sessionId;
     }
 }
