@@ -133,6 +133,13 @@ public class SessionController {
         return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_WIDE_OVERRIDE,
                 AuthUserDetailsService.getLoggedInUser());
     }
+
+    @ModelAttribute("recordedSessionExecutableScripts")
+    public List<ExecutableScript> gerecordedSessionExecutableScripts() {
+        return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.RECORDED_SESSION_SCRIPT,
+                AuthUserDetailsService.getLoggedInUser());
+    }
+
     @ModelAttribute("sessionBeforeExecutableScripts")
     public List<ExecutableScript> getSessionBeforeExecutableScripts() {
         return executableScriptDao.listByScriptTypeWithUserGroup(ScriptType.SESSION_BEFORE_START,
@@ -336,6 +343,20 @@ public class SessionController {
                 sessionService.listSessionHasTaskGroupBySessionId(session.getId()));
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", session);
+
+
+        List<Session> recordedSessions = new ArrayList<>();
+        if(session.getId()== null) {
+            recordedSessions = sessionDao.listByStudyId(studyId);
+        } else {
+            for (Session s: sessionDao.listByStudyId(studyId)) {
+                if(s.getId()!=session.getId()) {
+                    recordedSessions.add(s);
+                }
+            }
+        }
+        model.addAttribute("previousRecordedSessions",recordedSessions);
+
         return "session/session-edit";
     }
 

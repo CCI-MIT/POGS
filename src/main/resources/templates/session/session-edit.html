@@ -579,6 +579,47 @@
         </fieldset>
 
 
+
+                    <fieldset class="form-group row">
+                        <legend class="col-form-legend col-sm-8">Advanced - Robots </legend>
+                        <div class="container">
+                        <div class="form-group row col-sm-12" id="robotSessionEventSourceId">
+                                <label class="col-sm-5 col-form-label" for="robotSessionEventSourceIdSelect">Recorded session data source: </label>
+                                <div class="col-sm-7">
+                                    <select class="custom-select" th:field="*{robotSessionEventSourceId}" id="robotSessionEventSourceIdSelect">
+
+                                        <option th:if="*{robotSessionEventSourceId==null}" selected="selected" value="">No override</option>
+                                        <option th:if="*{robotSessionEventSourceId!=null}"  value="">No override</option>
+
+                                        <option
+                                           th:if="${not #lists.isEmpty(previousRecordedSessions) }"
+                                                th:each="rg: ${previousRecordedSessions}"
+                                                th:value="${rg.id}"
+                                                th:text="${rg.scriptName}" ></option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="form-group row col-sm-12" id="sessionWideScriptId">
+                                <label class="col-sm-5 col-form-label" for="sessionWideScriptIdSelect">Session data source override sript:</label>
+                                <div class="col-sm-7">
+                                    <select class="custom-select" th:field="*{robotSessionEventScriptId}" id="sessionWideScriptIdSelect">
+
+                                        <option th:if="*{robotSessionEventScriptId==null}" selected="selected" value="">No override</option>
+                                        <option th:if="*{robotSessionEventScriptId!=null}"  value="">No override</option>
+
+                                        <option
+                                           th:if="${not #lists.isEmpty(recordedSessionExecutableScripts) }"
+                                                th:each="rg: ${recordedSessionExecutableScripts}"
+                                                th:value="${rg.id}"
+                                                th:text="${rg.scriptName}" ></option>
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
         <!-- Begin research group field -->
         <fieldset class="form-group">
             <legend>Task groups</legend>

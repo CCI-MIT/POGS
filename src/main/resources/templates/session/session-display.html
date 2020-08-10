@@ -34,7 +34,8 @@
                 Edit session</a>
 
                 <!-- a th:if="${sessionBean.hasSessionStarted}" style="margin:5px" class="btn-link btn-info float-right"
-                th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/export'}">
+                th:href="${'/admin/studies/' + study.id + '/sessions/' + sessionBean.id + '/
+                '}">
                                 Export session data</a -->
 
         <a th:if="${sessionBean.status == T(edu.mit.cci.pogs.model.dao.session.SessionStatus).STARTED.getId().toString() or

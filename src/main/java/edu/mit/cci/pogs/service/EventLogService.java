@@ -6,11 +6,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.mit.cci.pogs.messages.CommunicationMessage;
+import edu.mit.cci.pogs.model.dao.completedtask.CompletedTaskDao;
 import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
@@ -23,6 +29,9 @@ public class EventLogService {
 
     @Autowired
     private SubjectDao subjectDao;
+
+    @Autowired
+    private CompletedTaskDao completedTaskDao;
 
     public JSONObject getLogJson(EventLog el) {
         JSONObject event = new JSONObject();
@@ -80,4 +89,44 @@ public class EventLogService {
             }
         }
     }
+    public String getScriptForLogs(Long sessionId) {
+        List<EventLog> eventLogs = eventLogDao.listLogsBySessionId(sessionId);
+        String scriptData = "// Script for session id: "+ sessionId + "\n";
+        scriptData += "// Events ordered by timestamp \n";
+        scriptData += "var subjectEvent=[];\n";
+        Map<String, String> subjects = new HashMap<>();
+        eventLogs.stream().forEach( el -> subjects.put(el.getSender(), el.getSender()));
+        for(String su: subjects.keySet()){
+            scriptData+= "subjectEvent[\""+su+"\"] = [];\n";
+        }
+
+        Long lastTaskId = null;
+        for(EventLog eventLog: eventLogs){
+            if(eventLog.getCompletedTaskId()!=null) {
+                CompletedTask ct = completedTaskDao.get(eventLog.getCompletedTaskId());
+                Long startTime = ct.getStartTime().getTime();
+
+                if (!eventLog.getEventType().equals(CommunicationMessage.CommunicationType.CHECK_IN.name())) {
+                    Long taskId = ct.getTaskId();
+                    JSONObject jo = getLogJson(eventLog);
+                    jo.put("taskId", taskId);
+                    scriptData += "subjectEvent[" + eventLog.getSenderSubjectId() + "][" + (eventLog.getTimestamp().getTime() - startTime) + "] = ";
+                    scriptData += jo.toString() + ";\n";
+                    if(lastTaskId==null ||
+                            (lastTaskId.longValue() != taskId.longValue())){
+                        scriptData += "// Task id "+taskId+ "\n";
+                        lastTaskId = taskId;
+                    }
+                }
+            }
+        }
+
+        return scriptData;
+
+    }
+
+    //Loop the events and group by TASK.
+    //order by timestamp.
+    //send them at the right timestamp?
+
 }

@@ -21,6 +21,7 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import edu.mit.cci.pogs.service.EventLogService;
 import edu.mit.cci.pogs.service.export.exportBeans.ExportFile;
 import edu.mit.cci.pogs.service.summaryexport.SummaryExportService;
 import edu.mit.cci.pogs.utils.ExportUtils;
@@ -33,6 +34,9 @@ public class SummaryController {
 
     @Autowired
     private SummaryExportService summaryExportService;
+
+    @Autowired
+    private EventLogService eventlogService;
 
     @GetMapping("/admin/export/summary/subject/study/{studyId}")
     public void exportSessionSubjectSummaryForStudy(HttpServletRequest request, HttpServletResponse response,
@@ -258,6 +262,26 @@ public class SummaryController {
             e.printStackTrace();
         }
 
+    }
+    @GetMapping("/admin/export/summary/eventlogscript/session/{sessionId}")
+    public void exportEventLogScriptDataForSession(HttpServletRequest request,
+                                                   HttpServletResponse response,
+                                             Long studyId,
+                                             @PathVariable("sessionId") Long sessionId) {
+
+        String scriptContent = eventlogService.getScriptForLogs(sessionId);
+        try {
+            response.setContentType("application/javascript");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=Event_Log_Script_Session_"+
+                            ("session["+sessionId+"]")
+                            +"__" + ExportUtils.getTimeFormattedNoSpaces(
+                            new Timestamp(new Date().getTime())) + ".js");
+
+            response.getWriter().print(scriptContent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @GetMapping("/admin/export/summary/subject/study/score/{studyId}")
