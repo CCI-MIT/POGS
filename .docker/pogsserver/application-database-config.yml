@@ -6,7 +6,8 @@ database:
   password: 1234
 plugin:
   dir: /app/plugins
-
+images:
+  dir: /app/uploadedFiles
 spring:
   redis:
     host: redisserver

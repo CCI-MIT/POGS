@@ -48,6 +48,8 @@ services:
       #restart: unless-stopped
       #volumes:
       # - mci-sync:/home/mci:nocopy
+    volumes:
+      - .imagefiles:/app/uploadedFiles
     networks:
       - test-network
     depends_on:

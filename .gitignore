@@ -40,6 +40,7 @@ atlassian-ide-plugin.xml
 target/
 
 .mysql/*
+.imagefiles/*
 ### Other ###
 *.jar
 !.docker/pogsserver/pogs-0.0.1-SNAPSHOT.jar
