@@ -21,12 +21,12 @@ install: true
 script:
   - others/travis/build.sh
 
-deploy:
-  provider: releases
-  api_key: "$GH_TOKEN"
-  file_glob: true
-  file: "target/pogs-0.0.1-SNAPSHOT.jar"
-  skip_cleanup: true
-  name: "pogs-0.0.1-SNAPSHOT.jar"
-  on:
-    branch: master
+#deploy:
+#  provider: releases
+#  api_key: "$GH_TOKEN"
+#  file_glob: true
+#  file: "target/pogs-0.0.1-SNAPSHOT.jar"
+#  skip_cleanup: true
+#  name: "pogs-0.0.1-SNAPSHOT.jar"
+#  on:
+#    branch: master
