@@ -14,7 +14,8 @@ before_install:
 
 addons:
   mariadb: '10.2'
-
+service:
+  - redis-server
 install: true
 
 script:
