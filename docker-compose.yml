@@ -8,12 +8,10 @@ services:
     volumes:
       - .mysql:/var/lib/mysql
       - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d
-    env_file:
-      - varibles.env
-    #environment:
-    #  MYSQL_ROOT_PASSWORD: 1234
-    #  MYSQL_DATABASE: pogs
-    #  MYSQL_USER: root
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       #MYSQL_PASSWORD: 1234
     networks:
       - test-network
@@ -22,8 +20,10 @@ services:
     build :
       context: ./src/main/resources/plugins/typingEtherpadPlugin/etherpad-server/
       dockerfile: Dockerfile
-    #environment:
-     # - ALLOW_OVERRIDE=true
+    environment:
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
+      - ETHERPAD_PASSWORD=${ETHERPAD_PASSWORD}
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "9001:9001"
     links:
@@ -31,8 +31,7 @@ services:
       - redisserver
     #volumes:
     #  - mci-sync:/home/mci:nocopy
-    env_file:
-      - varibles.env
+    restart: always
     networks:
       - test-network
     depends_on:
@@ -42,15 +41,15 @@ services:
     build :
       context: .
       dockerfile: .docker/pogsserver/Dockerfile
-    env_file:
-      - varibles.env
-    #environment:
-      #- ALLOW_OVERRIDE=true
+    environment:
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
+      - POGS_PASSWORD=${POGS_PASSWORD}
     ports:
       - "8080:8080"
     links:
       - database
       - redisserver
+    restart: always
       #restart: unless-stopped
       #volumes:
       # - mci-sync:/home/mci:nocopy
@@ -65,15 +64,14 @@ services:
     build :
       context: .
       dockerfile: .docker/pythonserver/Dockerfile
-    env_file:
-      - varibles.env
-    #environment:
-     # - ALLOW_OVERRIDE=true
+    environment:
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
     ports:
       - "8082:8082"
     links:
       - database
       - redisserver
+    restart: always
       #restart: unless-stopped
       #volumes:
       # - mci-sync:/home/mci:nocopy
@@ -88,8 +86,6 @@ services:
       - "6380:6379"
     networks:
       - test-network
-
-
 
 networks:
   test-network:
