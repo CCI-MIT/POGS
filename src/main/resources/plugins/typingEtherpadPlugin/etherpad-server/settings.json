@@ -116,12 +116,12 @@
    *
    * For a complete list of the supported drivers, please refer to:
    * https://www.npmjs.com/package/ueberdb2
-   */
+   *
 
   "dbType" : "dirty",
   "dbSettings" : {
     "filename" : "var/dirty.db"
-  },
+  },*/
 
   /*
    * An Example of MySQL Configuration (commented out).
@@ -129,17 +129,17 @@
    * See: https://github.com/ether/etherpad-lite/wiki/How-to-use-Etherpad-Lite-with-MySQL
    */
 
-  /*
+
   "dbType" : "mysql",
   "dbSettings" : {
                    "user"    : "etherpad",
-                   "host"    : "localhost",
+                   "host"    : "database",
                    "port"    : 3306,
-                   "password": "PASSWORD",
+                   "password": "${ETHERPAD_PASSWORD}",
                    "database": "etherpad_lite_db",
                    "charset" : "utf8mb4"
                  },
-  */
+
 
   /*
    * The default text of a pad

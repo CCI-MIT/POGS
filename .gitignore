@@ -38,7 +38,7 @@ atlassian-ide-plugin.xml
 
 ### Maven ###
 target/
-
+varibles.env
 .mysql/*
 .imagefiles/*
 ### Other ###

@@ -8,10 +8,12 @@ services:
     volumes:
       - .mysql:/var/lib/mysql
       - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d
-    environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: pogs
-      MYSQL_USER: root
+    env_file:
+      - varibles.env
+    #environment:
+    #  MYSQL_ROOT_PASSWORD: 1234
+    #  MYSQL_DATABASE: pogs
+    #  MYSQL_USER: root
       #MYSQL_PASSWORD: 1234
     networks:
       - test-network
@@ -20,8 +22,8 @@ services:
     build :
       context: ./src/main/resources/plugins/typingEtherpadPlugin/etherpad-server/
       dockerfile: Dockerfile
-    environment:
-      - ALLOW_OVERRIDE=true
+    #environment:
+     # - ALLOW_OVERRIDE=true
     ports:
       - "9001:9001"
     links:
@@ -29,6 +31,8 @@ services:
       - redisserver
     #volumes:
     #  - mci-sync:/home/mci:nocopy
+    env_file:
+      - varibles.env
     networks:
       - test-network
     depends_on:
@@ -38,8 +42,10 @@ services:
     build :
       context: .
       dockerfile: .docker/pogsserver/Dockerfile
-    environment:
-      - ALLOW_OVERRIDE=true
+    env_file:
+      - varibles.env
+    #environment:
+      #- ALLOW_OVERRIDE=true
     ports:
       - "8080:8080"
     links:
@@ -59,8 +65,10 @@ services:
     build :
       context: .
       dockerfile: .docker/pythonserver/Dockerfile
-    environment:
-      - ALLOW_OVERRIDE=true
+    env_file:
+      - varibles.env
+    #environment:
+     # - ALLOW_OVERRIDE=true
     ports:
       - "8082:8082"
     links:

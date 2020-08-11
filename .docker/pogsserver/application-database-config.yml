@@ -3,7 +3,7 @@ database:
   schema: pogs
   url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
   username: root
-  password: 1234
+  password: ${POGS_PASSWORD}
 plugin:
   dir: /app/plugins
 images:
