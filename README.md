@@ -1,5 +1,8 @@
+
 # POGS
 The Platform for Online Group Studies (POGS) is a tool to study collective learning.
+
+[![Travis build status](https://img.shields.io/travis/CCI-MIT/XCoLab.svg)](https://travis-ci.org/CCI-MIT/XCoLab)
 
 ## Simple download and play procedure
 1 Install [Docker](https://docs.docker.com/get-docker/)
