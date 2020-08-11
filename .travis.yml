@@ -27,7 +27,6 @@ deploy:
     file_glob: true
     file: "target/pogs-0.0.1-SNAPSHOT.jar"
     skip_cleanup: true
-    name: $NAME
-    on:
-      branch: master
-      jdk: oraclejdk9
+    name: "pogs-0.0.1-SNAPSHOT.jar"
+  on:
+    tags: true
