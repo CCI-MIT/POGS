@@ -244,6 +244,8 @@ public class SessionRunner implements Runnable {
     }
 
 
+
+
     private void configureRound(SessionWrapper session, RoundWrapper round) {
         // if task playmode == playlist
         if (session.isTaskExecutionModeSequential()) {

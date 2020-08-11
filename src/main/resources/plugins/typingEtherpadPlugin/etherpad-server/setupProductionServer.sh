@@ -30,7 +30,7 @@ cat pad.css >> /home/pogs/binaries/etherpad-lite/src/static/skins/no-skin/pad.cs
 echo "As mysql root create database and user for etherpad:"
 echo "================================================================="
 echo "CREATE DATABASE etherpad_lite_db CHARACTER SET utf8 COLLATE utf8_general_ci;"
-echo "CREATE USER 'etherpad'@'localhost' IDENTIFIED BY 'password';"
+echo "CREATE USER 'etherpad'@'localhost' IDENTIFIED BY '1234';"
 echo "GRANT ALL PRIVILEGES ON etherpad_lite_db.* TO 'etherpad'@'localhost';"
 echo "FLUSH PRIVILEGES;"
 echo "================================================================="

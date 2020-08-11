@@ -55,7 +55,8 @@ public class EventLogService {
 
         return allLogs;
     }
-    public void createEventLogFromJsonString(String attributesToAddJson, Long completedTaskId, Long sessionId){
+
+    public void createEventLogFromJsonString(String attributesToAddJson, Long completedTaskId, Long sessionId) {
         if (attributesToAddJson != null) {
 
             org.json.JSONArray array = new org.json.JSONArray(attributesToAddJson);
@@ -69,7 +70,7 @@ public class EventLogService {
                         eventLog.setEventType(jo.getString("eventType"));
                     }
                     if (jo.has("timestamp")) {
-                        eventLog.setTimestamp( new Timestamp(jo.getLong("timestamp")));
+                        eventLog.setTimestamp(new Timestamp(jo.getLong("timestamp")));
                     }
                     if (jo.has("eventContent")) {
                         eventLog.setEventContent(jo.getString("eventContent"));
@@ -77,10 +78,10 @@ public class EventLogService {
                     if (jo.has("summaryDescription")) {
                         eventLog.setSummaryDescription(jo.getString("summaryDescription"));
                     }
-                    if(jo.has("sender")){
+                    if (jo.has("sender")) {
                         Subject su = subjectDao.getByExternalId(jo.getString("sender"));
                         eventLog.setSender(jo.getString("sender"));
-                        if(su!=null){
+                        if (su != null) {
                             eventLog.setSenderSubjectId(su.getId());
                             eventLogDao.create(eventLog);
                         }
@@ -89,34 +90,46 @@ public class EventLogService {
             }
         }
     }
+
     public String getScriptForLogs(Long sessionId) {
         List<EventLog> eventLogs = eventLogDao.listLogsBySessionId(sessionId);
-        String scriptData = "// Script for session id: "+ sessionId + "\n";
+        String scriptData = "// Script for session id: " + sessionId + "\n";
         scriptData += "// Events ordered by timestamp \n";
-        scriptData += "var subjectEvent=[];\n";
+        scriptData += "var taskEvent=[];\n";
         Map<String, String> subjects = new HashMap<>();
-        eventLogs.stream().forEach( el -> subjects.put(el.getSender(), el.getSender()));
-        for(String su: subjects.keySet()){
-            scriptData+= "subjectEvent[\""+su+"\"] = [];\n";
+        Map<Long, CompletedTask> completedTaskMap = new HashMap<>();
+        Map<Long, Long> taskMap = new HashMap<>();
+        eventLogs.stream().forEach(el -> subjects.put(el.getSender(), el.getSender()));
+        eventLogs.stream().forEach(el -> {
+                    if (el.getCompletedTaskId() != null)
+                        completedTaskMap.putIfAbsent(
+                                el.getCompletedTaskId(),
+                                completedTaskDao.get(el.getCompletedTaskId()));
+                }
+        );
+        completedTaskMap.values().stream().forEach(ct ->taskMap.putIfAbsent(ct.getTaskId(),ct.getTaskId()) );
+        for (Long ct : taskMap.keySet()) {
+            scriptData += "taskEvent[\"" + (ct) + "\"] = [];\n";
         }
 
         Long lastTaskId = null;
-        for(EventLog eventLog: eventLogs){
-            if(eventLog.getCompletedTaskId()!=null) {
-                CompletedTask ct = completedTaskDao.get(eventLog.getCompletedTaskId());
-                Long startTime = ct.getStartTime().getTime();
+        for (EventLog eventLog : eventLogs) {
+            if (eventLog.getCompletedTaskId() != null) {
 
                 if (!eventLog.getEventType().equals(CommunicationMessage.CommunicationType.CHECK_IN.name())) {
+                    CompletedTask ct = completedTaskMap.get(eventLog.getCompletedTaskId());
+                    Long startTime = ct.getStartTime().getTime();
                     Long taskId = ct.getTaskId();
-                    JSONObject jo = getLogJson(eventLog);
-                    jo.put("taskId", taskId);
-                    scriptData += "subjectEvent[" + eventLog.getSenderSubjectId() + "][" + (eventLog.getTimestamp().getTime() - startTime) + "] = ";
-                    scriptData += jo.toString() + ";\n";
-                    if(lastTaskId==null ||
-                            (lastTaskId.longValue() != taskId.longValue())){
-                        scriptData += "// Task id "+taskId+ "\n";
+                    if (lastTaskId == null ||
+                            (lastTaskId.longValue() != taskId.longValue())) {
+                        scriptData += "// Task id " + taskId + "\n";
                         lastTaskId = taskId;
                     }
+
+                    JSONObject jo = getLogJson(eventLog);
+                    scriptData += "taskEvent[" + taskId + "][" + (eventLog.getTimestamp().getTime() - startTime) + "] = ";
+                    scriptData += jo.toString() + ";\n";
+
                 }
             }
         }
