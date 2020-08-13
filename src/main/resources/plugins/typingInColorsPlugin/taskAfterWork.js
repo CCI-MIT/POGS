@@ -129,7 +129,7 @@ var SUBJECT_ETHERPAD_AUTHOR_ID = "ETHERPAD_AUTHOR_ID";
 
 if(padID!= null){
 
-    print("Task After work for typing in colors is starting! ")
+    //print("Task After work for typing in colors is starting! ")
     var colorAssignments = [];
     for(var i=0; i < _completedTaskAttributes.length; i++){
         if(_completedTaskAttributes[i].attributeName.indexOf("subjectAssignedToColor_")!= -1){
@@ -143,7 +143,7 @@ if(padID!= null){
     var etherpadAuthorMap = {};
     for(var k=0; k < teammatez.length; k++) {
         var subjectEtherpadId = getSubjectAttribute(teammatez[k], SUBJECT_ETHERPAD_AUTHOR_ID);
-        print("Etherpad author id : " + subjectEtherpadId.stringValue +" for subject : " + teammatez[k].id );
+        //print("Etherpad author id : " + subjectEtherpadId.stringValue +" for subject : " + teammatez[k].id );
         etherpadAuthorMap[subjectEtherpadId.stringValue] = teammatez[k];
     }
 
@@ -185,10 +185,10 @@ if(padID!= null){
         var ass = getAuthorChosenColor(textsByAuthor[te].subject.externalId);
 
 
-        print("Added new attribute for " + "fullTextAuthor_" +textsByAuthor[te].subject.externalId);
-        print("<TEXT BEGIN>")
-        print(textsByAuthor[te].fullText)
-        print("</TEXT END>")
+        //print("Added new attribute for " + "fullTextAuthor_" +textsByAuthor[te].subject.externalId);
+        //print("<TEXT BEGIN>")
+        //print(textsByAuthor[te].fullText)
+        //print("</TEXT END>")
 
         attributesToAddz.push({
                                   "attributeName": "fullTextAuthor_" +textsByAuthor[te].subject.externalId,
@@ -237,7 +237,7 @@ if(padID!= null){
 function getSubjectAttribute(subject, attributeName){
     for(var j=0 ; j < subject.attributes.length; j ++){
         if(subject.attributes[j].attributeName == attributeName) {
-            print("Attribute found" + attributeName);
+            //print("Attribute found" + attributeName);
             return subject.attributes[j];
         }
     }

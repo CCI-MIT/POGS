@@ -59,7 +59,7 @@ for(var k = 0; k <= totalOfRounds; k++) {
 }
 
 
-print(JSON.stringify(rounds));
+//print(JSON.stringify(rounds));
 
 _headerColumns = "RoundIndex;Subject author; NumberOfClicks;HitsInMoles;TotalTargetsAppeared";
 //_exportRecordLines = ["a;b;c;d"];

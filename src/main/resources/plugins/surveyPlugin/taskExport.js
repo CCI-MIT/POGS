@@ -32,8 +32,8 @@ replacements.push(getOtherTasks());
 replacements.push(getSessionName());
 
 function resolveVariablesForNetworkQuestions(surveyItem){
-    print("     --------   SURVEY RESOLVING VARIABLES ------------")
-    print(surveyItem.question + " - " + surveyItem.type)
+    //print("     --------   SURVEY RESOLVING VARIABLES ------------")
+    //print(surveyItem.question + " - " + surveyItem.type)
     var regex = new RegExp(/\${.*}/gi);
     var allVariables = ['\\${allTeammates}','\\${otherTeamates}', '\\${lastTaskName}',
                         '\\${allTasksNames}','\\${otherTasksNames}', '\\${sessionName}'];
@@ -54,7 +54,7 @@ function resolveVariablesForNetworkQuestions(surveyItem){
         for(var i=0; i < allVariables.length; i ++) {
 
             var replacer = "";
-            print("Question has " + allVariables[i] );
+            //print("Question has " + allVariables[i] );
             if(surveyItem.question.match(new RegExp(allVariables[i] ,'gi'))) {
                 if(replacements[i].constructor === Array) {
 
@@ -236,15 +236,15 @@ function getRowValueFromArrayRange(fieldIndex, index, numberOfColumns){
     //    surveyBluePrint[fieldIndex].value.rows.length > 0 &&
     //     surveyBluePrint[fieldIndex].value.rows[0].indexOf("${")!= -1) {
     //
-        print("-------------")
-        print(JSON.stringify(resolved.value.rows))
-        print("-------------")
+        //print("-------------")
+        //print(JSON.stringify(resolved.value.rows))
+        //print("-------------")
 
         if(resolved && resolved.value.rows){
             var numberOfRows = resolved.value.rows.length;
             var inexInAnswe = parseInt(subIndex/numberOfRows)
 
-            print("Index of answer: " + index + " - " + "devided by number of columns: " + subIndex + " devided by the number of rows: " + inexInAnswe);
+            //print("Index of answer: " + index + " - " + "devided by number of columns: " + subIndex + " devided by the number of rows: " + inexInAnswe);
 
             if(inexInAnswe < resolved.value.rows.length)
                 return resolved.question + ": " + resolved.value.rows[subIndex];

@@ -225,7 +225,7 @@ if(padID!= null){
 function getSubjectAttribute(subject, attributeName){
     for(var j=0 ; j < subject.attributes.length; j ++){
         if(subject.attributes[j].attributeName == attributeName) {
-            print("Attribute found" + attributeName);
+            //print("Attribute found" + attributeName);
             return subject.attributes[j];
         }
     }

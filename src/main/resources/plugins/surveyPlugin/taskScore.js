@@ -52,7 +52,7 @@ for(var i=0 ; i < _completedTaskAttributes.length; i++) {
             var answer = _completedTaskAttributes[i].stringValue;
             answerKeyMap[index] = answer;
             answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
-            print("£££ field index (" + index+") - " + _completedTaskAttributes[i].lastAuthorSubject)
+            //print("£££ field index (" + index+") - " + _completedTaskAttributes[i].lastAuthorSubject)
 
         }
     }
@@ -88,7 +88,7 @@ for(var i=0 ;i < answerSheet.length; i++) {
     } else {
 
         if(answerKeyMap[i]!="") {
-            print("GIVEN ANS:" + answerKeyMap[i] + "RIGHT ANS:" + answerSheet[i] + " - " + answerAuthorMap[i])
+            //print("GIVEN ANS:" + answerKeyMap[i] + "RIGHT ANS:" + answerSheet[i] + " - " + answerAuthorMap[i])
             if (answerKeyMap[i] == answerSheet[i]) {
                 _completedTaskScore.numberOfRightAnswers++;
                 _completedTaskScore.totalScore += RIGHT_ANSWER_REWARD;
@@ -112,7 +112,7 @@ completedTaskScore = JSON.stringify(_completedTaskScore);
 
 var _indScor = [];
 for(var iss in _individualSubjectScore){
-    print("£££ "+JSON.stringify(_individualSubjectScore[iss]));
+    //print("£££ "+JSON.stringify(_individualSubjectScore[iss]));
     _indScor.push(_individualSubjectScore[iss]);
 }
 individualSubjectScores = JSON.stringify(_indScor);
