@@ -126,14 +126,14 @@ var groupId = createGroupIfNotExistsFor(sessionId_);
 var _subjectAttributesToAdd = [];
 //2 For each subject
 for(var k=0; k < teammatez.length; k++){
-    print("Trying to get subjectSessionId " + teammatez[k].id);
+    //print("Trying to get subjectSessionId " + teammatez[k].id);
     var subjectSessionId = getSubjectAttribute(teammatez[k],SUBJECT_ETHERPAD_SESSION_ID);
     //check if already have session ID. if not create new one.
     if(subjectSessionId == null ){
         var newAttr = [];
-        print("subjectSessionId not found creating a new one: for " + teammatez[k].id);
+        //print("subjectSessionId not found creating a new one: for " + teammatez[k].id);
         var authorId = createAuthorIfNotExistsFor(teammatez[k].id,teammatez[k].displayName);
-        print("new author id created : " + authorId + " for : "+ teammatez[k].id);
+        //print("new author id created : " + authorId + " for : "+ teammatez[k].id);
 
         newAttr.push({
                          "attributeName": SUBJECT_ETHERPAD_AUTHOR_ID,
@@ -153,7 +153,7 @@ for(var k=0; k < teammatez.length; k++){
                                          "attributes": newAttr
                                      });
     }
-    print("------\n")
+    //print("------\n")
 }
 
 //3 For the task at hand create the pad if it is not created YET.
@@ -161,7 +161,7 @@ for(var k=0; k < teammatez.length; k++){
 if(getCompletedTaskAttribute("padID")!= null){
         if(!padExists(getCompletedTaskAttribute("padID"))){
             var padID = createGroupPad(groupId, "",getCompletedTaskAttribute("padID"));
-            print("padID: " + padID);
+            //print("padID: " + padID);
             attributesToAddz = [{
                 "attributeName": "padID",
                 "stringValue": padID
@@ -171,7 +171,7 @@ if(getCompletedTaskAttribute("padID")!= null){
         }
 } else {
     var padID = createGroupPad(groupId, "");
-    print("padID: " + padID);
+    //print("padID: " + padID);
     attributesToAddz = [{
         "attributeName": "padID",
         "stringValue": padID
@@ -197,7 +197,7 @@ function getCompletedTaskAttribute(attributeName){
 function getSubjectAttribute(subject, attributeName){
     for(var j=0 ; j < subject.attributes.length; j ++){
         if(subject.attributes[j].attributeName == attributeName) {
-            print("Attribute found" + attributeName);
+            //print("Attribute found" + attributeName);
             return subject.attributes[j];
         }
     }

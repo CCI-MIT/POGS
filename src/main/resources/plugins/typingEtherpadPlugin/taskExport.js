@@ -47,13 +47,13 @@ function newConnection(url, method){
         return response.toString();
 
     }catch (ignore) {
-        print("Something wrong happened : " + ignore);
+        //print("Something wrong happened : " + ignore);
         return null;
     }
 }
 function getDictionaryEntry(dictId, dictEntryId) {
 
-    print(API_ADDRESS + "/dictionaries/" + dictId + '/dictionaryentries/' + dictEntryId)
+    //print(API_ADDRESS + "/dictionaries/" + dictId + '/dictionaryentries/' + dictEntryId)
     var apiResponse = JSON.parse(newConnection(
         API_ADDRESS + "/dictionaries/" + dictId + '/dictionaryentries/' + dictEntryId, "GET"));
     if(apiResponse){
@@ -119,9 +119,9 @@ for(var te in  textsByAuthor){
                             cleanEntry(userFullText)
                             + ";" + "EQUAL TO GROUP");
 
-    print(textsByAuthor[te].subject.externalId + ";"+
-          cleanEntry(userFullText)
-          + ";" + "EQUAL TO GROUP")
+    //print(textsByAuthor[te].subject.externalId + ";"+
+    //      cleanEntry(userFullText)
+    //      + ";" + "EQUAL TO GROUP")
 }
 
 function getAuthorSubject(author){

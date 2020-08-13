@@ -34,7 +34,7 @@ var _completedTaskScore = {
 for(var k = 0; k <= totalOfRounds; k++) {
     var round = newRound();
     var roundIndex = k +1;
-    print(" - " + k + " - " + roundIndex)
+    //print(" - " + k + " - " + roundIndex)
     for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
         if(_completedTaskAttributes[i].attributeName == ("teamScoreRound"+roundIndex)){
             round.teamScoreRound = parseInt(_completedTaskAttributes[i].integerValue);

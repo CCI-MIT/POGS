@@ -71,7 +71,7 @@ function newConnection(url, method){
         return response.toString();
 
     }catch (ignore) {
-        print("Something wrong happened : " + ignore);
+        //print("Something wrong happened : " + ignore);
         return null;
     }
 }
