@@ -19,7 +19,7 @@ class EquationTypingTaskEdit {
     }
 
     setupHtmlFromAttributeString(attribute){
-        console.log(attribute.taskText);
+        //console.log(attribute.taskText);
         $("#taskText").val(attribute.taskText);
         $("#totalSum").val(attribute.totalSum);
         $("#executionMode").val(attribute.executionMode);

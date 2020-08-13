@@ -82,7 +82,7 @@ class MemoryGridTaskPrimer{
             for(let k= 0 ; k < appearingOrder[j].length ; k ++) {
                 let ref = appearingOrder[j][k];
                 setTimeout(function () {
-                    console.log("Working on ref: " + ref);
+                    //console.log("Working on ref: " + ref);
                     $(ref).show();
                     $(ref).addClass('fadeIn');
                     setTimeout(function () {
@@ -100,7 +100,7 @@ class MemoryGridTaskPrimer{
 
 
 let memoryGridTaskPrimerPlugin = pogs.createPlugin('memoryGridTaskPrimerPlugin',function(){
-    console.log('creating the plugin');
+    //console.log('creating the plugin');
 
     let memoryGridTaskPrimer = new MemoryGridTaskPrimer(this);
     // get config attributes from task plugin

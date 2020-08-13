@@ -20,7 +20,7 @@ class Survey {
                             '\\${allTasksNames}','\\${otherTasksNames}', '\\${sessionName}'];
 
         var replacements = this.replacements;
-        console.log(" ---- CUSTOM VARIABLES: " + this.customVariables)
+        //console.log(" ---- CUSTOM VARIABLES: " + this.customVariables)
         if(this.customVariables!= null) {
             let custVar = JSON.parse(this.customVariables);
             for(var i= 0; i < custVar.length; i++){

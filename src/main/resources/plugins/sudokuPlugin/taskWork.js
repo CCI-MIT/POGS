@@ -30,14 +30,14 @@ class SudokuGame {
 
     }
     handleKeydown(theEvent){
-        console.log(theEvent);
-        console.log(theEvent.target);
+        //console.log(theEvent);
+        //console.log(theEvent.target);
 
         let key = theEvent.keyCode || theEvent.which;
         if(key == 9||key == 8 || key == 46){//backspace delete
             return true;
         }
-        console.log("THIS IS THE TARGET LENGTH: " +$(theEvent.target).text().length);
+        //console.log("THIS IS THE TARGET LENGTH: " +$(theEvent.target).text().length);
         if($(theEvent.target).text().length>=1) {
             theEvent.returnValue = false;
             theEvent.preventDefault()
@@ -91,7 +91,7 @@ class SudokuGame {
         if(!isNaN(cellIndex)) {
 
             var valueTyped = $(event.target).text().replace(/\r?\n?/g, '').trim();
-            console.log("Typed value : " + valueTyped);
+            //console.log("Typed value : " + valueTyped);
             if(valueTyped != null && ! isNaN(valueTyped)) {
                 this.pogsPlugin.saveCompletedTaskAttribute('sudokuAnswer_' + cellIndex,
                     valueTyped, 0.0,

@@ -83,8 +83,8 @@ class MinimumEffortTask {
         $(".optionBtn").addClass("btn-info");
         $(event.target).removeClass("btn-info");
         $(event.target).addClass("btn-success");
-        console.log(
-            "Clicked " + $(event.target).data("round") + " - " + $(event.target).data("option"));
+        //console.log(
+        //    "Clicked " + $(event.target).data("round") + " - " + $(event.target).data("option"));
 
         this.pogsPlugin.saveCompletedTaskAttribute(
             'roundAnswer_' + this.rounds[this.currentRound].roundNumber+ '|' + this.pogsPlugin.getSubjectId(),
@@ -120,9 +120,9 @@ class MinimumEffortTask {
     }
 
     calculatePayout(minimalNumber, userOwn) {
-        console.log("this.paymentStructure " + this.paymentStructure);
-        console.log("userOwn " + userOwn);
-        console.log("minimalNumber " + minimalNumber);
+        //console.log("this.paymentStructure " + this.paymentStructure);
+        //console.log("userOwn " + userOwn);
+        //console.log("minimalNumber " + minimalNumber);
         return this.paymentStructure[(this.availableNumbers - (userOwn))][(this.availableNumbers
                                                                            - (minimalNumber))];
 

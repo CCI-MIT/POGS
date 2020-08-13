@@ -673,7 +673,7 @@
             }
         }
 
-        console.log(display_string);
+        //console.log(display_string);
     };
 
     sudoku.validate_board = function(board){

@@ -5,8 +5,8 @@ class WhackTaskEdit {
     }
 
     init(taskConfigId, currentAttributes) {
-        console.log("taskConfigId: " + taskConfigId);
-        console.log("currentAttributes: " + currentAttributes)
+        //console.log("taskConfigId: " + taskConfigId);
+        //console.log("currentAttributes: " + currentAttributes)
 
         this.taskConfigId = taskConfigId;
 
@@ -14,7 +14,7 @@ class WhackTaskEdit {
         for (var i = 0; i < currentAttributes.length; i++) {
             if (currentAttributes[i].attributeName == "whackBluePrint") {
                 whackBluePrint = $.parseJSON(currentAttributes[i].stringValue);
-                console.log(whackBluePrint);
+                //console.log(whackBluePrint);
             }
         }
 
@@ -66,7 +66,7 @@ class WhackTaskEdit {
 
         $('#removePlayer' + this.numOfPlayer).click(function(){
             var playerNum = $(this).attr("id").match(/\d+/);
-            console.log("clicked: " + playerNum);
+            //console.log("clicked: " + playerNum);
             $("#player" + playerNum).remove();
         });
     }

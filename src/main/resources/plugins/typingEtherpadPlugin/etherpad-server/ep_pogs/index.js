@@ -24,13 +24,13 @@ var Changeset = require("ep_etherpad-lite/static/js/Changeset");
 
 // line, apool,attribLine,text
 exports.getLineHTMLForExport = function (hook, context) {
-    console.log("Exporting plugin hook ")
+    //console.log("Exporting plugin hook ")
     var author = _analyzeLine(context.attribLine, context.apool);
-    console.log("Found author value: " + (author));
-    console.log("Text: " + (context.text));
+    //console.log("Found author value: " + (author));
+    //console.log("Text: " + (context.text));
 
     if (author) {
-        console.log("returning HTML ");
+        //console.log("returning HTML ");
         //context.lineContent = "<span class=\"" + author+ "\">" + context.lineContent + "</span>";
     }
 }
