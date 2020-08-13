@@ -83,20 +83,20 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         this.getEngine().put("teammates", teamMates.toString());
 
-        System.out.println("teammates : " + teamMates.toString());
+        //System.out.println("teammates : " + teamMates.toString());
 
         JSONArray taskAttr = taskExecutionAttributeService.
                 listExecutionAttributesAsJsonArray(taskWrapper.getId());
 
         //get all task_execution_attribute
         this.getEngine().put("taskConfigurationAttributes", taskAttr.toString());
-        System.out.println("taskConfigurationAttributes : " + taskAttr.toString());
+        //System.out.println("taskConfigurationAttributes : " + taskAttr.toString());
 
         JSONArray completedTaskAttributes = completedTaskAttributeService
                 .listCompletedTaskAttributesForCompletedTask(this.getCompletedTask().getId());
 
         this.getEngine().put("completedTaskAttributes", completedTaskAttributes.toString());
-        System.out.println("completedTaskAttributes : " + completedTaskAttributes.toString());
+        //System.out.println("completedTaskAttributes : " + completedTaskAttributes.toString());
 
         if(taskConfiguration.getDictionaryId()!=null){
             this.getEngine().put("dictionary", dictionaryService.getDictionaryJSONObjectForTask(taskWrapper.getId()));

@@ -1,6 +1,7 @@
 class TwoAnwserSurvey extends Survey {
 
-    setupSurvey(surveyBluePrint){
+    setupSurvey(surveyBluePrint, customVariables){
+        this.customVariables = customVariables;
         console.info("starting survey setup...");
 
         let surveyValues = $.parseJSON(surveyBluePrint);

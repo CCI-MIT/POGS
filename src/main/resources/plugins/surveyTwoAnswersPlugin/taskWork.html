@@ -52,7 +52,7 @@ class Field {
 
     }
     setSecondAnswerField(field){
-        console.log("Setting second answer field object" + field)
+        //console.log("Setting second answer field object" + field)
         this.secondAnswerField = field;
     }
     broadcastReceived(message){
@@ -116,7 +116,7 @@ class Field {
         }else {
             this.unsetAuthorModal();
         }
-        console.log("Showing the field after final answer is set to original field and final answer was: " + this.originalFieldAuthor)
+        //console.log("Showing the field after final answer is set to original field and final answer was: " + this.originalFieldAuthor)
     }
     show(){
         $('#surveyField_' +this.index).show();
@@ -148,7 +148,7 @@ class Field {
 
         $("#surveyField_" + this.index + " .finalanswer-indicator").addClass('text-muted');
 
-        console.log('Second answer field: ' + this.secondAnswerField)
+        //console.log('Second answer field: ' + this.secondAnswerField)
         if(this.secondAnswerField != null){
            this.secondAnswerField.setOriginalFieldAuthor(this.finalAnswerSubject);
         }
@@ -194,11 +194,11 @@ class Field {
         $('#surveyField_'+this.index ).on('mouseleave',this.handleOnMouseOutOfField.bind(this))
     }
     saveCompletedTaskAttribute(attributeName, stringValue, doubleValue, intValue, loggable, fieldType){
-            console.log("Saving completed task attribute : " + fieldType);
+            //console.log("Saving completed task attribute : " + fieldType);
             var intVal = -1;
             if(this.firstAnswerField!=null){
                 intVal = this.firstAnswerField.index;
-                console.log("Original field index: " + intVal)
+                //console.log("Original field index: " + intVal)
             }
             this.getPogsPlugin().saveCompletedTaskAttribute(attributeName,
                                                             stringValue, doubleValue,

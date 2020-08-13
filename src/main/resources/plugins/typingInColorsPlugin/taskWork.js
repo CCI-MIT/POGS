@@ -124,7 +124,7 @@ class EtherpadWithColors {
         }
 
  */
-        console.log('Before leave');
+        //console.log('Before leave');
     }
     handleAssignedColor(colorIndex, subject){
         let allColorButtons = $("#colorPickerAndAssigner button");
@@ -207,8 +207,8 @@ class EtherpadWithColors {
 
         //2 - set COOKIE according to the DOMAIN.
 
-        console.log("sessionID "  + sessionId);
-        console.log("padID " + padId);
+        //console.log("sessionID "  + sessionId);
+        //console.log("padID " + padId);
 
         setCookie("sessionID",sessionId, 1);
 
@@ -231,7 +231,7 @@ const typingPlugin = pogs.createPlugin('typingInColorsPlugin', function() {
 },
     function(){
         eraseCookie("sessionID");
-        console.log("Erasing the cookie");
+        //console.log("Erasing the cookie");
 
     });
 

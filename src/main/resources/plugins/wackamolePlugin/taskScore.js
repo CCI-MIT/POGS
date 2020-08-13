@@ -39,7 +39,7 @@ for(var k = 0; k <= totalOfRounds; k++) {
         if(_completedTaskAttributes[i].attributeName == ("teamScoreRound"+roundIndex)){
             round.teamScoreRound = parseInt(_completedTaskAttributes[i].integerValue);
 
-            print(" ---- " + _completedTaskAttributes[i].integerValue);
+            //print(" ---- " + _completedTaskAttributes[i].integerValue);
         }
         if(_completedTaskAttributes[i].attributeName == ("totalTargetsAppearedRound"+roundIndex)){
             round.totalTargetsAppearedRound = parseInt(_completedTaskAttributes[i].integerValue);
@@ -59,7 +59,7 @@ for(var k = 0; k <= totalOfRounds; k++) {
     rounds.push(round);
 }
 
-print("Newly calculated SCORE: " + _completedTaskScore.totalScore)
+//print("Newly calculated SCORE: " + _completedTaskScore.totalScore)
 _completedTaskScore.scoringData = JSON.stringify(rounds);
 
 completedTaskScore = JSON.stringify(_completedTaskScore);

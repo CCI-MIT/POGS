@@ -20,7 +20,14 @@ class Survey {
                             '\\${allTasksNames}','\\${otherTasksNames}', '\\${sessionName}'];
 
         var replacements = this.replacements;
-
+        //console.log(" ---- CUSTOM VARIABLES: " + this.customVariables)
+        if(this.customVariables!= null) {
+            let custVar = JSON.parse(this.customVariables);
+            for(var i= 0; i < custVar.length; i++){
+                allVariables.push('\\' + custVar[i].variableName);
+                replacements.push(custVar[i].variableReplacements)
+            }
+        }
 
         // [['m01', 'm02', 'm03'],
         //     ['m02', 'm03'],
@@ -151,8 +158,9 @@ class Survey {
         this.globalFieldIndex = this.globalFieldIndex + 1;
         return field;
     }
-    setupSurvey(surveyBluePrint){
+    setupSurvey(surveyBluePrint, customVariables){
         console.info("starting survey setup...");
+        this.customVariables = customVariables;
 
         let surveyValues = $.parseJSON(surveyBluePrint);
         let self = this;

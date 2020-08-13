@@ -9,9 +9,9 @@ services:
       - .mysql:/var/lib/mysql
       - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d
     environment:
-      MYSQL_ROOT_PASSWORD: 1234
-      MYSQL_DATABASE: pogs
-      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
       #MYSQL_PASSWORD: 1234
     networks:
       - test-network
@@ -21,7 +21,9 @@ services:
       context: ./src/main/resources/plugins/typingEtherpadPlugin/etherpad-server/
       dockerfile: Dockerfile
     environment:
-      - ALLOW_OVERRIDE=true
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
+      - ETHERPAD_PASSWORD=${ETHERPAD_PASSWORD}
+      - NODE_ENV=${NODE_ENV}
     ports:
       - "9001:9001"
     links:
@@ -29,6 +31,7 @@ services:
       - redisserver
     #volumes:
     #  - mci-sync:/home/mci:nocopy
+    restart: always
     networks:
       - test-network
     depends_on:
@@ -39,12 +42,14 @@ services:
       context: .
       dockerfile: .docker/pogsserver/Dockerfile
     environment:
-      - ALLOW_OVERRIDE=true
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
+      - POGS_PASSWORD=${POGS_PASSWORD}
     ports:
       - "8080:8080"
     links:
       - database
       - redisserver
+    restart: always
       #restart: unless-stopped
       #volumes:
       # - mci-sync:/home/mci:nocopy
@@ -60,12 +65,13 @@ services:
       context: .
       dockerfile: .docker/pythonserver/Dockerfile
     environment:
-      - ALLOW_OVERRIDE=true
+      - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
     ports:
       - "8082:8082"
     links:
       - database
       - redisserver
+    restart: always
       #restart: unless-stopped
       #volumes:
       # - mci-sync:/home/mci:nocopy
@@ -80,8 +86,6 @@ services:
       - "6380:6379"
     networks:
       - test-network
-
-
 
 networks:
   test-network:

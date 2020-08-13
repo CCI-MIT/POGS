@@ -7,7 +7,7 @@ class MemoryGridTask {
     setupGrid(gridBluePrint){
 
         this.executionMode = gridBluePrint.executionMode;
-        console.log("setup grid blueprint: " + gridBluePrint.rowsSize + " - " + gridBluePrint.colsSize);
+        //console.log("setup grid blueprint: " + gridBluePrint.rowsSize + " - " + gridBluePrint.colsSize);
         let teamMates = this.pogsPlugin.getTeammates();
         let columnsUserCanChange = [];
         for (let j = 0; j < gridBluePrint.colsSize; j++) {
@@ -148,7 +148,7 @@ class MemoryGridTask {
     }
     handleMouseLeave(event){
         let cellIndex = parseInt($(event.target).data( "cell-reference-index"));
-        console.log("OnClick - Sending cell index: " + cellIndex);
+        //console.log("OnClick - Sending cell index: " + cellIndex);
         if(!isNaN(cellIndex)) {
             this.pogsPlugin.saveCompletedTaskAttribute('focusOutCell',
                                                        "", 0.0,
@@ -160,9 +160,9 @@ class MemoryGridTask {
         let attrName = message.content.attributeName;
         let index = message.content.attributeIntegerValue;
 
-        console.log("Broadcast received sender: " + message.sender);
-        console.log("Broadcast received subject id: " + this.pogsPlugin.getSubjectId());
-        console.log("Broadcast Attr name: " + attrName);
+        //console.log("Broadcast received sender: " + message.sender);
+        //console.log("Broadcast received subject id: " + this.pogsPlugin.getSubjectId());
+        //console.log("Broadcast Attr name: " + attrName);
 
         if(message.sender != this.pogsPlugin.getSubjectId()) {
             if (attrName == "focusInCell") {
@@ -180,9 +180,9 @@ class MemoryGridTask {
                 $('#cell_' + index + ' .workingOn '+ '.'+ sub.externalId + '_color').remove();
             }
             else{
-                console.log(" not focus in cell: " + message.content.attributeStringValue);
+                //console.log(" not focus in cell: " + message.content.attributeStringValue);
                 index = attrName.replace('memoryGridAnswer', '');
-                console.log("INDEX: " + index)
+                //console.log("INDEX: " + index)
                 $('#cell_' + index + ' input').val(message.content.attributeStringValue);
             }
         }

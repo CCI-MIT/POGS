@@ -6,5 +6,12 @@ COPY ./src/main/resources/plugins /app/plugins
 COPY .docker/pogsserver/setupRightLocalhostChange.sh /app/setupRightLocalhostChange.sh
 RUN ["chmod", "+x", "/app/setupRightLocalhostChange.sh"]
 RUN ["sh","/app/setupRightLocalhostChange.sh"]
+
+#RUN apk update && apk add --no-cache curl
+
+#COPY .docker/pogsserver/downloadLatestBinaryFromGithubReleases.sh /app/downloadLatestBinaryFromGithubReleases.sh
+#RUN ["chmod", "+x", "/app/downloadLatestBinaryFromGithubReleases.sh"]
+#RUN ["sh","/app/downloadLatestBinaryFromGithubReleases.sh"]
+
 WORKDIR /app
 CMD exec java -jar pogs.jar

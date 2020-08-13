@@ -24,8 +24,8 @@ class Wackamole {
         var self = this;
         var whackValues = $.parseJSON(whackBluePrint);
 
-        console.log(whackValues);
-        console.log(whackBluePrint);
+        //console.log(whackValues);
+        //console.log(whackBluePrint);
 
         var score = 0;
 
@@ -33,15 +33,15 @@ class Wackamole {
 
         // display teammates' id
         $.each(teammates, function (teammate) {
-            console.log(teammate);
+            //console.log(teammate);
         });
 
         $.each(whackValues, function (i, e) {
             //if (teammates[e.player].externalId == self.pogsPlugin.getSubjectId()) {
-                console.log(" whackConfig i :" + i);
-                console.log(" e.maxMoleNum:" + e.maxMoleNum);
-                console.log(" e.numberOfRounds:" + e.numberOfRounds);
-                console.log(" e.moleAppearTime:" + e.moleAppearTime);
+                //console.log(" whackConfig i :" + i);
+                //console.log(" e.maxMoleNum:" + e.maxMoleNum);
+                //console.log(" e.numberOfRounds:" + e.numberOfRounds);
+                //console.log(" e.moleAppearTime:" + e.moleAppearTime);
 
                 self.maxMoleNumber = e.maxMoleNum;
                 self.numberOfRounds = e.numberOfRounds;
@@ -169,7 +169,7 @@ class Wackamole {
                         $("#whack_cell" + cell).removeClass('clicked');
                     }, 1000); // TODO: change back to 500 after testing
                 }
-                console.log("click message recieved");
+                //console.log("click message recieved");
             }
             else if (attrName == 'targetHit') {
                 self.totalHitOnTarget++;
@@ -385,10 +385,10 @@ class Wackamole {
 
             // If the count down is over, empty all mole and print gamer over at time slot
             if (distance < 0) {
-                console.log("total target appeared: " + self.totalTarget);
-                console.log("Number of clicks: " + self.numberOfClicks);
-                console.log("Player hitOnTarget: " + self.playerHitOnTarget);
-                console.log("total hitOnTarget: " + self.totalHitOnTarget);
+                //console.log("total target appeared: " + self.totalTarget);
+                //console.log("Number of clicks: " + self.numberOfClicks);
+                //console.log("Player hitOnTarget: " + self.playerHitOnTarget);
+                //console.log("total hitOnTarget: " + self.totalHitOnTarget);
 
                 self.pogsPlugin.saveCompletedTaskAttributeMustCreateNew('totalOfRounds',
                                                            "", 0.0,
@@ -495,7 +495,7 @@ class Player {
         else {
             $("#pointerContainer").append('<i id="' + this.externalId + 'Pointer" class="'+this.externalId+'_activecolor fa fa-mouse-pointer" style="display:none"></i>')
         }
-        console.log("init player " + this.externalId);
+        //console.log("init player " + this.externalId);
         //console.log("color: " + this.color);
     }
 
@@ -505,10 +505,10 @@ class Player {
 }
 
 var wackamolePlugin = pogs.createPlugin('wackamoleTaskPlugin', function () {
-    console.log("Wack-a-mole Plugin Loaded");
+    //console.log("Wack-a-mole Plugin Loaded");
     var wackamole = new Wackamole(this);
     wackamole.setupGrid("Wack-a-mole", this.getTeammates(), this.getStringAttribute("whackBluePrint"))
     this.subscribeTaskAttributeBroadcast(wackamole.broadcastReceived.bind(wackamole))
-    console.log("teammates" + this.getTeammates());
+    //console.log("teammates" + this.getTeammates());
     wackamole.initPlayers(this.getTeammates(), this.getSubjectId());
 });

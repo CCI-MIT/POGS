@@ -115,3 +115,24 @@ _completedTaskScore.scoringData = {rounds: rounds};
 _completedTaskScore.scoringData = JSON.stringify(_completedTaskScore.scoringData);
 
 completedTaskScore = JSON.stringify(_completedTaskScore);
+
+// {"rounds":[{"roundNumber":1,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":7,"payout":30},{"externalId":"syn1inter1_1594320293582","chosenOption":2,"payout":80},{"externalId":"syn1inter1_1594320288694","chosenOption":3,"payout":70}],"roundMinimal":2,"totalRoundPayout":180},{"roundNumber":2,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":5,"payout":110},{"externalId":"syn1inter1_1594320293582","chosenOption":7,"payout":90},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":110}],"roundMinimal":5,"totalRoundPayout":310},{"roundNumber":3,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":6,"payout":120},{"externalId":"syn1inter1_1594320293582","chosenOption":7,"payout":110},{"externalId":"syn1inter1_1594320288694","chosenOption":6,"payout":120}],"roundMinimal":6,"totalRoundPayout":350},{"roundNumber":4,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":4,"payout":40},{"externalId":"syn1inter1_1594320293582","chosenOption":1,"payout":70},{"externalId":"syn1inter1_1594320288694","chosenOption":6,"payout":20}],"roundMinimal":1,"totalRoundPayout":130},{"roundNumber":5,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":6,"payout":80},{"externalId":"syn1inter1_1594320293582","chosenOption":4,"payout":100},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":90}],"roundMinimal":4,"totalRoundPayout":270},{"roundNumber":6,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":7,"payout":90},{"externalId":"syn1inter1_1594320293582","chosenOption":6,"payout":100},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":110}],"roundMinimal":5,"totalRoundPayout":300},{"roundNumber":7,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":4,"payout":100},{"externalId":"syn1inter1_1594320293582","chosenOption":5,"payout":90},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":90}],"roundMinimal":4,"totalRoundPayout":280},{"roundNumber":8,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":4,"payout":100},{"externalId":"syn1inter1_1594320293582","chosenOption":7,"payout":70},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":90}],"roundMinimal":4,"totalRoundPayout":260},{"roundNumber":9,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":3,"payout":70},{"externalId":"syn1inter1_1594320293582","chosenOption":2,"payout":80},{"externalId":"syn1inter1_1594320288694","chosenOption":0,"payout":0}],"roundMinimal":2,"totalRoundPayout":150},{"roundNumber":10,"subjects":[{"externalId":"syn1inter1_1594320289546","chosenOption":4,"payout":40},{"externalId":"syn1inter1_1594320293582","chosenOption":1,"payout":70},{"externalId":"syn1inter1_1594320288694","chosenOption":5,"payout":30}],"roundMinimal":1,"totalRoundPayout":140}]}
+
+var _individualSubjectScore = {};
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+        "subjectExternalId" :  _teammates[i].externalId,
+        "individualScore" : 0.0,
+        "scoringData" : ""
+    };
+}
+for(var j=0; j < rounds.length; j++){
+    for(var k=0; k < rounds[j].subjects.length; k++){
+        _individualSubjectScore[rounds[j].subjects[k].externalId].individualScore+= rounds[j].subjects[k].payout
+    }
+}
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);

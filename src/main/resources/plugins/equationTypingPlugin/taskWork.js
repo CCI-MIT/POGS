@@ -308,7 +308,7 @@ class EquationTypingTaskPlugin{
         let cellIndex = message.content.attributeIntegerValue;
 
         if(attrName == "startTimerForUserTurn") {
-            console.log(" <startTimerForUserTurn> Message received from: " + message.sender);
+            //console.log(" <startTimerForUserTurn> Message received from: " + message.sender);
             this.setupCurrentFieldWithTimerInfo();
             return;
         }
@@ -318,7 +318,7 @@ class EquationTypingTaskPlugin{
             if(message.sender == this.pogsPlugin.getSubjectId()) {
                 //if user who took the turn is self
                 //enable field
-                console.log( $("#inputEquation_"+cellIndex) + " : " + cellIndex);
+                //console.log( $("#inputEquation_"+cellIndex) + " : " + cellIndex);
                 $("#inputEquation_"+cellIndex).prop('disabled', false);
                 $("#inputEquation_"+cellIndex).removeAttr('disabled');
                 $("#takeTurnEquation_"+cellIndex).hide();
@@ -371,7 +371,7 @@ class EquationTypingTaskPlugin{
         }
         else {
             if(attrName == "timerTimedOutForIndex"){
-                console.log("Timer timed out: " + cellIndex + " - for user: " + message.sender);
+                //console.log("Timer timed out: " + cellIndex + " - for user: " + message.sender);
                 this.changeIndexCountDueToTimer(cellIndex);
                 return;
             }
@@ -398,7 +398,7 @@ class EquationTypingTaskPlugin{
                 $("#inputEquation_" + index).prop('disabled', true);
                 $("#doneEquation_" + index).val(message.content.attributeStringValue);
                 $("#takeTurnEquation_"+index).hide();
-                console.log("Equation typing" + index + " - " + this.executionMode);
+                //console.log("Equation typing" + index + " - " + this.executionMode);
 
                 if(this.executionMode == 1) {
                     $("#editEquation_" + index).show();
