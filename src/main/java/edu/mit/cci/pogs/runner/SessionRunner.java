@@ -320,7 +320,7 @@ public class SessionRunner implements Runnable {
             if (pl != null) {
                 if (taskConfiguration.getBeforeWorkScriptId()!= null ||pl.getTaskBeforeWorkJsContent() != null) {
                     TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
-                    _log.debug("Added task before work: " + task.getId() + " - " + csr);
+                    _log.debug("Added task before work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size() );
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -340,7 +340,7 @@ public class SessionRunner implements Runnable {
             if (pl != null) {
                 if (taskConfiguration.getAfterWorkScriptId()!= null || (pl.getTaskAfterWorkJsContent() != null)) {
                     TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
-                    _log.debug("Added task after work: " + task.getId() + " - " + csr);
+                    _log.debug("Added task after work: " + task.getId() + " - " + csr+ " - # of completed tasks: " + task.getCompletedTasks().size() );
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -439,9 +439,9 @@ public class SessionRunner implements Runnable {
         List<CompletedTask> completedTasks = completedTaskDao.listByRoundId(round.getId());
         for (CompletedTask ct : completedTasks) {
             for (TaskWrapper taskWrapper : session.getTaskList()) {
-                if (ct.getTaskId() == taskWrapper.getId()) {
+                if (ct.getTaskId().longValue() == taskWrapper.getId().longValue()) {
                     taskWrapper.getCompletedTasks().add(ct);
-                    continue;
+                    //continue;
                 }
             }
         }

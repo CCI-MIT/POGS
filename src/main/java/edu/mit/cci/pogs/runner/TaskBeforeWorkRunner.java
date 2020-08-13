@@ -31,7 +31,7 @@ public class TaskBeforeWorkRunner extends TaskRelatedScriptRunner implements Run
 
         try {
             if (timeBeforeStarts > 0) {
-                System.out.println(" Time until Before Task id: "+taskWrapper.getId()+" starts : " + timeBeforeStarts);
+                System.out.println(" Time until Before Task id: "+taskWrapper.getId()+" starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks());
                 Thread.sleep(timeBeforeStarts);
             }
 

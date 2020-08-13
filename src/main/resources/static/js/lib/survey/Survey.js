@@ -22,11 +22,13 @@ class Survey {
         var replacements = this.replacements;
         console.log(" ---- CUSTOM VARIABLES: " + this.customVariables)
         if(this.customVariables!= null) {
-            for(var i= 0; i < JSON.parse(this.customVariables.length); i++){
-                allVariables.push('\\' + this.customVariables[i].variableName);
-                replacements.push(this.customVariables[i].variableReplacements)
+            let custVar = JSON.parse(this.customVariables);
+            for(var i= 0; i < custVar.length; i++){
+                allVariables.push('\\' + custVar[i].variableName);
+                replacements.push(custVar[i].variableReplacements)
             }
         }
+
         // [['m01', 'm02', 'm03'],
         //     ['m02', 'm03'],
         //     "Last task name",
