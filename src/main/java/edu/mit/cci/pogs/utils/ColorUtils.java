@@ -61,7 +61,7 @@ public class ColorUtils {
 
 
 
-        for (int i =0 ; i < 4; i ++) {
+        for (int i =0 ; i < 4; i++) {
             System.out.println(""+ String.format("#%02x%02x%02x", colors[i].getRed(),
                     colors[i].getGreen(), colors[i].getBlue()));
         }

@@ -538,6 +538,7 @@ public class SummaryExportService {
                                 CompletedTask ct = completedTaskDao.getBySubjectIdTaskId(srs.getSubject().getId(), t.getId());
                                 if (ct != null) {
                                     CompletedTaskScore cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
+
                                     if (cts != null) {
                                         srs.getTaskGroupScores().add(cts.getTotalScore());
                                         srs.getTaskIndividualScores().add(cts.getTotalScore());
@@ -547,15 +548,24 @@ public class SummaryExportService {
                                     }
                                 }
                             } else {
+
                                 List<Round> roundList = roundDao.listBySessionId(srs.getSession().getId());
                                 if (roundList != null && roundList.size() > 0) {
                                     Round round = roundList.get(0);
+
                                     Team team = teamDao.getSubjectTeam(srs.getSubject().getId(),
-                                            srs.getSession().getId(), round.getId(), t.getId());
+                                            srs.getSession().getId(), round.getId(), null);
+
+                                    if(team == null ){
+                                        team = teamDao.getSubjectTeam(null,
+                                                srs.getSession().getId(), round.getId(), t.getId());
+                                    }
                                     if (team != null) {
+
                                         CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(
                                                 round.getId(),
                                                 team.getId(), t.getId());
+
                                         CompletedTaskScore cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
                                         if (cts != null) {
                                             srs.getTaskGroupScores().add(cts.getTotalScore());
@@ -567,6 +577,7 @@ public class SummaryExportService {
                                         if (iss != null) {
                                             srs.getTaskIndividualScores().add(iss.getIndividualScore());
                                         } else {
+
                                             srs.getTaskIndividualScores().add(0.0);
                                         }
                                     }

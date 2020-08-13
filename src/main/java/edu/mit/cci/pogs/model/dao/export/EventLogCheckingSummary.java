@@ -63,7 +63,7 @@ public class EventLogCheckingSummary {
 
     public String getSubjectsNamesStr() {
         String ret = "[";
-        for(int i =0; i < this.subjectsNames.size(); i ++){
+        for(int i =0; i < this.subjectsNames.size(); i++){
             ret += this.subjectsNames.get(i);
             if(i + 1 < this.subjectsNames.size()){
                 ret += ",";
@@ -75,7 +75,7 @@ public class EventLogCheckingSummary {
 
     public String getSubjectsPingCountStr() {
         String ret = "[";
-        for(int i =0; i < this.subjectsPingCount.size(); i ++){
+        for(int i =0; i < this.subjectsPingCount.size(); i++){
             ret += this.subjectsPingCount.get(i);
             if(i + 1 < this.subjectsPingCount.size()){
                 ret += ",";

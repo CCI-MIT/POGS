@@ -49,7 +49,7 @@ for (var i = 0; i < _completedTaskAttributes.length; i++) {
             _completedTaskAttributes[i].attributeName.replace("memoryGridAnswer", ""));
         var answer = _completedTaskAttributes[i].stringValue;
         answerKeyMap[index] = answer;
-        print("   >>>   " + _completedTaskAttributes[i].lastAuthorSubject)
+        //print("   >>>   " + _completedTaskAttributes[i].lastAuthorSubject)
         answerAuthorMap[index] = _completedTaskAttributes[i].lastAuthorSubject;
     }
 }
@@ -66,7 +66,7 @@ for(var i=0 ;i < answerSheet.length; i++) {
         }
 
     } else {
-        print("Original " + answerSheet[i] + " subject answer: " + answerKeyMap[i]);
+        //print("Original " + answerSheet[i] + " subject answer: " + answerKeyMap[i]);
         _completedTaskScore.numberOfWrongAnswers++;
         _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
         if(answerAuthorMap[i]!= "") {

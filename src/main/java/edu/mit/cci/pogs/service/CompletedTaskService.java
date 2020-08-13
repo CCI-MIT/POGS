@@ -202,7 +202,7 @@ public class CompletedTaskService {
                 //create object in the database
                 // originalText predictedCategory // dictionary ID.
                 JSONArray completedTaskScore = jo.getJSONArray("unprocessedEntries");
-                for(int i = 0 ; i < completedTaskScore.length(); i ++) {
+                for(int i = 0 ; i < completedTaskScore.length(); i++) {
                     UnprocessedDictionaryEntry ude = new UnprocessedDictionaryEntry();
                     JSONObject jsonObject = completedTaskScore.getJSONObject(i);
                     if(jsonObject.has("dictionaryId")) {

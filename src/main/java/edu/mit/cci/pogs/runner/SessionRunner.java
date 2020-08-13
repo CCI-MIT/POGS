@@ -544,7 +544,7 @@ public class SessionRunner implements Runnable {
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
             String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size(),generationType);
-            for(int i = 0; i <subjectList.size(); i ++){
+            for(int i = 0; i <subjectList.size(); i++){
                 Subject su = subjectList.get(i);
                 if(displayNames.length>i) {
                     su.setSubjectDisplayName(displayNames[i]);
