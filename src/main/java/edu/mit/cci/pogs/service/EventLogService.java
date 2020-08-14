@@ -95,7 +95,7 @@ public class EventLogService {
         List<EventLog> eventLogs = eventLogDao.listLogsBySessionId(sessionId);
         String scriptData = "// Script for session id: " + sessionId + "\n";
         scriptData += "// Events ordered by timestamp \n";
-        scriptData += "var taskEvent=[];\n";
+        scriptData += "var sessionEventArray={};\n";
         Map<String, String> subjects = new HashMap<>();
         Map<Long, CompletedTask> completedTaskMap = new HashMap<>();
         Map<Long, Long> taskMap = new HashMap<>();
@@ -109,7 +109,7 @@ public class EventLogService {
         );
         completedTaskMap.values().stream().forEach(ct ->taskMap.putIfAbsent(ct.getTaskId(),ct.getTaskId()) );
         for (Long ct : taskMap.keySet()) {
-            scriptData += "taskEvent[\"" + (ct) + "\"] = [];\n";
+            scriptData += "sessionEventArray[\"" + (ct) + "\"] = [];\n";
         }
 
         Long lastTaskId = null;
@@ -127,12 +127,14 @@ public class EventLogService {
                     }
 
                     JSONObject jo = getLogJson(eventLog);
-                    scriptData += "taskEvent[" + taskId + "][" + (eventLog.getTimestamp().getTime() - startTime) + "] = ";
-                    scriptData += jo.toString() + ";\n";
+                    scriptData += "sessionEventArray[\"" + taskId + "\"].push({\"timestamp\":" + (eventLog.getTimestamp().getTime() - startTime) + ", ";
+                    scriptData += "\"rawEventData\":" + jo.toString() + "});\n";
 
                 }
             }
         }
+        scriptData += "//This next line must remain in the file\n";
+        scriptData +="sessionEvents= JSON.stringify(sessionEventArray)";
 
         return scriptData;
 

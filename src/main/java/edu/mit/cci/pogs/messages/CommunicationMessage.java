@@ -20,7 +20,15 @@ public class CommunicationMessage extends PogsMessage<CommunicationMessageConten
         HANG_UP_CHAT,
         ACCEPT_CHAT,
 
-        STATUS
+        STATUS;
+        public static CommunicationType getByString(String value){
+            for(CommunicationType ct: CommunicationType.values()){
+                if(ct.name().equals(value)){
+                    return ct;
+                }
+            }
+            return null;
+        }
     }
 }
 

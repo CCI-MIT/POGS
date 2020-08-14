@@ -29,7 +29,7 @@ public class WorkspaceCommunicationWSController {
     private SubjectDao subjectDao;
 
     @MessageMapping("/communication.sendMessage")
-    public void getCheckin(@Payload CommunicationMessage pogsMessage, SimpMessageHeaderAccessor headerAccessor) {
+    public void sendMessage(@Payload CommunicationMessage pogsMessage, SimpMessageHeaderAccessor headerAccessor) {
 
         Long completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
 

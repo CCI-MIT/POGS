@@ -268,6 +268,7 @@ public class SessionRunner implements Runnable {
             session.createSessionSchedule();
             checkAndScheduleChatScripts(session);
             scheduleTaskRelatedThreads(session);
+            scheduleTaskReplays(session);
 
         } else {
             if ((session.getTeamCreationMoment().equals(
@@ -284,6 +285,28 @@ public class SessionRunner implements Runnable {
             }
         }
 
+    }
+
+    private void scheduleTaskReplays(SessionWrapper session) {
+        // RUN
+
+        if(session.getRobotSessionEventScriptId()!=null || session.getRobotSessionEventSourceId()!=null){
+            SessionReplayScriptProcessor srsp = (SessionReplayScriptProcessor) context.getBean("sessionReplayScriptProcessor");
+
+            srsp.setSessionScriptToReplayFrom(session.getRobotSessionEventScriptId());
+            srsp.setSessionToReplayFrom(session.getRobotSessionEventSourceId());
+            JSONArray sessionEvents = srsp.processAndGenerateScriptEntries();
+            for (TaskWrapper task : session.getTaskList()) {
+                TaskEventReplayRunner csr = (TaskEventReplayRunner) context.getBean("taskEventReplayRunner");
+                csr.setSession(session);
+                csr.setTaskWrapper(task);
+                csr.setSessionEvents(sessionEvents);
+                Thread thread = new Thread(csr);
+                thread.start();
+                chatAndScriptRunners.add(thread);
+
+            }
+        }
     }
 
     private void scheduleTaskRelatedThreads(SessionWrapper session) {
@@ -526,7 +549,11 @@ public class SessionRunner implements Runnable {
             TeamWrapper teamWrapper = new TeamWrapper(t);
 
             for (TeamHasSubject ths : teamHasSubjectDao.listByTeamId(t.getId())) {
-                teamWrapper.getSubjects().add(checkedInWaitingSubjectListById.get(ths.getSubjectId()));
+                Subject s = checkedInWaitingSubjectListById.get(ths.getSubjectId());
+                if(s == null){
+                    s = subjectDao.get(s.getId());
+                }
+                teamWrapper.getSubjects().add(s);
             }
             teamWrappers.add(teamWrapper);
         }
@@ -640,6 +667,18 @@ public class SessionRunner implements Runnable {
             team.setTaskId(task.getId());
         }
         team = teamDao.create(team);
+        if(session.getRobotSessionEventSourceId()!=null) {
+            List<Subject> robotsList = subjectDao.listBySessionId(session.getRobotSessionEventSourceId());
+            for(Subject su : robotsList){
+                Subject robotClone = new Subject();
+                robotClone.setSubjectDisplayName(su.getSubjectDisplayName());
+                robotClone.setSubjectExternalId(su.getSubjectExternalId());//CONFLICT?
+                robotClone.setSessionId(session.getId());
+                robotClone = subjectDao.create(robotClone);
+                subjectsInTeam.add(robotClone);
+            }
+
+        }
         for (Subject subject : subjectsInTeam) {
             TeamHasSubject ths = new TeamHasSubject();
             ths.setSubjectId(subject.getId());

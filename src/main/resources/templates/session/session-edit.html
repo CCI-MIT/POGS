@@ -595,7 +595,7 @@
                                            th:if="${not #lists.isEmpty(previousRecordedSessions) }"
                                                 th:each="rg: ${previousRecordedSessions}"
                                                 th:value="${rg.id}"
-                                                th:text="${rg.scriptName}" ></option>
+                                                th:text="${'# '+rg.id + ' '+rg.sessionSuffix }" ></option>
                                     </select>
 
                                 </div>

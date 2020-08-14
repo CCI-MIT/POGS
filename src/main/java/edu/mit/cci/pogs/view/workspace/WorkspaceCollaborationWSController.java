@@ -74,7 +74,7 @@ public class WorkspaceCollaborationWSController {
     private EventLogDao eventLogDao;
 
     @MessageMapping("/collaboration.sendMessage")
-    public void getCheckin(@Payload CollaborationMessage pogsMessage) {
+    public void sendCollaborationMessage(@Payload CollaborationMessage pogsMessage) {
 
 
         if (pogsMessage.getContent().getCollaborationType().equals(CollaborationMessage.CollaborationType.TODO_LIST)) {

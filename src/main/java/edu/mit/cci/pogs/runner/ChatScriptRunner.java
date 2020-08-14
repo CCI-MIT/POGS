@@ -23,9 +23,7 @@ import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class ChatScriptRunner implements Runnable {
 
-
     private List<ChatEntry> chatEntryList;
-
 
     private TaskWrapper taskWrapper;
 

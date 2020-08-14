@@ -8,7 +8,16 @@ public class CollaborationMessage extends PogsMessage<CollaborationMessageConten
     public enum CollaborationType {
         TODO_LIST,
         VOTING_LIST,
-        FEEDBACK_BAR
+        FEEDBACK_BAR;
+
+        public static CollaborationType getByString(String value){
+            for(CollaborationType ct: CollaborationType.values()){
+                if(ct.name().equals(value)){
+                    return ct;
+                }
+            }
+            return null;
+        }
     }
 
     public enum TodoType {

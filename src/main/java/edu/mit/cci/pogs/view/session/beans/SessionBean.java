@@ -71,6 +71,8 @@ public class SessionBean {
     private String    perpetualSessionTimeoutMessage;
     private Boolean   dispatcherSession;
 
+    private Long      robotSessionEventSourceId;
+    private Long      robotSessionEventScriptId;
 
 
     public SessionBean() {
@@ -132,6 +134,8 @@ public class SessionBean {
         this.perpetualSessionTimeoutLimit = value.getPerpetualSessionTimeoutLimit();
         this.perpetualSessionTimeoutMessage = value.getPerpetualSessionTimeoutMessage();
         this.dispatcherSession = value.getDispatcherSession();
+        this.robotSessionEventScriptId = value.getRobotSessionEventScriptId();
+        this.robotSessionEventSourceId = value.getRobotSessionEventSourceId();
 
     }
 
@@ -181,6 +185,22 @@ public class SessionBean {
 
     public void setPerpetualSubjectsNumber(Integer perpetualSubjectsNumber) {
         this.perpetualSubjectsNumber = perpetualSubjectsNumber;
+    }
+
+    public Long getRobotSessionEventSourceId() {
+        return robotSessionEventSourceId;
+    }
+
+    public void setRobotSessionEventSourceId(Long robotSessionEventSourceId) {
+        this.robotSessionEventSourceId = robotSessionEventSourceId;
+    }
+
+    public Long getRobotSessionEventScriptId() {
+        return robotSessionEventScriptId;
+    }
+
+    public void setRobotSessionEventScriptId(Long robotSessionEventScriptId) {
+        this.robotSessionEventScriptId = robotSessionEventScriptId;
     }
 
     public String getPerpetualSubjectsPrefix() {

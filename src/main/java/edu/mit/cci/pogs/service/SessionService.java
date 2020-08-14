@@ -227,6 +227,10 @@ public class SessionService {
         session.setPerpetualSessionTimeoutMessage(sessionBean.getPerpetualSessionTimeoutMessage());
         session.setDispatcherSession(sessionBean.getDispatcherSession());
 
+        session.setScoreboardAverageSoloSession(sessionBean.getScoreboardAverageSoloSession());
+        session.setRobotSessionEventScriptId(sessionBean.getRobotSessionEventScriptId());
+        session.setRobotSessionEventSourceId(sessionBean.getRobotSessionEventSourceId());
+
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -320,6 +324,9 @@ public class SessionService {
         clonedNonPerpetualSession.setPerpetualSessionTimeoutLimit(session.getPerpetualSessionTimeoutLimit());
         clonedNonPerpetualSession.setPerpetualSessionTimeoutMessage(session.getPerpetualSessionTimeoutMessage());
         clonedNonPerpetualSession.setDispatcherSession(session.getDispatcherSession());
+        clonedNonPerpetualSession.setScoreboardAverageSoloSession(session.getScoreboardAverageSoloSession());
+        clonedNonPerpetualSession.setRobotSessionEventScriptId(session.getRobotSessionEventScriptId());
+        clonedNonPerpetualSession.setRobotSessionEventSourceId(session.getRobotSessionEventSourceId());
 
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
