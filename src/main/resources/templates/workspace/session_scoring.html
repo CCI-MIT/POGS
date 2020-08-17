@@ -10,7 +10,7 @@
 <div layout:fragment="content">
     <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
 
-
+        <span th:if="${not showScore}">Redirecting ...</span>
 
         <div class="form-group waiting_message" >
             <div id="countdown"></div>

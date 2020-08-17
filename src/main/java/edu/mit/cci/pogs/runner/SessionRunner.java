@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.runner;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -295,7 +296,7 @@ public class SessionRunner implements Runnable {
 
             srsp.setSessionScriptToReplayFrom(session.getRobotSessionEventScriptId());
             srsp.setSessionToReplayFrom(session.getRobotSessionEventSourceId());
-            JSONArray sessionEvents = srsp.processAndGenerateScriptEntries();
+            JSONObject sessionEvents = srsp.processAndGenerateScriptEntries();
             for (TaskWrapper task : session.getTaskList()) {
                 TaskEventReplayRunner csr = (TaskEventReplayRunner) context.getBean("taskEventReplayRunner");
                 csr.setSession(session);
@@ -478,7 +479,7 @@ public class SessionRunner implements Runnable {
         ct.setRoundId(currentRound.getId());
         ct.setTaskId(task.getId());
 
-        ct.setStartTime(new Timestamp(task.getTaskStartTimestamp()));
+        ct.setStartTime(new Timestamp(task.getPrimerEndTime()));
         ct.setExpectedFinishTime(new Timestamp(task.getTaskEndTimestamp()));
 
         if (subject != null) {
@@ -551,7 +552,7 @@ public class SessionRunner implements Runnable {
             for (TeamHasSubject ths : teamHasSubjectDao.listByTeamId(t.getId())) {
                 Subject s = checkedInWaitingSubjectListById.get(ths.getSubjectId());
                 if(s == null){
-                    s = subjectDao.get(s.getId());
+                    s = subjectDao.get(ths.getSubjectId());
                 }
                 teamWrapper.getSubjects().add(s);
             }

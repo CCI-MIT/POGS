@@ -230,7 +230,7 @@ public class SessionService {
         session.setScoreboardAverageSoloSession(sessionBean.getScoreboardAverageSoloSession());
         session.setRobotSessionEventScriptId(sessionBean.getRobotSessionEventScriptId());
         session.setRobotSessionEventSourceId(sessionBean.getRobotSessionEventSourceId());
-
+        session.setRecordSessionSaveEphemeralEvents(sessionBean.getRecordSessionSaveEphemeralEvents());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -327,6 +327,7 @@ public class SessionService {
         clonedNonPerpetualSession.setScoreboardAverageSoloSession(session.getScoreboardAverageSoloSession());
         clonedNonPerpetualSession.setRobotSessionEventScriptId(session.getRobotSessionEventScriptId());
         clonedNonPerpetualSession.setRobotSessionEventSourceId(session.getRobotSessionEventSourceId());
+        clonedNonPerpetualSession.setRecordSessionSaveEphemeralEvents(session.getRecordSessionSaveEphemeralEvents());
 
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());

@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.runner;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -34,7 +35,7 @@ public class SessionReplayScriptProcessor {
     @Autowired
     private ExecutableScriptDao executableScriptDao;
 
-    public JSONArray processAndGenerateScriptEntries(){
+    public JSONObject processAndGenerateScriptEntries(){
         //setup the variables/script from event log
         String code = null;
         if(sessionScriptToReplayFrom==null) {
@@ -65,7 +66,8 @@ public class SessionReplayScriptProcessor {
 
         String sessionEvents = (String) engine
                 .getBindings(ScriptContext.ENGINE_SCOPE).get("sessionEvents");
-        JSONArray sessEv = new JSONArray(sessionEvents);
+        System.out.println(sessionEvents);
+        JSONObject sessEv = new JSONObject(sessionEvents);
 
         return sessEv;
     }

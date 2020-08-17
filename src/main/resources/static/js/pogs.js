@@ -80,6 +80,7 @@ class Pogs {
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
         this.teammates = config.teammates;
+        this.recordSessionSaveEphemeralEvents = config.recordSessionSaveEphemeralEvents;
         this.taskList = config.taskList;
         this.task = config.task;
         this.lastTask = config.lastTask;

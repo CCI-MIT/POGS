@@ -30,7 +30,7 @@ import edu.mit.cci.pogs.view.workspace.WorkspaceTaskWSController;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TaskEventReplayRunner implements Runnable {
 
-    private JSONArray sessionEvents;
+    private JSONObject sessionEvents;
 
     private TaskWrapper taskWrapper;
 
@@ -65,19 +65,17 @@ public class TaskEventReplayRunner implements Runnable {
             }
             Long lastTimeDiff = 0l;
 
-            for(int i=0; i< this.sessionEvents.length(); i++) {
-                JSONObject jsonObject = this.sessionEvents.getJSONObject(i);
-                JSONArray taskEvents = jsonObject.getJSONArray(this.taskWrapper.getId().toString());
-                if(taskEvents!=null) {
-                    for(int j=0; j < taskEvents.length(); j ++) {
-                        JSONObject event = taskEvents.getJSONObject(j);
-                        Long eventTime = event.getLong("timestamp");
-                        Thread.sleep((eventTime - lastTimeDiff) * 1000);
-                        lastTimeDiff = eventTime;
-                        createAndSendMessage(event.getJSONObject("rawEventData"));
-                    }
+            JSONArray taskEvents = this.sessionEvents.getJSONArray(this.taskWrapper.getId().toString());
+            if(taskEvents!=null) {
+                for(int j=0; j < taskEvents.length(); j ++) {
+                    JSONObject event = taskEvents.getJSONObject(j);
+                    Long eventTime = event.getLong("timestamp");
+                    Thread.sleep((eventTime - lastTimeDiff));
+                    lastTimeDiff = eventTime;
+                    createAndSendMessage(event.getJSONObject("rawEventData"));
                 }
             }
+
 
         } catch (InterruptedException ie) {
             _log.info("Stopping taskEventReplay for task : " + taskWrapper.getId());
@@ -103,7 +101,10 @@ public class TaskEventReplayRunner implements Runnable {
             if(content.has("loggableAttribute"))
                 tamc.setLoggableAttribute(content.getBoolean("loggableAttribute"));
             if(content.has("summaryDescription"))
-                tamc.setSummaryDescription("Robot " + content.getString("summaryDescription"));
+
+                tamc.setSummaryDescription((content.isNull("summaryDescription"))?
+                        (null):("Robot " + content.getString("summaryDescription")));
+
             if(content.has("extraData"))
                 tamc.setExtraData(content.getString("extraData"));
             if(content.has("mustCreateNewAttribute"))
@@ -111,7 +112,7 @@ public class TaskEventReplayRunner implements Runnable {
             TaskAttributeMessage tam = new TaskAttributeMessage();
 
             tam.setSender(ce.getString("sender"));
-            tam.setReceiver(ce.getString("receiver"));
+            tam.setReceiver((ce.isNull("receiver"))?(null):(ce.getString("receiver")));
             tam.setContent(tamc);
             tam.setType(TaskAttributeMessage.MessageType.TASK_ATTRIBUTE);
             tam.setSessionId(session.getId().toString());
@@ -136,7 +137,7 @@ public class TaskEventReplayRunner implements Runnable {
             if(content.has("message"))
                 cmc.setMessage(content.getString("message"));
             if(content.has("channel"))
-                cmc.setMessage(content.getString("channel"));
+                cmc.setChannel(content.getString("channel"));
 
 
             CommunicationMessage pogsMessage = new CommunicationMessage();
@@ -144,7 +145,8 @@ public class TaskEventReplayRunner implements Runnable {
             pogsMessage.setType(PogsMessage.MessageType.COMMUNICATION_MESSAGE);
 
             pogsMessage.setSender(ce.getString("sender"));
-            pogsMessage.setReceiver(ce.getString("receiver"));
+            pogsMessage.setReceiver((ce.isNull("receiver"))?(null):(ce.getString("receiver")));
+
 
             pogsMessage.setSessionId(session.getId().toString());
 
@@ -177,7 +179,8 @@ public class TaskEventReplayRunner implements Runnable {
 
             cm.setType(PogsMessage.MessageType.COLLABORATION_MESSAGE);
             cm.setSender(ce.getString("sender"));
-            cm.setReceiver(ce.getString("receiver"));
+            cm.setReceiver((ce.isNull("receiver"))?(null):(ce.getString("receiver")));
+
             cm.setContent(cmc);
 
             cm.setSessionId(session.getId().toString());
@@ -191,11 +194,11 @@ public class TaskEventReplayRunner implements Runnable {
 
     }
 
-    public JSONArray getSessionEvents() {
+    public JSONObject getSessionEvents() {
         return sessionEvents;
     }
 
-    public void setSessionEvents(JSONArray sessionEvents) {
+    public void setSessionEvents(JSONObject sessionEvents) {
         this.sessionEvents = sessionEvents;
     }
 

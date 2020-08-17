@@ -583,6 +583,11 @@
                     <fieldset class="form-group row">
                         <legend class="col-form-legend col-sm-8">Advanced - Robots </legend>
                         <div class="container">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" th:field="*{recordSessionSaveEphemeralEvents}" type="checkbox"  id="recordSessionSaveEphemeralEvents" />
+                            <label class="col-form-label" for="recordSessionSaveEphemeralEvents">Record ephemeral events</label>
+                            <small id="" class="form-text text-muted">Use only when recording, this can overload the server</small>
+                        </div>
                         <div class="form-group row col-sm-12" id="robotSessionEventSourceId">
                                 <label class="col-sm-5 col-form-label" for="robotSessionEventSourceIdSelect">Recorded session data source: </label>
                                 <div class="col-sm-7">

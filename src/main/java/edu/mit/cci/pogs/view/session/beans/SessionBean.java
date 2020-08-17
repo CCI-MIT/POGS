@@ -73,6 +73,7 @@ public class SessionBean {
 
     private Long      robotSessionEventSourceId;
     private Long      robotSessionEventScriptId;
+    private Boolean   recordSessionSaveEphemeralEvents;
 
 
     public SessionBean() {
@@ -136,6 +137,7 @@ public class SessionBean {
         this.dispatcherSession = value.getDispatcherSession();
         this.robotSessionEventScriptId = value.getRobotSessionEventScriptId();
         this.robotSessionEventSourceId = value.getRobotSessionEventSourceId();
+        this.recordSessionSaveEphemeralEvents = value.getRecordSessionSaveEphemeralEvents();
 
     }
 
@@ -598,5 +600,13 @@ public class SessionBean {
 
     public void setScoreboardAverageSoloSession(Boolean scoreboardAverageSoloSession) {
         this.scoreboardAverageSoloSession = scoreboardAverageSoloSession;
+    }
+
+    public Boolean getRecordSessionSaveEphemeralEvents() {
+        return recordSessionSaveEphemeralEvents;
+    }
+
+    public void setRecordSessionSaveEphemeralEvents(Boolean recordSessionSaveEphemeralEvents) {
+        this.recordSessionSaveEphemeralEvents = recordSessionSaveEphemeralEvents;
     }
 }
