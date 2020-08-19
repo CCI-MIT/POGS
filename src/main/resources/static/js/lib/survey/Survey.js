@@ -23,9 +23,13 @@ class Survey {
         //console.log(" ---- CUSTOM VARIABLES: " + this.customVariables)
         if(this.customVariables!= null) {
             let custVar = JSON.parse(this.customVariables);
-            for(var i= 0; i < custVar.length; i++){
+            for(var i= 0; i < custVar.length; i++) {
                 allVariables.push('\\' + custVar[i].variableName);
-                replacements.push(custVar[i].variableReplacements)
+                if (custVar[i].variableReplacements != null) {
+                    replacements.push(custVar[i].variableReplacements)
+                } else {
+                    replacements.push("")
+                }
             }
         }
 
