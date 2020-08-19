@@ -40,10 +40,10 @@ var CONFIG = {
     },
     libs: {
         destPath: RESOURCE_PATH + '/dist/vendor',
-        excludes: ['/**/eyeglass-exports.js', '/build/**/*']
+        excludes: ['/**/eyeglass-exports.js']
     }
 };
-
+//        excludes: ['/**/eyeglass-exports.js', '/build/**/*']
 
 
 gulp.task('watch', function () {

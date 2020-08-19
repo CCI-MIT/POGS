@@ -146,14 +146,25 @@ public class WorkspaceController {
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
 
+        Date beforeParse = new Date();
+        String userAgent = request.getHeader("User-Agent");
+
+        if(userAgent.contains("Firefox") || userAgent.contains("MSIE")){
+
+            model.addAttribute("browser", (userAgent.contains("MSIE")?("Internet Explorer"):("Firefox")));
+            return "workspace/unsupported";
+        }
+
+        /*
         try {
+
             final UserAgentParser parser =
                     new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
                             BrowsCapField.BROWSER_MAJOR_VERSION,
                             BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
                             BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
                             BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
-            String userAgent = request.getHeader("User-Agent");
+
             final Capabilities capabilities = parser.parse(userAgent);
 
             // the default fields have getters
@@ -166,9 +177,11 @@ public class WorkspaceController {
                 return "workspace/unsupported";
             }
 
+
         }catch (IOException  |ParseException o){
             o.printStackTrace();
         }
+         */
 
         model.addAttribute("action", "/sessions/start/" + sessionId);
         if (workerId != null) {
@@ -187,6 +200,7 @@ public class WorkspaceController {
             for (Cookie co : request.getCookies()) {
                 if (co.getName().equals("unique_pogs_id")) {
                     alreadyHasCookie = true;
+                    break;
                 }
             }
         }
@@ -264,6 +278,18 @@ public class WorkspaceController {
 
         su = subjectDao.create(su);
 
+        String userAgent = request.getHeader("User-Agent");
+
+        SubjectAttribute saa = new SubjectAttribute();
+        saa.setSubjectId(su.getId());
+        saa.setAttributeName("userAgent");
+        saa.setStringValue(userAgent);
+        saa.setInternalAttribute(true);
+        saa.setLatest(true);
+        subjectAttributeDao.create(saa);
+
+        /*
+
         try {
             final UserAgentParser parser =
                     new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
@@ -271,7 +297,8 @@ public class WorkspaceController {
                             BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
                             BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
                             BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
-            String userAgent = request.getHeader("User-Agent");
+
+
             final Capabilities capabilities = parser.parse(userAgent);
 
             // the default fields have getters
@@ -326,6 +353,8 @@ public class WorkspaceController {
         }catch (IOException  |ParseException o){
             o.printStackTrace();
         }
+
+         */
 
         if ((workerId != null && !workerId.isEmpty()) ||
                 (assignmentId != null && !assignmentId.isEmpty()) ||

@@ -78,13 +78,18 @@ public class SessionExportService {
         Map<Long, Long> completedTaskIdToSessionId = new HashMap<>();
 
         for (EventLog el : eventLogList) {
-            completedTaskIdToSessionId.put(el.getCompletedTaskId(), el.getSessionId());
+            if(el.getCompletedTaskId()!=null) {
+                completedTaskIdToSessionId.put(el.getCompletedTaskId(), el.getSessionId());
+            }
         }
         List<Long> completedTaskIds = new ArrayList<>();
         List<CompletedTask> completedTaskList = new ArrayList<>();
         for (Long id : completedTaskIdToSessionId.keySet()) {
             completedTaskIds.add(id);
-            completedTaskList.add(completedTaskDao.get(id));
+            CompletedTask ctTem = completedTaskDao.get(id);
+            if(ctTem!=null) {
+                completedTaskList.add(ctTem);
+            }
         }
 
         ex.addAll(ExportUtils.getEntityDataExportFile(path, CompletedTask.class, completedTaskList, studyId,
