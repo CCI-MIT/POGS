@@ -15,12 +15,18 @@ If you are having problems setting it up, you can contact me by email (You shoul
 
 ## Simple download and play procedure
 
-1 Install [Docker](https://docs.docker.com/get-docker/)
-2. Clone this repository, and at the root directory run:
+1. Install [Docker](https://docs.docker.com/get-docker/)
+2. Clone this repository, at the repo's root copy the sample.env file to a local .env file:
+```cp sample.env .env``` 
+ This file has all the usernames and passwords used in the system. It is advised to change this on production setups.
+3. We are currently integrating with a CI to automatically build and create binary releases but we havent completed the process, meanwhile follow de development procedure, and copy the binary from a local buid ```cp target/pogs-0.0.1-SNAPSHOT.jar .docker/pogsserver```
+4. At the repo's root directory run:
 
 ```
 docker-compose up
 ```
+
+
 Open a browser window at :
 ```http://localhost:8080/admin```
 ```
