@@ -7,6 +7,9 @@ cache:
   directories:
     - $HOME/.m2
 
+env:
+  - RUN_SLOW_TESTS=false
+
 before_install:
   - gem install dpl --source http://rubygems.org
   - source others/travis/travis_rc.sh
@@ -16,6 +19,7 @@ addons:
   mariadb: '10.2'
 service:
   - redis-server
+
 install: true
 
 script:
