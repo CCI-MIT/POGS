@@ -115,8 +115,12 @@ public class CompletedTaskService {
             params.add(new BasicNameValuePair("taskExecutionAttibutes", taskExecutionAttributeService.listExecutionAttributesAsJsonArray(
                     task.getId()).toString()));
 
-            params.add(new BasicNameValuePair("completedTaskAttributes", (completedTaskAttributeService
-                    .listCompletedTaskAttributesForCompletedTask(ct.getId())).toString()));
+            String complAt = (completedTaskAttributeService
+                    .listCompletedTaskAttributesForCompletedTask(ct.getId())).toString();
+            params.add(new BasicNameValuePair("completedTaskAttributes", complAt));
+            System.out.println("---------------");
+            System.out.println(complAt);
+            System.out.println("---------------");
 
             TaskConfiguration tc = taskConfigurationDao.get(thtc.getTaskConfigurationId());
 
@@ -142,7 +146,12 @@ public class CompletedTaskService {
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
+
+            System.out.println("---------------");
+            System.out.println(result.toString());
+            System.out.println("---------------");
             JSONObject jo = new JSONObject(result.toString());
+
             if(jo.has("completedTaskScore")) {
                 CompletedTaskScore cts;
                 cts = completedTaskScoreDao.getByCompletedTaskId(ct.getId());
