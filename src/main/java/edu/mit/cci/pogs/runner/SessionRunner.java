@@ -840,10 +840,15 @@ public class SessionRunner implements Runnable {
         checkedInWaitingSubjectList = new HashMap<>();
         checkedInWaitingSubjectListById = new HashMap<>();
         sessionsRelatedToPerpetual = new HashMap<>();
-        //try {
+        try {
             while (shouldRun) {
 
-                //Thread.sleep(1000);
+
+                if(checkedInWaitingSubjectListById.size() == 0){
+                    Thread.sleep(10*1000);
+                } else {
+                    Thread.sleep(5*1000);
+                }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
                     if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
                         subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
@@ -977,9 +982,9 @@ public class SessionRunner implements Runnable {
                     sessionsRelatedToPerpetual.remove(sess);
                 }
             }
-        //}catch (InterruptedException ie){
+        }catch (InterruptedException ie){
 
-        //}
+        }
     }
 
     public Map<String, Subject> getAllCheckedInSubjects() {

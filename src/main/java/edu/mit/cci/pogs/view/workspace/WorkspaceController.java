@@ -148,6 +148,12 @@ public class WorkspaceController {
 
         Date beforeParse = new Date();
         String userAgent = request.getHeader("User-Agent");
+        String referrer = request.getHeader("referer");
+        boolean isPogsRef = false;
+        if(referrer!=null ){
+            isPogsRef = (referrer.contains("https://pogs.info") || referrer.contains("http://localhost"));
+        }
+        model.addAttribute("isPogsReferrer",isPogsRef);
 
         if(userAgent.contains("Firefox") || userAgent.contains("MSIE")){
 

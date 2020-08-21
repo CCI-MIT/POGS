@@ -139,12 +139,14 @@ for(var te in  textsByAuthor){
 
 
     var ass = getAuthorChosenColor(textsByAuthor[te].subject.externalId);
+    if(ass!=null) {
+        ass.color = colorArray[ass.colorIndex];
+        _exportRecordLines.push(textsByAuthor[te].subject.externalId + ";"+ ass.color
+                                + ";"+ cleanEntry(textsByAuthor[te].fullText)
+                                + ";" + cleanEntry(colorDictByDictId[ass.color].originalText));
+    }
 
-    ass.color = colorArray[ass.colorIndex];
 
-    _exportRecordLines.push(textsByAuthor[te].subject.externalId + ";"+ ass.color
-                            + ";"+ cleanEntry(textsByAuthor[te].fullText)
-                            + ";" + cleanEntry(colorDictByDictId[ass.color].originalText));
 }
 
 function getAuthorChosenColor(sub){

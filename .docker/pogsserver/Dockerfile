@@ -12,10 +12,12 @@ RUN ["sh","/app/setupRightLocalhostChange.sh"]
 #[LOCAL END]
 
 #If running on server setup get latest relase from github
+#[SERVER START]
 RUN apk update && apk add --no-cache curl
 COPY .docker/pogsserver/downloadLatestBinaryFromGithubReleases.sh /app/downloadLatestBinaryFromGithubReleases.sh
 RUN ["chmod", "+x", "/app/downloadLatestBinaryFromGithubReleases.sh"]
 RUN ["sh","/app/downloadLatestBinaryFromGithubReleases.sh"]
+#[SERVER END]
 
 WORKDIR /app
 CMD exec java -jar pogs.jar
