@@ -24,8 +24,8 @@ script:
 deploy:
   provider: releases
   api_key: "$GH_TOKEN"
-  #file_glob: true
-  file: "target/pogs-0.0.1-SNAPSHOT.jar"
+  file_glob: true
+  file: "target/*"
   skip_cleanup: true
   name: "pogs-0.0.1-SNAPSHOT.jar"
   on:
