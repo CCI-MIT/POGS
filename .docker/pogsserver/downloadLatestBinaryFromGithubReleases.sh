@@ -1,4 +1,7 @@
+cd app/
 LOCATION=$(curl -s https://api.github.com/repos/CCI-MIT/POGS/releases/latest \
-| grep "tag_name" \
-| awk '{print "https://github.com/CCI-MIT/POGS/archive/" substr($2, 2, length($2)-3) ".zip"}') \
+| grep "/pogs-0.0.1-SNAPSHOT.jar" \
+| cut -d : -f 2,3 \
+| tr -d \"
+)\
 ; curl -L -o pogs.jar $LOCATION
