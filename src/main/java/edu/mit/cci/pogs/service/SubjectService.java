@@ -72,6 +72,20 @@ public class SubjectService {
         return channelSubjectIsIn;
     }
 
+    public Subject createSubjectSafeExternalId(Subject subject){
+
+        int attempt = 1;
+        boolean createdSubject = false;
+        while(!createdSubject) {
+            if (subjectDao.getByExternalId(subject.getSubjectExternalId()) == null) {
+                return subjectDao.create(subject);
+            } else {
+                subject.setSubjectExternalId(subject.getSubjectExternalId()+"_"+attempt);
+                attempt++;
+            }
+        }
+        return null;
+    }
     public void createOrUpdateSubjectsAttributes(String attributesToAddJson) {
         if (attributesToAddJson != null) {
 
@@ -90,7 +104,11 @@ public class SubjectService {
                             sa.setAttributeName(att.getString("attributeName"));
                             sa.setSubjectId(su.getId());
                             if (att.has("stringValue")) {
-                                sa.setStringValue(att.getString("stringValue"));
+                                if(!att.isNull("stringValue")) {
+                                    sa.setStringValue(att.getString("stringValue"));
+                                } else {
+                                    sa.setStringValue("");
+                                }
                             }
                             if (att.has("integerValue")) {
                                 sa.setIntegerValue(new Integer(att.getInt("integerValue")).longValue());

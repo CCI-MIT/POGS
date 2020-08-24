@@ -277,12 +277,13 @@ public class WorkspaceController {
 
 
 
-        String newSubjectExtId = session.getFullSessionName() + "_" + now;
+        UUID uuid = UUID.randomUUID();
+        String newSubjectExtId = session.getFullSessionName() + "_" +uuid.toString();
         su.setSubjectExternalId(newSubjectExtId);
         su.setSubjectDisplayName(newSubjectExtId);
         su.setSessionId(session.getId());
 
-        su = subjectDao.create(su);
+        su = subjectService.createSubjectSafeExternalId(su);
 
         String userAgent = request.getHeader("User-Agent");
 

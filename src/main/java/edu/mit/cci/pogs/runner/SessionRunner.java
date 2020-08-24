@@ -805,7 +805,9 @@ public class SessionRunner implements Runnable {
         ExecutableScript es = executableScriptDao.get(scriptId);
         if(es!=null) {
             // Set JavaScript variables
-            engine.put("subjects", teamService.getTeamatesJSONObject(subjects));
+            JSONArray subjctJsonArray =teamService.getTeamatesJSONObject(subjects);
+            System.out.println("Subjects checked by the script: " + subjctJsonArray.toString());
+            engine.put("subjects", subjctJsonArray.toString());
 
             Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
                     es.getScriptContent().getBytes()));
@@ -908,10 +910,12 @@ public class SessionRunner implements Runnable {
 
                                 if (subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
                                     checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
+
                                 }
 
                             }
                             List<Subject> checkedInSubjects = checkedInWaitingSubjectListById.values().stream().collect(Collectors.toList());
+
                             String[] subjectsToJoin = shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
                             if (subjectsToJoin != null) {
                                 for (String subjects : subjectsToJoin) {
@@ -926,9 +930,9 @@ public class SessionRunner implements Runnable {
 
 
                                     for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
-
-
-                                        String externalId = checkedInWaitingSubjectListById.get(shscI.getSubjectId()).getSubjectExternalId();
+                                        Subject suToTest = checkedInWaitingSubjectListById.get(shscI.getSubjectId());
+                                        
+                                        String externalId = suToTest.getSubjectExternalId();
                                         for (String chosenExternalId : subjectsToJoin) {
                                             if (chosenExternalId.equals(externalId)) {
                                                 Subject su = checkedInWaitingSubjectList.get(externalId);
@@ -936,7 +940,6 @@ public class SessionRunner implements Runnable {
                                                     su.setSessionId(newSpawnedSession.getId());
                                                     subjectDao.update(su);
                                                     subjectsInNewSession.add(su);
-
 
                                                     checkedInWaitingSubjectListById.remove(su.getId());
                                                     shscI.setJoinedSessionId(newSpawnedSession.getId());
