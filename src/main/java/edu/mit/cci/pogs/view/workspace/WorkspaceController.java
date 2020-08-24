@@ -428,6 +428,9 @@ public class WorkspaceController {
         SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr != null) {
             sr.subjectCheckIn(su);
+        } else {
+            model.addAttribute("errorMessage", "Too late, this session expired.");
+            return "workspace/error";
         }
         //go to pre-check-in page (wait for event CHECKIN OPEN)
         //return "redirect:/check_in/?externalId=" + su.getSubjectExternalId();

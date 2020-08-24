@@ -931,7 +931,7 @@ public class SessionRunner implements Runnable {
 
                                     for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
                                         Subject suToTest = checkedInWaitingSubjectListById.get(shscI.getSubjectId());
-                                        
+
                                         String externalId = suToTest.getSubjectExternalId();
                                         for (String chosenExternalId : subjectsToJoin) {
                                             if (chosenExternalId.equals(externalId)) {
