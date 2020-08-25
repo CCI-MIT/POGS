@@ -287,6 +287,7 @@ public class SessionController {
         Study study = studyDao.get(studyId);
         session.setStudyId(study.getId());
 
+        setupRecordedSessions(studyId, model, session);
 
         model.addAttribute("study", study);
         model.addAttribute("sessionBean", session);
@@ -345,19 +346,23 @@ public class SessionController {
         model.addAttribute("sessionBean", session);
 
 
+        setupRecordedSessions(studyId, model, session);
+
+        return "session/session-edit";
+    }
+
+    private void setupRecordedSessions(Long studyId, Model model, SessionBean session) {
         List<Session> recordedSessions = new ArrayList<>();
         if(session.getId()== null) {
             recordedSessions = sessionDao.listByStudyId(studyId);
         } else {
             for (Session s: sessionDao.listByStudyId(studyId)) {
-                if(s.getId()!=session.getId()) {
+                if(s.getId()!= session.getId()) {
                     recordedSessions.add(s);
                 }
             }
         }
         model.addAttribute("previousRecordedSessions",recordedSessions);
-
-        return "session/session-edit";
     }
 
     @PostMapping("/admin/sessions/subjects/edit")
