@@ -62,7 +62,7 @@ public class WorkspaceTaskWSController {
                             taskAttributeMessage.getExtraData(),
                             taskAttributeMessage.getMustCreateNewAttribute(),
                             sender.getId(),
-                            taskAttributeMessage.getShouldUpdateExistingAttribute()
+                            (taskAttributeMessage.getShouldUpdateExistingAttribute()!=null)?(taskAttributeMessage.getShouldUpdateExistingAttribute()):(true)
                     );
 
                     if (sender != null) {
