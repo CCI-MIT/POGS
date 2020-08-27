@@ -186,16 +186,15 @@ public class SessionRunner implements Runnable {
 
                     SessionSchedule ss = session.getSessionSchedule().get(i);
                     long nowTS = DateUtils.now();
-                    if(!ss.isAlreadyPassed(nowTS) && ss.isHappeningNow(nowTS)) {
+                    if (!ss.isAlreadyPassed(nowTS) && ss.isHappeningNow(nowTS)) {
                         _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
 
 
-
-                            try{
-                                Thread.sleep(ss.getEndTimestamp()-nowTS + 500);
-                            }catch (InterruptedException inte){
-                                _log.info("Session schedule interrupted: (" + ss.getUrl() + "):" + simpleDateFormat.format(DateUtils.now()));
-                            }
+                        try {
+                            Thread.sleep(ss.getEndTimestamp() - nowTS + 500);
+                        } catch (InterruptedException inte) {
+                            _log.info("Session schedule interrupted: (" + ss.getUrl() + "):" + simpleDateFormat.format(DateUtils.now()));
+                        }
 
 
                         _log.info("Finishing session schedule: (" + ss.getUrl() + "):" + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
@@ -210,7 +209,7 @@ public class SessionRunner implements Runnable {
         }
         SessionRunnerManager.removeSessionRunner(session.getId());
         for (Thread th : this.chatAndScriptRunners) {
-            if(th!=null && th.isAlive()) {
+            if (th != null && th.isAlive()) {
                 th.interrupt();
             }
         }
@@ -219,7 +218,7 @@ public class SessionRunner implements Runnable {
     }
 
     private void startSessionAfterScriptIfAny() {
-        if(session.getAfterSessionScriptId()!=null){
+        if (session.getAfterSessionScriptId() != null) {
             SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
             _log.debug("Added before session script : " + csr);
             csr.setSession(session);
@@ -233,7 +232,7 @@ public class SessionRunner implements Runnable {
     }
 
     private void startSessionBeforeScriptIfAny() {
-        if(session.getBeforeSessionScriptId()!=null){
+        if (session.getBeforeSessionScriptId() != null) {
             SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
             _log.debug("Added before session script : " + csr);
             csr.setSession(session);
@@ -243,8 +242,6 @@ public class SessionRunner implements Runnable {
             chatAndScriptRunners.add(thread);
         }
     }
-
-
 
 
     private void configureRound(SessionWrapper session, RoundWrapper round) {
@@ -263,7 +260,6 @@ public class SessionRunner implements Runnable {
             } else {
                 //TODO:Handle before task , team and completed task creation
             }
-
 
 
             session.createSessionSchedule();
@@ -291,7 +287,7 @@ public class SessionRunner implements Runnable {
     private void scheduleTaskReplays(SessionWrapper session) {
         // RUN
 
-        if(session.getRobotSessionEventScriptId()!=null || session.getRobotSessionEventSourceId()!=null){
+        if (session.getRobotSessionEventScriptId() != null || session.getRobotSessionEventSourceId() != null) {
             SessionReplayScriptProcessor srsp = (SessionReplayScriptProcessor) context.getBean("sessionReplayScriptProcessor");
 
             srsp.setSessionScriptToReplayFrom(session.getRobotSessionEventScriptId());
@@ -339,14 +335,15 @@ public class SessionRunner implements Runnable {
             }
         }
     }
+
     private void scheduleTaskBeforeWork(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
             TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
             if (pl != null) {
-                if (taskConfiguration.getBeforeWorkScriptId()!= null ||pl.getTaskBeforeWorkJsContent() != null) {
+                if (taskConfiguration.getBeforeWorkScriptId() != null || pl.getTaskBeforeWorkJsContent() != null) {
                     TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
-                    _log.debug("Added task before work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size() );
+                    _log.debug("Added task before work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -359,14 +356,15 @@ public class SessionRunner implements Runnable {
             }
         }
     }
+
     private void scheduleTaskAfterWork(SessionWrapper session) {
         for (TaskWrapper task : session.getTaskList()) {
             TaskPlugin pl = TaskPlugin.getTaskPlugin(task.getTaskPluginType());
             TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
             if (pl != null) {
-                if (taskConfiguration.getAfterWorkScriptId()!= null || (pl.getTaskAfterWorkJsContent() != null)) {
+                if (taskConfiguration.getAfterWorkScriptId() != null || (pl.getTaskAfterWorkJsContent() != null)) {
                     TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
-                    _log.debug("Added task after work: " + task.getId() + " - " + csr+ " - # of completed tasks: " + task.getCompletedTasks().size() );
+                    _log.debug("Added task after work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -379,7 +377,6 @@ public class SessionRunner implements Runnable {
             }
         }
     }
-
 
 
     private void checkAndScheduleChatScripts(SessionWrapper session) {
@@ -551,7 +548,7 @@ public class SessionRunner implements Runnable {
 
             for (TeamHasSubject ths : teamHasSubjectDao.listByTeamId(t.getId())) {
                 Subject s = checkedInWaitingSubjectListById.get(ths.getSubjectId());
-                if(s == null){
+                if (s == null) {
                     s = subjectDao.get(ths.getSubjectId());
                 }
                 teamWrapper.getSubjects().add(s);
@@ -566,17 +563,18 @@ public class SessionRunner implements Runnable {
 
         assignColorsToTeamMembers(round.getRoundTeams());
 
-        if(session.getDisplayNameGenerationEnabled() && session.getDisplayNameGenerationType()!=null){
-            assignDisplayNamesToTeamMembers(round.getRoundTeams(),session.getDisplayNameGenerationType().charAt(0));
+        if (session.getDisplayNameGenerationEnabled() && session.getDisplayNameGenerationType() != null) {
+            assignDisplayNamesToTeamMembers(round.getRoundTeams(), session.getDisplayNameGenerationType().charAt(0));
         }
     }
+
     private void assignDisplayNamesToTeamMembers(List<TeamWrapper> roundTeams, char generationType) {
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
-            String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size(),generationType);
-            for(int i = 0; i <subjectList.size(); i++){
+            String[] displayNames = StringUtils.getUniqueNamesOfSize(subjectList.size(), generationType);
+            for (int i = 0; i < subjectList.size(); i++) {
                 Subject su = subjectList.get(i);
-                if(displayNames.length>i) {
+                if (displayNames.length > i) {
                     su.setSubjectDisplayName(displayNames[i]);
                     subjectDao.update(su);
                 }
@@ -584,6 +582,7 @@ public class SessionRunner implements Runnable {
         }
 
     }
+
     private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
 
         for (TeamWrapper tw : roundTeams) {
@@ -668,9 +667,9 @@ public class SessionRunner implements Runnable {
             team.setTaskId(task.getId());
         }
         team = teamDao.create(team);
-        if(session.getRobotSessionEventSourceId()!=null) {
+        if (session.getRobotSessionEventSourceId() != null) {
             List<Subject> robotsList = subjectDao.listBySessionId(session.getRobotSessionEventSourceId());
-            for(Subject su : robotsList){
+            for (Subject su : robotsList) {
                 Subject robotClone = new Subject();
                 robotClone.setSubjectDisplayName(su.getSubjectDisplayName());
                 robotClone.setSubjectExternalId(su.getSubjectExternalId());//CONFLICT?
@@ -732,12 +731,18 @@ public class SessionRunner implements Runnable {
     }
 
     public void subjectCheckIn(Subject subject) {
-        synchronized (checkedInWaitingSubjectList) {
-            checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
-            checkedInWaitingSubjectListById.put(subject.getId(), subject);
-
-            if(this.session.isSessionPerpetual()){
+        if (this.session.isSessionPerpetual()) {
+            synchronized (checkedInWaitingSubjectListById) {
+                checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
+                checkedInWaitingSubjectListById.put(subject.getId(), subject);
                 subjectHasSessionCheckInService.checkSubjectIn(subject, session);
+            }
+        } else {
+
+            synchronized (checkedInWaitingSubjectList) {
+                checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
+                checkedInWaitingSubjectListById.put(subject.getId(), subject);
+
             }
         }
 
@@ -790,7 +795,7 @@ public class SessionRunner implements Runnable {
     @Override
     public void run() {
         if (session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())
-        || session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString())) {
+                || session.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString())) {
             runPerpetual();
         } else {
             init();
@@ -803,10 +808,14 @@ public class SessionRunner implements Runnable {
         ScriptEngine engine = manager.getEngineByName("JavaScript");
         String[] subjectsToJoinSession = null;
         ExecutableScript es = executableScriptDao.get(scriptId);
-        if(es!=null) {
+        if (es != null) {
             // Set JavaScript variables
-            JSONArray subjctJsonArray =teamService.getTeamatesJSONObject(subjects);
-            System.out.println("Subjects checked by the script: " + subjctJsonArray.toString());
+            JSONArray subjctJsonArray = teamService.getTeamatesJSONObject(subjects);
+            System.out.print("Subjects checked by the script: [");
+            for (Subject su : subjects) {
+                System.out.print("" + su.getSubjectExternalId() + ", ");
+            }
+            System.out.println("]");
             engine.put("subjects", subjctJsonArray.toString());
 
             Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(
@@ -818,10 +827,10 @@ public class SessionRunner implements Runnable {
                 String subjectsFromScript = (String) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("subjectsToJoinSession");
                 Boolean shouldStart = new Boolean(((Boolean) engine.getBindings(ScriptContext.ENGINE_SCOPE).get("shouldStart")));
 
-                if (subjectsFromScript != null && shouldStart != null ) {
+                if (subjectsFromScript != null && shouldStart != null) {
                     org.json.JSONArray array = new org.json.JSONArray(subjectsFromScript);
                     subjectsToJoinSession = new String[array.length()];
-                    for(int i =0; i< array.length(); i++){
+                    for (int i = 0; i < array.length(); i++) {
                         subjectsToJoinSession[i] = array.getString(i);
                     }
 
@@ -839,30 +848,26 @@ public class SessionRunner implements Runnable {
     public void runPerpetual() {
         shouldRun = true;
         threadShouldStop = false;
+
         checkedInWaitingSubjectList = new HashMap<>();
         checkedInWaitingSubjectListById = new HashMap<>();
+
         sessionsRelatedToPerpetual = new HashMap<>();
         try {
             while (shouldRun) {
 
 
-                if(checkedInWaitingSubjectListById.size() == 0){
-                    Thread.sleep(10*1000);
-                } else {
-                    Thread.sleep(5*1000);
+                if (checkedInWaitingSubjectListById.size() == 0) {
+                    Thread.sleep(10 * 1000);
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
+                    sanitizeCheckInList();
+
                     if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
-                        subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
-                        for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
-                            if (subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
-                                checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
-                                continue;
-                            }
-                        }
+
                         if ((subjectCheckInList.size() >= session.getPerpetualSubjectsNumber())) {
 
-                            synchronized (checkedInWaitingSubjectList) {
+                            synchronized (checkedInWaitingSubjectListById) {
                                 Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
                                 List<Subject> subjectsInNewSession = new ArrayList<>();
 
@@ -883,11 +888,11 @@ public class SessionRunner implements Runnable {
 //                                            su.setSubjectDisplayName(externalId);
 //                                            su = subjectDao.create(su);
 //                                        } else {
-                                            su.setSessionId(newSpawnedSession.getId());
-                                            subjectDao.update(su);
-                                            checkedInWaitingSubjectListById.remove(su.getId());
-                                            shscI.setJoinedSessionId(newSpawnedSession.getId());
-                                            subjectHasSessionCheckInService.subjectJoinedSession(shscI);
+                                        su.setSessionId(newSpawnedSession.getId());
+                                        subjectDao.update(su);
+                                        checkedInWaitingSubjectListById.remove(su.getId());
+                                        shscI.setJoinedSessionId(newSpawnedSession.getId());
+                                        subjectHasSessionCheckInService.subjectJoinedSession(shscI);
                                         //}
 
                                         subjectsInNewSession.add(su);
@@ -904,16 +909,7 @@ public class SessionRunner implements Runnable {
                     } else {
 
                         if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.CONDITION_SCRIPT.getId().toString())) {
-                            subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
 
-                            for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
-
-                                if (subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
-                                    checkedInWaitingSubjectListById.remove(shscI.getSubjectId());
-
-                                }
-
-                            }
                             List<Subject> checkedInSubjects = checkedInWaitingSubjectListById.values().stream().collect(Collectors.toList());
 
                             String[] subjectsToJoin = shouldSessionStartByConditionScript(session.getExecutableScriptId(), checkedInSubjects);
@@ -923,33 +919,36 @@ public class SessionRunner implements Runnable {
                                 }
                             }
                             if (subjectsToJoin != null && subjectsToJoin.length > 0) {
-                                synchronized (checkedInWaitingSubjectList) {
+                                synchronized (checkedInWaitingSubjectListById) {
                                     Session newSpawnedSession = this.sessionService.clonePerpetualSession(session);
                                     List<Subject> subjectsInNewSession = new ArrayList<>();
-
-
+                                    subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
 
                                     for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
                                         Subject suToTest = checkedInWaitingSubjectListById.get(shscI.getSubjectId());
+                                        if(suToTest!=null) {
+                                            String externalId = suToTest.getSubjectExternalId();
+                                            if (suToTest != null) {
+                                                for (String chosenExternalId : subjectsToJoin) {
+                                                    if (chosenExternalId.equals(externalId)) {
+                                                        Subject su = checkedInWaitingSubjectList.get(externalId);
+                                                        if (su != null) {
+                                                            su.setSessionId(newSpawnedSession.getId());
+                                                            subjectDao.update(su);
+                                                            subjectsInNewSession.add(su);
 
-                                        String externalId = suToTest.getSubjectExternalId();
-                                        for (String chosenExternalId : subjectsToJoin) {
-                                            if (chosenExternalId.equals(externalId)) {
-                                                Subject su = checkedInWaitingSubjectList.get(externalId);
-                                                if (su != null) {
-                                                    su.setSessionId(newSpawnedSession.getId());
-                                                    subjectDao.update(su);
-                                                    subjectsInNewSession.add(su);
+                                                            checkedInWaitingSubjectListById.remove(su.getId());
+                                                            shscI.setJoinedSessionId(newSpawnedSession.getId());
+                                                            subjectHasSessionCheckInService.subjectJoinedSession(shscI);
 
-                                                    checkedInWaitingSubjectListById.remove(su.getId());
-                                                    shscI.setJoinedSessionId(newSpawnedSession.getId());
-                                                    subjectHasSessionCheckInService.subjectJoinedSession(shscI);
-
-                                                    continue;
+                                                            continue;
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+
                                     sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
 
                                     subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
@@ -985,8 +984,29 @@ public class SessionRunner implements Runnable {
                     sessionsRelatedToPerpetual.remove(sess);
                 }
             }
-        }catch (InterruptedException ie){
+        } catch (InterruptedException ie) {
 
+        }
+    }
+
+    private void sanitizeCheckInList() {
+        subjectCheckInList = subjectHasSessionCheckInService.listReadyToJoinSubjects(session.getId());
+        Map<Long, Long> subjectInCheckInList = new HashMap<>();
+        for (SubjectHasSessionCheckIn shscI : subjectCheckInList) {
+            if (!subjectHasSessionCheckInService.hasSubjectExpiredOrNotPingedRecently(shscI)) {
+                subjectInCheckInList.put(shscI.getSubjectId(), shscI.getSessionId());
+            }
+        }
+        List<Long> subjectsThatPingedOut = new ArrayList<>();
+        for (Subject su : checkedInWaitingSubjectListById.values()) {
+            if (subjectInCheckInList.get(su.getId()) == null) {
+                subjectsThatPingedOut.add(su.getId());
+            }
+        }
+        for(Long removeSu: subjectsThatPingedOut){
+            synchronized (checkedInWaitingSubjectListById) {
+                checkedInWaitingSubjectListById.remove(removeSu);
+            }
         }
     }
 

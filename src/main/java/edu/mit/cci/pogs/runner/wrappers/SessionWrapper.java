@@ -98,7 +98,7 @@ public class SessionWrapper extends Session {
 
         if (isSessionPerpetual()) {
 
-            return (new Date().getTime() + 1000 * 60 * 5);
+            return (new Date().getTime() + (1000 * (this.getWaitingRoomTime()+10)));
         }
         if (this.sessionSchedule == null) {
             return getTimeToStart();

@@ -27,6 +27,11 @@ public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageConten
     }
 
     @JsonIgnore
+    public Boolean getShouldUpdateExistingAttribute() {
+        return content.getShouldUpdateExistingAttribute();
+    }
+
+    @JsonIgnore
     public Boolean getMustCreateNewAttribute() {
         return content.getMustCreateNewAttribute();
     }
@@ -60,6 +65,8 @@ public class TaskAttributeMessage extends PogsMessage<TaskAttributeMessageConten
     public String getSummaryDescription(){
         return content.getSummaryDescription();
     }
+
+
 
 
     public JSONObject toJSON() {return content.toJSON();}

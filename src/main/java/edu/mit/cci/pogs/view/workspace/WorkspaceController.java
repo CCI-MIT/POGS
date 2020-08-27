@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -133,63 +134,46 @@ public class WorkspaceController {
     private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
 
 
-
     private static final Logger _log = LoggerFactory.getLogger(WorkspaceController.class);
 
     @GetMapping("/sessions/{sessionId}")
     public String landingPageLogin(@PathVariable("sessionId") String sessionId,
                                    @RequestParam(name = "externalId", required = false) String externalId,
+
                                    @RequestParam(name = "workerId", required = false) String workerId,
                                    @RequestParam(name = "assignmentId", required = false) String assignmentId,
                                    @RequestParam(name = "hitId", required = false) String hitId,
+                                   @RequestParam(name = "PROLIFIC_PID", required = false) String PROLIFIC_PID,
+                                   @RequestParam(name = "STUDY_ID", required = false) String STUDY_ID,
+                                   @RequestParam(name = "SESSION_ID", required = false) String SESSION_ID,
                                    Model model,
                                    HttpServletRequest request,
                                    HttpServletResponse response) {
 
-        Date beforeParse = new Date();
+        Session session = sessionService.getSessionByFullName(sessionId);
+
+        if (!isCurrentPerpetualSessionValid(model, session)) {
+            return "workspace/error";
+        }
+
         String userAgent = request.getHeader("User-Agent");
         String referrer = request.getHeader("referer");
+
         boolean isPogsRef = false;
-        if(referrer!=null ){
+        if (referrer != null) {
             isPogsRef = (referrer.contains("https://pogs.info") || referrer.contains("http://localhost"));
         }
-        model.addAttribute("isPogsReferrer",isPogsRef);
+        model.addAttribute("isPogsReferrer", isPogsRef);
 
-        if(userAgent.contains("Firefox") || userAgent.contains("MSIE")){
+        if (userAgent.contains("Firefox") || userAgent.contains("MSIE")) {
 
-            model.addAttribute("browser", (userAgent.contains("MSIE")?("Internet Explorer"):("Firefox")));
+            model.addAttribute("browser", (userAgent.contains("MSIE") ? ("Internet Explorer") : ("Firefox")));
             return "workspace/unsupported";
         }
 
-        /*
-        try {
-
-            final UserAgentParser parser =
-                    new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
-                            BrowsCapField.BROWSER_MAJOR_VERSION,
-                            BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
-                            BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
-                            BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
-
-            final Capabilities capabilities = parser.parse(userAgent);
-
-            // the default fields have getters
-            final String browser = capabilities.getBrowser();
-            final String deviceType = capabilities.getDeviceType();
-
-            System.out.println("Browser:" + browser + " - " + deviceType);
-            if(browser.equals("Firefox") || browser.equals("IE")){
-                model.addAttribute("browser", browser);
-                return "workspace/unsupported";
-            }
-
-
-        }catch (IOException  |ParseException o){
-            o.printStackTrace();
-        }
-         */
-
         model.addAttribute("action", "/sessions/start/" + sessionId);
+
+
         if (workerId != null) {
             model.addAttribute("workerId", workerId);
         }
@@ -202,16 +186,18 @@ public class WorkspaceController {
         model.addAttribute("externalId", externalId);
 
         boolean alreadyHasCookie = false;
+        String cookieName = "unique_pogs_id_" + session.getId();
         if (request.getCookies() != null && request.getCookies().length > 0) {
             for (Cookie co : request.getCookies()) {
-                if (co.getName().equals("unique_pogs_id")) {
+                if (co.getName().equals(cookieName)) {
                     alreadyHasCookie = true;
                     break;
                 }
             }
         }
         if (!alreadyHasCookie) {
-            Cookie co = new Cookie("unique_pogs_id", UUID.randomUUID().toString());
+            Cookie co = new Cookie(cookieName, UUID.randomUUID().toString());
+            co.setMaxAge(session.getWaitingRoomTime());
             response.addCookie(co);
         }
 
@@ -222,31 +208,23 @@ public class WorkspaceController {
     public String landingPageLoginPost(@PathVariable("sessionId") String sessionId,
                                        @RequestParam(name = "externalId", required = false) String externalId,
 
-                                       @RequestParam(name = "workerId", required = false) String workerId,
-                                       @RequestParam(name = "assignmentId", required = false) String assignmentId,
-                                       @RequestParam(name = "hitId", required = false) String hitId,
+
                                        HttpServletRequest request,
                                        Model model) {
 
         Session session = sessionService.getSessionByFullName(sessionId);
-        if (session == null) {
-            model.addAttribute("errorMessage", "This session url was not recognized.");
+
+        if (!isCurrentPerpetualSessionValid(model, session)) {
             return "workspace/error";
         }
 
-
-        Long now = DateUtils.now();
-        if (session.getPerpetualStartDate().getTime() > now ||
-                session.getPerpetualEndDate().getTime() < now) {
-            model.addAttribute("errorMessage", "Too late, this session expired.");
-            return "workspace/error";
-        }
 
         boolean alreadyHasCookie = false;
         String cookieHash = null;
+        String cookieName = "unique_pogs_id_" + session.getId();
         if (request.getCookies() != null && request.getCookies().length > 0) {
             for (Cookie co : request.getCookies()) {
-                if (co.getName().equals("unique_pogs_id")) {
+                if (co.getName().equals(cookieName)) {
                     alreadyHasCookie = true;
                     cookieHash = co.getValue();
                 }
@@ -275,155 +253,21 @@ public class WorkspaceController {
             }
         }
 
-
-
-        UUID uuid = UUID.randomUUID();
-        String newSubjectExtId = session.getFullSessionName() + "_" +uuid.toString();
+        String newSubjectExtId = session.getFullSessionName() + "_" + UUID.randomUUID().toString();
         su.setSubjectExternalId(newSubjectExtId);
         su.setSubjectDisplayName(newSubjectExtId);
         su.setSessionId(session.getId());
 
+        if (cookieHash != null) {
+            su.setPogsUniqueHash(cookieHash);
+        }
         su = subjectService.createSubjectSafeExternalId(su);
 
-        String userAgent = request.getHeader("User-Agent");
+        createSubjectAttributeFromUserAgent(request, su);
 
-        SubjectAttribute saa = new SubjectAttribute();
-        saa.setSubjectId(su.getId());
-        saa.setAttributeName("userAgent");
-        saa.setStringValue(userAgent);
-        saa.setInternalAttribute(true);
-        saa.setLatest(true);
-        subjectAttributeDao.create(saa);
+        createSubjectAttributesFromParameters(su, request);
 
-        /*
-
-        try {
-            final UserAgentParser parser =
-                    new UserAgentService().loadParser(Arrays.asList(BrowsCapField.BROWSER, BrowsCapField.BROWSER_TYPE,
-                            BrowsCapField.BROWSER_MAJOR_VERSION,
-                            BrowsCapField.DEVICE_TYPE, BrowsCapField.PLATFORM, BrowsCapField.PLATFORM_VERSION,
-                            BrowsCapField.RENDERING_ENGINE_VERSION, BrowsCapField.RENDERING_ENGINE_NAME,
-                            BrowsCapField.PLATFORM_MAKER, BrowsCapField.RENDERING_ENGINE_MAKER));
-
-
-            final Capabilities capabilities = parser.parse(userAgent);
-
-            // the default fields have getters
-            final String browser = capabilities.getBrowser();
-            final String browserVersion = capabilities.getBrowserMajorVersion();
-            final String deviceType = capabilities.getDeviceType();
-            final String platform = capabilities.getPlatform();
-            final String platformVersion = capabilities.getPlatformVersion();
-            
-
-            SubjectAttribute subjectAttribute = new SubjectAttribute();
-            subjectAttribute.setSubjectId(su.getId());
-            subjectAttribute.setAttributeName("browser");
-            subjectAttribute.setStringValue(browser);
-            subjectAttribute.setInternalAttribute(true);
-            subjectAttribute.setLatest(true);
-            subjectAttributeDao.create(subjectAttribute);
-
-            subjectAttribute = new SubjectAttribute();
-            subjectAttribute.setSubjectId(su.getId());
-            subjectAttribute.setAttributeName("browserVersion");
-            subjectAttribute.setStringValue(browserVersion);
-            subjectAttribute.setInternalAttribute(true);
-            subjectAttribute.setLatest(true);
-            subjectAttributeDao.create(subjectAttribute);
-
-            subjectAttribute = new SubjectAttribute();
-            subjectAttribute.setSubjectId(su.getId());
-            subjectAttribute.setAttributeName("deviceType");
-            subjectAttribute.setStringValue(deviceType);
-            subjectAttribute.setInternalAttribute(true);
-            subjectAttribute.setLatest(true);
-            subjectAttributeDao.create(subjectAttribute);
-
-            subjectAttribute = new SubjectAttribute();
-            subjectAttribute.setSubjectId(su.getId());
-            subjectAttribute.setAttributeName("platform");
-            subjectAttribute.setStringValue(platform);
-            subjectAttribute.setInternalAttribute(true);
-            subjectAttribute.setLatest(true);
-            subjectAttributeDao.create(subjectAttribute);
-
-            subjectAttribute = new SubjectAttribute();
-            subjectAttribute.setSubjectId(su.getId());
-            subjectAttribute.setAttributeName("platformVersion");
-            subjectAttribute.setStringValue(platformVersion);
-            subjectAttribute.setInternalAttribute(true);
-            subjectAttribute.setLatest(true);
-            subjectAttributeDao.create(subjectAttribute);
-
-
-        }catch (IOException  |ParseException o){
-            o.printStackTrace();
-        }
-
-         */
-
-        if ((workerId != null && !workerId.isEmpty()) ||
-                (assignmentId != null && !assignmentId.isEmpty()) ||
-                (hitId != null && !hitId.isEmpty())) {
-            List<SubjectAttribute> allSubAttr2 = new ArrayList<>();
-            if (workerId != null && !workerId.isEmpty()) {
-                SubjectAttribute sa = new SubjectAttribute();
-                sa.setInternalAttribute(true);
-                sa.setAttributeName("workerId");
-                sa.setStringValue(workerId);
-                sa.setLatest(true);
-                allSubAttr2.add(sa);
-            }
-            if (assignmentId != null && !assignmentId.isEmpty()) {
-                SubjectAttribute sa = new SubjectAttribute();
-                sa.setInternalAttribute(true);
-                sa.setAttributeName("assignmentId");
-                sa.setStringValue(assignmentId);
-                sa.setLatest(true);
-                allSubAttr2.add(sa);
-            }
-            if (hitId != null && !hitId.isEmpty()) {
-                SubjectAttribute sa = new SubjectAttribute();
-                sa.setInternalAttribute(true);
-                sa.setAttributeName("hitId");
-                sa.setStringValue(hitId);
-                sa.setLatest(true);
-                allSubAttr2.add(sa);
-            }
-            for (SubjectAttribute sa : allSubAttr2) {
-                SubjectAttribute subjectAttribute = new SubjectAttribute();
-                subjectAttribute.setSubjectId(su.getId());
-                subjectAttribute.setAttributeName(sa.getAttributeName());
-                subjectAttribute.setStringValue(sa.getStringValue());
-                subjectAttribute.setIntegerValue(sa.getIntegerValue());
-                subjectAttribute.setRealValue(sa.getRealValue());
-                subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
-                subjectAttribute.setLatest(true);
-                subjectAttributeDao.create(subjectAttribute);
-            }
-        }
-
-        if (allSubAttr != null) {
-            for (SubjectAttribute sa : allSubAttr) {
-
-                if ((sa.getAttributeName().equals("workerId") ||
-                        sa.getAttributeName().equals("hitId")||
-                        sa.getAttributeName().equals("assignmentId"))
-                    ||!(sa.getInternalAttribute())) {
-
-                    SubjectAttribute subjectAttribute = new SubjectAttribute();
-                    subjectAttribute.setSubjectId(su.getId());
-                    subjectAttribute.setAttributeName(sa.getAttributeName());
-                    subjectAttribute.setStringValue(sa.getStringValue());
-                    subjectAttribute.setIntegerValue(sa.getIntegerValue());
-                    subjectAttribute.setRealValue(sa.getRealValue());
-                    subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
-                    subjectAttribute.setLatest(true);
-                    subjectAttributeDao.create(subjectAttribute);
-                }
-            }
-        }
+        retroactivelyCopySubjectAttributes(su, allSubAttr);
         //Check in user in session runner for perpetual session.
         SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
         if (sr != null) {
@@ -440,11 +284,94 @@ public class WorkspaceController {
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/pre_check_in");
     }
 
+    private void createSubjectAttributeFromUserAgent(HttpServletRequest request, Subject su) {
+        String userAgent = request.getHeader("User-Agent");
+
+        SubjectAttribute saa = new SubjectAttribute();
+        saa.setSubjectId(su.getId());
+        saa.setAttributeName("userAgent");
+        saa.setStringValue(userAgent);
+        saa.setInternalAttribute(true);
+        saa.setLatest(true);
+        subjectAttributeDao.create(saa);
+    }
+
+    private void retroactivelyCopySubjectAttributes(Subject su, List<SubjectAttribute> allSubAttr) {
+        String[] parametersAllowed = {"workerId", "hitId", "assignmentId", "PROLIFIC_PID", "STUDY_ID", "SESSION_ID"};
+
+        if (allSubAttr != null) {
+            for (SubjectAttribute sa : allSubAttr) {
+
+                for (String param : parametersAllowed) {
+                    if ((sa.getAttributeName().equals(param)
+                            || !(sa.getInternalAttribute()))) {
+                        SubjectAttribute subjectAttribute = new SubjectAttribute();
+                        subjectAttribute.setSubjectId(su.getId());
+                        subjectAttribute.setAttributeName(sa.getAttributeName());
+                        subjectAttribute.setStringValue(sa.getStringValue());
+                        subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                        subjectAttribute.setRealValue(sa.getRealValue());
+                        subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
+                        subjectAttribute.setLatest(true);
+                        subjectAttributeDao.create(subjectAttribute);
+                    }
+                }
+            }
+        }
+    }
+
+    private void createSubjectAttributesFromParameters(Subject su, HttpServletRequest request) {
+
+        Enumeration<String> parameternames = request.getParameterNames();
+
+        List<SubjectAttribute> allSubAttr2 = new ArrayList<>();
+        while (parameternames.hasMoreElements()) {
+            String parameterName = parameternames.nextElement();
+            SubjectAttribute sa = new SubjectAttribute();
+            sa.setInternalAttribute(true);
+            sa.setAttributeName(parameterName);
+            sa.setStringValue(request.getParameter(parameterName));
+            sa.setLatest(true);
+            allSubAttr2.add(sa);
+        }
+
+        for (SubjectAttribute sa : allSubAttr2) {
+            SubjectAttribute subjectAttribute = new SubjectAttribute();
+            subjectAttribute.setSubjectId(su.getId());
+            subjectAttribute.setAttributeName(sa.getAttributeName());
+            subjectAttribute.setStringValue(sa.getStringValue());
+            subjectAttribute.setIntegerValue(sa.getIntegerValue());
+            subjectAttribute.setRealValue(sa.getRealValue());
+            subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
+            subjectAttribute.setLatest(true);
+            subjectAttributeDao.create(subjectAttribute);
+        }
+
+    }
+
+
+    private boolean isCurrentPerpetualSessionValid(Model model, Session session) {
+        if (session == null) {
+            model.addAttribute("errorMessage", "This session url was not recognized.");
+            return false;
+        }
+
+
+        Long now = DateUtils.now();
+        if (session.getPerpetualStartDate().getTime() > now ||
+                session.getPerpetualEndDate().getTime() < now) {
+            model.addAttribute("errorMessage", "Too late, this session expired.");
+            return false;
+        }
+        return true;
+    }
+
     @RequestMapping(value = "/expired", method = {RequestMethod.GET, RequestMethod.POST})
-    public String expired(@RequestParam("externalId") String externalId, Model model) {
+    public String expired(@RequestParam("externalId") String externalId, Model model,HttpServletRequest request,HttpServletResponse response) {
         Subject su;
         su = workspaceService.getSubject(externalId);
 
+        eraseCookies(request,response);
         return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/expired");
     }
 
@@ -518,7 +445,7 @@ public class WorkspaceController {
                 model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
                 String url = sr.getSession().getNextUrl();
 
-                if(url.contains("qualtrix")){
+                if (url.contains("qualtrix")) {
                     //add parameters
                     String workerId = "";
                     String assignmentId = "";
@@ -537,10 +464,10 @@ public class WorkspaceController {
                             hitId = sa.getStringValue();
                         }
                     }
-                    if(url.contains("?")){
-                        url = url + "&workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                    if (url.contains("?")) {
+                        url = url + "&workerId=" + workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
                     } else {
-                        url = url + "?workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
+                        url = url + "?workerId=" + workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId + "&pogsExternalId=" + su.getSubjectExternalId();
                     }
                 }
                 model.addAttribute("nextUrl", url);

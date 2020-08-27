@@ -30,4 +30,22 @@ public class SessionLogService {
         sessionLogDao.create(sl);
 
     }
+    // session starting
+    // schedule creation
+    // (client) page load
+    // (script started)
+    // (script ended)
+    public void createLogFromSystem(String externalUserId, String action, Long sessionId, String url){
+        SessionLog sl = new SessionLog();
+        sl.setLogTime(new Timestamp(new Date().getTime()));
+        sl.setLogType("SubjectLoaded");
+        sl.setSessionId(sessionId);
+        JSONObject jo = new JSONObject();
+        jo.put("subjectExternalId", externalUserId);
+        jo.put("action",action);
+        jo.put("url", url);
+        sl.setMessage(jo.toString());
+        sessionLogDao.create(sl);
+
+    }
 }

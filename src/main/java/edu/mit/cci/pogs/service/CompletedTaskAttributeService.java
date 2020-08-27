@@ -23,7 +23,7 @@ public class CompletedTaskAttributeService {
     private SubjectDao subjectDao;
 
     public void createOrUpdate(String attributeName, String stringValue, Double doubleValue,
-                               Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute, Long author) {
+                               Long integerValue, Long completedTaskId,String extraData, boolean mustCreateNewAttribute, Long author, boolean shouldUpdateExistingAttribute) {
 
         CompletedTaskAttribute cta;
         if(mustCreateNewAttribute){
@@ -52,7 +52,9 @@ public class CompletedTaskAttributeService {
         if(cta.getId() == null ) {
             completedTaskAttributeDao.create(cta);
         } else{
-            completedTaskAttributeDao.update(cta);
+            if(shouldUpdateExistingAttribute) {
+                completedTaskAttributeDao.update(cta);
+            }
         }
 
 
@@ -99,7 +101,11 @@ public class CompletedTaskAttributeService {
                     tea.setAttributeName(jo.getString("attributeName"));
                     tea.setCompletedTaskId(completedTaskId);
                     if (jo.has("stringValue")) {
-                        tea.setStringValue(jo.getString("stringValue"));
+                        if(!jo.isNull("stringValue")) {
+                            tea.setStringValue(jo.getString("stringValue"));
+                        } else {
+                            tea.setStringValue("");
+                        }
                     }
                     if (jo.has("integerValue")) {
                         tea.setIntegerValue(jo.getLong("integerValue"));

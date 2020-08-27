@@ -171,7 +171,7 @@ class GroupChatManager {
 
             $("#friend-list").append(
             '                           <li class="list-group-item p-1 hover-bg-lightgray '+this.subjectsInChannel[i].externalId+'_popover" data-toggle="popover">\n'
-            + '                            <span class="badge '+ this.subjectsInChannel[i].externalId+'_color username">'+trim(this.subjectsInChannel[i].displayName)+'</span>\n'
+            + '                            <span class="badge '+ this.subjectsInChannel[i].externalId+'_color username">'+trimDisplayName(this.subjectsInChannel[i].displayName)+'</span>\n'
             + '                        </li>\n');
             //handle onclick to change CHAT channel
 
@@ -281,7 +281,7 @@ class GroupChatManager {
      return '<div class="row justify-content-end" >'
             +'<div class="card message-card m-1 '+this.communicationPluginReference.getSubjectId()+'_color ">'
                + '<div class="card-body p-1">'
-                    +((hideAuthor)?(''):('<span class="float-left mx-1"><b>'+trim(creator)+'</b></span>'))
+                    +((hideAuthor)?(''):('<span class="float-left mx-1"><b>'+trimDisplayName(creator)+'</b></span>'))
                     +'<span class="mx-2">'+message+'</span>'
                     +'<span class="float-right mx-1 chat_time"><small style="font-size: 10px">'+minuteAndSecond(timeStamp)+'</small></span>'
                 +'</div>'
@@ -306,7 +306,7 @@ class GroupChatManager {
         return '<div class="row ">\n'
                + '                            <div class="card message-card bg-lightblue m-1 '+externalId+'_color">\n'
                + '                                <div class="card-body p-1">\n'
-               + ((hideAuthor)?(''):('                                    <span class="float-left mx-1 "><b>'+trim(creator)+'</b></span>\n'))
+               + ((hideAuthor)?(''):('                                    <span class="float-left mx-1 "><b>'+trimDisplayName(creator)+'</b></span>\n'))
                + '                                    <span class="mx-2">'+message+'</span>\n'
                + '                                    <span class="float-right mx-1 chat_time"><small style="font-size: 10px">'+minuteAndSecond(timestamp)+'</span>\n'
                + '                                </div>\n'
@@ -715,11 +715,7 @@ class DyadicChatManager extends GroupChatManager {
 
 }
 
-const MAXLENGH = 10;
 
-function trim(str){
-    return str.substring(0, MAXLENGH);
-}
 
 function minuteAndSecond(timestamp){
     function trailingZeros(val) {

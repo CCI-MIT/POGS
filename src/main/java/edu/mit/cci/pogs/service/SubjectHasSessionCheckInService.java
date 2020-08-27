@@ -24,6 +24,8 @@ public class SubjectHasSessionCheckInService {
     @Autowired
     private SubjectDao subjectDao;
 
+    static final Integer ACCEPTABLETIMETHRESHOLD = 20*1000;
+
     public void checkSubjectIn(Subject su, Session session) {
         SubjectHasSessionCheckIn shsc = subjectHasSessionCheckInDao.getBySubjectIdSessionId(su.getId(), session.getId());
         if (shsc == null) {
@@ -63,15 +65,15 @@ public class SubjectHasSessionCheckInService {
 
     public boolean hasSubjectExpiredOrNotPingedRecently(SubjectHasSessionCheckIn subjectHasSessionCheckIn){
         Long now = DateUtils.now();
-        if(subjectHasSessionCheckIn.getShouldExpireTime().getTime() < now){
+
+        if(subjectHasSessionCheckIn.getShouldExpireTime().getTime() < now ||
+                !(subjectHasSessionCheckIn.getLastPingTime().getTime() > (now - ACCEPTABLETIMETHRESHOLD))
+        ){
             subjectHasSessionCheckIn.setLostSubjectTime(new Timestamp(now));
             subjectHasSessionCheckIn.setHasLostSession(true);
             subjectHasSessionCheckInDao.update(subjectHasSessionCheckIn);
             return true;
         }
-//        if(subjectHasSessionCheckIn.getLastPingTime().getTime() < now - ACCEPTABLETIMETHRESHOLD){
-//          return true;
-//        }
 
         return false;
     }

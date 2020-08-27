@@ -11,6 +11,7 @@ public class TaskAttributeMessageContent {
     private Boolean loggableAttribute;
     private Boolean mustCreateNewAttribute;
     private Boolean broadcastableAttribute;
+    private Boolean shouldUpdateExistingAttribute;
     private String summaryDescription;
 
     public TaskAttributeMessageContent() {
@@ -95,6 +96,14 @@ public class TaskAttributeMessageContent {
         this.extraData = extraData;
     }
 
+    public Boolean getShouldUpdateExistingAttribute() {
+        return shouldUpdateExistingAttribute;
+    }
+
+    public void setShouldUpdateExistingAttribute(Boolean shouldUpdateExistingAttribute) {
+        this.shouldUpdateExistingAttribute = shouldUpdateExistingAttribute;
+    }
+
     public JSONObject toJSON(){
         JSONObject jo = new JSONObject();
         jo.put("attributeName",attributeName);
@@ -103,6 +112,7 @@ public class TaskAttributeMessageContent {
         jo.put("attributeIntegerValue",attributeIntegerValue);
         jo.put("loggableAttribute",loggableAttribute);
         jo.put("summaryDescription",summaryDescription);
+        jo.put("shouldUpdateExistingAttribute", shouldUpdateExistingAttribute);
         return jo;
     }
 }

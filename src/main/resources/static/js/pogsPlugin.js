@@ -116,6 +116,7 @@ class PogsPlugin {
             loggableAttribute: ((this.pogsRef.recordSessionSaveEphemeralEvents)?(true):(loggable)),
             mustCreateNewAttribute: true,
             broadcastableAttribute: true,
+            shouldUpdateExistingAttribute: true,
             summaryDescription: summaryDescription,
             extraData: extraData
         };
@@ -134,6 +135,27 @@ class PogsPlugin {
             loggableAttribute: ((this.pogsRef.recordSessionSaveEphemeralEvents)?(true):(loggable)),
             mustCreateNewAttribute: false,
             broadcastableAttribute: true,
+            shouldUpdateExistingAttribute: true,
+            summaryDescription: summaryDescription,
+            extraData: extraData
+        };
+
+        this.pogsRef.sendMessage("/pogsapp/task.saveAttribute", "TASK_ATTRIBUTE", messageContent,
+                                 this.getSubjectId(), null, this.getCompletedTaskId(),
+                                 this.getSessionId());
+    }
+
+    saveCompletedTaskAttributeWithoutOverride(attributeName, stringValue, floatValue, intValue,
+                               loggable, extraData,summaryDescription) {
+        var messageContent = {
+            attributeName: attributeName,
+            attributeStringValue: stringValue,
+            attributeDoubleValue: floatValue,
+            attributeIntegerValue: intValue,
+            loggableAttribute: ((this.pogsRef.recordSessionSaveEphemeralEvents)?(true):(loggable)),
+            mustCreateNewAttribute: false,
+            broadcastableAttribute: true,
+            shouldUpdateExistingAttribute: false,
             summaryDescription: summaryDescription,
             extraData: extraData
         };
@@ -238,4 +260,9 @@ class PogsPlugin {
     }
 }
 
+const MAXLENGH = 10;
+
+function trimDisplayName(str){
+    return str.substring(0, MAXLENGH);
+}
 

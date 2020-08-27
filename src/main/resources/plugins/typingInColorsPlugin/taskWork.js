@@ -184,7 +184,7 @@ class EtherpadWithColors {
 
     }
     sendAssignedColorToSelf(colorIndex){
-        this._pogsPlugin.saveCompletedTaskAttribute('subjectAssignedToColor_'+colorIndex,
+        this._pogsPlugin.saveCompletedTaskAttributeWithoutOverride('subjectAssignedToColor_'+colorIndex,
                                                     this._pogsPlugin.getSubjectId(), 0.0,
                                                     colorIndex, true, colorIndex, 'Subject selected color: ' + this.availableColors[colorIndex]);
     }

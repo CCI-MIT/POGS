@@ -46,8 +46,8 @@ public class SubjectHasSessionCheckInDaoImpl extends AbstractDao<SubjectHasSessi
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.SESSION_ID.eq(sessionId));
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.HAS_JOINED_SESSION.eq(hasJoinedSession));
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.HAS_LOST_SESSION.eq(hasLostSession));
-        query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.CHECK_IN_TIME);
-        query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.LAST_PING_TIME);
+        query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.CHECK_IN_TIME.asc());
+        query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.LAST_PING_TIME.desc());
 
 
         return query.fetchInto(SubjectHasSessionCheckIn.class);

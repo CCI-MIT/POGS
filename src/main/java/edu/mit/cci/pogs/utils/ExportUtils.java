@@ -131,6 +131,14 @@ public class ExportUtils {
         return ret;
 
     }
+    public static String cleanEntry(String summaryDescription) {
+        if (summaryDescription == null) return "";
+        summaryDescription = summaryDescription.replace("/\n/g", "¶");
+        summaryDescription = summaryDescription.replace("/\r/g", "");
+        summaryDescription = summaryDescription.replace("/,/g", "|");
+        summaryDescription = summaryDescription.replace("/;/g", "|");
+        return summaryDescription;
+    }
 
     public static <T> ExportFile getExportFileForSimplePojoWithExtraColumns(String path, String fileName ,
                                                             Class<T> clazz,

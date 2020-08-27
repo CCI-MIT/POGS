@@ -359,14 +359,19 @@ class Pogs {
 
         this.latestFlowMessage = new Date().getTime();
 
-        if((message.content.currentUrl + "/" +this.subjectId == window.location.pathname)) {
-            this.nextUrl = message.content.nextUrl;
-            this.nextUrl = this.validateFinalUrl(this.nextUrl);
-            var finalDate = (new Date().getTime() + parseInt(
-                message.content.secondsRemainingCurrentUrl));
-            this.countDown.updateCountDownDate(finalDate)
+        if(!this.sessionIsPerpetual) {
+            if ((message.content.currentUrl + "/" + this.subjectId == window.location.pathname)) {
+                this.nextUrl = message.content.nextUrl;
+                this.nextUrl = this.validateFinalUrl(this.nextUrl);
+                var finalDate = (new Date().getTime() + parseInt(
+                    message.content.secondsRemainingCurrentUrl));
+                this.countDown.updateCountDownDate(finalDate)
+            } else {
+                window.location = message.content.currentUrl + "/" + this.subjectId;
+            }
         }
-        console.log(JSON.parse(message.content.perpetualSubjectsChosen));
+
+
         if(this.sessionIsPerpetual) {
             console.log(JSON.parse(message.content.perpetualSubjectsChosen));
             this.perpetualSubjectsChosen = JSON.parse(message.content.perpetualSubjectsChosen);

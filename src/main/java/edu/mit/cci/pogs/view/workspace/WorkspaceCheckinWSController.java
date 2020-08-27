@@ -16,6 +16,7 @@ import edu.mit.cci.pogs.model.dao.eventlog.EventLogDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.EventLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 
 @Controller
 public class WorkspaceCheckinWSController {
@@ -29,11 +30,14 @@ public class WorkspaceCheckinWSController {
     @Autowired
     private SubjectDao subjectDao;
 
+    @Autowired
+    private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
+
 
     @MessageMapping("/checkIn.sendMessage")
     public void getCheckin(@Payload CheckInMessage pogsMessage, SimpMessageHeaderAccessor headerAccessor) {
         Long completedTaskId = null;
-        if(pogsMessage.getCompletedTaskId()!=null) {
+        if (pogsMessage.getCompletedTaskId() != null) {
             completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
         }
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
@@ -44,7 +48,7 @@ public class WorkspaceCheckinWSController {
 
 
         //save only first checkin to database
-        if(!pogsMessage.getContent().getChannel().isEmpty() && pogsMessage.getContent().getChannel().equals("true")){
+        if (!pogsMessage.getContent().getChannel().isEmpty() && pogsMessage.getContent().getChannel().equals("true")) {
             Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
             EventLog el = new EventLog();
             el.setCompletedTaskId(completedTaskId);
@@ -54,13 +58,23 @@ public class WorkspaceCheckinWSController {
             el.setTimestamp(new Timestamp(new Date().getTime()));
             el.setEventType(pogsMessage.getType().name().toString());
             el.setEventContent(pogsMessage.toJSON().toString());
-            if(sender!=null) {//handle non users (task preview)
+            if (sender != null) {//handle non users (task preview)
                 el.setSenderSubjectId(sender.getId());
             }
             el.setExtraData("");
             el.setSummaryDescription("Subject loaded : " + pogsMessage.getContent().getMessage());
-            if(sender!=null) {
+            if (sender != null) {
                 eventLogDao.create(el);
+                if (pogsMessage.getContent().getMessage().contains("/start/")) {
+                    subjectHasSessionCheckInService.updateLatestSubjectPing(sender.getId(), sessionId);
+                }
+            }
+        }
+
+        if (pogsMessage.getContent().getMessage().contains("/start/")) {
+            Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
+            if (sender != null) {
+                subjectHasSessionCheckInService.updateLatestSubjectPing(sender.getId(), sessionId);
             }
         }
 

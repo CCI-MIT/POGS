@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectAttribute;
+import edu.mit.cci.pogs.utils.ExportUtils;
 
 public class SubjectExport {
 
@@ -115,7 +116,7 @@ public class SubjectExport {
             SubjectAttribute sa = this.attributeMap.get(column);
             if (sa != null) {
                 if (sa.getStringValue() != null) {
-                    ret += sa.getStringValue() + ";";
+                    ret += ExportUtils.cleanEntry(sa.getStringValue()) + ";";
                 } else {
                     if (sa.getIntegerValue() != null) {
                         ret += sa.getIntegerValue() + ";";

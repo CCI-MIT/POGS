@@ -170,7 +170,7 @@ class MemoryGridTask {
                 let sub = this.pogsPlugin.getSubjectByExternalId(message.sender);
                 $('#cell_' + index + ' .workingOn').empty();
 
-                $('<span class="badge ' + sub.externalId + '_color username">' + sub.displayName
+                $('<span class="badge ' + sub.externalId + '_color username" alt="'+sub.displayName+'">' + trimDisplayName(sub.displayName)
                   + '</span>')
                     .appendTo('#cell_' + index + ' .workingOn');
                 //set timeout

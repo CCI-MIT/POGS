@@ -6,7 +6,9 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.chatchannel.ChatChannelDao;
@@ -78,6 +80,7 @@ public class SubjectService {
         boolean createdSubject = false;
         while(!createdSubject) {
             if (subjectDao.getByExternalId(subject.getSubjectExternalId()) == null) {
+                subject.setCreatedAt(new Timestamp(new Date().getTime()));
                 return subjectDao.create(subject);
             } else {
                 subject.setSubjectExternalId(subject.getSubjectExternalId()+"_"+attempt);
