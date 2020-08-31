@@ -118,6 +118,7 @@ public class TaskEventReplayRunner implements Runnable {
             tam.setSessionId(session.getId().toString());
 
 
+
             for(CompletedTask ct: taskWrapper.getCompletedTasks()) {
                 tam.setCompletedTaskId(ct.getId().toString());
                 //messagingTemplate.convertAndSend("/topic/public/task/" + ct.getId() + "/communication", pogsMessage);

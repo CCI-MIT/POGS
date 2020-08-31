@@ -109,7 +109,7 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
 
     @Override
     public void handleScriptFailure(ScriptException se) {
-        _log.error("Before work script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
+        _log.error("Task scoring runner script execution error for : " + taskPlugin.getTaskPluginName() + " - " + se.getMessage());
     }
 
 }
