@@ -133,10 +133,10 @@ public class ExportUtils {
     }
     public static String cleanEntry(String summaryDescription) {
         if (summaryDescription == null) return "";
-        summaryDescription = summaryDescription.replace("/\n/g", "¶");
-        summaryDescription = summaryDescription.replace("/\r/g", "");
-        summaryDescription = summaryDescription.replace("/,/g", "|");
-        summaryDescription = summaryDescription.replace("/;/g", "|");
+        summaryDescription = summaryDescription.replace("/\\n", "¶");
+        summaryDescription = summaryDescription.replace("/\\r", "");
+        summaryDescription = summaryDescription.replace(",", "|");
+        summaryDescription = summaryDescription.replace(";", "|");
         return summaryDescription;
     }
 
