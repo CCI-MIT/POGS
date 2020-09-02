@@ -98,7 +98,7 @@ public class ExportUtils {
                                 content.append(method.invoke(element, null));
                             }
                         }
-                        content.append(",");
+                        content.append(";");
                     } catch (InvocationTargetException ite) {
                         ite.printStackTrace();
                     } catch (IllegalAccessException iae) {
