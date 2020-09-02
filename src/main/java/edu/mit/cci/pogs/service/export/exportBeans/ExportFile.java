@@ -38,7 +38,9 @@ public class ExportFile {
 
             writer1 = new PrintWriter(new OutputStreamWriter
                     (new FileOutputStream(fullFilePathAndName), "UTF-8"));
-            writer1.println("sep=;");
+            if(fileName.endsWith(".csv")){
+                writer1.println("sep=;");
+            }
             if(fileHeader!=null) {
                 writer1.println(fileHeader);
             }
