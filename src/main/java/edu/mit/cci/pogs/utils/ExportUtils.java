@@ -326,7 +326,7 @@ public class ExportUtils {
 
         StringBuffer header = new StringBuffer();
         for (String s : headers.values()) {
-            header.append(s + ",");
+            header.append(s + ";");
         }
 
         return header;
