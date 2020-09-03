@@ -126,6 +126,9 @@ public class SummaryExportService {
                 //handle the parent id
                 List<Session> sessions = sessionDao.listByParentSessionId(session.getId());
                 sessions.forEach((se) -> sessionList.add(se.getId()));
+                if(sessions.size() == 0){
+                    sessionList.add(session.getId());
+                }
             } else {
                 sessionList.add(session.getId());
             }
