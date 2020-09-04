@@ -25,7 +25,7 @@ class InputField extends Field {
     setupHooks(){
         super.setupHooks();
         //$('#answer'+this.index + '').on('focusin', this.handleTextOnClick.bind(this));
-        $('#answer'+this.index + '').on('input', this.handleTextOnBlur.bind(this));
+        $('#answer'+this.index + '').on('change textInput input', this.handleTextOnBlur.bind(this));
 
     }
     handleTextOnBlur(event){
