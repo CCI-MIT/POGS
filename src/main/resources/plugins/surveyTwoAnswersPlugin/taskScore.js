@@ -35,6 +35,15 @@ for(var i = 0; i < answerSheet.length; i++){
     newanswerSheet.push(answerSheet[i]);
 }
 answerSheet = newanswerSheet;
+var answerAuthorMap = [];
+
+for(var i=0;i<_teammates.length; i++){
+    _individualSubjectScore[_teammates[i].externalId] = {
+        "subjectExternalId" :  _teammates[i].externalId,
+        "individualScore" : 0.0,
+        "scoringData" : ""
+    };
+}
 
 var answerSheetAndKey = {};
 for(var j=0; j < answerSheet.length; j = j +2){
@@ -52,10 +61,14 @@ for(var j=0; j < answerSheet.length; j = j +2){
             answerSheetAndKey[("surveyAnswer" + j)][0] = emptyArrayStr;
             answerSheetAndKey[("surveyAnswer" + j)][1] = emptyArrayStr;
             answerSheetAndKey[("surveyAnswer" + j)][2] = answerSheet[j];
+            answerSheetAndKey[("surveyAnswer" + j)][3] = "";
+            answerSheetAndKey[("surveyAnswer" + j)][4] = "";
         } else {
             answerSheetAndKey[("surveyAnswer" + j)][0] = "";
             answerSheetAndKey[("surveyAnswer" + j)][1] = "";
             answerSheetAndKey[("surveyAnswer" + j)][2] = answerSheet[j];
+            answerSheetAndKey[("surveyAnswer" + j)][3] = "";
+            answerSheetAndKey[("surveyAnswer" + j)][4] = "";
         }
 
 }
@@ -68,9 +81,11 @@ for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
 
         if(fieldKind == -1 ){
             answerSheetAndKey[_completedTaskAttributes[i].attributeName][0] = answer;
+            answerSheetAndKey[_completedTaskAttributes[i].attributeName][3] = _completedTaskAttributes[i].lastAuthorSubject;
         } else {
             var indet = "surveyAnswer"+fieldKind;
             answerSheetAndKey[indet][1] = answer;
+            answerSheetAndKey[indet][4] = _completedTaskAttributes[i].lastAuthorSubject;
         }
 
     }
@@ -93,10 +108,20 @@ for(var answerKey in answerSheetAndKey) {
         var rightAnswer = (anArray[2]);
 
         var isRight = true;
+        var isFirstRight = true;
+        var isSecondRight = true;
+
         for (var j = 0; j < rightAnswer.length; j++) {
             if(!((rightAnswer[j] == firstAnswer[j]) &&
                  (rightAnswer[j] == secondAnswer[j]))){
                 isRight = false;
+            }
+            if(!((rightAnswer[j] == firstAnswer[j]))){
+                isFirstRight = false;
+            }
+            if(!(
+                 (rightAnswer[j] == secondAnswer[j]))){
+                isSecondRight = false;
             }
         }
         if(isRight){
@@ -105,6 +130,22 @@ for(var answerKey in answerSheetAndKey) {
         } else {
             _completedTaskScore.numberOfWrongAnswers++;
             _completedTaskScore.totalScore += WRONG_ANSWER_REWARD;
+        }
+        //individual
+        if(anArray[3]!= "") {
+            if(isFirstRight) {
+                _individualSubjectScore[anArray[3]].individualScore += RIGHT_ANSWER_REWARD
+            } else {
+                _individualSubjectScore[anArray[3]].individualScore += WRONG_ANSWER_REWARD
+            }
+        }
+        if(anArray[4]!= "") {
+
+            if(isSecondRight) {
+                _individualSubjectScore[anArray[4]].individualScore += RIGHT_ANSWER_REWARD
+            } else {
+                _individualSubjectScore[anArray[4]].individualScore += WRONG_ANSWER_REWARD
+            }
         }
     } else {
         if ((anArray[1] == anArray[2]) && (anArray[0] == anArray[2])) {
@@ -119,7 +160,31 @@ for(var answerKey in answerSheetAndKey) {
 
             }
         }
+
+        if(anArray[3]!= "") {
+            if((anArray[0] == anArray[2])) {
+                _individualSubjectScore[anArray[3]].individualScore += RIGHT_ANSWER_REWARD
+            } else {
+                _individualSubjectScore[anArray[3]].individualScore += WRONG_ANSWER_REWARD
+            }
+        }
+        if(anArray[4]!= "") {
+
+            if((anArray[1] == anArray[2])) {
+                _individualSubjectScore[anArray[4]].individualScore += RIGHT_ANSWER_REWARD
+            } else {
+                _individualSubjectScore[anArray[4]].individualScore += WRONG_ANSWER_REWARD
+            }
+        }
+
     }
 }
 
 completedTaskScore = JSON.stringify(_completedTaskScore);
+
+var _indScor = [];
+for(var iss in _individualSubjectScore){
+    //print("£££ "+JSON.stringify(_individualSubjectScore[iss]));
+    _indScor.push(_individualSubjectScore[iss]);
+}
+individualSubjectScores = JSON.stringify(_indScor);
