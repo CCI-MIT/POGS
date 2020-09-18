@@ -37,6 +37,7 @@ for(var i = 0; i < answerSheet.length; i++){
 answerSheet = newanswerSheet;
 var answerAuthorMap = [];
 
+var _individualSubjectScore = {};
 for(var i=0;i<_teammates.length; i++){
     _individualSubjectScore[_teammates[i].externalId] = {
         "subjectExternalId" :  _teammates[i].externalId,
@@ -82,10 +83,12 @@ for(var i=0 ; i < _completedTaskAttributes.length; i ++) {
         if(fieldKind == -1 ){
             answerSheetAndKey[_completedTaskAttributes[i].attributeName][0] = answer;
             answerSheetAndKey[_completedTaskAttributes[i].attributeName][3] = _completedTaskAttributes[i].lastAuthorSubject;
+            //print(" First anwser "+index+" last author: "+ _completedTaskAttributes[i].lastAuthorSubject)
         } else {
             var indet = "surveyAnswer"+fieldKind;
             answerSheetAndKey[indet][1] = answer;
             answerSheetAndKey[indet][4] = _completedTaskAttributes[i].lastAuthorSubject;
+            //print(" Second anwser "+index+" last author: "+ _completedTaskAttributes[i].lastAuthorSubject)
         }
 
     }
@@ -161,6 +164,8 @@ for(var answerKey in answerSheetAndKey) {
             }
         }
 
+        //print("First Answer has author: " + anArray[3]);
+
         if(anArray[3]!= "") {
             if((anArray[0] == anArray[2])) {
                 _individualSubjectScore[anArray[3]].individualScore += RIGHT_ANSWER_REWARD
@@ -168,6 +173,9 @@ for(var answerKey in answerSheetAndKey) {
                 _individualSubjectScore[anArray[3]].individualScore += WRONG_ANSWER_REWARD
             }
         }
+
+        //print("Second Answer has author: " + anArray[4]);
+
         if(anArray[4]!= "") {
 
             if((anArray[1] == anArray[2])) {

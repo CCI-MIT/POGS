@@ -20,6 +20,9 @@
             <input type="hidden" name="workerId" th:value="${workerId}">
             <input type="hidden" name="assignmentId" th:value="${assignmentId}">
             <input type="hidden" name="hitId" th:value="${hitId}">
+            <input type="hidden" name="SESSION_ID" th:value="${SESSION_ID}">
+            <input type="hidden" name="PROLIFIC_PID" th:value="${PROLIFIC_PID}">
+            <input type="hidden" name="STUDY_ID" th:value="${STUDY_ID}">
                <button type="submit" class="btn btn-primary" th:if="${not isPogsReferrer}" >Start</button>
         </form>
         <script>

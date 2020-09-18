@@ -173,6 +173,15 @@ public class WorkspaceController {
 
         model.addAttribute("action", "/sessions/start/" + sessionId);
 
+        if(PROLIFIC_PID != null){
+            model.addAttribute("PROLIFIC_PID", PROLIFIC_PID);
+        }
+        if(STUDY_ID!=null){
+            model.addAttribute("STUDY_ID", STUDY_ID);
+        }
+        if(SESSION_ID!=null){
+            model.addAttribute("SESSION_ID",SESSION_ID);
+        }
 
         if (workerId != null) {
             model.addAttribute("workerId", workerId);
