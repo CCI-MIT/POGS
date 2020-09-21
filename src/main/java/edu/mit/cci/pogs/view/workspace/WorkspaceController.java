@@ -160,9 +160,9 @@ public class WorkspaceController {
         String referrer = request.getHeader("referer");
 
         boolean isPogsRef = false;
-        if (referrer != null) {
-            isPogsRef = (referrer.contains("https://pogs.info") || referrer.contains("http://localhost"));
-        }
+        //if (referrer != null) {
+            //isPogsRef = (referrer.contains("https://pogs.info") || referrer.contains("http://localhost"));
+        //}
         model.addAttribute("isPogsReferrer", isPogsRef);
 
         if (userAgent.contains("Firefox") || userAgent.contains("MSIE")) {
