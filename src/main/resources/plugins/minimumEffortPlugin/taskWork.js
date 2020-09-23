@@ -196,7 +196,7 @@ class MinimumEffortTask {
                 }
             }
         }
-        $("#finalPayout").text(totalPayout)
+        $("#finalPayout").text( (totalPayout/this.rounds.length));
         $("#noMoreRounds").show();
     }
 
