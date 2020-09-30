@@ -87,6 +87,7 @@ class Pogs {
         this.sessionName = config.sessionName;
         this.chatBotName = config.chatBotName;
         this.sessionIsPerpetual = ((config.sessionIsPerpetual)?(config.sessionIsPerpetual):(false));
+        this.sessionExecutionMode = ((config.sessionExecutionMode)?(config.sessionExecutionMode): (false));
         this.waitingRoomExpireTime = config.waitingRoomExpireTime;
         this.doneUrlParameter = config.doneUrlParameter;
         this.taskIsSolo = config.taskIsSolo;
@@ -367,7 +368,13 @@ class Pogs {
                     message.content.secondsRemainingCurrentUrl));
                 this.countDown.updateCountDownDate(finalDate)
             } else {
-                window.location = message.content.currentUrl + "/" + this.subjectId;
+                if(!this.sessionExecutionMode) {
+                    window.location = message.content.currentUrl + "/" + this.subjectId;
+                } else {
+                    var finalDate = (new Date().getTime() + parseInt(
+                        message.content.secondsRemainingCurrentUrl));
+                    this.countDown.updateCountDownDate(finalDate)
+                }
             }
         }
 
