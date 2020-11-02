@@ -369,6 +369,8 @@ class Pogs {
                 this.countDown.updateCountDownDate(finalDate)
             } else {
                 if(!this.sessionExecutionMode) {
+                    //console.log(message.content.currentUrl + "/" + this.subjectId)
+
                     window.location = message.content.currentUrl + "/" + this.subjectId;
                 } else {
                     var finalDate = (new Date().getTime() + parseInt(
@@ -427,3 +429,4 @@ class Pogs {
 
 
 new Pogs();
+console.log("Version 1.2.20");

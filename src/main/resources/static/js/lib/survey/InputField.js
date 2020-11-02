@@ -53,7 +53,10 @@ class InputField extends Field {
             var cell = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
 
             if($("#answer" + cell).attr('type') == "text"){ // sync text field
-                $("#answer" + cell).val(message.content.attributeStringValue);
+                let isCurrentSubject = (message.sender == this._pogsPlugin.getSubjectId())?(true):(false);
+                if(!isCurrentSubject ) {//to avoid the content flashing
+                    $("#answer" + cell).val(message.content.attributeStringValue);
+                }
                 this.setFinalAnswer(message.sender);
             }
 
