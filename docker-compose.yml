@@ -5,7 +5,7 @@ services:
     container_name: pogsmysql
     ports:
       - "3307:3306"
-    command: mysqld --sql_mode=""
+    #command: mysqld --sql_mode=""
     volumes:
       - .mysql:/var/lib/mysql
       - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d
