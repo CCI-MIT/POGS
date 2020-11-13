@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.model.dao.completedtaskattribute.impl;
 
 import org.jooq.DSLContext;
 import org.jooq.Record;
+import org.jooq.Result;
 import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -64,11 +65,11 @@ public class CompletedTaskAttributeDaoImpl extends AbstractDao<CompletedTaskAttr
         query.addConditions(COMPLETED_TASK_ATTRIBUTE.ATTRIBUTE_NAME.eq(attributeName));
         query.addConditions(COMPLETED_TASK_ATTRIBUTE.COMPLETED_TASK_ID.eq(completedTaskId));
 
-        Record record = query.fetchOne();
-        if (record == null) {
+        List<CompletedTaskAttribute> result = query.fetchInto(CompletedTaskAttribute.class);
+        if (result == null) {
             return null;
         } else {
-            return record.into(CompletedTaskAttribute.class);
+            return result.get(0);
         }
     }
 
