@@ -66,7 +66,7 @@ public class CompletedTaskAttributeDaoImpl extends AbstractDao<CompletedTaskAttr
         query.addConditions(COMPLETED_TASK_ATTRIBUTE.COMPLETED_TASK_ID.eq(completedTaskId));
 
         List<CompletedTaskAttribute> result = query.fetchInto(CompletedTaskAttribute.class);
-        if (result == null) {
+        if (result == null || result.size() == 0) {
             return null;
         } else {
             return result.get(0);
