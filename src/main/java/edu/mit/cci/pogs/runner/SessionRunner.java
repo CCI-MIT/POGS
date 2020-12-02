@@ -853,15 +853,22 @@ public class SessionRunner implements Runnable {
         checkedInWaitingSubjectListById = new HashMap<>();
 
         sessionsRelatedToPerpetual = new HashMap<>();
+        int sleepTimes = 1;
         try {
             while (shouldRun) {
 
 
                 if (checkedInWaitingSubjectListById.size() == 0) {
-                    Thread.sleep(10 * 1000);
+                    Thread.sleep(sleepTimes *10 * 1000);
+                    if(sleepTimes != 50) {
+                        sleepTimes++;
+                    }
+                    _log.debug("PERPETUAL SESSION SLEEPING for " + sleepTimes *10 + " seconds");
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
+                    _log.debug("checkedInWaitingSubjectListById #" + checkedInWaitingSubjectListById);
                     sanitizeCheckInList();
+                    sleepTimes = 1;
 
                     if (session.getScheduleConditionType().equals(SessionScheduleConditionToStartType.NUMBER_OF_USERS_CHECKED_IN.getId().toString())) {
 

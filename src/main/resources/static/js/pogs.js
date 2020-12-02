@@ -286,6 +286,11 @@ class Pogs {
 
         location.reload();
     }
+    handleBlockingError(msg) {
+        $.getJSON('/log/' +this.sessionId + "?externalId="+ this.subjectId+"&errorMessage="+ msg + "&url"+window.location.href);
+
+        location.reload();
+    }
     onConnected() {
 
         this.subscribeTopicAndFireEvent(('/topic/public/flow/' + this.sessionId),
@@ -429,4 +434,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.2.25");
+console.log("Version 1.2.27");
