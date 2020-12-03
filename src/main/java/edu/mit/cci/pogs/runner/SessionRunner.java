@@ -865,10 +865,13 @@ public class SessionRunner implements Runnable {
                     }else {
                         sleepTimes = 1;
                     }
-                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds");
+                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds - no subjects in queue");
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
-                    _log.debug("checkedInWaitingSubjectListById #" + checkedInWaitingSubjectListById);
+
+                    Thread.sleep( 10 * 1000);
+                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + 10 + " seconds - checkin queue #:"+ checkedInWaitingSubjectListById.size());
+
                     sanitizeCheckInList();
                     sleepTimes = 1;
 
