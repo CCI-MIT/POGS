@@ -860,10 +860,12 @@ public class SessionRunner implements Runnable {
 
                 if (checkedInWaitingSubjectListById.size() == 0) {
                     Thread.sleep(sleepTimes *10 * 1000);
-                    if(sleepTimes != 50) {
+                    if(sleepTimes != 27) {
                         sleepTimes++;
+                    }else {
+                        sleepTimes = 1;
                     }
-                    _log.debug("PERPETUAL SESSION SLEEPING for " + sleepTimes *10 + " seconds");
+                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds");
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
                     _log.debug("checkedInWaitingSubjectListById #" + checkedInWaitingSubjectListById);
