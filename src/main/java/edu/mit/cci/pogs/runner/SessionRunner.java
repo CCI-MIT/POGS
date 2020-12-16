@@ -176,7 +176,7 @@ public class SessionRunner implements Runnable {
 
             if ((allSubjectsAreWaiting() || sessionIsReadyToStart())
                     && !sessionHasStarted) {
-                _log.info("Starting session: " + session.getFullSessionName());
+                _log.info("#" + session.getId()+"Starting session: " + session.getFullSessionName());
                 sessionHasStarted = true;
                 startSession();
                 startSessionBeforeScriptIfAny();
@@ -187,23 +187,25 @@ public class SessionRunner implements Runnable {
                     SessionSchedule ss = session.getSessionSchedule().get(i);
                     long nowTS = DateUtils.now();
                     if (!ss.isAlreadyPassed(nowTS) && ss.isHappeningNow(nowTS)) {
-                        _log.info("Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
+                        _log.info("#" + session.getId()+" Starting session schedule (" + ss.getUrl() + "): " + simpleDateFormat.format(new Date(ss.getStartTimestamp())));
 
 
                         try {
                             Thread.sleep(ss.getEndTimestamp() - nowTS + 500);
                         } catch (InterruptedException inte) {
-                            _log.info("Session schedule interrupted: (" + ss.getUrl() + "):" + simpleDateFormat.format(DateUtils.now()));
+                            _log.info("#" + session.getId()+" Session schedule interrupted: (" + ss.getUrl() + "):" + simpleDateFormat.format(DateUtils.now()));
                         }
 
 
-                        _log.info("Finishing session schedule: (" + ss.getUrl() + "):" + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
+                        _log.info("#" + session.getId()+" Finishing session schedule: (" + ss.getUrl() + "):" + simpleDateFormat.format(new Date(ss.getEndTimestamp())));
                     }
                 }
             }
             if (session.getSecondsRemainingForSession() < 0) {
                 shouldRun = false;
                 startSessionAfterScriptIfAny();
+            } else {
+                _log.info("#" + session.getId()+" Loop : Seconds remaining" + session.getSecondsRemainingForSession());
             }
 
         }
@@ -214,13 +216,13 @@ public class SessionRunner implements Runnable {
             }
         }
         endSession();
-        _log.info("Exiting session runner for session: " + session.getSessionSuffix());
+        _log.info("#" + session.getId()+" Exiting session runner for session: " + session.getSessionSuffix());
     }
 
     private void startSessionAfterScriptIfAny() {
         if (session.getAfterSessionScriptId() != null) {
             SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
-            _log.debug("Added before session script : " + csr);
+            _log.debug("#" + session.getId()+" Added before session script : " + csr);
             csr.setSession(session);
             csr.setExecutableScriptId(session.getAfterSessionScriptId());
 
@@ -234,7 +236,7 @@ public class SessionRunner implements Runnable {
     private void startSessionBeforeScriptIfAny() {
         if (session.getBeforeSessionScriptId() != null) {
             SessionRelatedScriptRunner csr = (SessionRelatedScriptRunner) context.getBean("sessionRelatedScriptRunner");
-            _log.debug("Added before session script : " + csr);
+            _log.debug("#" + session.getId()+" Added before session script : " + csr);
             csr.setSession(session);
             csr.setExecutableScriptId(session.getBeforeSessionScriptId());
             Thread thread = new Thread(csr);
@@ -321,7 +323,7 @@ public class SessionRunner implements Runnable {
                     TaskConfiguration taskConfiguration = taskService.getTaskConfiguration(task.getId());
                     if (taskConfiguration.getScoreScriptId() != null || pl != null) {
                         ScoringRunner csr = (ScoringRunner) context.getBean("scoringRunner");
-                        _log.debug("Added task scoring: " + task.getId() + " - " + csr);
+                        _log.debug("#" + session.getId()+" Added task scoring: " + task.getId() + " - " + csr);
                         csr.setSession(session);
                         csr.setTaskWrapper(task);
                         csr.setTaskPlugin(pl);
@@ -343,7 +345,7 @@ public class SessionRunner implements Runnable {
             if (pl != null) {
                 if (taskConfiguration.getBeforeWorkScriptId() != null || pl.getTaskBeforeWorkJsContent() != null) {
                     TaskBeforeWorkRunner csr = (TaskBeforeWorkRunner) context.getBean("taskBeforeWorkRunner");
-                    _log.debug("Added task before work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
+                    _log.debug("#" + session.getId()+" Added task before work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -364,7 +366,7 @@ public class SessionRunner implements Runnable {
             if (pl != null) {
                 if (taskConfiguration.getAfterWorkScriptId() != null || (pl.getTaskAfterWorkJsContent() != null)) {
                     TaskAfterWorkRunner csr = (TaskAfterWorkRunner) context.getBean("taskAfterWorkRunner");
-                    _log.debug("Added task after work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
+                    _log.debug("#" + session.getId()+" Added task after work: " + task.getId() + " - " + csr + " - # of completed tasks: " + task.getCompletedTasks().size());
                     csr.setSession(session);
                     csr.setTaskWrapper(task);
                     csr.setTaskPlugin(pl);
@@ -865,12 +867,12 @@ public class SessionRunner implements Runnable {
                     }else {
                         sleepTimes = 1;
                     }
-                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds - no subjects in queue");
+                    _log.debug( "#" + session.getId()+" PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds - no subjects in queue");
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
 
                     Thread.sleep( 10 * 1000);
-                    _log.debug("PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + 10 + " seconds - checkin queue #:"+ checkedInWaitingSubjectListById.size());
+                    _log.debug("#" + session.getId()+" PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + 10 + " seconds - checkin queue #:"+ checkedInWaitingSubjectListById.size());
 
                     sanitizeCheckInList();
                     sleepTimes = 1;
@@ -985,7 +987,7 @@ public class SessionRunner implements Runnable {
                     if (sr != null) {
                         for (Subject s : sessionsRelatedToPerpetual.get(sessionId)) {
                             sr.subjectCheckIn(s);
-                            _log.debug("Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
+                            _log.debug("#" + session.getId()+" Checkin in: " + s.getSubjectExternalId() + " - session id: " + sr.getSession().getId());
                             perpetualSubjectsMigratedToSpawnedSessions.put(s.getSubjectExternalId());
 
                         }

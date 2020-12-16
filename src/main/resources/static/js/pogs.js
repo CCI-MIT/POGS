@@ -434,4 +434,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.2.29");
+console.log("Version 1.2.30");
