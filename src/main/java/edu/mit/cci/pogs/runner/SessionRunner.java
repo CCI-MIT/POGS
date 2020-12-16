@@ -205,7 +205,12 @@ public class SessionRunner implements Runnable {
                 shouldRun = false;
                 startSessionAfterScriptIfAny();
             } else {
-                _log.info("#" + session.getId()+" Loop : Seconds remaining" + session.getSecondsRemainingForSession());
+                try {
+                    Thread.sleep(30 * 1000);
+                    _log.info("#" + session.getId() + " Sleeping for 30 seconds ... Loop : Seconds remaining" + session.getSecondsRemainingForSession());
+                }catch (InterruptedException ie){
+
+                }
             }
 
         }
