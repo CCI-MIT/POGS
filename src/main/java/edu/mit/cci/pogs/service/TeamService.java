@@ -117,9 +117,11 @@ public class TeamService {
     }
     public JSONArray getTeamatesJSONObject(List<Subject> teammates) {
         JSONArray ja = new JSONArray();
-        for (Subject s : teammates) {
-            JSONObject subject = getSubjectJsonObject(s);
-            ja.put(subject);
+        if(teammates!=null) {
+            for (Subject s : teammates) {
+                JSONObject subject = getSubjectJsonObject(s);
+                ja.put(subject);
+            }
         }
         return ja;
     }

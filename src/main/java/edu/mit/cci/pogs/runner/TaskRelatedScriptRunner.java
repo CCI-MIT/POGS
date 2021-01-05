@@ -77,6 +77,11 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
         this.getEngine().put("isSoloTask", isSoloTask);
 
+        //System.out.println(" Session Id: " + session.getId() + " isSoloTask : " + isSoloTask);
+        //System.out.println(" completedTaskId : " + this.getCompletedTask().getId());
+
+        //System.out.println(" Teams by: " + getCompletedTask().getSubjectId() + " - " +getCompletedTask().getTeamId());
+
         JSONArray teamMates = teamService.getTeamatesJSONObject(
                 teamService.getTeamSubjectsFromCompletedTask(getCompletedTask().getSubjectId(),
                         getCompletedTask().getTeamId()));
