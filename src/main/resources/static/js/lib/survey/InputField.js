@@ -47,14 +47,17 @@ class InputField extends Field {
         super.broadcastReceived(message);
 
         let attrName = message.content.attributeName;
-
+        let time = new Date().getTime();
 
         if (attrName.indexOf(SURVEY_CONST.FIELD_NAME) != -1) {
             var cell = attrName.replace(SURVEY_CONST.FIELD_NAME, "");
 
             if($("#answer" + cell).attr('type') == "text"){ // sync text field
                 let isCurrentSubject = (message.sender == this.getPogsPlugin().getSubjectId())?(true):(false);
-                if(!isCurrentSubject ) {//to avoid the content flashing
+
+                let currentVal = $("#answer" + cell).val();
+                if(currentVal!=message.content.attributeStringValue){
+                // if(!isCurrentSubject ) {//to avoid the content flashing
                     $("#answer" + cell).val(message.content.attributeStringValue);
                 }
                 this.setFinalAnswer(message.sender);
