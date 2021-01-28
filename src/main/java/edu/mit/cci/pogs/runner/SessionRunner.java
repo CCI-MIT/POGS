@@ -867,7 +867,7 @@ public class SessionRunner implements Runnable {
 
                 if (checkedInWaitingSubjectListById.size() == 0) {
                     Thread.sleep(sleepTimes *10 * 1000);
-                    if(sleepTimes != 27) {
+                    if(sleepTimes != 19) {
                         sleepTimes++;
                     }else {
                         sleepTimes = 1;
