@@ -56,9 +56,14 @@ class InputField extends Field {
                 let isCurrentSubject = (message.sender == this.getPogsPlugin().getSubjectId())?(true):(false);
 
                 let currentVal = $("#answer" + cell).val();
-                if(currentVal!=message.content.attributeStringValue){
-                // if(!isCurrentSubject ) {//to avoid the content flashing
+                let isOldEvent = (message.timestamp)?(true):(false);
+
+                if(!isCurrentSubject ) {//to avoid the content flashing
                     $("#answer" + cell).val(message.content.attributeStringValue);
+                } else {
+                    if(isOldEvent){//to allow old events to show up even from the same subject
+                        $("#answer" + cell).val(message.content.attributeStringValue);
+                    }
                 }
                 this.setFinalAnswer(message.sender);
             }

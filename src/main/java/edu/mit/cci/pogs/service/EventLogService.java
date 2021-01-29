@@ -35,6 +35,7 @@ public class EventLogService {
 
     public JSONObject getLogJson(EventLog el) {
         JSONObject event = new JSONObject();
+        event.put("timestamp", el.getTimestamp());
         event.put("sender", el.getSender());
         event.put("receiver", el.getReceiver());
 

@@ -204,8 +204,8 @@ class Pogs {
         for(var i=0; i< this.eventsUntilNow.length ; i++) {
 
             var event = this.eventsUntilNow[i];
-            console.log("OLD EVENT" )
-            console.log(JSON.stringify(event));
+            //console.log("OLD EVENT" )
+            //console.log(JSON.stringify(event));
             if(event.type == "TASK_ATTRIBUTE"){
                 this.fireOldEvent(event,'taskAttributeBroadcast')
             }
@@ -436,4 +436,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.3.5");
+console.log("Version 1.3.6");
