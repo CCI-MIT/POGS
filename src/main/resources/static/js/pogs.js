@@ -341,7 +341,7 @@ class Pogs {
                          {message: window.location.pathname, type: "CHECK_IN", channel: this.firstLoad},
                                  this.subjectId, null, this.completedTaskId,
                                  this.sessionId);
-        this.firstLoad = false;
+        this.firstLoad = true;
 
     }
     validateFinalUrl(newUrlToBeSet) {
@@ -436,4 +436,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.3.4");
+console.log("Version 1.3.5");
