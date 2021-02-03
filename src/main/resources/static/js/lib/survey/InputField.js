@@ -34,7 +34,8 @@ class InputField extends Field {
         //console.log("cell reference " + cellIndex);
         if(!isNaN(cellIndex)) {
             // console.log($(event.target))
-            var valueTyped = $(event.target).val().replace(/\r?\n?/g, '').trim();
+            var valueTyped = $(event.target).val().replace(/\r?\n?/g, '');
+            //.trim();
             // console.log(valueTyped);
             if(valueTyped != null) {
                 this.saveCompletedTaskAttribute(SURVEY_CONST.FIELD_NAME + cellIndex,
