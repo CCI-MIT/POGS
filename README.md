@@ -49,6 +49,11 @@ ctrl + c
  - Install mysql-server 5.7
  - Install nodejs (used for sass) version v9.11.1
  
+ On macs be sure to use the java 8 home 
+``` 
+ "export JAVA_HOME=`/usr/libexec/java_home -v 1.8`;java -version"
+```
+
 2 On mysql create a new database:
 
 ```
