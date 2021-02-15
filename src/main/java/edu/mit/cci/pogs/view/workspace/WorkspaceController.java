@@ -408,13 +408,25 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "You are too late, your session has already passed!");
             return "workspace/error";
         }
-
         sr.subjectCheckIn(su);
-        return "redirect:/waiting_room/" + su.getSubjectExternalId();
+        if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT)) {
+            return "redirect:/waiting_room/" + su.getSubjectExternalId();
+        } else {
+            return "redirect:/session_global_chat/" + su.getSubjectExternalId();
+        }
     }
 
     @GetMapping("/waiting_room/{externalId}")
     public String waitingRoom(@PathVariable("externalId") String externalId, Model model) {
+        return forwardToWaitingRoomOrGlobalChatRoom(externalId, model, "workspace/waiting_room");
+    }
+
+    @GetMapping("/session_global_chat/{externalId}")
+    public String sessionGlobalChat(@PathVariable("externalId") String externalId, Model model) {
+        return forwardToWaitingRoomOrGlobalChatRoom(externalId, model, "workspace/session_global_chat");
+    }
+
+    public String forwardToWaitingRoomOrGlobalChatRoom(@PathVariable("externalId") String externalId, Model model,String forwadString) {
         Subject su = workspaceService.getSubject(externalId);
         if (su == null) {
             Session session = sessionService.getPerpetualSessionForSubject(externalId);
@@ -430,7 +442,7 @@ public class WorkspaceController {
         }
 
 
-        return checkExternalIdAndSessionRunningAndForward(su, model, "workspace/waiting_room");
+        return checkExternalIdAndSessionRunningAndForward(su, model, forwadString);
     }
 
     private String checkExternalIdAndSessionRunningAndForward(Subject su, Model model, String forwardString) {
@@ -438,6 +450,12 @@ public class WorkspaceController {
         if (su != null) {
 
             SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+            if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+                model.addAttribute("template", "layouts/workspace-layout.html");
+            } else {
+                model.addAttribute("template", "layouts/workspace-iframe-layout.html");
+            }
+
 
             if (sr != null && !sr.getSession().getStatus().equals(SessionStatus.DONE.getStatus())) {
                 SessionWrapper session = sr.getSession();
@@ -557,6 +575,13 @@ public class WorkspaceController {
                 model.addAttribute("secondsRemainingCurrentUrl",
                         sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
+
+                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+                    model.addAttribute("template", "layouts/workspace-layout.html");
+                } else {
+                    model.addAttribute("template", "layouts/workspace-iframe-layout.html");
+                }
+
                 return forward;
             } else {
                 return handleErrorMessage("There was an error and your session has ended!", model);
@@ -985,7 +1010,11 @@ public class WorkspaceController {
                 model.addAttribute("completedTaskAttributes",
                         completedTaskAttributeService.listCompletedTaskAttributesForCompletedTask(completedTask.getId()));
 
-
+                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+                    model.addAttribute("template", "layouts/workspace-layout.html");
+                } else {
+                    model.addAttribute("template", "layouts/workspace-iframe-layout.html");
+                }
             } else {
                 return handleErrorMessage("There was an error and your session has ended!", model);
             }
