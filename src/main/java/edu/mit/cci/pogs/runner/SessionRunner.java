@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.runner;
 
+import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -451,6 +452,17 @@ public class SessionRunner implements Runnable {
 
     private void createCompletedTasks(SessionWrapper session, RoundWrapper round, boolean hasOrder) {
         int taskOrderCounter = 1;
+
+        if(!session.getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+            TeamWrapper team = round.getRoundTeams().get(0);
+            TaskWrapper tw = session.getTaskList().get(0);
+            CompletedTask ct = createCompletedTask(team.getTeam(),null,round,tw,taskOrderCounter);
+            Session sessionDb = sessionDao.get(session.getId());
+            sessionDb.setGlobalChatCompletedTaskId(ct.getId());
+            session.setGlobalChatCompletedTaskId(ct.getId());
+            sessionDao.update(sessionDb);
+        }
+
         for (TaskWrapper task : session.getTaskList()) {
             if (task.getSoloTask()) {
                 for (Subject subject : checkedInWaitingSubjectList.values()) {
@@ -464,6 +476,7 @@ public class SessionRunner implements Runnable {
             if (hasOrder) {
                 taskOrderCounter++;
             }
+
         }
 
         List<CompletedTask> completedTasks = completedTaskDao.listByRoundId(round.getId());
@@ -477,7 +490,7 @@ public class SessionRunner implements Runnable {
         }
     }
 
-    private void createCompletedTask(Team team, Subject subject, Round currentRound, TaskWrapper task, Integer order) {
+    private CompletedTask createCompletedTask(Team team, Subject subject, Round currentRound, TaskWrapper task, Integer order) {
         CompletedTask ct = new CompletedTask();
         ct.setCompledTaskOrder(order.shortValue());
         ct.setRoundId(currentRound.getId());
@@ -494,7 +507,7 @@ public class SessionRunner implements Runnable {
             ct.setTeamId(team.getId());
             ct.setSolo("false");
         }
-        completedTaskDao.create(ct);
+        return completedTaskDao.create(ct);
     }
 
 
@@ -922,6 +935,8 @@ public class SessionRunner implements Runnable {
                                 sessionsRelatedToPerpetual.put(newSpawnedSession.getId(), subjectsInNewSession);
 
                                 subjectCommunicationService.createSubjectCommunications(newSpawnedSession.getId(), true);
+
+
 
                             }
                         }

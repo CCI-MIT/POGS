@@ -1,5 +1,7 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,7 @@ public class SubjectCommunicationService {
     private SubjectDao subjectDao;
 
     public void createSubjectCommunications(Long sessionId, boolean allowCommunication) {
+
         List<Subject> subjectList = subjectDao.listBySessionId(sessionId);
         for (Subject su : subjectList) {
             List<SubjectCommunication> currentCommunications = subjectCommunicationDao.listByFromSubjectId(su.getId());

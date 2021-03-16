@@ -79,6 +79,8 @@ class Pogs {
         this.sessionId = config.sessionId;
         this.subjectId = config.subjectId;
         this.completedTaskId = config.completedTaskId;
+        this.isGlobalChatPage = (config.isGlobalChatPage)?(config.isGlobalChatPage):(false);
+        this.isGlobalChatInitialized = false;
         this.teammates = config.teammates;
         this.recordSessionSaveEphemeralEvents = config.recordSessionSaveEphemeralEvents;
         this.taskList = config.taskList;
@@ -157,7 +159,11 @@ class Pogs {
 
         this.subscribe('flowBroadcast', this.onFlowBroadcastReceived.bind(this));
 
-        this.setupCommunication();
+        if(!this.isGlobalChatPage) {
+            this.setupCommunication();
+        } else {
+            console.log("IS GLOBAL CHAT PAGE")
+        }
         this.setupCollaboration();
 
 
@@ -195,7 +201,9 @@ class Pogs {
     }
     onCountdownEnd(){
         this.subscribe("onUnload", function(){
-            window.location = this.nextUrl;
+
+            //TODO FIX: window.location = this.nextUrl;
+            console.log("Linha 206")
         }.bind(this))
         this.fire(null, 'onUnload', this);
 
@@ -251,7 +259,8 @@ class Pogs {
 
             this.stompClient.connect({}, this.onConnected.bind(this), this.onError.bind(this));
         } catch (error){
-            this.handleSocketError("Error in socket initialization, STOMP exception:" + error);
+            console.log(error);
+            //TODOFIX: this.handleSocketError("Error in socket initialization, STOMP exception:" + error);
         }
     }
     subscribe(eventName, fn) {
@@ -285,13 +294,15 @@ class Pogs {
     }
     handleSocketError(msg) {
         $.getJSON('/log/' +this.sessionId + "?externalId="+ this.subjectId+"&errorMessage="+ msg + "&url"+window.location.href);
-
-        location.reload();
+        //TODO FIX: location.reload();
+        console.log("LINHA 298")
     }
+
     handleBlockingError(msg) {
         $.getJSON('/log/' +this.sessionId + "?externalId="+ this.subjectId+"&errorMessage="+ msg + "&url"+window.location.href);
 
-        location.reload();
+        //TODO FIX: location.reload();
+        console.log("LINHA 304")
     }
     onConnected() {
 
@@ -366,7 +377,19 @@ class Pogs {
     onFlowBroadcastReceived(message) {
 
         this.latestFlowMessage = new Date().getTime();
+        console.log("MESSAGE RECEIVED: " + JSON.stringify(message));
+       console.log("this.isGlobalChatPage: " + this.isGlobalChatPage)
+        if(this.isGlobalChatPage){
 
+            if(message.content.currentUrl.indexOf("/task/")!=-1){
+                if(!this.isGlobalChatInitialized){
+                    this.isGlobalChatInitialized = true;
+                    $("#communication_to_show").show();
+                    this.setupCommunication();
+                    this.fire(null, 'onReady', this);
+                }
+            }
+        }
         if(!this.sessionIsPerpetual) {
             if ((message.content.currentUrl + "/" + this.subjectId == window.location.pathname)) {
                 this.nextUrl = message.content.nextUrl;
@@ -377,8 +400,10 @@ class Pogs {
             } else {
                 if(!this.sessionExecutionMode) {
                     //console.log(message.content.currentUrl + "/" + this.subjectId)
-
-                    window.location = message.content.currentUrl + "/" + this.subjectId;
+                    if(!this.isGlobalChatPage) {
+                        window.location = message.content.currentUrl + "/"
+                            + this.subjectId;
+                    }
                 } else {
                     var finalDate = (new Date().getTime() + parseInt(
                         message.content.secondsRemainingCurrentUrl));
@@ -394,6 +419,7 @@ class Pogs {
             for(var i = 0; i < this.perpetualSubjectsChosen.length ; i ++){
                 if(this.subjectId == this.perpetualSubjectsChosen[i]) {
                     window.location.href = "/check_in?externalId=" + this.subjectId;
+                    //console.log("Linha 415")
                 }
             }
 
@@ -402,7 +428,8 @@ class Pogs {
         if(this.sessionIsPerpetual && window.location.pathname.indexOf("/sessions/start/") >=0 ){
             let now = new Date();
             if(parseInt(this.waitingRoomExpireTime) < now){
-                window.location.href = "/expired?externalId=" + this.subjectId;
+                 window.location.href = "/expired?externalId=" + this.subjectId;
+                //console.log("Linha 425");
             }
         }
 
@@ -436,4 +463,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.3.7");
+console.log("Version 1.3.11");

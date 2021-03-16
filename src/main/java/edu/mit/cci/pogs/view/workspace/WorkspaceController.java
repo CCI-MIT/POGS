@@ -423,6 +423,52 @@ public class WorkspaceController {
 
     @GetMapping("/session_global_chat/{externalId}")
     public String sessionGlobalChat(@PathVariable("externalId") String externalId, Model model) {
+        //add stuff to make pogs.js work
+
+
+
+        Subject su = workspaceService.getSubject(externalId);
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+
+        //Task task = taskDao.get(taskId);
+        Round round = (sr.getSession().getSessionRounds().get(0));
+
+        model.addAttribute("subject", su);
+        model.addAttribute("subjectCanTalkTo", subjectService.getSubjectsSubjectIsAllowedToTalkJson(su.getId()));
+        model.addAttribute("channelSubjectIsIn", subjectService.getChannelsSubjectIsIn(su.getId()));
+
+
+        //model.addAttribute("task", new TaskWrapper(task));
+        //model.addAttribute("round", new RoundWrapper(round));
+
+        SessionWrapper sessionWrapper = sr.getSession();
+        model.addAttribute("pogsSession", sessionWrapper);
+        if (sessionWrapper.isTaskExecutionModeParallel()) {
+            model.addAttribute("hasTabs", true);
+            model.addAttribute("taskList", sessionWrapper.getTaskList());
+            //add all tasks
+        } else {
+            model.addAttribute("hasTabs", false);
+        }
+        String cc = sr.getSession().getCommunicationType();
+        model.addAttribute("communicationType", cc);
+        model.addAttribute("chatBotName", sessionWrapper.getChatBotName());
+        model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
+            .NO_CHAT.getId().toString()) ? (true) : (false)));
+        model.addAttribute("hasCollaborationTodoListEnabled", false);
+        model.addAttribute("hasCollaborationFeedbackWidget", false);
+        model.addAttribute("hasCollaborationVotingWidget", false);
+        model.addAttribute("secondsRemainingCurrentUrl",
+            sr.getSession().getSecondsRemainingForCurrentUrl());
+        model.addAttribute("nextUrl", sr.getSession().getNextUrl());
+
+        CompletedTask completedTask = completedTaskDao.get(sessionWrapper.getGlobalChatCompletedTaskId());
+        model.addAttribute("completedTask", completedTask);
+
+        model.addAttribute("eventsUntilNow", eventLogService.getAllLogsUntilNow(completedTask.getId()));
+
+        model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(sessionWrapper.getTaskList().get(0), su, round)));
+
         return forwardToWaitingRoomOrGlobalChatRoom(externalId, model, "workspace/session_global_chat");
     }
 
