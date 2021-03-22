@@ -409,7 +409,7 @@ public class WorkspaceController {
             return "workspace/error";
         }
         sr.subjectCheckIn(su);
-        if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT)) {
+        if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())) {
             return "redirect:/waiting_room/" + su.getSubjectExternalId();
         } else {
             return "redirect:/session_global_chat/" + su.getSubjectExternalId();
@@ -496,7 +496,7 @@ public class WorkspaceController {
         if (su != null) {
 
             SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
-            if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+            if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
                 model.addAttribute("template", "layouts/workspace-layout.html");
             } else {
                 model.addAttribute("template", "layouts/workspace-iframe-layout.html");
@@ -622,7 +622,7 @@ public class WorkspaceController {
                         sr.getSession().getSecondsRemainingForCurrentUrl());
                 model.addAttribute("nextUrl", sr.getSession().getNextUrl());
 
-                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId()+ "")){
                     model.addAttribute("template", "layouts/workspace-layout.html");
                 } else {
                     model.addAttribute("template", "layouts/workspace-iframe-layout.html");
@@ -1056,7 +1056,7 @@ public class WorkspaceController {
                 model.addAttribute("completedTaskAttributes",
                         completedTaskAttributeService.listCompletedTaskAttributesForCompletedTask(completedTask.getId()));
 
-                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+                if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
                     model.addAttribute("template", "layouts/workspace-layout.html");
                 } else {
                     model.addAttribute("template", "layouts/workspace-iframe-layout.html");
