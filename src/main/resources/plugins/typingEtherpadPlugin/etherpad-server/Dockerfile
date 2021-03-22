@@ -19,7 +19,7 @@ ARG ETHERPAD_VERSION=develop
 #
 # EXAMPLE:
 #   ETHERPAD_PLUGINS="ep_codepad ep_author_neat"
-ARG ETHERPAD_PLUGINS=""
+ARG ETHERPAD_PLUGINS="ep_disable_chat"
 
 # Set the following to production to avoid installing devDeps
 # this can be done with build args (and is mandatory to build ARM version)

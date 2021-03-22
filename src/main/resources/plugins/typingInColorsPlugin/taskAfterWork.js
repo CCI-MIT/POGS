@@ -29,7 +29,7 @@ function newConnection(url, method){
     }
 }
 
-var API_ADDRESS = "http://localhost:9001/api/1.2.13/";
+var API_ADDRESS = "http://localhost:9001/api/1.2.15/";
 var API_KEY = "8jsa738hjkds89hhjhk";
 var SUBJECT_ETHERPAD_AUTHOR_ID = "ETHERPAD_AUTHOR_ID";
 var SUBJECT_ETHERPAD_SESSION_ID = "ETHERPAD_SESSION_ID";
