@@ -453,7 +453,7 @@ public class SessionRunner implements Runnable {
     private void createCompletedTasks(SessionWrapper session, RoundWrapper round, boolean hasOrder) {
         int taskOrderCounter = 1;
 
-        if(!session.getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getCommunicationType())){
+        if(!session.getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
             TeamWrapper team = round.getRoundTeams().get(0);
             TaskWrapper tw = session.getTaskList().get(0);
             CompletedTask ct = createCompletedTask(team.getTeam(),null,round,tw,taskOrderCounter);
