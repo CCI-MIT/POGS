@@ -202,8 +202,8 @@ class Pogs {
     onCountdownEnd(){
         this.subscribe("onUnload", function(){
 
-            //TODO FIX: window.location = this.nextUrl;
-            console.log("Linha 206")
+            window.location = this.nextUrl;
+            //console.log("Linha 206")
         }.bind(this))
         this.fire(null, 'onUnload', this);
 
@@ -463,4 +463,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.3.11");
+console.log("Version 1.4.1");
