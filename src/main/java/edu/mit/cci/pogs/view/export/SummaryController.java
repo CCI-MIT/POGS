@@ -22,6 +22,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import edu.mit.cci.pogs.service.EventLogService;
+import edu.mit.cci.pogs.service.export.SQLExportService;
 import edu.mit.cci.pogs.service.export.exportBeans.ExportFile;
 import edu.mit.cci.pogs.service.summaryexport.SummaryExportService;
 import edu.mit.cci.pogs.utils.ExportUtils;
@@ -34,6 +35,10 @@ public class SummaryController {
 
     @Autowired
     private SummaryExportService summaryExportService;
+
+    @Autowired
+    private SQLExportService sqlExportService;
+
 
     @Autowired
     private EventLogService eventlogService;
@@ -73,8 +78,34 @@ public class SummaryController {
             e.printStackTrace();
         }
     }
+    @GetMapping("/admin/export/summary/sqldump/study/{studyId}")
+    public void exportDump(HttpServletRequest request, HttpServletResponse response,
+                                                       @PathVariable("studyId") Long studyId) {
+        List<ExportFile> efs = sqlExportService.generateStudyConfigurationSQL(
+                studyId, getPath(request));
+        try {
+            response.setContentType("application/zip");
+            response.setHeader("Content-Disposition",
+                    "attachment; filename=StudyConfigurationSQLDump"+
+                            ("study["+studyId+"]")+"__" +
+                            ExportUtils.getTimeFormattedNoSpaces(new
+                                    Timestamp(new Date().getTime())) + ".zip");
 
-    @GetMapping("/admin/export/summary/snapshot/study/{studyId}")
+
+
+            List<ExportFile> sessionExportFiles = new ArrayList<>();
+
+            for(ExportFile ef: efs) {
+                sessionExportFiles.add(ef);
+            }
+            filesToZip(response, sessionExportFiles);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+        @GetMapping("/admin/export/summary/snapshot/study/{studyId}")
     public void exportSessionTaskFinalSnapshotForStudy(HttpServletRequest request, HttpServletResponse response,
                                                  @PathVariable("studyId") Long studyId) {
         generateTaskFinalSnapshotSummary(request,response,null,studyId);

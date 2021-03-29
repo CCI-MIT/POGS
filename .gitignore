@@ -2,6 +2,7 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 #module and compilation related files (optional)
+.env
 *.iml
 .idea/compiler.xml
 .idea/modules.xml

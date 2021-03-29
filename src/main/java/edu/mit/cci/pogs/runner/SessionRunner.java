@@ -455,7 +455,8 @@ public class SessionRunner implements Runnable {
 
         if(!session.getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
             TeamWrapper team = round.getRoundTeams().get(0);
-            TaskWrapper tw = session.getTaskList().get(0);
+            Task t  = taskDao.get(300l);
+            TaskWrapper tw = new TaskWrapper(t);
             CompletedTask ct = createCompletedTask(team.getTeam(),null,round,tw,taskOrderCounter);
             Session sessionDb = sessionDao.get(session.getId());
             sessionDb.setGlobalChatCompletedTaskId(ct.getId());

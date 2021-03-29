@@ -1,0 +1,2 @@
+INSERT INTO `task` (`id`, `task_name`, `task_plugin_type`, `solo_task`, `interaction_time`, `intro_page_enabled`, `intro_time`, `primer_page_enabled`, `primer_video_autoplay_mute`, `primer_time`, `interaction_widget_enabled`, `communication_type`, `collaboration_todo_list_enabled`, `collaboration_feedback_widget_enabled`, `collaboration_voting_widget_enabled`, `should_score`) VALUES
+('300', 'Global chat dummy task', 'surveyPlugin', '0', '30', '0', '0', '0', '0', '0', '0', 'N', '0', '0', '0', '0');
