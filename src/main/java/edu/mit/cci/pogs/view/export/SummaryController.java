@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -367,25 +368,31 @@ public class SummaryController {
         ZipOutputStream out = new ZipOutputStream(response.getOutputStream());
         // compress the files
         for (int i = 0; i < files.size(); i++) {
-            File file = new File(files.get(i).getFullFilePathAndName());
-            FileInputStream in = new FileInputStream(file);
-            // add ZIP entry to output stream
-            String relativeFolder = files.get(i).getRelativeFolder();
-            if(relativeFolder!=null) {
+
+            try {
+
+                File file = new File(files.get(i).getFullFilePathAndName());
+                FileInputStream in = new FileInputStream(file);
+                // add ZIP entry to output stream
+                String relativeFolder = files.get(i).getRelativeFolder();
+                if (relativeFolder != null) {
 
 
-                out.putNextEntry(new ZipEntry(relativeFolder + "/" + file.getName()));
-            }else {
-                out.putNextEntry(new ZipEntry( file.getName()));
+                    out.putNextEntry(new ZipEntry(relativeFolder + "/" + file.getName()));
+                } else {
+                    out.putNextEntry(new ZipEntry(file.getName()));
+                }
+                // transfer bytes from the file to the ZIP file
+                int len;
+                while ((len = in.read(buf)) > 0) {
+                    out.write(buf, 0, len);
+                }
+                // complete the entry
+                out.closeEntry();
+                in.close();
+            } catch (FileNotFoundException fnf){
+                System.out.println("File not found" + files.get(i).getFullFilePathAndName());
             }
-            // transfer bytes from the file to the ZIP file
-            int len;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            // complete the entry
-            out.closeEntry();
-            in.close();
         }
         // complete the ZIP file
         out.close();

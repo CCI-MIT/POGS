@@ -47,7 +47,7 @@ public class SQLUtils {
             }
 
         }
-        String sql = "INSERT INTO `" + camelToSnake(pojo.getClass().getSimpleName()) +
+        String sql = "INSERT INTO IGNORE `" + camelToSnake(pojo.getClass().getSimpleName()) +
                 "` (" + sqlFields + ") values (" + sqlValues + ");\n";
         //System.out.println(sql);
         return sql;
