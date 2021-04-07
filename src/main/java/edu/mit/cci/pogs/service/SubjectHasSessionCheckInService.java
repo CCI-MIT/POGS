@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
@@ -103,11 +104,11 @@ public class SubjectHasSessionCheckInService {
     }
 
     public List<SubjectHasSessionCheckInBean> listLostSubjects(Long sessionId){
-        return checkInBeanFromSubjectHasSessionCheckInBean(subjectHasSessionCheckInDao.listLostSubjects(sessionId));
+        return checkInBeanFromSubjectHasSessionCheckInBean(subjectHasSessionCheckInDao.listLostSubjects(sessionId, new Date(DateUtils.today())));
     }
 
     public List<SubjectHasSessionCheckInBean> listCheckedInSubjects(Long sessionId){
-        return checkInBeanFromSubjectHasSessionCheckInBean(subjectHasSessionCheckInDao.listCheckedInSubjects(sessionId));
+        return checkInBeanFromSubjectHasSessionCheckInBean(subjectHasSessionCheckInDao.listCheckedInSubjects(sessionId, new Date(DateUtils.today())));
     }
 
 }

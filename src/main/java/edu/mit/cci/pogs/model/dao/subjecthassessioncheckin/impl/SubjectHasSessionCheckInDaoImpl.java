@@ -6,6 +6,8 @@ import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
@@ -28,17 +30,17 @@ public class SubjectHasSessionCheckInDaoImpl extends AbstractDao<SubjectHasSessi
         this.dslContext = dslContext;
     }
 
-    public List<SubjectHasSessionCheckIn> listLostSubjects(Long sessionId){
-        return listSubjects(sessionId, false, true);
+    public List<SubjectHasSessionCheckIn> listLostSubjects(Long sessionId, Date date){
+        return listSubjects(sessionId, false, true, date);
     }
 
-    public List<SubjectHasSessionCheckIn> listCheckedInSubjects(Long sessionId){
-        return listSubjects(sessionId, true, false);
+    public List<SubjectHasSessionCheckIn> listCheckedInSubjects(Long sessionId, Date date){
+        return listSubjects(sessionId, true, false, date);
     }
     public List<SubjectHasSessionCheckIn> listReadyToJoinSubjects(Long sessionId) {
-        return listSubjects(sessionId, false, false);
+        return listSubjects(sessionId, false, false, null);
     }
-    public List<SubjectHasSessionCheckIn> listSubjects(Long sessionId, boolean hasJoinedSession, boolean hasLostSession) {
+    public List<SubjectHasSessionCheckIn> listSubjects(Long sessionId, boolean hasJoinedSession, boolean hasLostSession, Date date) {
 
         final SelectQuery<Record> query = dslContext.select()
                 .from(SUBJECT_HAS_SESSION_CHECK_IN)
@@ -46,8 +48,13 @@ public class SubjectHasSessionCheckInDaoImpl extends AbstractDao<SubjectHasSessi
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.SESSION_ID.eq(sessionId));
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.HAS_JOINED_SESSION.eq(hasJoinedSession));
         query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.HAS_LOST_SESSION.eq(hasLostSession));
+        if(date!=null){
+            query.addConditions(SUBJECT_HAS_SESSION_CHECK_IN.CHECK_IN_TIME.greaterThan(new Timestamp(date.getTime())));
+        }
+
         query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.CHECK_IN_TIME.asc());
         query.addOrderBy(SUBJECT_HAS_SESSION_CHECK_IN.LAST_PING_TIME.desc());
+
 
 
         return query.fetchInto(SubjectHasSessionCheckIn.class);

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dashboard </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+    </ol>
+    <h2>Active running sessions on session runner class</h2>
+
+
+
+    <br/>
+
+    <div class="alert alert-info" th:if="${#lists.isEmpty(livePerpetuals)}">There are no current live perpetual sessions associated with the research groups you are associated with!</div>
+    <div th:if="${not #lists.isEmpty(livePerpetuals)}" >
+    <h2>Perpetual parent sessions</h2>
+    <table class="table table-striped" th:if="${not #lists.isEmpty(livePerpetuals)}">
+           <thead>
+           <tr>
+               <th>Session ID</th>
+               <th>Session name</th>
+               <th>Session start date </th>
+               <th>Subjects with valid checked in </th>
+           </tr>
+           </thead>
+           <tbody>
+           <th:block th:each="sessionRunner : ${livePerpetuals}">
+               <tr>
+                   <td>Main session</td>
+                   <td th:text="${sessionRunner.session.id}"></td>
+                   <td><a th:text="${sessionRunner.session.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionRunner.session.id} "></a> <small><a target="_blank" th:href="${'/admin/dashboard/sessionlog/' + sessionRunner.session.id} ">LOG</a> <a target="_blank" th:href="${'/admin/dashboard/subjectcheckin/' + sessionRunner.session.id} ">Check-Ins</a></small></td>
+                   <td th:text="${#dates.format(sessionRunner.session.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+                   <td th:text="${#maps.size(sessionRunner.checkedInWaitingSubjectListById)}"></td>
+               </tr>
+
+                    <th:block th:if="${not #maps.isEmpty(sessionRunner.checkedInWaitingSubjectListById)}" th:each="subjectCheckin : ${sessionRunner.checkedInWaitingSubjectListById}">
+                   <tr>
+                       <td></td>
+                       <td th:text="${subjectCheckin.key}"></td>
+                       <td th:text="${subjectCheckin.value.createdAt}"></td>
+                       <td th:text="${subjectCheckin.value.subjectExternalId}"></td>
+                       <td></td>
+                   </tr>
+                   </th:block>
+               </th:block>
+           </tbody>
+       </table>
+     </div>
+
+       <div class="alert alert-info" th:if="${#lists.isEmpty(liveScheduleds)}">There are no current live scheduled sessions or perpetual children sessions associated with the research groups you are associated with!</div>
+       <div th:if="${not #lists.isEmpty(liveScheduleds)}" >
+       <h2>Scheduled or perpetual children session</h2>
+           <table class="table table-striped" th:if="${not #lists.isEmpty(liveScheduleds)}">
+                  <thead>
+                  <tr>
+                      <th>Session ID</th>
+                      <th>Session name</th>
+                      <th>Session start date </th>
+                      <th>Subjects with valid checked in </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <th:block th:each="sessionRunner : ${liveScheduleds}">
+                      <tr>
+                          <td>Main session</td>
+                          <td th:text="${sessionRunner.session.id}"></td>
+                          <td><a th:text="${sessionRunner.session.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionRunner.session.id} "></a> <small><a target="_blank" th:href="${'/admin/dashboard/sessionlog/' + sessionRunner.session.id} ">LOG</a> <a target="_blank" th:href="${'/admin/dashboard/subjectcheckin/' + sessionRunner.session.id} ">Check-Ins</a></small></td>
+                          <td th:text="${#dates.format(sessionRunner.session.sessionStartDate, 'dd/MM/yyyy HH:mm')}"></td>
+                          <td th:text="${#maps.size(sessionRunner.checkedInWaitingSubjectListById)}"></td>
+                      </tr>
+
+                        <th:block th:if="${not #maps.isEmpty(sessionRunner.checkedInWaitingSubjectListById)}" th:each="subjectCheckin : ${sessionRunner.checkedInWaitingSubjectListById}">
+                   <tr>
+                       <td></td>
+                       <td th:text="${subjectCheckin.key}"></td>
+                       <td th:text="${subjectCheckin.value.createdAt}"></td>
+                       <td th:text="${subjectCheckin.value.subjectExternalId}"></td>
+                       <td></td>
+                   </tr>
+                   </th:block>
+
+                      </th:block>
+                  </tbody>
+              </table>
+              </div>
+</div>
+</body>
+</html>

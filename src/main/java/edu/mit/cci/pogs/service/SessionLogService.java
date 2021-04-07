@@ -48,4 +48,13 @@ public class SessionLogService {
         sessionLogDao.create(sl);
 
     }
+    public void createLogFromSystem(Long sessionId, String message){
+        SessionLog sl = new SessionLog();
+        sl.setLogTime(new Timestamp(new Date().getTime()));
+        sl.setLogType("INFO");
+        sl.setSessionId(sessionId);
+        sl.setMessage(message);
+        sessionLogDao.create(sl);
+
+    }
 }

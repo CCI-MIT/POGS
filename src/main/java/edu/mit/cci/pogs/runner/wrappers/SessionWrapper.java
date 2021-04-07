@@ -21,7 +21,7 @@ public class SessionWrapper extends Session {
 
     private ArrayList<SessionSchedule> sessionSchedule;
 
-    private static final Integer SCORING_TIME_PAGE = 1000*8;
+    private static final Integer SCORING_TIME_PAGE = 1000 * 8;
 
     public SessionWrapper(Session session) {
         super(session);
@@ -83,11 +83,14 @@ public class SessionWrapper extends Session {
             return 20 * 1000l;
         }
         Integer roundSize = this.sessionRounds.size();
-
-        if (roundSize != 0) {
-            long startRoundTime = this.getSessionStartDate().getTime();
-            return (startRoundTime + sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize)  + 1000*60 - DateUtils.now();
+        long startRoundTime = this.getSessionStartDate().getTime();
+        if (!this.isTaskExecutionModeSequential()) {
+            return (startRoundTime + this.getFixedInteractionTime() + 1000*60 - DateUtils.now());
         }
+        if (roundSize != 0) {
+            return (startRoundTime + sessionRounds.get(roundSize - 1).getTotalRoundTime() * roundSize) + 1000 * 60 - DateUtils.now();
+        }
+
         return -1l;
     }
 
@@ -98,7 +101,7 @@ public class SessionWrapper extends Session {
 
         if (isSessionPerpetual()) {
 
-            return (new Date().getTime() + (1000 * (this.getWaitingRoomTime()+10)));
+            return (new Date().getTime() + (1000 * (this.getWaitingRoomTime() + 10)));
         }
         if (this.sessionSchedule == null) {
             return getTimeToStart();
@@ -109,11 +112,11 @@ public class SessionWrapper extends Session {
 
     }
 
-    public Boolean isSessionPerpetual(){
-        if(getParentSessionId()!=null) {
+    public Boolean isSessionPerpetual() {
+        if (getParentSessionId() != null) {
             return false;
         }
-        return this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString())||
+        return this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL.getId().toString()) ||
                 this.getSessionScheduleType().equals(SessionScheduleType.PERPETUAL_LANDING_PAGE.getId().toString());
     }
 
@@ -199,7 +202,7 @@ public class SessionWrapper extends Session {
 
 
     public boolean isTooLate() {
-        if(isSessionPerpetual()){
+        if (isSessionPerpetual()) {
             return false;
         }
         return DateUtils.now() > this.getSessionStartDate().getTime();
@@ -248,9 +251,9 @@ public class SessionWrapper extends Session {
         return this.getTaskExecutionType().equals(
                 TaskExecutionType.SEQUENTIAL_FIXED_ORDER.getId().toString()) ||
                 this.getTaskExecutionType().equals(
-                        TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString())||
-                                this.getTaskExecutionType().equals(
-                                        TaskExecutionType.SEQUENTIAL_TASKGROUP_RANDOM_ORDER.getId().toString());
+                        TaskExecutionType.SEQUENTIAL_RANDOM_ORDER.getId().toString()) ||
+                this.getTaskExecutionType().equals(
+                        TaskExecutionType.SEQUENTIAL_TASKGROUP_RANDOM_ORDER.getId().toString());
     }
 
     public boolean isTaskExecutionModeParallel() {
@@ -280,7 +283,7 @@ public class SessionWrapper extends Session {
     }
 
 
-    public void createSessionSchedule() {
+    public List<String> createSessionSchedule() {
 
         this.sessionSchedule = new ArrayList<>();
 
@@ -330,17 +333,19 @@ public class SessionWrapper extends Session {
         if (this.isTaskExecutionModeParallel()) {
             removeIntrosAndPrimersFromSchedule();
         }
-
-        System.out.println("Time of schedule creation : " + new Date());
+        List<String> scheduleOutput = new ArrayList<>();
+        scheduleOutput.add("Time of schedule creation : " + new Date());
 
         long lastTimeStamp = 0l;
         for (SessionSchedule ss : this.sessionSchedule) {
-               if(lastTimeStamp!=0l) {
-                   ss.setStartTimestamp(lastTimeStamp);
-               }
-               lastTimeStamp = ss.getEndTimestamp() - 1000;//one second overlap
-            System.out.println(simpleDateFormat.format(new Date(ss.getStartTimestamp())) + " - " + simpleDateFormat.format(new Date(ss.getEndTimestamp())) + " - " + ss.getUrl());
+            if (lastTimeStamp != 0l) {
+                ss.setStartTimestamp(lastTimeStamp);
+            }
+            lastTimeStamp = ss.getEndTimestamp() - 1000;//one second overlap
+            scheduleOutput.add(simpleDateFormat.format(new Date(ss.getStartTimestamp())) + " - " + simpleDateFormat.format(new Date(ss.getEndTimestamp())) + " - " + ss.getUrl());
         }
+
+        return scheduleOutput;
     }
 
     private void removeIntrosAndPrimersFromSchedule() {

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/admin-layout.html}">
+<!--/*@thymesVar id="study" type="edu.mit.cci.pogs.model.jooq.tables.pojos.Study"*/-->
+<!--/*@thymesVar id="sessionBean" type="edu.mit.cci.pogs.view.session.beans.SessionBean"*/-->
+<head>
+    <meta charset="UTF-8">
+    <title>POGS - Dashboard </title>
+</head>
+<body>
+<div layout:fragment="content" class="container">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+    </ol>
+    <h2>Session log</h2>
+    <br/>
+
+    <div class="alert alert-info" th:if="${#lists.isEmpty(logs)}">There are no logs for this session</div>
+    <div th:if="${not #lists.isEmpty(logs)}" >
+        <table class="table table-striped" th:if="${not #lists.isEmpty(logs)}">
+            <thead>
+            <tr>
+
+                <th>timestamp</th>
+                <th>log</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="log : ${logs}">
+                <tr>
+
+                    <td th:text="${#dates.format(log.logTime, 'dd/MM/yyyy HH:mm:ss')}"></td>
+                    <td th:text="${log.message}"></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

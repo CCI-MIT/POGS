@@ -16,10 +16,12 @@ import java.util.Map;
 
 import edu.mit.cci.pogs.config.AuthUserDetailsService;
 import edu.mit.cci.pogs.model.dao.session.TaskExecutionType;
+import edu.mit.cci.pogs.model.dao.sessionlog.SessionLogDao;
 import edu.mit.cci.pogs.model.dao.study.StudyDao;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionLog;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Study;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SubjectHasSessionCheckIn;
 import edu.mit.cci.pogs.runner.SessionRunner;
@@ -29,6 +31,7 @@ import edu.mit.cci.pogs.runner.wrappers.SessionSchedule;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
+import edu.mit.cci.pogs.service.SessionLogService;
 import edu.mit.cci.pogs.service.StudyService;
 import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 
@@ -42,7 +45,49 @@ public class DashboardController {
     private StudyService studyService;
 
     @Autowired
+    private SessionLogDao sessionLogDao;
+
+    @Autowired
     private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
+
+    @GetMapping("/admin/dashboard/sessionrunner")
+    public String sessionRunner(Model model) {
+        Collection<SessionRunner> liveSessionRunners = SessionRunnerManager.getLiveRunners();
+        Collection<SessionRunner> livePerpetuals = new ArrayList<>();
+        Collection<SessionRunner> liveScheduleds = new ArrayList<>();
+        for (SessionRunner sr : liveSessionRunners) {
+            sr.getCheckedInWaitingSubjectListById();
+            if(sr.getSession().isSessionPerpetual()){
+                livePerpetuals.add(sr);
+            } else {
+                liveScheduleds.add(sr);
+
+            }
+        }
+        model.addAttribute("liveSessions",liveSessionRunners);
+        model.addAttribute("livePerpetuals",livePerpetuals);
+        model.addAttribute("liveScheduleds",liveScheduleds);
+        return "dashboard/dashboard-advanced";
+    }
+
+
+
+    @GetMapping("/admin/dashboard/sessionlog/{sessionId}")
+    public String sessionRunnerLog(@PathVariable("sessionId") Long sessionId,Model model) {
+
+        model.addAttribute("logs",sessionLogDao.listTodayLogs(sessionId));
+        return "dashboard/dashboard-advanced-logs";
+    }
+
+    @GetMapping("/admin/dashboard/subjectcheckin/{sessionId}")
+    public String sessionSubjectCheckIn(@PathVariable("sessionId") Long sessionId,Model model) {
+
+        model.addAttribute("subjectsToJoin",subjectHasSessionCheckInService.listReadyToJoinSubjects(sessionId));
+
+        model.addAttribute("subjectsCheckedIn",subjectHasSessionCheckInService.listCheckedInSubjects(sessionId));
+        model.addAttribute("subjectsLost",subjectHasSessionCheckInService.listLostSubjects(sessionId));
+        return "dashboard/dashboard-advanced-subjects";
+    }
 
     @GetMapping("/admin/dashboard")
     public String dashboard(Model model) {
