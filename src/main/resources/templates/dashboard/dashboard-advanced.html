@@ -25,6 +25,7 @@
     <table class="table table-striped" th:if="${not #lists.isEmpty(livePerpetuals)}">
            <thead>
            <tr>
+               <th>Number</th>
                <th>Session ID</th>
                <th>Session name</th>
                <th>Session start date </th>
@@ -32,8 +33,9 @@
            </tr>
            </thead>
            <tbody>
-           <th:block th:each="sessionRunner : ${livePerpetuals}">
+           <th:block th:each="sessionRunner, iter : ${livePerpetuals}">
                <tr>
+                   <td th:text="${iter.index}"></td>
                    <td>Main session</td>
                    <td th:text="${sessionRunner.session.id}"></td>
                    <td><a th:text="${sessionRunner.session.sessionSuffix}" th:href="${'/admin/dashboard/sessions/' + sessionRunner.session.id} "></a> <small><a target="_blank" th:href="${'/admin/dashboard/sessionlog/' + sessionRunner.session.id} ">LOG</a> <a target="_blank" th:href="${'/admin/dashboard/subjectcheckin/' + sessionRunner.session.id} ">Check-Ins</a></small></td>
