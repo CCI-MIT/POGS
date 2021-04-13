@@ -18,6 +18,12 @@ spring:
     url: ${database.url}
     username: ${database.username}
     password: ${database.password}
+    hikari:
+      minimumIdle: 2
+      maximumPoolSize: 50
+      idleTimeout: 120000
+      connectionTimeout: 300000
+      leakDetectionThreshold: 300000
   security:
     filter:
       dispatcher-types: ASYNC,REQUEST,ERROR

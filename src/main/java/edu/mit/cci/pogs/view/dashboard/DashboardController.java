@@ -50,7 +50,7 @@ public class DashboardController {
     @Autowired
     private SubjectHasSessionCheckInService subjectHasSessionCheckInService;
 
-    @GetMapping("/admin/dashboard/sessionrunner")
+        @GetMapping("/admin/dashboard/sessionrunner")
     public String sessionRunner(Model model) {
         Collection<SessionRunner> liveSessionRunners = SessionRunnerManager.getLiveRunners();
         Collection<SessionRunner> livePerpetuals = new ArrayList<>();
