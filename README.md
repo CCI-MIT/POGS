@@ -94,3 +94,5 @@ In the root directory:
 java -jar target/pogs-0.0.1-SNAPSHOT.jar
 ```
 
+If you are setting up the system in a RedHat remember to allow proxy to connect
+https://manastri.blogspot.com/2020/07/13-permission-denied-while-connecting.html

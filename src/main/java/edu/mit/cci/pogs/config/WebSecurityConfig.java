@@ -64,6 +64,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                         .and()
                     .frameOptions()
                         .sameOrigin();
+
+        //.frameOptions()
+        //        .disable()
+        //        .addHeaderWriter(new StaticHeadersWriter("X-FRAME-OPTIONS",
+         //               "ALLOW-FROM https://www.youtube.com/watch?v=HV2LVEPrKGs&feature=emb_title"));
     }
 
     @Bean

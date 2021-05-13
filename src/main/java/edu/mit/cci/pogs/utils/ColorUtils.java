@@ -53,6 +53,9 @@ public class ColorUtils {
 
 
     public static void main(String[] args) {
+
+        Long.parseLong("-1");
+        /*
         Color[] colors = ColorUtils.generateVisuallyDistinctColors(
                 ((4 > 10) ? (4) : (10)),
                 ColorUtils.MIN_COMPONENT, ColorUtils.MAX_COMPONENT);
@@ -65,6 +68,8 @@ public class ColorUtils {
             System.out.println(""+ String.format("#%02x%02x%02x", colors[i].getRed(),
                     colors[i].getGreen(), colors[i].getBlue()));
         }
+
+         */
     }
 
 

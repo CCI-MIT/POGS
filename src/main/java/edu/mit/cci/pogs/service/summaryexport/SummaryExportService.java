@@ -409,6 +409,7 @@ public class SummaryExportService {
         List<CompletedTask> completedTaskList = completedTaskDao.listBySessionId(sessionList);
         List<ExportFile> ret = new ArrayList<>();
         Map<Long, List<CompletedTask>> groupedByTask = new HashMap<>();
+        System.out.println(" Extracting around : " + completedTaskList.size());
         for (CompletedTask ct : completedTaskList) {
             List<CompletedTask> currentList = groupedByTask.get(ct.getTaskId());
             if (currentList == null) {
@@ -440,10 +441,16 @@ public class SummaryExportService {
             Round round = roundDao.get(ct.getRoundId());
             Session session = sessionDao.get(round.getSessionId());
             Study study = studyDao.get(session.getStudyId());
-            ct.getTeamId();
+            //ct.getTeamId();
             String subject = "";
             if (task.getSoloTask()) {
+                System.out.println(ct.getSubjectId() + " --- task id" + task.getId() + " - "+ ct.getTaskId());
+
+                if(ct.getSubjectId() == null){
+                    //System.out.println(" CT with solo set and null: " + ct.getId());
+                }
                 Subject sub = subjectDao.get(ct.getSubjectId());
+
                 subject = sub.getSubjectExternalId();
             }
             String rec = study.getStudySessionPrefix() + ";" + session.getSessionSuffix() + ";" +
