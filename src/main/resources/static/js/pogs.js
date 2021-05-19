@@ -201,8 +201,15 @@ class Pogs {
     }
     onCountdownEnd(){
         this.subscribe("onUnload", function(){
+            if(!this.isGlobalChatPage){
+                window.location = this.nextUrl;
+            } else {
+                this.countDown = null;
+                if(this.nextUrl.indexOf("pogs.info")!=-1||this.nextUrl.indexOf("localhost")!=-1){
+                    window.location = this.nextUrl;
+                }
+            }
 
-            window.location = this.nextUrl;
             //console.log("Linha 206")
         }.bind(this))
         this.fire(null, 'onUnload', this);
@@ -377,7 +384,7 @@ class Pogs {
     onFlowBroadcastReceived(message) {
 
         this.latestFlowMessage = new Date().getTime();
-        console.log("MESSAGE RECEIVED: " + JSON.stringify(message));
+        //console.log("MESSAGE RECEIVED: " + JSON.stringify(message));
        console.log("this.isGlobalChatPage: " + this.isGlobalChatPage)
         if(this.isGlobalChatPage){
 
@@ -389,6 +396,14 @@ class Pogs {
                     this.fire(null, 'onReady', this);
                 }
             }
+            if( this.countDown == null){
+                var finalDate = (new Date().getTime() + parseInt(
+                    message.content.secondsRemainingCurrentUrl));
+                this.countDown = new Countdown(finalDate,
+                                               "countdown",
+                                               this.onCountdownEnd.bind(this))
+            }
+            return;
         }
         if(!this.sessionIsPerpetual) {
             if ((message.content.currentUrl + "/" + this.subjectId == window.location.pathname)) {
@@ -463,4 +478,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.4.6");
+console.log("Version 1.4.9");

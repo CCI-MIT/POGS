@@ -2,6 +2,7 @@
 const COMMUNICATION_TYPE ={
     GROUP_CHAT: 'G',
     MATRIX_CHAT: 'M',
+    VIDEO_CHAT : 'V',
     DYADIC : 'D'
 }
 
@@ -50,6 +51,9 @@ class CommunicationPlugin extends PogsPlugin {
             if(this.pogsRef.communicationType == COMMUNICATION_TYPE.MATRIX_CHAT) {
                 var mtm = new MatrixChatManager(this);
                 mtm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
+            }
+            if(this.pogsRef.communicationType == COMMUNICATION_TYPE.VIDEO_CHAT) {
+                var vtm = new VideoChatManager(this);
             }
 
 
@@ -716,6 +720,116 @@ class DyadicChatManager extends GroupChatManager {
 }
 
 
+class VideoChatManager {
+    constructor(communicationPluginReference) {
+        console.log("<<<<<<<<<<<New video chat>>>>> ")
+        this.channelReceiver = null;
+        this.communicationPluginReference = communicationPluginReference;
+        this.subjectsInChannel = communicationPluginReference.getTeammates();
+        this.currentSubject = communicationPluginReference.getSubjectByExternalId(communicationPluginReference.getSubjectId());
+        //this.setupSubjectPanel();
+
+        this.sendJoinedMessage();
+        this.setupHTML();
+        this.communicationPluginReference.
+        subscribeCommunicationBroadcast(this.onCommunicationBroadcastReceived.bind(this));
+
+    }
+
+
+    onCommunicationBroadcastReceived(message) {
+
+        if (message.sender != this.communicationPluginReference.getSubjectId()) {
+            if (message.content.type == CHAT_TYPE.MESSAGE) {
+
+                if (message.content.message != "") {
+
+
+
+                }
+
+            }
+        }else{
+            if (message.content.message != "") {
+
+            }
+        }
+
+    }
+    setupSubjectPanel() {
+        for(var i = 0; i < this.subjectsInChannel.length; i ++) {
+
+
+        }
+
+    }
+    setupHTML() {
+        console.log("SETTING UP THE PAGE FOR CALL")
+        $("#communication_to_show").empty();
+        var script = document.createElement('script');
+        //add jitsi iframe lib
+        var url = "meet.jit.si/POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId();
+        script.onload = function() {
+            var options = {
+                width: 350,
+                roomName : "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId(),
+                parentNode: document.getElementById("communication_to_show"),
+                interfaceConfigOverwrite: {
+                    filmStripOnly: false,
+                    MOBILE_APP_PROMO: false,
+                    HIDE_INVITE_MORE_HEADER: true,
+                    SHOW_CHROME_EXTENSION_BANNER: false,
+                    DISPLAY_WELCOME_PAGE_CONTENT: false,
+                    DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
+                    TILE_VIEW_MAX_COLUMNS : 1,
+                    enableClosePage: false,
+                    toolbarButtons: [
+                        'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
+                    ],
+                },
+                userInfo: {
+                    displayName: this.currentSubject.displayName
+                },
+
+                configOverwrite: {
+                    disableSimulcast: false,
+                    disableDeepLinking: true,
+                    useStunTurn: true,
+                    prejoinPageEnabled: false,
+
+                }
+            }
+            this.api = new window.JitsiMeetExternalAPI(url, options);
+            this.api.addEventListener('videoConferenceJoined', () => {
+                console.log("videoConferenceJoined");
+                this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
+            });
+            this.api.addEventListener("participantLeft", () => {
+                console.log("participantLeft")
+                this.communicationPluginReference.sendMessage("participantLeft", "-", CHAT_TYPE.STATUS, null);
+
+            });
+            this.api.addEventListener("videoConferenceLeft", () => {
+                console.log("videoConferenceLeft");
+                this.communicationPluginReference.sendMessage("videoConferenceLeft", "-", CHAT_TYPE.STATUS, null);
+                $("#communicationContainer").empty();
+            });
+
+        }.bind(this);
+
+        script.src = "https://meet.jit.si/external_api.js";
+        document.getElementsByTagName('head')[0].appendChild(script);
+
+
+
+
+
+    }
+
+    sendJoinedMessage() {
+        this.communicationPluginReference.sendMessage("loadedPage", "-", CHAT_TYPE.STATUS, null)
+    }
+}
 
 function minuteAndSecond(timestamp){
     function trailingZeros(val) {

@@ -485,11 +485,14 @@ public class SessionRunner implements Runnable {
             TeamWrapper team = round.getRoundTeams().get(0);
             Task t  = taskDao.get(300l);
             TaskWrapper tw = new TaskWrapper(t);
+            tw.setTaskStartTimestamp(new Date().getTime());
             CompletedTask ct = createCompletedTask(team.getTeam(),null,round,tw,taskOrderCounter);
             Session sessionDb = sessionDao.get(session.getId());
             sessionDb.setGlobalChatCompletedTaskId(ct.getId());
             session.setGlobalChatCompletedTaskId(ct.getId());
+            this.session.setGlobalChatCompletedTaskId(ct.getId());
             sessionDao.update(sessionDb);
+
         }
 
         for (TaskWrapper task : session.getTaskList()) {
