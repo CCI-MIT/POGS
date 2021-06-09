@@ -153,6 +153,12 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+		<!-- Jitsi as a service dependency -->
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>java-jwt</artifactId>
+			<version>3.12.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

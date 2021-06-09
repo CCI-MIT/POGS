@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.awt.*;
@@ -76,6 +77,7 @@ import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
 import edu.mit.cci.pogs.utils.ColorUtils;
 import edu.mit.cci.pogs.utils.DateUtils;
+import edu.mit.cci.pogs.utils.JaasUtils;
 import edu.mit.cci.pogs.utils.StringUtils;
 
 @Component
@@ -108,6 +110,9 @@ public class SessionRunner implements Runnable {
     private List<SubjectHasSessionCheckIn> subjectCheckInList;
 
     private Map<Long, List<Subject>> sessionsRelatedToPerpetual = new HashMap<>();
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private SessionDao sessionDao;
@@ -614,6 +619,11 @@ public class SessionRunner implements Runnable {
 
 
         assignColorsToTeamMembers(round.getRoundTeams());
+        String videoProvider = env.getProperty("videoprovider.privatekey");
+        if(session.getCommunicationType().equals(CommunicationConstraint.VIDEO_CHAT.getId())&&
+                videoProvider!=null && !videoProvider.isEmpty()){
+            assignJWTToTeamMembers(round.getRoundTeams());
+        }
 
         if (session.getDisplayNameGenerationEnabled() && session.getDisplayNameGenerationType() != null) {
             assignDisplayNamesToTeamMembers(round.getRoundTeams(), session.getDisplayNameGenerationType().charAt(0));
@@ -635,6 +645,32 @@ public class SessionRunner implements Runnable {
 
     }
 
+    private void assignJWTToTeamMembers(List<TeamWrapper> roundTeams){
+
+        String privateKeyPath = env.getProperty("videoprovider.privatekey");
+        String apiToken = env.getProperty("videoprovider.api_token");
+        String appId = env.getProperty("videoprovider.app_id");
+
+        for (TeamWrapper tw : roundTeams) {
+            List<Subject> subjectList = tw.getSubjects();
+            for (int i = 0; i < subjectList.size(); i++) {
+                String jitsiToken = JaasUtils.generateJitsiToken(
+                        subjectList.get(i).getId().toString(),
+                        subjectList.get(i).getSubjectDisplayName(),
+                        appId, apiToken, privateKeyPath);
+                addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_TOKEN", jitsiToken);
+            }
+        }
+    }
+    private void addSubjectAttributeJWT(Subject su1, String attributeName, String token){
+        Subject su = su1;
+        SubjectAttribute sa = new SubjectAttribute();
+        sa.setAttributeName(attributeName);
+        sa.setStringValue(token);
+        sa.setSubjectId(su.getId());
+        sa.setInternalAttribute(true);
+        subjectAttributeDao.create(sa);
+    }
     private void assignColorsToTeamMembers(List<TeamWrapper> roundTeams) {
 
         for (TeamWrapper tw : roundTeams) {
@@ -917,7 +953,7 @@ public class SessionRunner implements Runnable {
                 if (checkedInWaitingSubjectListById.size() == 0) {
                     log( "#" + session.getId()+" PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds - no subjects in queue");
                     Thread.sleep(sleepTimes *10 * 1000);
-                    if(sleepTimes != 19) {
+                    if(sleepTimes < 19) {
                         sleepTimes++;
                     }else {
                         sleepTimes = 1;

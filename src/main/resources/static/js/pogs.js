@@ -18,6 +18,7 @@ class Pogs {
         this.subscribe("onUnload", pl.destroyFunc.bind(pl));
         return pl;
     }
+
     setupSubjectColors(){
 
         var subjectColorMap = [];
@@ -82,6 +83,7 @@ class Pogs {
         this.isGlobalChatPage = (config.isGlobalChatPage)?(config.isGlobalChatPage):(false);
         this.isGlobalChatInitialized = false;
         this.teammates = config.teammates;
+        this.videoProviderAppId = config.videoProviderAppId;
         this.recordSessionSaveEphemeralEvents = config.recordSessionSaveEphemeralEvents;
         this.taskList = config.taskList;
         this.task = config.task;
@@ -478,4 +480,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.5.1");
+console.log("Version 1.5.2");

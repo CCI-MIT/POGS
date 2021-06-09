@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -78,6 +79,9 @@ import edu.mit.cci.pogs.utils.DateUtils;
 
 @Controller
 public class WorkspaceController {
+
+    @Autowired
+    private Environment env;
 
     @Autowired
     private WorkspaceService workspaceService;
@@ -500,6 +504,7 @@ public class WorkspaceController {
                 model.addAttribute("template", "layouts/workspace-layout.html");
             } else {
                 model.addAttribute("template", "layouts/workspace-iframe-layout.html");
+                model.addAttribute("videoProviderAppId", env.getProperty("videoprovider.app_id"));
             }
 
 
@@ -625,6 +630,7 @@ public class WorkspaceController {
                 if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId()+ "")){
                     model.addAttribute("template", "layouts/workspace-layout.html");
                 } else {
+                    model.addAttribute("videoProviderAppId", env.getProperty("videoprovider.app_id"));
                     model.addAttribute("template", "layouts/workspace-iframe-layout.html");
                 }
 
@@ -988,6 +994,7 @@ public class WorkspaceController {
 
                 model.addAttribute("communicationType", cc);
                 model.addAttribute("chatBotName", sessionWrapper.getChatBotName());
+                model.addAttribute("videoProviderAppId", env.getProperty("videoprovider.app_id"));
                 model.addAttribute("hasChat", (cc != null && !cc.equals(CommunicationConstraint
                         .NO_CHAT.getId().toString()) ? (true) : (false)));
 
@@ -1059,6 +1066,7 @@ public class WorkspaceController {
                 if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
                     model.addAttribute("template", "layouts/workspace-layout.html");
                 } else {
+                    model.addAttribute("videoProviderAppId", env.getProperty("videoprovider.app_id"));
                     model.addAttribute("template", "layouts/workspace-iframe-layout.html");
                 }
             } else {

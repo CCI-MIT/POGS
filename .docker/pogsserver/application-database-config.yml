@@ -4,6 +4,11 @@ database:
   url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
   username: root
   password: ${POGS_PASSWORD}
+videoprovider:
+  providerurl: ${VIDEO_PROVIDER_URL}
+  privatekey : ${VIDEO_PROVIDER_PRIVATE_KEY_PATH}
+  api_token : ${VIDEO_PROVIDER_API_KEY}
+  app_id : ${VIDEO_PROVIDER_APP_ID}
 plugin:
   dir: /app/plugins
 images:

@@ -74,6 +74,8 @@ public class SessionBean {
     private Long      robotSessionEventSourceId;
     private Long      robotSessionEventScriptId;
     private Boolean   recordSessionSaveEphemeralEvents;
+    private String    videoChatNotificationEmail;
+
 
 
     public SessionBean() {
@@ -138,7 +140,16 @@ public class SessionBean {
         this.robotSessionEventScriptId = value.getRobotSessionEventScriptId();
         this.robotSessionEventSourceId = value.getRobotSessionEventSourceId();
         this.recordSessionSaveEphemeralEvents = value.getRecordSessionSaveEphemeralEvents();
+        this.videoChatNotificationEmail = value.getVideoChatNotificationEmail();
 
+    }
+
+    public String getVideoChatNotificationEmail() {
+        return videoChatNotificationEmail;
+    }
+
+    public void setVideoChatNotificationEmail(String videoChatNotificationEmail) {
+        this.videoChatNotificationEmail = videoChatNotificationEmail;
     }
 
     public String getScheduleConditionType() {

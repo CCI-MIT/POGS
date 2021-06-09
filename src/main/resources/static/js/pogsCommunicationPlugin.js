@@ -768,11 +768,21 @@ class VideoChatManager {
         $("#communication_to_show").empty();
         var script = document.createElement('script');
         //add jitsi iframe lib
-        var url = "meet.jit.si/POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId();
+        let jitsiJWT = this.communicationPluginReference.getCurrentSubjectVideoChatCredential();
+        var jitsiProviderURL ="meet.jit.si/";
+
+        if(jitsiJWT!=null) {
+            jitsiProviderURL='8x8.vc/'+ this.communicationPluginReference.pogsRef.videoProviderAppId + "/";
+        }
+        var roomName = "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId()
+
+
+        var url = jitsiProviderURL + roomName
         script.onload = function() {
             var options = {
                 width: 350,
-                roomName : "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId(),
+
+                roomName : roomName,
                 parentNode: document.getElementById("communication_to_show"),
                 interfaceConfigOverwrite: {
                     filmStripOnly: false,
@@ -817,7 +827,9 @@ class VideoChatManager {
 
         }.bind(this);
 
-        script.src = "https://meet.jit.si/external_api.js";
+
+        script.src = (jitsiJWT==null)?("https://meet.jit.si/external_api.js"):("https://8x8.vc/external_api.js");
+
         document.getElementsByTagName('head')[0].appendChild(script);
 
 
