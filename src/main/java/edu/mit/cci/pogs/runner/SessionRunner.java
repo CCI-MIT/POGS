@@ -663,7 +663,7 @@ public class SessionRunner implements Runnable {
                 String jitsiToken = JaasUtils.generateJitsiToken(
                         subjectList.get(i).getId().toString(),
                         subjectList.get(i).getSubjectDisplayName(),
-                        appId, apiToken, privateKeyPath);
+                        appId, apiToken, privateKeyPath,!chooseFirstSubjectToStartRecording);
                 addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_TOKEN", jitsiToken);
                 if(!chooseFirstSubjectToStartRecording){
                     addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_START_REC", "true");

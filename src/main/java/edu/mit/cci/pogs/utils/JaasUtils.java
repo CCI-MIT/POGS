@@ -265,30 +265,48 @@ public class JaasUtils {
     }
 
     public static void main(String[] args) {
-        generateJitsiToken("user", "superUser", "ias9e83ikwas", "apiKey", "/Users/carlosbpf/ROOT/Professional/MIT/MCI/POGS/others/privatekey");
+        generateJitsiToken("user", "superUser", "ias9e83ikwas", "apiKey", "/Users/carlosbpf/ROOT/Professional/MIT/MCI/POGS/others/privatekey", true);
     }
-    public static String generateJitsiToken(String userId, String displayName,String appId, String apiKey , String privateKeyPath) {
+    public static String generateJitsiToken(String userId, String displayName,String appId, String apiKey , String privateKeyPath, boolean firstUserModerator) {
         try
         {
             /** Read private key from file. */
             RSAPrivateKey rsaPrivateKey = getPemPrivateKey(privateKeyPath);
 
             /** Create new JaaSJwtBuilder and setup the claims. */
-            String token = JaaSJwtBuilder.builder()
-                    .withDefaults() // This sets default/most common values
-                    .withApiKey(apiKey) // Set the api key
-                    .withUserName(displayName) // Set the user name
-                    .withUserId(userId)
-                    .withRoomName("*")
-                    //.withUserEmail("My email here") // Set the user email
-                    .withModerator(false) // Enable user as moderator
-                    .withOutboundEnabled(false) // Enable outbound calls
-                    .withTranscriptionEnabled(true) // Enable transcription
-                    .withAppID(appId) // Set the AppID
-                    //.withUserAvatar("https://avatarurl.com/avatar/url") // Set the user avatar
-                    .signWith(rsaPrivateKey); /** Finally the JWT is signed with the private key */
+            String token = null;
+            if(firstUserModerator){
+                token = JaaSJwtBuilder.builder()
+                        .withDefaults() // This sets default/most common values
+                        .withApiKey(apiKey) // Set the api key
+                        .withUserName(displayName) // Set the user name
+                        .withUserId(userId)
+                        .withRoomName("*")
+                        //.withUserEmail("My email here") // Set the user email
+                        .withModerator(true) // Enable user as moderator
+                        .withRecordingEnabled(true)
+                        .withOutboundEnabled(false) // Enable outbound calls
+                        .withTranscriptionEnabled(true) // Enable transcription
+                        .withAppID(appId) // Set the AppID
+                        //.withUserAvatar("https://avatarurl.com/avatar/url") // Set the user avatar
+                        .signWith(rsaPrivateKey); /** Finally the JWT is signed with the private key */
+            } else {
+                token = JaaSJwtBuilder.builder()
+                        .withDefaults() // This sets default/most common values
+                        .withApiKey(apiKey) // Set the api key
+                        .withUserName(displayName) // Set the user name
+                        .withUserId(userId)
+                        .withRoomName("*")
+                        //.withUserEmail("My email here") // Set the user email
+                        .withModerator(false) // Enable user as moderator
 
-            System.out.println(token);
+                        .withOutboundEnabled(false) // Enable outbound calls
+                        .withTranscriptionEnabled(true) // Enable transcription
+                        .withAppID(appId) // Set the AppID
+                        //.withUserAvatar("https://avatarurl.com/avatar/url") // Set the user avatar
+                        .signWith(rsaPrivateKey); /** Finally the JWT is signed with the private key */
+            }
+            //System.out.println(token);
             return token;
         }
         catch (Exception ex) {
