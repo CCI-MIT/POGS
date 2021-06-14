@@ -621,8 +621,8 @@ public class SessionRunner implements Runnable {
         assignColorsToTeamMembers(round.getRoundTeams());
         String videoProvider = env.getProperty("videoprovider.privatekey");
         System.out.println("Video provider: " + videoProvider);
-        if(session.getCommunicationType().equals(CommunicationConstraint.VIDEO_CHAT.getId())&&
-                videoProvider!=null && !videoProvider.isEmpty()){
+        if(session.getCommunicationType().equals(CommunicationConstraint.VIDEO_CHAT.getId() + "")&&
+                (videoProvider!=null && !videoProvider.isEmpty())){
             assignJWTToTeamMembers(round.getRoundTeams());
         }
 
