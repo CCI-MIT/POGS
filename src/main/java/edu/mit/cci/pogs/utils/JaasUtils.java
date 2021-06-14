@@ -279,6 +279,7 @@ public class JaasUtils {
                     .withApiKey(apiKey) // Set the api key
                     .withUserName(displayName) // Set the user name
                     .withUserId(userId)
+                    .withRoomName("*")
                     //.withUserEmail("My email here") // Set the user email
                     .withModerator(false) // Enable user as moderator
                     .withOutboundEnabled(false) // Enable outbound calls

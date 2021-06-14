@@ -775,7 +775,7 @@ class VideoChatManager {
         var roomName = "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId()
 
         if(jitsiJWT!=null) {
-            jitsiProviderURL='8x8.vc/';
+            jitsiProviderURL='8x8.vc';
             url = jitsiProviderURL;
             roomName = this.communicationPluginReference.pogsRef.videoProviderAppId + "/" + roomName;
         } else {
@@ -787,34 +787,69 @@ class VideoChatManager {
 
 
         script.onload = function() {
-            var options = {
-                width: 350,
+            var options = {};
+            if(jitsiJWT){
+                options = {
+                    width: 350,
 
-                roomName : roomName,
-                parentNode: document.getElementById("communication_to_show"),
-                interfaceConfigOverwrite: {
-                    filmStripOnly: false,
-                    MOBILE_APP_PROMO: false,
-                    HIDE_INVITE_MORE_HEADER: true,
-                    SHOW_CHROME_EXTENSION_BANNER: false,
-                    DISPLAY_WELCOME_PAGE_CONTENT: false,
-                    DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
-                    TILE_VIEW_MAX_COLUMNS : 1,
-                    enableClosePage: false,
-                    toolbarButtons: [
-                        'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
-                    ],
-                },
-                userInfo: {
-                    displayName: this.currentSubject.displayName
-                },
+                    roomName: roomName,
+                    jwt: jitsiJWT,
+                    parentNode: document.getElementById("communication_to_show"),
+                    interfaceConfigOverwrite: {
+                        filmStripOnly: false,
+                        MOBILE_APP_PROMO: false,
+                        HIDE_INVITE_MORE_HEADER: true,
+                        SHOW_CHROME_EXTENSION_BANNER: false,
+                        DISPLAY_WELCOME_PAGE_CONTENT: false,
+                        DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
+                        TILE_VIEW_MAX_COLUMNS: 1,
+                        enableClosePage: false,
+                        toolbarButtons: [
+                            'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
+                        ],
+                    },
+                    userInfo: {
+                        displayName: this.currentSubject.displayName
+                    },
 
-                configOverwrite: {
-                    disableSimulcast: false,
-                    disableDeepLinking: true,
-                    useStunTurn: true,
-                    prejoinPageEnabled: false,
+                    configOverwrite: {
+                        disableSimulcast: false,
+                        disableDeepLinking: true,
+                        useStunTurn: true,
+                        prejoinPageEnabled: false,
 
+                    }
+                }
+            } else {
+                options = {
+                    width: 350,
+
+                    roomName: roomName,
+                    parentNode: document.getElementById("communication_to_show"),
+                    interfaceConfigOverwrite: {
+                        filmStripOnly: false,
+                        MOBILE_APP_PROMO: false,
+                        HIDE_INVITE_MORE_HEADER: true,
+                        SHOW_CHROME_EXTENSION_BANNER: false,
+                        DISPLAY_WELCOME_PAGE_CONTENT: false,
+                        DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
+                        TILE_VIEW_MAX_COLUMNS: 1,
+                        enableClosePage: false,
+                        toolbarButtons: [
+                            'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
+                        ],
+                    },
+                    userInfo: {
+                        displayName: this.currentSubject.displayName
+                    },
+
+                    configOverwrite: {
+                        disableSimulcast: false,
+                        disableDeepLinking: true,
+                        useStunTurn: true,
+                        prejoinPageEnabled: false,
+
+                    }
                 }
             }
             this.api = new window.JitsiMeetExternalAPI(url, options);
