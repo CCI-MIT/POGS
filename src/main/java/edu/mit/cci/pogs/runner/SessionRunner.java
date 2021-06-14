@@ -620,6 +620,7 @@ public class SessionRunner implements Runnable {
 
         assignColorsToTeamMembers(round.getRoundTeams());
         String videoProvider = env.getProperty("videoprovider.privatekey");
+        System.out.println("Video provider: " + videoProvider);
         if(session.getCommunicationType().equals(CommunicationConstraint.VIDEO_CHAT.getId())&&
                 videoProvider!=null && !videoProvider.isEmpty()){
             assignJWTToTeamMembers(round.getRoundTeams());
@@ -650,6 +651,10 @@ public class SessionRunner implements Runnable {
         String privateKeyPath = env.getProperty("videoprovider.privatekey");
         String apiToken = env.getProperty("videoprovider.api_token");
         String appId = env.getProperty("videoprovider.app_id");
+
+        System.out.println("privateKeyPath: " + privateKeyPath);
+        System.out.println("apiToken: " + apiToken);
+        System.out.println("appId: " + appId);
 
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
