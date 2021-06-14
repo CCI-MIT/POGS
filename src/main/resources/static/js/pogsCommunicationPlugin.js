@@ -866,6 +866,7 @@ class VideoChatManager {
                         //youtubeBroadcastID: string //the youtube broacast ID.
                     });
                 }
+                this.api.executeCommand('toggleTileView');
 
                 this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
             });
@@ -880,6 +881,7 @@ class VideoChatManager {
                 if(shouldStartRecording) {
                     this.api.executeCommand('stopRecording', {mode: 'file'});
                 }
+
                 console.log("videoConferenceLeft");
                 this.communicationPluginReference.sendMessage("videoConferenceLeft", "-", CHAT_TYPE.STATUS, null);
                 $("#communicationContainer").empty();

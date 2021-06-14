@@ -44,6 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers("/display_name/**").permitAll()
                     .and()
+                .authorizeRequests().antMatchers("/jitsiwebhook").permitAll().and()
                 .formLogin()
                     .loginPage("/login")
                     .usernameParameter("emailAddress")
