@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders
         .AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -44,7 +45,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                     .antMatchers("/display_name/**").permitAll()
                     .and()
-                .authorizeRequests().antMatchers("/jitsiwebhook").permitAll().and()
+                .authorizeRequests().antMatchers(HttpMethod.POST,"/jitsiwebhook").permitAll().and()
                 .formLogin()
                     .loginPage("/login")
                     .usernameParameter("emailAddress")
@@ -54,6 +55,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                     .permitAll()
                     .and()
                 .csrf()
+                .ignoringAntMatchers("/jitsiwebhook")
                     .and()
                 .headers().defaultsDisabled()
                     .referrerPolicy(ReferrerPolicy.ORIGIN_WHEN_CROSS_ORIGIN)

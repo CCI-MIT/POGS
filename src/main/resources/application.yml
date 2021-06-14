@@ -53,8 +53,8 @@ logging:
     org.springframework: INFO
     org.springframework.jmx: WARN
     org.springframework.boot.actuate: WARN
-    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: WARN
-    org.springframework.boot.web.servlet.FilterRegistrationBean: WARN
+    org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping: DEBUG
+    org.springframework.boot.web.servlet.FilterRegistrationBean: DEBUG
     org.springframework.web.servlet.handler.SimpleUrlHandlerMapping: WARN
     edu.mit.cci: DEBUG
 
