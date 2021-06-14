@@ -855,6 +855,18 @@ class VideoChatManager {
             this.api = new window.JitsiMeetExternalAPI(url, options);
             this.api.addEventListener('videoConferenceJoined', () => {
                 console.log("videoConferenceJoined");
+                let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
+                if(shouldStartRecording){
+                    this.api.executeCommand('startRecording', {
+                        mode: 'file', //recording mode, either `file` or `stream`.
+                        shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
+                        //rtmpStreamKey: string, //the RTMP stream key.
+                        //rtmpBroadcastID: string, //the RTMP broadcast ID.
+                        //youtubeStreamKey: string, //the youtube stream key.
+                        //youtubeBroadcastID: string //the youtube broacast ID.
+                    });
+                }
+
                 this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
             });
             this.api.addEventListener("participantLeft", () => {
@@ -863,6 +875,11 @@ class VideoChatManager {
 
             });
             this.api.addEventListener("videoConferenceLeft", () => {
+                let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
+
+                if(shouldStartRecording) {
+                    this.api.executeCommand('stopRecording', {mode: 'file'});
+                }
                 console.log("videoConferenceLeft");
                 this.communicationPluginReference.sendMessage("videoConferenceLeft", "-", CHAT_TYPE.STATUS, null);
                 $("#communicationContainer").empty();

@@ -656,6 +656,7 @@ public class SessionRunner implements Runnable {
         System.out.println("apiToken: " + apiToken);
         System.out.println("appId: " + appId);
 
+        boolean chooseFirstSubjectToStartRecording = false;
         for (TeamWrapper tw : roundTeams) {
             List<Subject> subjectList = tw.getSubjects();
             for (int i = 0; i < subjectList.size(); i++) {
@@ -664,6 +665,10 @@ public class SessionRunner implements Runnable {
                         subjectList.get(i).getSubjectDisplayName(),
                         appId, apiToken, privateKeyPath);
                 addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_TOKEN", jitsiToken);
+                if(!chooseFirstSubjectToStartRecording){
+                    addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_START_REC", "true");
+                    chooseFirstSubjectToStartRecording = true;
+                }
             }
         }
     }
