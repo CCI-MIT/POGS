@@ -770,14 +770,22 @@ class VideoChatManager {
         //add jitsi iframe lib
         let jitsiJWT = this.communicationPluginReference.getCurrentSubjectVideoChatCredential();
         var jitsiProviderURL ="meet.jit.si/";
+        var url = "";
 
-        if(jitsiJWT!=null) {
-            jitsiProviderURL='8x8.vc/'+ this.communicationPluginReference.pogsRef.videoProviderAppId + "/";
-        }
         var roomName = "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId()
 
+        if(jitsiJWT!=null) {
+            jitsiProviderURL='8x8.vc/';
+            url = jitsiProviderURL;
+            roomName = this.communicationPluginReference.pogsRef.videoProviderAppId + "/" + roomName;
+        } else {
+            url = jitsiProviderURL + roomName
+        }
 
-        var url = jitsiProviderURL + roomName
+
+
+
+
         script.onload = function() {
             var options = {
                 width: 350,

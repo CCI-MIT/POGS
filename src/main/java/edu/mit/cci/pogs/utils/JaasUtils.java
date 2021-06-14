@@ -20,6 +20,7 @@ public class JaasUtils {
      * The file must be in PKCS #8 format supported by JAVA, also see https://tools.ietf.org/html/rfc5208.
      * Use the following command to convert the generated private key to PKCS #8 :
      * openssl pkcs8 -topk8 -inform PEM -in <input key path> -outform pem -nocrypt -out <output key path>
+     *     ssh-keygen -t rsa -b 4096 -m PEM -f
      * */
     private static final String PRIVATE_KEY_FILE_RSA = "src/test/resources/jaas-key.pk";
 
@@ -263,6 +264,9 @@ public class JaasUtils {
         return (RSAPrivateKey) kf.generatePrivate(spec);
     }
 
+    public static void main(String[] args) {
+        generateJitsiToken("user", "superUser", "ias9e83ikwas", "apiKey", "/Users/carlosbpf/ROOT/Professional/MIT/MCI/POGS/others/privatekey");
+    }
     public static String generateJitsiToken(String userId, String displayName,String appId, String apiKey , String privateKeyPath) {
         try
         {
