@@ -57,7 +57,7 @@ class PogsPlugin {
         return teamm;
     }
     getCurrentSubjectVideoChatCredential() {
-        return this.getTeammateAttribute(this.getSubjectId(),"JITSI_JWT_TOKEN");
+        return this.getTeammateAttribute(this.getSubjectId(),"JITSI_JWT_TOKEN").stringValue;
     }
     getTeammateAttribute(subjectId, propertyName){
         if(!this.getTeammates()) return;
