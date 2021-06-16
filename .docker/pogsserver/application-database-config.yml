@@ -13,6 +13,12 @@ plugin:
   dir: /app/plugins
 images:
   dir: /app/uploadedFiles
+
+email:
+  smtpHost: ${SMTP_HOST:''}
+  smtpPort: ${SMTP_PORT:''}
+  userName: ${SMTP_USERNAME:''}
+  password: ${SMTP_PASSWORD:''}
 spring:
   redis:
     host: redisserver

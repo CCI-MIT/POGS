@@ -57,7 +57,8 @@ class PogsPlugin {
         return teamm;
     }
     getCurrentSubjectVideoChatCredential() {
-        return this.getTeammateAttribute(this.getSubjectId(),"JITSI_JWT_TOKEN").stringValue;
+        let attr = this.getTeammateAttribute(this.getSubjectId(),"JITSI_JWT_TOKEN");
+        return (attr)?(attr.stringValue):(null);
     }
     getCurrentSubjectShouldStartRecording() {
         return (this.getTeammateAttribute(this.getSubjectId(),"JITSI_JWT_START_REC")!=null);

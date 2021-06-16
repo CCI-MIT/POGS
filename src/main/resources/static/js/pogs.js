@@ -203,11 +203,27 @@ class Pogs {
     }
     onCountdownEnd(){
         this.subscribe("onUnload", function(){
+
+            let url = this.nextUrl;
+            let isExternalFinalPage =
+                ((url.indexOf("http") != -1||url.indexOf("https")!=-1))
+                && (url.indexOf("/sessions/")==-1) ;
+
             if(!this.isGlobalChatPage){
-                window.location = this.nextUrl;
+
+                if ( window.location !== window.parent.location ) {
+
+                    if(!isExternalFinalPage){
+                        window.location = this.nextUrl;
+
+                    }
+                } else {
+                    window.location = this.nextUrl;
+                }
             } else {
                 this.countDown = null;
-                if(this.nextUrl.indexOf("pogs.info")!=-1||this.nextUrl.indexOf("localhost")!=-1){
+
+                if(isExternalFinalPage){
                     window.location = this.nextUrl;
                 }
             }
@@ -399,6 +415,8 @@ class Pogs {
                 }
             }
             if( this.countDown == null){
+                this.nextUrl = message.content.nextUrl;
+                this.nextUrl = this.validateFinalUrl(this.nextUrl);
                 var finalDate = (new Date().getTime() + parseInt(
                     message.content.secondsRemainingCurrentUrl));
                 this.countDown = new Countdown(finalDate,
@@ -480,4 +498,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.5.7");
+console.log("Version 1.5.9");
