@@ -772,7 +772,7 @@ class VideoChatManager {
         var jitsiProviderURL ="meet.jit.si/";
         var url = "";
 
-        var roomName = "POGS_SESSION_VIDEO_CHAT_CONFENRENCE_76856758976898532342_"+this.communicationPluginReference.getSessionId() + this.communicationPluginReference.getCompletedTaskId()
+        var roomName = "pogs_session_video_chat_confenrence_76856758976898532342_"+this.communicationPluginReference.getSessionId() + "_"+this.communicationPluginReference.getCompletedTaskId()
 
         if(jitsiJWT!=null) {
             jitsiProviderURL='8x8.vc';
