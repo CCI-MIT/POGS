@@ -963,11 +963,12 @@ public class SessionRunner implements Runnable {
                 if (checkedInWaitingSubjectListById.size() == 0) {
                     log( "#" + session.getId()+" PERPETUAL SESSION "+ this.session.getFullSessionName()+" SLEEPING for " + sleepTimes *10 + " seconds - no subjects in queue");
                     Thread.sleep(sleepTimes *10 * 1000);
+                    /*
                     if(sleepTimes < 19) {
                         sleepTimes++;
                     }else {
                         sleepTimes = 1;
-                    }
+                    }*/
 
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {

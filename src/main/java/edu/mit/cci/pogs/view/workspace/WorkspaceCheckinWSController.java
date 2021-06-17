@@ -39,6 +39,9 @@ public class WorkspaceCheckinWSController {
         Long completedTaskId = null;
         if (pogsMessage.getCompletedTaskId() != null) {
             completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
+            if(completedTaskId == 0){
+                completedTaskId = null;
+            }
 
         }
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
