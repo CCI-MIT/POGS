@@ -743,7 +743,7 @@ class VideoChatManager {
 
         if (message.sender != this.communicationPluginReference.getSubjectId()) {
             if (message.content.type == CHAT_TYPE.JOINED) {
-                if (message.content.message != "videoConferenceJoined") {
+                if (message.content.message == "videoConferenceJoined") {
                     this.memberReady++;
 
                     let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
