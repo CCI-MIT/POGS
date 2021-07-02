@@ -232,6 +232,7 @@ public class SessionService {
         session.setRobotSessionEventSourceId(sessionBean.getRobotSessionEventSourceId());
         session.setRecordSessionSaveEphemeralEvents(sessionBean.getRecordSessionSaveEphemeralEvents());
         session.setVideoChatNotificationEmail(sessionBean.getVideoChatNotificationEmail());
+        session.setVideoChatRecordingEnabled(sessionBean.getVideoChatRecordingEnabled());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -330,6 +331,7 @@ public class SessionService {
         clonedNonPerpetualSession.setRobotSessionEventSourceId(session.getRobotSessionEventSourceId());
         clonedNonPerpetualSession.setRecordSessionSaveEphemeralEvents(session.getRecordSessionSaveEphemeralEvents());
         clonedNonPerpetualSession.setVideoChatNotificationEmail(session.getVideoChatNotificationEmail());
+        clonedNonPerpetualSession.setVideoChatRecordingEnabled(session.getVideoChatRecordingEnabled());
 
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());

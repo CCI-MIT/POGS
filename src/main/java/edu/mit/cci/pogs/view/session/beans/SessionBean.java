@@ -45,6 +45,10 @@ public class SessionBean {
     private String teamCreationMethod;
     private String teamCreationMatrix;
 
+
+
+    private Boolean videoChatRecordingEnabled;
+
     private String    sessionScheduleType;
     private Timestamp perpetualStartDate;
     private Timestamp perpetualEndDate;
@@ -141,6 +145,7 @@ public class SessionBean {
         this.robotSessionEventSourceId = value.getRobotSessionEventSourceId();
         this.recordSessionSaveEphemeralEvents = value.getRecordSessionSaveEphemeralEvents();
         this.videoChatNotificationEmail = value.getVideoChatNotificationEmail();
+        this.videoChatRecordingEnabled = value.getVideoChatRecordingEnabled();
 
     }
 
@@ -619,5 +624,12 @@ public class SessionBean {
 
     public void setRecordSessionSaveEphemeralEvents(Boolean recordSessionSaveEphemeralEvents) {
         this.recordSessionSaveEphemeralEvents = recordSessionSaveEphemeralEvents;
+    }
+    public Boolean getVideoChatRecordingEnabled() {
+        return videoChatRecordingEnabled;
+    }
+
+    public void setVideoChatRecordingEnabled(Boolean videoChatRecordingEnabled) {
+        this.videoChatRecordingEnabled = videoChatRecordingEnabled;
     }
 }

@@ -415,6 +415,12 @@
                         <small id="videoChatNotificationEmailHelp" class="form-text text-muted">This email will receive a notification with a download link that EXPIRES in 24 hours</small>
                     </div>
                 </div>
+                <div class="form-group row form-check form-check-inline">
+
+                    <input class="form-check-input" th:field="*{videoChatRecordingEnabled}" type="checkbox" id="videoChatRecordingEnabled"/>
+                    <label class="col-form-label" for="videoChatRecordingEnabled">Video chat recording enabled</label>
+
+                </div>
             </div>
         </fieldset>
         <fieldset class="form-group row">
