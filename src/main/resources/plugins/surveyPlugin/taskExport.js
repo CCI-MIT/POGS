@@ -283,7 +283,7 @@ function getTeammatesDisplayNames() {
     var teamm = [];
     var teammates = getTeammates();
     for(var i = 0; i < teammates.length; i ++) {
-        teamm.push(teammates[i].displayName);
+        teamm.push(teammates[i].externalId);
     }
     return teamm;
 }
@@ -292,7 +292,7 @@ function getOtherTeammates() {
     var teammates = getTeammates();
     for(var i = 0; i < teammates.length; i ++) {
         if(teammates[i].externalId != _subject.subjectExternalId){
-            teamm.push(teammates[i].displayName);
+            teamm.push(teammates[i].externalId);
         }
     }
     return teamm;
