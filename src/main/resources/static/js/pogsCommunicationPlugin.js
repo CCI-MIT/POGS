@@ -872,6 +872,10 @@ class VideoChatManager {
                 console.log("videoConferenceJoined");
 
                 this.api.executeCommand('toggleTileView');
+                let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
+                if(shouldStartRecording) {
+                    this.api.executeCommand('set-follow-me');
+                }
 
                 this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
             });
