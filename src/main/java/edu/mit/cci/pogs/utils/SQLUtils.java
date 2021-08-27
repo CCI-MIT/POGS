@@ -20,7 +20,7 @@ public class SQLUtils {
             if (methods[i].getName().startsWith("get")&& methods[i].getName()!="getClass") {
 
                 try {
-                    String name = methods[i].getName().replace("get", "");
+                    String name = methods[i].getName().replaceAll("^get", "");
                     name = camelToSnake(name);
 
                     Object objectValue = methods[i].invoke(pojo);
@@ -47,7 +47,7 @@ public class SQLUtils {
             }
 
         }
-        String sql = "INSERT INTO IGNORE `" + camelToSnake(pojo.getClass().getSimpleName()) +
+        String sql = "INSERT INTO `" + camelToSnake(pojo.getClass().getSimpleName()) +
                 "` (" + sqlFields + ") values (" + sqlValues + ");\n";
         //System.out.println(sql);
         return sql;

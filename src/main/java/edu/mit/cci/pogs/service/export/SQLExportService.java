@@ -87,6 +87,8 @@ public class SQLExportService {
     @Autowired
     private Environment env;
 
+    private static final Long RESEARCH_GROUP_ID = 1l;
+
     public List<ExportFile> generateStudyConfigurationSQL(Long studyId, String path) {
 
         String imagePath = env.getProperty("images.dir");
@@ -99,6 +101,9 @@ public class SQLExportService {
         List<SessionHasTaskGroup> sessionHasTaskGroups = new ArrayList<>();
         List<Task> taskList = new ArrayList<>();
         List<TaskConfiguration> taskConfigurations = new ArrayList<>();
+
+        List<TaskHasTaskConfiguration> taskHasTaskConfigurations = new ArrayList<>();
+
         List<TaskExecutionAttribute> taskExecutionAttributes = new ArrayList<>();
         Map<Long,Dictionary> dictionaryList = new HashMap<>();
         List<DictionaryEntry> dictionaryEntryList = new ArrayList<>();
@@ -122,11 +127,13 @@ public class SQLExportService {
         }
         for(TaskGroupHasTask tght: taskGroupHasTasks){
             taskList.add(taskDao.get(tght.getTaskId()));
-            TaskHasTaskConfiguration taskHasTaskConfigurations =
+            TaskHasTaskConfiguration taskHasTaskConfigurationz =
                     taskHasTaskConfigurationDao.getByTaskId(tght.getTaskId());
             TaskConfiguration tg = taskConfigurationDao.get(
-                    taskHasTaskConfigurations.getTaskConfigurationId());
+                    taskHasTaskConfigurationz.getTaskConfigurationId());
             taskConfigurations.add(tg);
+            taskHasTaskConfigurations.add(taskHasTaskConfigurationz);
+
             taskExecutionAttributes.addAll(
                     taskExecutionAttributeDao.listByTaskConfigurationId(tg.getId()));
 
@@ -176,16 +183,12 @@ public class SQLExportService {
             buffer += SQLUtils.getSQLInsertFromPojo(shtg);
         }
 
-        //task group has task
-        for(TaskGroupHasTask tght: taskGroupHasTasks){
-            buffer += SQLUtils.getSQLInsertFromPojo(tght);
 
-        }
 
         //task
         for(Task t: taskList){
             buffer += SQLUtils.getSQLInsertFromPojo(t);
-            buffer+=generateResearchGroupInsert("task_has_research_group","task_id",studyId +"");
+            buffer+=generateResearchGroupInsert("task_has_research_group","task_id",t.getId() + "");
         }
 
         //task config
@@ -195,12 +198,23 @@ public class SQLExportService {
                     "task_configuration_id",tc.getId() +"");
         }
 
+        for(TaskHasTaskConfiguration thtc: taskHasTaskConfigurations){
+            buffer += SQLUtils.getSQLInsertFromPojo(thtc);
+        }
+
         //task execution attribute
         List<Long> imageReferencesInAttributes = new ArrayList<>();
 
         for(TaskExecutionAttribute tea: taskExecutionAttributes){
             buffer += SQLUtils.getSQLInsertFromPojo(tea);
             imageReferencesInAttributes.addAll(retrieveImageReferenceFromAttribute(tea));
+        }
+
+
+        //task group has task
+        for(TaskGroupHasTask tght: taskGroupHasTasks){
+            buffer += SQLUtils.getSQLInsertFromPojo(tght);
+
         }
 
         //dictionary
@@ -273,7 +287,7 @@ public class SQLExportService {
     }
 
     private static String generateResearchGroupInsert(String tableName, String fieldName, String value){
-        return "INSERT IGNORE INTO `"+tableName+"` (`"+fieldName+"`, `research_group_id`) VALUES ('"+value +"', '9');\n";
+        return "INSERT INTO `"+tableName+"` (`"+fieldName+"`, `research_group_id`) VALUES ('"+value +"', '"+RESEARCH_GROUP_ID+"');\n";
 
     }
 }

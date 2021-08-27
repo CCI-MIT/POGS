@@ -4,14 +4,6 @@ The Platform for Online Group Studies (POGS) is a tool to study collective learn
 
 [![Travis build status](https://img.shields.io/travis/CCI-MIT/POGS.svg)](https://travis-ci.org/CCI-MIT/POGS)
 
-PLEASE DON'T COMMIT TO MASTER.
-
-The procedures are changing and have not yet been documented.
-
-There is an active developer working on this project, you can easily see from the commit logs. 
-
-If you are having problems setting it up, you can contact me by email (You should have it).
-
 
 ## Simple download and play procedure
 

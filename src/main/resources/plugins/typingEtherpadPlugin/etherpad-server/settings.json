@@ -347,7 +347,7 @@
    *          follow the section "secure your installation" in README.md
    */
   "users": {
-    "carlos": {
+    "admin": {
       "password": "carlos1234",
       "is_admin": true
     }
