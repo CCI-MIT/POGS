@@ -250,7 +250,7 @@ public class SQLExportService {
             ef.setFileRootPath(path);
             ef.setShouldCopy(true);
             //ef.setRelativeFolder(".imagesfiles");
-            ef.setPathOfOriginFile(imagePath+"/"+fileEntry.getFileEntryName());
+            ef.setPathOfOriginFile(imagePath+"/fileEntries/"+fileEntry.getId()+"."+fileEntry.getFileEntryExtension());
             ef.setFileName(fileEntry.getFileEntryName());
             ef.setFileType(fileEntry.getFileEntryExtension());
             exportFiles.add(ef);
