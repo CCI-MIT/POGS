@@ -159,7 +159,7 @@ public class SQLExportService {
                 }
             }
         }
-        String buffer = "SET FOREIGN_KEY_CHECKS=0;\n";
+        String buffer = "";
         //study
         Study study = studyDao.get(studyId);
         buffer += SQLUtils.getSQLInsertFromPojo(study);
@@ -251,7 +251,7 @@ public class SQLExportService {
             ef.setShouldCopy(true);
             //ef.setRelativeFolder(".imagesfiles");
             ef.setPathOfOriginFile(imagePath+"/fileEntries/"+fileEntry.getId()+"."+fileEntry.getFileEntryExtension());
-            ef.setFileName(fileEntry.getFileEntryName());
+            ef.setFileName(fileEntry.getId().toString());
             ef.setFileType(fileEntry.getFileEntryExtension());
             exportFiles.add(ef);
 
@@ -260,7 +260,7 @@ public class SQLExportService {
 
 
 
-        buffer+= "\nSET FOREIGN_KEY_CHECKS=1;\n";
+
 
         ExportFile ef = new ExportFile();
         ef.setFileContent(buffer);
