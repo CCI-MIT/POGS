@@ -40,6 +40,10 @@ public class UserService {
         return userDao.create(authUser);
     }
 
+    public boolean hasAuthUsers(){
+        return (userDao.list().size() > 0);
+    }
+
 
     public AuthUser adminCreateOrUpdateUser(AuthUserBean authUserBean) {
 
