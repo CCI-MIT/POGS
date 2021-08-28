@@ -17,6 +17,8 @@ The Platform for Online Group Studies (POGS) is a tool to study collective learn
 docker-compose up
 ```
 
+On startup expect some issues with the node server, as it loads faster than the mysql initial server setup.
+It will automatically restart until the mysql 
 
 Open a browser window at :
 ```http://localhost:8080/initialize```

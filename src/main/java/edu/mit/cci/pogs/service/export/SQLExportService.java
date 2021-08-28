@@ -104,7 +104,7 @@ public class SQLExportService {
 
         List<TaskHasTaskConfiguration> taskHasTaskConfigurations = new ArrayList<>();
 
-        List<TaskExecutionAttribute> taskExecutionAttributes = new ArrayList<>();
+        Map<Long, TaskExecutionAttribute> taskExecutionAttributes = new HashMap<>();
         Map<Long,Dictionary> dictionaryList = new HashMap<>();
         List<DictionaryEntry> dictionaryEntryList = new ArrayList<>();
 
@@ -134,8 +134,9 @@ public class SQLExportService {
             taskConfigurations.put(tg.getId(), tg);
             taskHasTaskConfigurations.add(taskHasTaskConfigurationz);
 
-            taskExecutionAttributes.addAll(
-                    taskExecutionAttributeDao.listByTaskConfigurationId(tg.getId()));
+            for(TaskExecutionAttribute tea : taskExecutionAttributeDao.listByTaskConfigurationId(tg.getId())){
+                taskExecutionAttributes.put(tea.getId(), tea);
+            }
 
             if(tg.getDictionaryId()!=null) {
                 dictionaryList.put((tg.getDictionaryId()),dictionaryDao.get(tg.getDictionaryId()));
@@ -206,7 +207,7 @@ public class SQLExportService {
         //task execution attribute
         List<Long> imageReferencesInAttributes = new ArrayList<>();
 
-        for(TaskExecutionAttribute tea: taskExecutionAttributes){
+        for(TaskExecutionAttribute tea: taskExecutionAttributes.values()){
             buffer += SQLUtils.getSQLInsertFromPojo(tea);
             imageReferencesInAttributes.addAll(retrieveImageReferenceFromAttribute(tea));
         }
