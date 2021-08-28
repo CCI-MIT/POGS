@@ -78,6 +78,7 @@ public class ExportFile {
                         ((relativeFolder!= null)?(relativeFolder + File.separatorChar):("")));
                 f.mkdirs();
             }
+            System.out.println(fullFilePathAndName);
             File copied = new File(fullFilePathAndName);
 
             try (
