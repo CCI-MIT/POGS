@@ -19,7 +19,17 @@ docker-compose up
 
 
 Open a browser window at :
+```http://localhost:8080/initialize```
+
+Select the file found in ```others/T1ShortDemo.zip``` or another POGS generated study configuration dump file.
+
+And click the button ```INITIALIZE```
+
+After confirmation go to:
 ```http://localhost:8080/admin```
+
+Use the following credentials:
+
 ```
 User: admin@pogs.info
 
