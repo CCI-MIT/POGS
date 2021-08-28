@@ -11,6 +11,8 @@ server:
     enabled: true
 plugin:
   dir: ${user.home}/plugins
+
+
 spring:
   profiles:
     include: database-config
@@ -24,6 +26,9 @@ spring:
       idleTimeout: 120000
       connectionTimeout: 300000
       leakDetectionThreshold: 300000
+  servlet:
+    multipart:
+      max-file-size: -1
   security:
     filter:
       dispatcher-types: ASYNC,REQUEST,ERROR

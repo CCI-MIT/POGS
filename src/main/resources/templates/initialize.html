@@ -9,18 +9,18 @@
 <body>
 <div layout:fragment="content">
     <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
-        <form th:if="${not alreadyInitialized}" class="form-inline" th:action="@{/initialize}" method="post" >
+        <form th:if="${not alreadyInitialized}" class="form-inline" enctype="multipart/form-data" th:action="@{/initialize}" method="post" >
             <div class="form-group mb-2">
                 <label style="color:black">Please select the system dump file to initialize the system:</label>
             </div>
             <div class="form-group mx-sm-3 mb-2">
-                <input type="file" class="form-control" id="dumpFile" autofocus="autofocus"  placeholder="" name="dumpFile">
+                <input type="file" class="form-control" id="file" autofocus="autofocus"  placeholder="" name="file">
             </div>
             <button type="submit" class="btn btn-primary mb-2">Initialize</button>
         </form>
 
         <div th:if="${alreadyInitialized}" class="form-group mb-2">
-            <label style="color:black">System already initialized!</label>
+            <label style="color:black">System was successfully initialized!</label>
         </div>
     </div>
 </div>

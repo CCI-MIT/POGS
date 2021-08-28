@@ -1,5 +1,12 @@
 package edu.mit.cci.pogs.view.admin;
 
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
+import edu.mit.cci.pogs.service.UserService;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.jooq.DSLContext;
@@ -15,10 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 import java.util.Date;
@@ -31,8 +41,11 @@ import javax.servlet.http.HttpServletResponse;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.FileEntry;
 import edu.mit.cci.pogs.view.file.FileUploadController;
 
-@RestController
+@Controller
 public class InitializerController {
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private Environment env;
@@ -43,18 +56,10 @@ public class InitializerController {
     private DSLContext dslContext;
 
     @PostMapping("/initialize")
-    public void fileImageUpload(@RequestParam("file") MultipartFile file,
-                                HttpServletRequest request, HttpServletResponse response) {
-
-
-        try {
-            String ir = uploadImage(file, request);
-            response.setContentType("text/html");
-            response.getOutputStream()
-                    .write(ir.getBytes(StandardCharsets.UTF_8));
-        } catch (IOException ignored) {
-
-        }
+    public String fileImageUpload(@RequestParam("file") MultipartFile file,
+                                HttpServletRequest request, HttpServletResponse response, Model model) {
+        String ir = uploadImage(file, request);
+        return forwardToHTML(model);
     }
 
     private String uploadImage(MultipartFile file, HttpServletRequest request) {
@@ -76,24 +81,44 @@ public class InitializerController {
             fileEntry.setFileEntryName(FilenameUtils.getName(nameExt));
 
 
-            String finalPath = path + "/fileEntries/" + File.separator;
+            String finalPath = path + "/fileEntries" + File.separator;
             File folder = new File(finalPath);
             if (!folder.exists()) {
                 folder.mkdirs();
             }
 
             FileUtils.writeByteArrayToFile(new File(finalPath + fileEntry.getId() + "." + fileEntry.getFileEntryExtension()), bytes);
-            unzip(finalPath, path + "/fileEntries/");
+            unzip(finalPath + fileEntry.getId() + "." + fileEntry.getFileEntryExtension(), path + "/fileEntries/");
             String finalPathForDump = path + "/fileEntries/dump.sql";
+            String fileContests = getFileContents(finalPathForDump);
+            runSQLFromFile(fileContests);
 
 
         } catch (IOException e) {
         }
         return "";
     }
-    public void runSQLFromFile(){
+    public static String getFileContents(String filepath) throws IOException {
+        InputStream is = new FileInputStream(filepath);
+        BufferedReader buf = new BufferedReader(new InputStreamReader(is));
+        String line = buf.readLine();
+        StringBuilder sb = new StringBuilder();
+        while(line != null){ sb.append(line).append("\n"); line = buf.readLine(); }
+        String fileAsString = sb.toString();
+        return fileAsString;
+    }
+    public void runSQLFromFile(String contents ){
 
-        dslContext.execute("");
+        String [] lines = contents.split("\n");
+        for(String line: lines) {
+            if(!line.isEmpty()) {
+                try {
+                    dslContext.execute(line);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void unzip(String zipFilePath, String destDirectory) throws IOException {
@@ -108,6 +133,7 @@ public class InitializerController {
             String filePath = destDirectory + File.separator + entry.getName();
             if (!entry.isDirectory()) {
                 // if the entry is a file, extracts it
+                new File(filePath).getParentFile().mkdirs();
                 extractFile(zipIn, filePath);
             } else {
                 // if the entry is a directory, make the directory
@@ -128,5 +154,21 @@ public class InitializerController {
             bos.write(bytesIn, 0, read);
         }
         bos.close();
+    }
+
+
+    @GetMapping("/initialize")
+    public String showIndex(Model model) {
+        return forwardToHTML(model);
+    }
+
+    private String forwardToHTML(Model model) {
+        if(userService.hasAuthUsers()){
+            model.addAttribute("alreadyInitialized", true);
+        } else {
+            model.addAttribute("alreadyInitialized", false);
+        }
+
+        return "initialize";
     }
 }

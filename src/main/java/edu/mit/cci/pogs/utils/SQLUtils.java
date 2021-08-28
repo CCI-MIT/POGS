@@ -8,6 +8,15 @@ import java.sql.Timestamp;
 
 public class SQLUtils {
 
+    public static String getBasicSetup(){
+        String saida = new String();
+        saida = "";
+        saida+="INSERT INTO `auth_user` VALUES (1,'admin@pogs.info','$2a$10$TCuFoMKkAo4o5b7yWpRN8.RH8H4brfPdEhkhHEg8YzqmerB5u5A0i','Pogs','Admin',true);\n";
+        saida+="INSERT INTO `research_group` (`id`,`group_name`) VALUES (1,'superAdminGroup');\n";
+        saida+="INSERT INTO `research_group_has_auth_user` (`id`,`research_group_id`,`auth_user_id`) VALUES (1,1,1);\n";
+        return saida;
+    }
+
     public static String getSQLInsertFromPojo(Object pojo) {
 
         Method[] methods = pojo.getClass().getMethods();

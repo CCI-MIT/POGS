@@ -100,7 +100,7 @@ public class SQLExportService {
         List<SessionHasTaskGroup> sessionHasTaskGroupsTemp;
         List<SessionHasTaskGroup> sessionHasTaskGroups = new ArrayList<>();
         List<Task> taskList = new ArrayList<>();
-        List<TaskConfiguration> taskConfigurations = new ArrayList<>();
+        Map<Long,TaskConfiguration> taskConfigurations = new HashMap<>();
 
         List<TaskHasTaskConfiguration> taskHasTaskConfigurations = new ArrayList<>();
 
@@ -131,7 +131,7 @@ public class SQLExportService {
                     taskHasTaskConfigurationDao.getByTaskId(tght.getTaskId());
             TaskConfiguration tg = taskConfigurationDao.get(
                     taskHasTaskConfigurationz.getTaskConfigurationId());
-            taskConfigurations.add(tg);
+            taskConfigurations.put(tg.getId(), tg);
             taskHasTaskConfigurations.add(taskHasTaskConfigurationz);
 
             taskExecutionAttributes.addAll(
@@ -161,6 +161,7 @@ public class SQLExportService {
         }
         String buffer = "";
         //study
+        buffer += SQLUtils.getBasicSetup();
         Study study = studyDao.get(studyId);
         buffer += SQLUtils.getSQLInsertFromPojo(study);
         buffer+=generateResearchGroupInsert("study_has_research_group",
@@ -192,7 +193,7 @@ public class SQLExportService {
         }
 
         //task config
-        for(TaskConfiguration tc: taskConfigurations){
+        for(TaskConfiguration tc: taskConfigurations.values()){
             buffer += SQLUtils.getSQLInsertFromPojo(tc);
             buffer+=generateResearchGroupInsert("task_configuration_has_research_group",
                     "task_configuration_id",tc.getId() +"");
