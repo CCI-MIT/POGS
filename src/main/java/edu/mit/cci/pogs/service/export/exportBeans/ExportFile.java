@@ -41,7 +41,7 @@ public class ExportFile {
         try {
 
             fullFilePathAndName = fileRootPath +
-                    ((relativeFolder!= null)?(relativeFolder + File.separatorChar):("")) + fileName;
+                    ((relativeFolder!= null)?(relativeFolder + File.separatorChar):("")) + fileName ;
 
             if(relativeFolder!=null){
                 File f = new File(fileRootPath +
