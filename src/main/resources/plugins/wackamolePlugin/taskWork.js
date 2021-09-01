@@ -507,7 +507,7 @@ class Player {
 var wackamolePlugin = pogs.createPlugin('wackamoleTaskPlugin', function () {
     //console.log("Wack-a-mole Plugin Loaded");
     var wackamole = new Wackamole(this);
-    wackamole.setupGrid("Wack-a-mole", this.getTeammates(), this.getStringAttribute("whackBluePrint"))
+    wackamole.setupGrid("Whack-a-mole", this.getTeammates(), this.getStringAttribute("whackBluePrint"))
     this.subscribeTaskAttributeBroadcast(wackamole.broadcastReceived.bind(wackamole))
     //console.log("teammates" + this.getTeammates());
     wackamole.initPlayers(this.getTeammates(), this.getSubjectId());
