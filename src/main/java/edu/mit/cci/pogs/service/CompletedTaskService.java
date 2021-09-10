@@ -104,6 +104,8 @@ public class CompletedTaskService {
         try {
 
             CloseableHttpClient client = HttpClients.createDefault();
+
+
             HttpPost httpPost = new HttpPost(tp.getScoring().getUrl());
 
             List<NameValuePair> params = new ArrayList<>();

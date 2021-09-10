@@ -75,8 +75,37 @@ public class JaaSWebhookController {
 
 
         }
-        if(eventType.asText().equals("RECORDING_STARTED")) {
-            //save to log
+        if(eventType.asText().equals("TRANSCRIPTION_UPLOADED")) {
+            JsonNode preAuthenticatedLink = data.get("preAuthenticatedLink");
+
+            JsonNode fqn = payload.get("fqn");
+            String fqnStr = fqn.asText();
+            String videoProviderAPPID = env.getProperty("videoprovider.app_id");
+            String prefix = "pogs_session_video_chat_confenrence_76856758976898532342_";
+            String sessionAndCompletedTaskIds = fqnStr.replace(videoProviderAPPID+ "/"+prefix,"");
+            String[] sessionAndCt = sessionAndCompletedTaskIds.split("_");
+            if(sessionAndCt.length>0) {
+                Long sessionId = Long.parseLong(sessionAndCt[0]);
+                Session session = sessionDao.get(sessionId);
+                if(session!=null){
+                    EmailUtils.sendEmailToRecipient("POGS session's transcription download link",
+                            session.getVideoChatNotificationEmail(), "" +
+                                    "Please download this file in the next 24 hours or it will be lost: " +
+                                    "<a href='" + preAuthenticatedLink + "'>" + preAuthenticatedLink + "</a>" +
+                                    "<br/> POGS admin",
+                            env.getProperty("email.smtpHost"),
+                            env.getProperty("email.smtpPort"),
+                            env.getProperty("email.userName"),
+                            env.getProperty("email.password"));
+                    //save to session log
+                    sessionLogService.createLogFromSystem(session.getId(),
+                            "Video transcription recording sent to: "+
+                                    session.getVideoChatNotificationEmail() +
+                                    " with link: " + preAuthenticatedLink);
+                }
+            }
+
+
         }
 
     }
