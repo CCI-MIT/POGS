@@ -747,19 +747,19 @@ class VideoChatManager {
                     this.memberReady++;
 
                     let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
-                    if(this.memberReady == this.communicationPluginReference.getTeammates().length) {
-                        if (shouldStartRecording
-                            && this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
-                            this.api.executeCommand('startRecording', {
-                                mode: 'file', //recording mode, either `file` or `stream`.
-                                shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
-                                //rtmpStreamKey: string, //the RTMP stream key.
-                                //rtmpBroadcastID: string, //the RTMP broadcast ID.
-                                //youtubeStreamKey: string, //the youtube stream key.
-                                //youtubeBroadcastID: string //the youtube broacast ID.
-                            });
-                        }
-                    }
+                    // if(this.memberReady == this.communicationPluginReference.getTeammates().length) {
+                    //     if (shouldStartRecording
+                    //         && this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
+                    //         this.api.executeCommand('startRecording', {
+                    //             mode: 'file', //recording mode, either `file` or `stream`.
+                    //             shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
+                    //             //rtmpStreamKey: string, //the RTMP stream key.
+                    //             //rtmpBroadcastID: string, //the RTMP broadcast ID.
+                    //             //youtubeStreamKey: string, //the youtube stream key.
+                    //             //youtubeBroadcastID: string //the youtube broacast ID.
+                    //         });
+                    //     }
+                    // }
                 }
             }
         }else{
@@ -875,6 +875,18 @@ class VideoChatManager {
                 let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
                 if(shouldStartRecording) {
                     this.api.executeCommand('set-follow-me');
+
+                    if(this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
+                        this.api.executeCommand('startRecording', {
+                            mode: 'file', //recording mode, either `file` or `stream`.
+                            shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
+                            //rtmpStreamKey: string, //the RTMP stream key.
+                            //rtmpBroadcastID: string, //the RTMP broadcast ID.
+                            //youtubeStreamKey: string, //the youtube stream key.
+                            //youtubeBroadcastID: string //the youtube broacast ID.
+                        });
+                    }
+
                 }
 
                 this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
