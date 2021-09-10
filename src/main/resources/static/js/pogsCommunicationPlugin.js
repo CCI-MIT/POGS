@@ -873,10 +873,12 @@ class VideoChatManager {
 
                 this.api.executeCommand('toggleTileView');
                 let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
+                console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: " + shouldStartRecording)
                 if(shouldStartRecording) {
                     this.api.executeCommand('set-follow-me');
 
                     if(this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
+                        console.log("Will send start recording")
                         this.api.executeCommand('startRecording', {
                             mode: 'file', //recording mode, either `file` or `stream`.
                             shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
