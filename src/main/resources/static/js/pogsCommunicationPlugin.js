@@ -873,9 +873,12 @@ class VideoChatManager {
 
                 this.api.executeCommand('toggleTileView');
                 let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
-                console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: " + shouldStartRecording)
+                console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: " + (shouldStartRecording)?("TRUE"):("FALSE"))
                 if(shouldStartRecording) {
                     this.api.executeCommand('setFollowMe');
+                    console.log(" this.communicationPluginReference.pogsRef.videoChatShouldRecord: " +
+                                (this.communicationPluginReference.pogsRef.videoChatShouldRecord)?
+                                ("TRUE"):("FALSE"))
 
                     if(this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
                         console.log("Will send start recording")

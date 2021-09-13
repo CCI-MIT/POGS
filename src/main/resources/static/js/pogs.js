@@ -94,6 +94,7 @@ class Pogs {
         this.sessionExecutionMode = ((config.sessionExecutionMode)?(config.sessionExecutionMode): (false));
         this.waitingRoomExpireTime = config.waitingRoomExpireTime;
         this.doneUrlParameter = config.doneUrlParameter;
+        this.videoChatShouldRecord = (config.videoChatShouldRecord)?(config.videoChatShouldRecord):(false);
         this.taskIsSolo = config.taskIsSolo;
         this.setupSubjectColors();
 
@@ -498,4 +499,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.7.5");
+console.log("Version 1.7.6");
