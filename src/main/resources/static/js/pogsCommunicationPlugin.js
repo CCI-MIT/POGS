@@ -875,7 +875,7 @@ class VideoChatManager {
                 let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
                 console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: " + shouldStartRecording)
                 if(shouldStartRecording) {
-                    this.api.executeCommand('set-follow-me');
+                    this.api.executeCommand('setFollowMe');
 
                     if(this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
                         console.log("Will send start recording")
