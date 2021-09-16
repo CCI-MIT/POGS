@@ -284,6 +284,7 @@ public class JaasUtils {
                         .withRoomName("*")
                         //.withUserEmail("My email here") // Set the user email
                         .withModerator(true) // Enable user as moderator
+                        .withTranscriptionEnabled(true) // ADD BOOLEAN IN SESSION BECAUSE TRANSCRIPT IS PAID EXTRA
                         .withRecordingEnabled(true)
                         .withOutboundEnabled(false) // Enable outbound calls
                         .withTranscriptionEnabled(true) // Enable transcription
