@@ -12,6 +12,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      TZ : America/New_York
       #MYSQL_USER: ${MYSQL_USER}
       #MYSQL_PASSWORD: 1234
     networks:
@@ -25,6 +26,7 @@ services:
       - ALLOW_OVERRIDE=${ALLOW_OVERRIDE}
       - ETHERPAD_PASSWORD=${ETHERPAD_PASSWORD}
       - NODE_ENV=${NODE_ENV}
+      - TZ=America/New_York
     ports:
       - "9001:9001"
     links:
