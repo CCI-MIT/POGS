@@ -6,7 +6,7 @@ COPY ./src/main/resources/plugins /app/plugins
 COPY .docker/pogsserver/setupRightLocalhostChange.sh /app/setupRightLocalhostChange.sh
 RUN ["chmod", "+x", "/app/setupRightLocalhostChange.sh"]
 RUN ["sh","/app/setupRightLocalhostChange.sh"]
-ENV TZ America/New_York
+
 
 
 #[LOCAL START]If running local copy enable this line and disable SERVER.
@@ -16,12 +16,17 @@ ENV TZ America/New_York
 #If running on server setup get latest relase from github
 #[SERVER START]
 RUN apk update && apk add --no-cache curl
-RUN apt install tzdata
+
 COPY .docker/pogsserver/downloadLatestBinaryFromGithubReleases.sh /app/downloadLatestBinaryFromGithubReleases.sh
 RUN ["chmod", "+x", "/app/downloadLatestBinaryFromGithubReleases.sh"]
 RUN ["sh","/app/downloadLatestBinaryFromGithubReleases.sh"]
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 #[SERVER END]
+#[TMZ start]
+ENV TZ America/New_York
+RUN apk add tzdata
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+#[TMZ end]
+
 
 WORKDIR /app
 CMD exec java -jar pogs.jar
