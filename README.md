@@ -14,6 +14,7 @@ The Platform for Online Group Studies (POGS) is a tool to study collective learn
 3. At the repo's root directory run:
 
 ```
+docker image prune
 docker-compose up
 ```
 
