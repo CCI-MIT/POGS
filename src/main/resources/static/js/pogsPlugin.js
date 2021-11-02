@@ -110,7 +110,12 @@ class PogsPlugin {
     }
 
 
-
+    /*
+        This method is called during the plugin setup and configuration phase. Calling this method subscribes all the clients
+        to completed task attribute updates. For tasks operating in solo-mode, the clients would receive updates for our
+        their own completed task attributes while, clients participating in group-mode tasks would receive these updates
+        from all the clients (including themselves) participating in the task.
+    */
     subscribeTaskAttributeBroadcast (funct) {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
@@ -145,7 +150,6 @@ class PogsPlugin {
     /*
         This method broadcasts a completed task attribute to all the users attempting the task. Depending on the
         arguments passed to the method, it may also save the completed task attribute and log it in the event log.
-        // TODO: e.g. hover -> only broadcast, no persistence and survey answer response -> broadcast + persistence
 
         attributeName: this is a unique identifier for the completed task attribute. Two different executions of a
         (completed) task may use the same unique identifier without overriding the value stored against the completed
@@ -241,8 +245,11 @@ class PogsPlugin {
     getConfigurationAttributes() {
         return this.pogsRef.taskConfigurationAttributesMap;
     }
-    getStringAttribute(attributeName) {
 
+    /*
+        get access to the attribute using its unique identifier
+    */
+    getStringAttribute(attributeName) {
         if (this.pogsRef.taskConfigurationAttributesMap.has(attributeName)) {
             return String(
                 this.pogsRef.taskConfigurationAttributesMap.get(attributeName).stringValue);
@@ -250,6 +257,7 @@ class PogsPlugin {
             return null;
         }
     }
+
     getFloatAttribute(attributeName) {
         if (this.pogsRef.taskConfigurationAttributesMap.has(attributeName)) {
             return parseFloat(
