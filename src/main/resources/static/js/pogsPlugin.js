@@ -1,6 +1,7 @@
 'use strict';
 
 class PogsPlugin {
+
     constructor(pluginName, initFunc, pogsRef, destroyFunc){
         this.pluginName = pluginName;
         this.initFunc = initFunc;
@@ -109,10 +110,23 @@ class PogsPlugin {
     }
 
 
-
+    /*
+        This method is called during the plugin setup and configuration phase. Calling this method subscribes all the clients
+        to completed task attribute updates. For tasks operating in solo-mode, the clients would receive updates for our
+        their own completed task attributes while, clients participating in group-mode tasks would receive these updates
+        from all the clients (including themselves) participating in the task.
+    */
     subscribeTaskAttributeBroadcast (funct) {
         this.pogsRef.subscribe('taskAttributeBroadcast', funct);
     }
+
+    /*
+        This method has a usage very similar to that of the saveCompletedTaskAttribute(...) method with the exception
+        that  each call to this method with the same attributeName value would not cause an override of the value.
+        An example can be when we want to score different participants in a joint task - calls from the client of all the
+        subject would have the same attributeName but, we would store them as individual entries in the database with
+        each entry representing the score of each client.
+    */
     saveCompletedTaskAttributeMustCreateNew(attributeName, stringValue, floatValue, intValue,
                                loggable, extraData,summaryDescription) {
         var messageContent = {
@@ -132,6 +146,28 @@ class PogsPlugin {
                                  this.getSubjectId(), null, this.getCompletedTaskId(),
                                  this.getSessionId());
     }
+
+    /*
+        This method broadcasts a completed task attribute to all the users attempting the task. Depending on the
+        arguments passed to the method, it may also save the completed task attribute and log it in the event log.
+
+        attributeName: this is a unique identifier for the completed task attribute. Two different executions of a
+        (completed) task may use the same unique identifier without overriding the value stored against the completed
+        task attribute. For a task running in solo mode, calls to this method would only override the value stored against
+        a completed task attribute if they are received from the same client. The method calls with the same completed
+        task attribute received from two different clients will be treated as separate entries. For a task NOT running in solo
+        mode, every call to this method with a given attributeName would overwrite the entry regardless of the client that
+        it is received from.
+        stringValue: a string value stored with the attributeName as a key
+        floatValue: a float value stored with the attributeName as a key
+        intValue: an integer value stored with the attributeName as a key
+        loggable: boolean; we could potentially have a change-log to be able to record overwrites;
+                  if recordSessionSaveEphemeralEvents is set, this argument will be disregarded and all events will be
+                  recorded
+                  recordSessionSaveEphemeralEvents is fixed at run-time
+        extraData: an additional string value that can be used as metadata for adding any additional business logic
+        summaryDescription: human-readable description of the event (meant only for logging?)
+    */
     saveCompletedTaskAttribute(attributeName, stringValue, floatValue, intValue,
                                           loggable, extraData,summaryDescription) {
         var messageContent = {
@@ -152,6 +188,14 @@ class PogsPlugin {
                                  this.getSessionId());
     }
 
+    /*
+        This method has a usage very similar to that of the saveCompletedTaskAttribute(...) method with the exception that
+        the value against a given attributeName is not overridden. One example of this is a timed sub-task in which we can have
+        only one "winner" e.g. choosing a number from 0-9 to start a task. In this case all the clients would attempt to call this
+        method but, only the first one to make the call would be able to store the value against the attributeName and all the other
+        calls would simply do nothing. In the saveCompletedTaskAttribute(...) method the last call to the method would override the
+        value stored against the given attributeName
+    */
     saveCompletedTaskAttributeWithoutOverride(attributeName, stringValue, floatValue, intValue,
                                loggable, extraData,summaryDescription) {
         var messageContent = {
@@ -172,7 +216,12 @@ class PogsPlugin {
                                  this.getSessionId());
     }
 
-
+    /*
+        This method has a usage very similar to that of the saveCompletedTaskAttribute(...) method with the exception
+        that the value for a given attributeName received from one client is not broadcast to the rest of the clients.
+        One example of this is group tasks such as a Jeopardy game in which we may not want every participants responses
+        to be broadcast to the clients of other participants.
+    */
     saveCompletedTaskAttributeWithoutBroadcast(attributeName, stringValue, floatValue, intValue,
                                loggable, extraData, summaryDescription) {
         var messageContent = {
@@ -196,8 +245,11 @@ class PogsPlugin {
     getConfigurationAttributes() {
         return this.pogsRef.taskConfigurationAttributesMap;
     }
-    getStringAttribute(attributeName) {
 
+    /*
+        get access to the attribute using its unique identifier
+    */
+    getStringAttribute(attributeName) {
         if (this.pogsRef.taskConfigurationAttributesMap.has(attributeName)) {
             return String(
                 this.pogsRef.taskConfigurationAttributesMap.get(attributeName).stringValue);
@@ -205,6 +257,7 @@ class PogsPlugin {
             return null;
         }
     }
+
     getFloatAttribute(attributeName) {
         if (this.pogsRef.taskConfigurationAttributesMap.has(attributeName)) {
             return parseFloat(
@@ -272,4 +325,5 @@ const MAXLENGH = 10;
 function trimDisplayName(str){
     return str.substring(0, MAXLENGH);
 }
+
 
