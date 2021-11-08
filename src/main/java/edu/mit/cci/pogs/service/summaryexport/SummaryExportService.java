@@ -444,7 +444,7 @@ public class SummaryExportService {
             //ct.getTeamId();
             String subject = "";
             if (task.getSoloTask()) {
-                System.out.println(ct.getSubjectId() + " --- task id" + task.getId() + " - "+ ct.getTaskId());
+                //System.out.println(ct.getSubjectId() + " --- task id" + task.getId() + " - "+ ct.getTaskId());
 
                 if(ct.getSubjectId() == null){
                     //System.out.println(" CT with solo set and null: " + ct.getId());

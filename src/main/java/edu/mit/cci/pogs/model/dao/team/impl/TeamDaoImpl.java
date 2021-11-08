@@ -98,7 +98,8 @@ public class TeamDaoImpl extends AbstractDao<Team, Long, TeamRecord> implements 
         if (taskId != null) {
             query.addConditions(TEAM.TASK_ID.eq(taskId));
         }
-        Record record = query.fetchOne();
+        //System.out.println("subjectId: " + subjectId+" taskId:" + taskId + " roundId:" + roundId + " sessionId:" + sessionId);
+        Record record = query.fetchAny();
 
         if (record == null) {
             return null;
