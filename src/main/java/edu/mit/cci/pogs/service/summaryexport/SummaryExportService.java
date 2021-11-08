@@ -448,10 +448,15 @@ public class SummaryExportService {
 
                 if(ct.getSubjectId() == null){
                     //System.out.println(" CT with solo set and null: " + ct.getId());
-                }
-                Subject sub = subjectDao.get(ct.getSubjectId());
+                    continue;
+                } else {
+                    System.out.println(">" +ct.getSubjectId() + "<");
 
-                subject = sub.getSubjectExternalId();
+                    Subject sub = subjectDao.get(ct.getSubjectId());
+
+                    subject = sub.getSubjectExternalId();
+                }
+
             }
             String rec = study.getStudySessionPrefix() + ";" + session.getSessionSuffix() + ";" +
                     session.getId() + ";" +
