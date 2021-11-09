@@ -39,7 +39,7 @@ public class StudyAttributeService {
         return attributeArray;
     }
 
-    public void createOrUpdateStudyAttributes(String attributesToAddJson) {
+    public void createOrUpdateStudyAttributes(String attributesToAddJson, Long sessionId, Long studyId) {
         if (attributesToAddJson != null) {
 
             JSONArray attributes = new JSONArray(attributesToAddJson);
@@ -64,9 +64,13 @@ public class StudyAttributeService {
                 }
                 if (att.has("studyId")) {
                     sa.setStudyId(att.getLong("studyId"));
+                } else {
+                    sa.setStudyId(studyId);
                 }
                 if (att.has("sessionId")) {
-                    sa.setStudyId(att.getLong("sessionId"));
+                    sa.setSessionId(att.getLong("sessionId"));
+                } else{
+                    sa.setSessionId(sessionId);
                 }
                 boolean alreadyExist = false;
                 List<StudyAttribute> list = studyAttributeDao.listBySessionId(sa.getSessionId());

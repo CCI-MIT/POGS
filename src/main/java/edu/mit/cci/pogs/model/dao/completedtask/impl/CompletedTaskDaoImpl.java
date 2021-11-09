@@ -88,7 +88,7 @@ public class CompletedTaskDaoImpl extends AbstractDao<CompletedTask, Long, Compl
         query.addConditions(COMPLETED_TASK.SUBJECT_ID.eq(subjectId));
         query.addConditions(COMPLETED_TASK.TASK_ID.eq(taskId));
 
-        Record record = query.fetchOne();
+        Record record = query.fetchAny();
         if (record == null) {
             return null;
         } else {

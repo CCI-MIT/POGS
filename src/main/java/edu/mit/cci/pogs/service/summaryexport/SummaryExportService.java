@@ -409,7 +409,7 @@ public class SummaryExportService {
         List<CompletedTask> completedTaskList = completedTaskDao.listBySessionId(sessionList);
         List<ExportFile> ret = new ArrayList<>();
         Map<Long, List<CompletedTask>> groupedByTask = new HashMap<>();
-        System.out.println(" Extracting around : " + completedTaskList.size());
+        //System.out.println(" Extracting around : " + completedTaskList.size());
         for (CompletedTask ct : completedTaskList) {
             List<CompletedTask> currentList = groupedByTask.get(ct.getTaskId());
             if (currentList == null) {
@@ -450,7 +450,7 @@ public class SummaryExportService {
                     //System.out.println(" CT with solo set and null: " + ct.getId());
                     continue;
                 } else {
-                    System.out.println(">" +ct.getSubjectId() + "<");
+                    //System.out.println(">" +ct.getSubjectId() + "<");
 
                     Subject sub = subjectDao.get(ct.getSubjectId());
 

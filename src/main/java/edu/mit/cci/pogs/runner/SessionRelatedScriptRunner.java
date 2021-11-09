@@ -19,6 +19,7 @@ import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionExecutionAttribute;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.service.SessionExecutionAttributeService;
+import edu.mit.cci.pogs.service.StudyAttributeService;
 import edu.mit.cci.pogs.service.SubjectService;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.service.TeamService;
@@ -36,6 +37,9 @@ public class SessionRelatedScriptRunner extends AbstractJavascriptRunner impleme
 
     @Autowired
     private SessionExecutionAttributeService sessionExecutionAttributeService;
+
+    @Autowired
+    private StudyAttributeService studyAttributeService;
 
     @Autowired
     protected SubjectDao subjectDao;
@@ -64,9 +68,11 @@ public class SessionRelatedScriptRunner extends AbstractJavascriptRunner impleme
 
         JSONArray sessionAttr = sessionExecutionAttributeService.
                 listSessionExecutionAttributesAsJsonArray(session.getId());
-
         this.getEngine().put("sessionExecutionAttributes", sessionAttr.toString());
-        System.out.println("sessionExecutionAttributes : " + sessionAttr.toString());
+
+
+        JSONArray studyAttr = studyAttributeService.listStudyAttributesArray(session.getStudyId());
+        this.getEngine().put("studyAttributes", studyAttr.toString());
 
     }
 
@@ -81,6 +87,15 @@ public class SessionRelatedScriptRunner extends AbstractJavascriptRunner impleme
                 ScriptContext.ENGINE_SCOPE).get("sessionExecutionAttributesToAdd");
         sessionExecutionAttributeService.createSessionExecutionAttributesFromJsonString(
                 attributesToAddJson,session.getId());
+
+        updateSessionReferencesBaseedOnSessionAttributes();
+    }
+
+    protected void retrieveStudyAttributesToAdd() {
+        String attributesToAddJson = (String) this.getEngine().getBindings(
+                ScriptContext.ENGINE_SCOPE).get("studyAttributesToAdd");
+        studyAttributeService.createOrUpdateStudyAttributes(
+                attributesToAddJson,session.getId(), session.getStudyId());
 
         updateSessionReferencesBaseedOnSessionAttributes();
     }
@@ -107,7 +122,8 @@ public class SessionRelatedScriptRunner extends AbstractJavascriptRunner impleme
     public void retrieveScriptVariables() {
 
         retreiveSubjectAttributesToAdd();
-        retrieveSessionExecutionAttributesToAdd();//change this to SESSION WIDE ATRIBUTES.
+        retrieveSessionExecutionAttributesToAdd();
+        retrieveStudyAttributesToAdd();
     }
 
     @Override
