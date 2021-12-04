@@ -1,0 +1,9 @@
+name: ticTacToePlugin
+description: Simple 3x3 tic tac toe game
+# Scoring types are:
+# - script : for javascript based script scoring calculation. Must implement the taskScore.js file
+# - externalService : for external servers doing the calculation. No need to implement or even have the taskScore.js file
+#    - parameter: url - the full URL for the scoring server
+#    -     url: http://localhost:8082/typingTask
+scoring:
+    scoringType : script
