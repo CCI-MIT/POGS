@@ -16,7 +16,7 @@ class TicTacToeTaskEdit {
         }
 
         if(gridSize!=null){
-            setupHtmlFromAttributeString(gridSize);
+            this.setupHtmlFromAttributeString(gridSize);
             createOrUpdateAttribute("gridSize",gridSize.stringValue,null,null,this.taskConfigId,0, gridSize.id);
         }
     }
@@ -25,10 +25,11 @@ class TicTacToeTaskEdit {
     }
     setupAttributesFromHtml(){
         let gridsize = $("#tictactoegridsize").val();
+        console.log("gridsize: "+ gridsize)
         return gridsize;
     }
     beforeSubmit(){
-        let attribute = setupAttributesFromHtml();
+        let attribute = this.setupAttributesFromHtml();
         createOrUpdateAttribute("gridSize",attribute,null,null,this.taskConfigId,0, "");
 
     }
