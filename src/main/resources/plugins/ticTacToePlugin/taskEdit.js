@@ -25,7 +25,7 @@ class TicTacToeTaskEdit {
     }
     setupAttributesFromHtml(){
         let gridsize = $("#tictactoegridsize").val();
-        console.log("gridsize: "+ gridsize)
+
         return gridsize;
     }
     beforeSubmit(){

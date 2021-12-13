@@ -1,3 +1,40 @@
 /*
  Any CSS that the developer will need to use on the editing page, primer and task work.
 */
+
+table td {
+    width: 100px;
+    height: 100px;
+}
+.tic-tac-toe {
+    height: 350px;
+    width: 350px;
+    margin: auto;
+}
+
+.tic-tac-toe-cell {
+
+    background-color: #78bec5;
+    border-radius: 14px;
+    font-family: "FontAwesome";
+    font-size: 60px;
+    cursor: pointer;
+    color: #fff;
+    height: 90px;
+    margin: 5px;
+    width: 90px;
+    text-align: center;
+    -moz-transition: background-color 0.3s;
+    -o-transition: background-color 0.3s;
+    -webkit-transition: background-color 0.3s;
+    transition: background-color 0.3s;
+}
+.tic-tac-toe-cell:hover {
+    background-color: #3d4250;
+ }
+.tic-tac-toe-cell-x {
+    background-color: #dc685a;
+}
+.tic-tac-toe-cell-o {
+    background-color: #ecaf4f;
+}
