@@ -314,20 +314,28 @@ public class WorkspaceController {
 
         if (allSubAttr != null) {
             for (SubjectAttribute sa : allSubAttr) {
+                Boolean shouldCreate = false;
 
-                for (String param : parametersAllowed) {
-                    if ((sa.getAttributeName().equals(param)
-                            || !(sa.getInternalAttribute()))) {
-                        SubjectAttribute subjectAttribute = new SubjectAttribute();
-                        subjectAttribute.setSubjectId(su.getId());
-                        subjectAttribute.setAttributeName(sa.getAttributeName());
-                        subjectAttribute.setStringValue(sa.getStringValue());
-                        subjectAttribute.setIntegerValue(sa.getIntegerValue());
-                        subjectAttribute.setRealValue(sa.getRealValue());
-                        subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
-                        subjectAttribute.setLatest(true);
-                        subjectAttributeDao.create(subjectAttribute);
+                if(!(sa.getInternalAttribute())){
+                    shouldCreate = true;
+                }
+                if(!shouldCreate){
+                    for (String param : parametersAllowed) {
+                        if ((sa.getAttributeName().equals(param))){
+                            shouldCreate = true;
+                        }
                     }
+                }
+                if(shouldCreate) {
+                    SubjectAttribute subjectAttribute = new SubjectAttribute();
+                    subjectAttribute.setSubjectId(su.getId());
+                    subjectAttribute.setAttributeName(sa.getAttributeName());
+                    subjectAttribute.setStringValue(sa.getStringValue());
+                    subjectAttribute.setIntegerValue(sa.getIntegerValue());
+                    subjectAttribute.setRealValue(sa.getRealValue());
+                    subjectAttribute.setInternalAttribute(sa.getInternalAttribute());
+                    subjectAttribute.setLatest(true);
+                    subjectAttributeDao.create(subjectAttribute);
                 }
             }
         }
