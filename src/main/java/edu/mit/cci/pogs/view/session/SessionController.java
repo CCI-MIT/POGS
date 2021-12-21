@@ -304,6 +304,10 @@ public class SessionController {
         return "redirect:/admin/studies/" + study.getId() + "/sessions/" + session.getId();
     }
 
+    @GetMapping("/admin/studies/{studyId}/sessions/{id}/rescore")
+    public String rescoreSessionGet(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+      return rescoreSession(studyId,id,redirectAttributes);
+    }
     @PostMapping("/admin/studies/{studyId}/sessions/{id}/rescore")
     public String rescoreSession(@PathVariable("studyId") Long studyId, @PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
         Session session = (sessionDao.get(id));
