@@ -437,6 +437,7 @@ public class SummaryExportService {
         StringBuffer records = new StringBuffer();
         String fixedHeader = "Study prefix; Session name;Session id;Session start date; Task Name;Is solo;Team;Subject;";
         for (CompletedTask ct : completedTasks) {
+            if(ct.getTaskId()== 300 ) continue;
             TaskSnapshotExportRunner csr = (TaskSnapshotExportRunner) context.getBean("taskSnapshotExportRunner");
             Round round = roundDao.get(ct.getRoundId());
             Session session = sessionDao.get(round.getSessionId());
