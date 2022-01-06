@@ -8,10 +8,10 @@ class TicTacToeGame {
 
     }
     discoverSubjectTeam(){
-        console.log( " this.pogsPlugin.subjectId = " + this.pogsPlugin.getSubjectId());
+        //console.log( " this.pogsPlugin.subjectId = " + this.pogsPlugin.getSubjectId());
 
         for(let i =0; i < this.teamX.length;i++){
-            console.log(" this.teamX" + this.teamX[i]);
+            //console.log(" this.teamX" + this.teamX[i]);
             if(this.pogsPlugin.getSubjectId() == this.teamX[i]){
                 return X_CLASS;
             }
@@ -22,19 +22,22 @@ class TicTacToeGame {
         //If we had a configurable grid size, we would create the html on the javascript side.
         this.clearGrid();
 
-        console.log("TEAM X" + teamX);
-        console.log("TEAM O" + teamO);
+        //console.log("TEAM X" + teamX);
+        //console.log("TEAM O" + teamO);
         this.teamX = teamX;
         this.teamO = teamO;
         this.currentTeamsClass = (shouldTeamXStart)?(X_CLASS):(O_CLASS);
         this.myTeam = this.discoverSubjectTeam();
+        $("#subject_team").addClass(this.myTeam);
 
         $(".tic-tac-toe-cell").on("click", this.handleOnClick.bind(this));
         //$(".tic-tac-toe-cell").on("click", this.handleOnClick.bind(this));
         this.checkAndUpdateTurn();
+
         $("#game_over").hide();
         $("#game_won").hide();
         $("#game_on").show();
+        $("#subject_group").show();
     }
     checkAndUpdateTurn(){
 
@@ -94,12 +97,17 @@ class TicTacToeGame {
 
                     if(!this.isGameOver()){
                         this.changeCurrentTeamTurn();
+                    } else {
+                        this.handleGameOver();
                     }
                 }
             }
         //}
 
         //All attributes sync(send all set attributes)
+    }
+    handleGameOver(){
+        $(".tic-tac-toe-cell").unbind("click");
     }
     changeCurrentTeamTurn(){
         this.currentTeamsClass = (this.currentTeamsClass==O_CLASS)?(X_CLASS):(O_CLASS);
@@ -110,7 +118,6 @@ class TicTacToeGame {
 
         let totalAnswers = $(".tic-tac-toe ." + X_CLASS).length + $(".tic-tac-toe ." + O_CLASS).length ;
 
-        if(totalAnswers!=9) return gameOver;
 
        // [x][x][x]
        // [][][]
@@ -125,9 +132,11 @@ class TicTacToeGame {
         // [][x][]
         // [][][x]
         let isCellX = [];
+        let isCellY = [];
 
         for(let i=0;i<9;i++){
             isCellX.push($("#tictac_"+i + " span").hasClass(X_CLASS));
+            isCellY.push($("#tictac_"+i + " span").hasClass(O_CLASS));
         }
         //horizontal scenarios
         let winnerClass = null;
@@ -136,47 +145,57 @@ class TicTacToeGame {
            isCellX[3]&&isCellX[4]&&isCellX[5] ||
             isCellX[6]&&isCellX[7]&&isCellX[8]){
             winnerClass = X_CLASS;
+            gameOver = true;
         }
 
         if(isCellX[0]&&isCellX[3]&&isCellX[6] ||
            isCellX[1]&&isCellX[4]&&isCellX[7] ||
            isCellX[2]&&isCellX[5]&&isCellX[8]){
             winnerClass = X_CLASS;
+            gameOver = true;
         }
         if(isCellX[0]&&isCellX[4]&&isCellX[8] ||
            isCellX[2]&&isCellX[4]&&isCellX[6] ){
             winnerClass = X_CLASS;
+            gameOver = true;
         }
 
 
-        if(!isCellX[0]&&!isCellX[1]&&!isCellX[2] ||
-           !isCellX[3]&&!isCellX[4]&&!isCellX[5] ||
-           !isCellX[6]&&!isCellX[7]&&!isCellX[8]){
+        if(isCellY[0]&&isCellY[1]&&isCellY[2] ||
+           isCellY[3]&&isCellY[4]&&isCellY[5] ||
+           isCellX[6]&&isCellY[7]&&isCellY[8]){
             winnerClass = O_CLASS;
+            gameOver = true;
         }
 
-        if(!isCellX[0]&&!isCellX[3]&&!isCellX[6] ||
-           !isCellX[1]&&!isCellX[4]&&!isCellX[7] ||
-           !isCellX[2]&&!isCellX[5]&&!isCellX[8]){
+        if(isCellY[0]&&isCellY[3]&&isCellY[6] ||
+           isCellY[1]&&isCellY[4]&&isCellY[7] ||
+           isCellY[2]&&isCellY[5]&&isCellY[8]){
             winnerClass = O_CLASS;
+            gameOver = true;
         }
-        if(!isCellX[0]&&!isCellX[4]&&!isCellX[8] ||
-           !isCellX[2]&&!isCellX[4]&&!isCellX[6] ){
+        if(isCellY[0]&&isCellY[4]&&isCellY[8] ||
+           isCellY[2]&&isCellY[4]&&isCellY[6] ){
             winnerClass = O_CLASS;
+            gameOver = true;
         }
 
         if(gameOver){
-            if(winnerClass!=null) {
                 $("#winner").addClass(winnerClass);
                 $("#game_won").show();
                 $("#game_over").hide();
                 $("#game_on").hide();
-            } else {
+                $("#game_tied").hide();
+        } else {
+            if(totalAnswers == 9) {
                 $("#game_won").hide();
                 $("#game_over").show();
                 $("#game_on").hide();
+                $("#game_tied").show();
+                gameOver = true;
             }
         }
+
         return gameOver;
     }
     isCellAlreadyFilled(reference){

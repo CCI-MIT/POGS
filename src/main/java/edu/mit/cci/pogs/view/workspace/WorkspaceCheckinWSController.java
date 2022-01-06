@@ -68,7 +68,7 @@ public class WorkspaceCheckinWSController {
             el.setExtraData("");
             el.setSummaryDescription("Subject loaded : " + pogsMessage.getContent().getMessage());
             //&& completedTaskId!=null && completedTaskId > 0
-            if (sender != null ) {
+            if (sender != null&& completedTaskId != -1 ) {
                 eventLogDao.create(el);
                 if (pogsMessage.getContent().getMessage().contains("/start/")) {
                     subjectHasSessionCheckInService.updateLatestSubjectPing(sender.getId(), sessionId);
