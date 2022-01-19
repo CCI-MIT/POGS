@@ -31,6 +31,21 @@ replacements.push(getTaskList());
 replacements.push(getOtherTasks());
 replacements.push(getSessionName());
 
+function translateDisplayNamesToExternalId(index, stringValue){
+    if(stringValue == "") return "";
+    for(var j =0; j < stringValue.length; j++){
+
+        var teamm = [];
+        var teammates = getTeammates();
+        for(var i = 0; i < teammates.length; i ++) {
+            if(stringValue[j] == teammates[i].displayName){
+                stringValue[j] = teammates[i].externalId;
+            }
+        }
+    }
+    return stringValue;
+
+}
 function resolveVariablesForNetworkQuestions(surveyItem){
     //print("     --------   SURVEY RESOLVING VARIABLES ------------")
     //print(surveyItem.question + " - " + surveyItem.type)
@@ -203,7 +218,8 @@ for(var i=0; i < _completedTaskAttributes.length; i++){
                 _exportRecordLines.push(index + ";" + _completedTaskAttributes[i].extraData + ";"
                                         + cleanEntry(surveyBluePrint[index].question) + ";"
                                         + _completedTaskAttributes[i].lastAuthorSubject + ";"
-                                        + JSON.stringify(JSON.parse(_completedTaskAttributes[i].stringValue)) + ";"
+                                        + JSON.stringify( translateDisplayNamesToExternalId(index,
+                                        JSON.parse(_completedTaskAttributes[i].stringValue))) + ";"
                                         + JSON.stringify((rightAnwser)))
 
             } else {
