@@ -6,7 +6,7 @@
 #
 # Version 0.1
 
-FROM node:12
+FROM node:18.0
 LABEL maintainer="Etherpad team, https://github.com/ether/etherpad-lite"
 
 # git hash of the version to be built.
