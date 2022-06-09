@@ -137,6 +137,7 @@
                    "port"    : 3306,
                    "password": "${ETHERPAD_PASSWORD}",
                    "database": "etherpad_lite_db",
+                   "insecureAuth" : true,
                    "charset" : "utf8mb4"
                  },
 

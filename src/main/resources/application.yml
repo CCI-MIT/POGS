@@ -14,6 +14,8 @@ plugin:
 
 
 spring:
+  main:
+    allow-circular-references: true
   profiles:
     include: database-config
   datasource:
@@ -40,17 +42,22 @@ spring:
       strategy:
         content:
           enabled: true
-          paths:
-            - "/js/**"      # /static/js - our JavaScript files
-            - "/css/**"     # /(static|dist)/css - our CSS files
-            - "/vendor/**"  # /dist/vendor - external dependencies (from yarn)
       cache: false
     cache:
       period: 1d
     # use comma-separated list to override default value
-    static-locations: >
-      classpath:/dist/,
-      classpath:/static/
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            paths:
+              - "/js/**"      # /static/js - our JavaScript files
+              - "/css/**"     # /(static|dist)/css - our CSS files
+              - "/vendor/**"  # /dist/vendor - external dependencies (from yarn)
+      static-locations: >
+            classpath:/dist/,
+            classpath:/static/
 
 logging:
   level:
@@ -67,12 +74,13 @@ logging:
 
 spring:
   profiles: development
-  resources:
-    # use comma-separated list to override default value
-    static-locations: >
-      file:src/main/resources/static/,
-      file:src/main/resources/dist/,
-      file:src/main/resources/plugins/,
-      classpath:/dist/,
-      classpath:/static/,
-      classpath:/plugins/
+  web:
+    resources:
+      static-locations: >
+            file:src/main/resources/static/,
+            file:src/main/resources/dist/,
+            file:src/main/resources/plugins/,
+            classpath:/dist/,
+            classpath:/static/,
+            classpath:/plugins/
+      

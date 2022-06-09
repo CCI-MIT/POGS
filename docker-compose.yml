@@ -6,6 +6,7 @@ services:
     ports:
       - "3307:3306"
     #command: mysqld --sql_mode=""
+    command: mysqld --default-authentication-plugin=mysql_native_password
     volumes:
       - .mysql:/var/lib/mysql
       - .docker/pogsserver/sql/:/docker-entrypoint-initdb.d

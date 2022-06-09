@@ -1,7 +1,7 @@
 database:
   host: database:3306
   schema: pogs
-  url: jdbc:mysql://${database.host}/${database.schema}?useSSL=false
+  url: jdbc:mysql://${database.host}/${database.schema}?allowPublicKeyRetrieval=true&useSSL=false
   username: root
   password: ${POGS_PASSWORD}
 videoprovider:

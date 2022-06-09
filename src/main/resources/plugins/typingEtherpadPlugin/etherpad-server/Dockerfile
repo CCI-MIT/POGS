@@ -6,7 +6,7 @@
 #
 # Version 0.1
 
-FROM node:18.0
+FROM node:lts-slim
 LABEL maintainer="Etherpad team, https://github.com/ether/etherpad-lite"
 
 # git hash of the version to be built.
@@ -25,6 +25,20 @@ ARG ETHERPAD_PLUGINS="ep_disable_chat"
 # this can be done with build args (and is mandatory to build ARM version)
 ARG NODE_ENV=production
 
+ARG EP_HOME=
+ARG EP_UID=5001
+ARG EP_GID=0
+ARG EP_SHELL=
+RUN groupadd --system ${EP_GID:+--gid "${EP_GID}" --non-unique} etherpad && \
+    useradd --system ${EP_UID:+--uid "${EP_UID}" --non-unique} --gid etherpad \
+        ${EP_HOME:+--home-dir "${EP_HOME}"} --create-home \
+        ${EP_SHELL:+--shell "${EP_SHELL}"} etherpad
+
+ARG EP_DIR=/opt/etherpad-lite
+
+
+RUN apt-get update; apt-get install curl -y
+
 # grab the ETHERPAD_VERSION tarball from github (no need to clone the whole
 # repository)
 RUN echo "Getting version: ${ETHERPAD_VERSION}" && \
@@ -41,16 +55,22 @@ RUN echo "Getting version: ${ETHERPAD_VERSION}" && \
 		--strip-components=1 && \
 	rm /opt/etherpad-lite.tar.gz
 
+RUN chown etherpad:etherpad "${EP_DIR}"
 WORKDIR /opt/etherpad-lite
 
-# install node dependencies for Etherpad
-RUN bin/installDeps.sh
+# Plugins must be installed before installing Etherpad's dependencies, otherwise
+# npm will try to hoist common dependencies by removing them from
+# src/node_modules and installing them in the top-level node_modules. As of
+# v6.14.10, npm's hoist logic appears to be buggy, because it sometimes removes
+# dependencies from src/node_modules but fails to add them to the top-level
+# node_modules. Even if npm correctly hoists the dependencies, the hoisting
+# seems to confuse tools such as `npm outdated`, `npm update`, and some ESLint
+# rules.
+RUN { [ -z "${ETHERPAD_PLUGINS}" ] || \
+      npm install --no-save --legacy-peer-deps ${ETHERPAD_PLUGINS}; } && \
+    src/bin/installDeps.sh && \
+    rm -rf ~/.npm
 
-# Install the plugins, if ETHERPAD_PLUGINS is not empty.
-#
-# Bash trick: in the for loop ${ETHERPAD_PLUGINS} is NOT quoted, in order to be
-# able to split at spaces.
-RUN for PLUGIN_NAME in ${ETHERPAD_PLUGINS}; do npm install "${PLUGIN_NAME}"; done
 
 #COPY ep_pogs /opt/etherpad-lite/node_modules/ep_pogs enable to use the local copy of plugin
 #RUN  npm install /opt/etherpad-lite/temp/ep_pogs/
@@ -69,5 +89,14 @@ COPY injectChangesToAPICode.sh /opt/etherpad-lite/temp/
 RUN /opt/etherpad-lite/temp/injectChangesToAPICode.sh
 
 
+# Fix group permissions
+RUN chmod -R g=u .
+
+USER root
+RUN cd src && npm link
+USER etherpad
+
+HEALTHCHECK --interval=20s --timeout=3s CMD ["etherpad-healthcheck"]
+
 EXPOSE 9001
-CMD ["node", "node_modules/ep_etherpad-lite/node/server.js"]
+CMD ["etherpad"]
