@@ -10,8 +10,8 @@ RUN ["sh","/app/setupRightLocalhostChange.sh"]
 
 
 #[LOCAL START]If running local copy enable this line and disable SERVER.
-# mvn clean compile package install; cp target/pogs-0.0.1-SNAPSHOT.jar .docker/pogsserver/
-#COPY .docker/pogsserver/pogs-0.0.1-SNAPSHOT.jar /app/pogs.jar
+## RUN mvn clean compile package install; cp target/pogs-0.0.1-SNAPSHOT.jar .docker/pogsserver/
+# COPY .docker/pogsserver/pogs-0.0.1-SNAPSHOT.jar /app/pogs.jar
 #[LOCAL END]
 
 #If running on server setup get latest relase from github
