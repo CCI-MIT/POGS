@@ -16,7 +16,7 @@ before_install:
   - others/travis/before_script.sh
 
 addons:
-  mariadb: '10.2'
+  mariadb: '10.9.2'
 service:
   - redis-server
 
