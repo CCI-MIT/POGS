@@ -39,9 +39,9 @@ public class WorkspaceCheckinWSController {
         Long completedTaskId = null;
         if (pogsMessage.getCompletedTaskId() != null) {
             completedTaskId = Long.parseLong(pogsMessage.getCompletedTaskId());
-            if(completedTaskId == 0){
-                completedTaskId = null;
-            }
+//            if(completedTaskId == 0){
+//                completedTaskId = 0l;
+//            }
 
         }
         Long sessionId = Long.parseLong(pogsMessage.getSessionId());
@@ -55,7 +55,7 @@ public class WorkspaceCheckinWSController {
         if (!pogsMessage.getContent().getChannel().isEmpty() && pogsMessage.getContent().getChannel().equals("true")) {
             Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
             EventLog el = new EventLog();
-            el.setCompletedTaskId(completedTaskId);
+            el.setCompletedTaskId((completedTaskId==0)?(null):(completedTaskId));
             el.setSessionId(sessionId);
             el.setSender(pogsMessage.getSender());
             el.setReceiver(pogsMessage.getReceiver());
@@ -68,7 +68,10 @@ public class WorkspaceCheckinWSController {
             el.setExtraData("");
             el.setSummaryDescription("Subject loaded : " + pogsMessage.getContent().getMessage());
             //&& completedTaskId!=null && completedTaskId > 0
+
+
             if (sender != null&& completedTaskId != -1 ) {
+
                 eventLogDao.create(el);
                 if (pogsMessage.getContent().getMessage().contains("/start/")) {
                     subjectHasSessionCheckInService.updateLatestSubjectPing(sender.getId(), sessionId);

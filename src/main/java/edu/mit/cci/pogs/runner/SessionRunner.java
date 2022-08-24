@@ -829,11 +829,13 @@ public class SessionRunner implements Runnable {
     }
 
     public void subjectCheckIn(Subject subject) {
+
         if (this.session.isSessionPerpetual()) {
             synchronized (checkedInWaitingSubjectListById) {
                 checkedInWaitingSubjectList.put(subject.getSubjectExternalId(), subject);
                 checkedInWaitingSubjectListById.put(subject.getId(), subject);
                 subjectHasSessionCheckInService.checkSubjectIn(subject, session);
+
             }
         } else {
 
@@ -970,6 +972,13 @@ public class SessionRunner implements Runnable {
                         sleepTimes = 1;
                     }*/
 
+                }
+                log( "----- <#>" + session.getId()+" PERPETUAL SESSION "+ this.session.getFullSessionName()+" TEST for " +  checkedInWaitingSubjectListById.size() + " subjects in queue");
+
+                if(subjectCheckInList!=null) {
+                    for (int i = 0; i < subjectCheckInList.size(); i++) {
+                        log(" - " + subjectCheckInList.get(i));
+                    }
                 }
                 if ((checkedInWaitingSubjectListById.size() > 0)) {
 

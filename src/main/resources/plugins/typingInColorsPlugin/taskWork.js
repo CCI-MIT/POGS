@@ -216,7 +216,7 @@ class EtherpadWithColors {
         if(window.location.href.indexOf("localhost")!=-1){
             etherpadAddress = "http://localhost:9001/p/"
         }
-        let iframe_src = etherpadAddress + padId + "?showControls=false&showLineNumbers=false&showChat=false&userColor="+currentUserColor;
+        let iframe_src = etherpadAddress + padId + "?sessionID="+sessionId+"&showControls=false&showLineNumbers=false&showChat=false&userColor="+currentUserColor;
 
         $("#etherpadArea").append('<iframe src="'+iframe_src+'" frameborder="0" style="position:relative;width:100%;height:100%;"></iframe>');
     }

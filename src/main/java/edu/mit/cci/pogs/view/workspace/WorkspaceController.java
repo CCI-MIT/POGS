@@ -420,7 +420,9 @@ public class WorkspaceController {
             model.addAttribute("errorMessage", "You are too late, your session has already passed!");
             return "workspace/error";
         }
+        System.out.println("Right before check in");
         sr.subjectCheckIn(su);
+        System.out.println("Right after check in");
         if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())) {
             return "redirect:/waiting_room/" + su.getSubjectExternalId();
         } else {
