@@ -136,6 +136,10 @@ public class SubjectService {
                                 }
                             }
                             if (!alreadyExist) {
+                                if(sa.getAttributeName().equals("displayName")){
+                                    su.setSubjectDisplayName(sa.getStringValue());
+                                    subjectDao.update(su);
+                                }
                                 subjectAttributeDao.create(sa);
                             }
                         }
