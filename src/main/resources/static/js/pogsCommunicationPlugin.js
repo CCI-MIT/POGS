@@ -870,6 +870,7 @@ class VideoChatManager {
                 this.memberReady++;
 
                 console.log("videoConferenceJoined");
+                this.api.executeCommand('displayName',this.currentSubject.displayName);
 
                 this.api.executeCommand('toggleTileView');
                 let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();

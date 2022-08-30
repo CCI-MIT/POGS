@@ -101,3 +101,12 @@ java -jar target/pogs-0.0.1-SNAPSHOT.jar
 
 If you are setting up the system in a RedHat remember to allow proxy to connect
 https://manastri.blogspot.com/2020/07/13-permission-denied-while-connecting.html
+
+## Instructions to fix broken etherpad update
+```sql
+
+mysql> alter database `etherpad_lite_db` CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin;
+mysql> alter table `store` convert to character set utf8mb4 collate utf8mb4_bin;
+mysql> alter table `store` change `key` `key` varchar(100) character set utf8mb4 collate utf8mb4_bin;
+mysql> alter table `store` change `value` `value` longtext character set utf8mb4 collate utf8mb4_bin;
+```
