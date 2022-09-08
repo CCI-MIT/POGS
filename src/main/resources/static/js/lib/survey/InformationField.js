@@ -55,7 +55,8 @@ class InformationFieldEdit {
                     ['fontsize', ['fontsize']],
                     ['color', ['color']],
                     ['insert', ['picture','link','video','table','codeview']]
-                ]
+                ],
+                codeviewIframeWhitelistSrc: ['drive.google.com']
                 ,
                 callbacks: {
                     onImageUpload: function(files) {
