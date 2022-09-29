@@ -162,7 +162,7 @@ class Survey {
         this.globalFieldIndex = this.globalFieldIndex + 1;
         return field;
     }
-    setupSurvey(surveyBluePrint, customVariables){
+    setupSurvey(surveyBluePrint, customVariables, orderOfFields){
         console.info("starting survey setup...");
         this.customVariables = customVariables;
 
@@ -170,10 +170,13 @@ class Survey {
         let self = this;
 
         let str = '';
-        $.each(surveyValues,function(i,e){
-
+        let hasRandomizedFields = false;
+        for( let i = 0; i < surveyValues.length;i++) {
+            let e = surveyValues[i];
             e = this.resolveVariablesForNetworkQuestions(e);
-
+            if(e.shouldRandomize) {
+                hasRandomizedFields = true;
+            }
             if(e.type == "text"){ // setup text question
                 this.fields.push(new InputField(this,e));
             }
@@ -193,7 +196,15 @@ class Survey {
             }
 
             //console.log(i + '----'+ JSON.stringify(e));
-        }.bind(this));
+        }
+
+        if(hasRandomizedFields) {
+            let orderOfFieldsJSON = JSON.parse(orderOfFields);
+            for(var i=0;i< orderOfFieldsJSON.length;i++){
+                $("#surveyField_" + orderOfFieldsJSON[i])
+                    .appendTo("#surveyFormOrdered");
+            }
+        }
 
     }
 
@@ -268,7 +279,7 @@ class SurveyTaskEdit {
             question_number = question_number + 1;
             let withVideo = $("#withVideo").prop("checked");
             if (($("#questionType")).val() == "text") { //For adding short answer (text) question
-                this.fieldList.push(new InputFieldEdit(question_number, "", withVideo, "", "", ""));
+                this.fieldList.push(new InputFieldEdit(question_number, "", withVideo, "", "", "", false));
 
             } else if (($("#questionType")).val() == "radio") { //For adding multiple choices question
                 this.fieldList.push(new RadioFieldEdit(question_number, "", withVideo, "", [""],null));
@@ -309,33 +320,33 @@ class SurveyTaskEdit {
             }
             if(bluePrint[i].type == "text"){
 
-                this.fieldList.push(new InputFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, answerSheet[i], bluePrint[i].placeholder));
+                this.fieldList.push(new InputFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, answerSheet[i], bluePrint[i].placeholder, bluePrint[i].shouldRandomize));
 
             } else if(bluePrint[i].type == "radio"){
 
-                this.fieldList.push(new RadioFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i],bluePrint[i].orientation));
+                this.fieldList.push(new RadioFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i],bluePrint[i].orientation, bluePrint[i].shouldRandomize));
 
 
 
             } else if(bluePrint[i].type == "checkbox"){
 
-                this.fieldList.push(new CheckboxFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i]));
+                this.fieldList.push(new CheckboxFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i],bluePrint[i].shouldRandomize));
 
             } else if(bluePrint[i].type == "select"){
 
-                this.fieldList.push(new SelectFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,answerSheet[i]));
+                this.fieldList.push(new SelectFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url, bluePrint[i].value,bluePrint[i].shouldRandomize));
 
 
 
 
             } else if(bluePrint[i].type == "introduction") {
-                this.fieldList.push(new InformationFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url));
+                this.fieldList.push(new InformationFieldEdit(question_number, bluePrint[i].question, withVideo, bluePrint[i].video_url,bluePrint[i].shouldRandomize));
 
             }else if(bluePrint[i].type == "radiotable"){
 
                 this.fieldList.push(new RadioTableFieldEdit(question_number, bluePrint[i].question,
                                                             withVideo, bluePrint[i].video_url,
-                                                            bluePrint[i].value,answerSheet[i]));
+                                                            bluePrint[i].value,answerSheet[i],bluePrint[i].shouldRandomize));
 
             }
             question_number++;

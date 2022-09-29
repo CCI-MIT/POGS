@@ -415,6 +415,13 @@
                         <small id="videoChatNotificationEmailHelp" class="form-text text-muted">This email will receive a notification with a download link that EXPIRES in 24 hours</small>
                     </div>
                 </div>
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="triggerTaskForVideoChat">Task to start video chat:</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="triggerTaskForVideoChat" th:field="*{triggerTaskForVideoChat}"/>
+                        <small id="triggerTaskForVideoChatHelp" class="form-text text-muted">If not set the first task will trigger the display</small>
+                    </div>
+                </div>
                 <div class="form-group row form-check form-check-inline">
 
                     <input class="form-check-input" th:field="*{videoChatRecordingEnabled}" type="checkbox" id="videoChatRecordingEnabled"/>

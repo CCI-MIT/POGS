@@ -44,6 +44,7 @@ public class SessionBean {
     private Integer teamMaxSize;
     private String teamCreationMethod;
     private String teamCreationMatrix;
+    private String triggerTaskForVideoChat;
 
 
 
@@ -146,6 +147,7 @@ public class SessionBean {
         this.recordSessionSaveEphemeralEvents = value.getRecordSessionSaveEphemeralEvents();
         this.videoChatNotificationEmail = value.getVideoChatNotificationEmail();
         this.videoChatRecordingEnabled = value.getVideoChatRecordingEnabled();
+        this.triggerTaskForVideoChat = value.getTriggerTaskForVideoChat();
 
     }
 
@@ -631,5 +633,13 @@ public class SessionBean {
 
     public void setVideoChatRecordingEnabled(Boolean videoChatRecordingEnabled) {
         this.videoChatRecordingEnabled = videoChatRecordingEnabled;
+    }
+
+    public void setTriggerTaskForVideoChat(String triggerTaskForVideoChat) {
+        this.triggerTaskForVideoChat = triggerTaskForVideoChat;
+    }
+
+    public String getTriggerTaskForVideoChat() {
+        return this.triggerTaskForVideoChat;
     }
 }

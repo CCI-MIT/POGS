@@ -55,7 +55,7 @@ public class WorkspaceCheckinWSController {
         if (!pogsMessage.getContent().getChannel().isEmpty() && pogsMessage.getContent().getChannel().equals("true")) {
             Subject sender = subjectDao.getByExternalId(pogsMessage.getSender());
             EventLog el = new EventLog();
-            el.setCompletedTaskId((completedTaskId==0)?(null):(completedTaskId));
+            el.setCompletedTaskId(((completedTaskId==null) ||(completedTaskId==0))?(null):(completedTaskId));
             el.setSessionId(sessionId);
             el.setSender(pogsMessage.getSender());
             el.setReceiver(pogsMessage.getReceiver());
@@ -70,7 +70,7 @@ public class WorkspaceCheckinWSController {
             //&& completedTaskId!=null && completedTaskId > 0
 
 
-            if (sender != null&& completedTaskId != -1 ) {
+            if (sender != null&& (completedTaskId!=null && (completedTaskId != -1)) ) {
 
                 eventLogDao.create(el);
                 if (pogsMessage.getContent().getMessage().contains("/start/")) {

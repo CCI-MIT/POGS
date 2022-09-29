@@ -20,12 +20,16 @@ class InformationFieldEdit {
 
     //addIntroduction
     //this.fieldList.push(new InformationFieldEdit(
-    constructor(question_number, question, withVideo, video_url) {
+    constructor(question_number, question, withVideo, video_url, shouldRandomize) {
         this.questionNumber = question_number;
         var str = "";
         str += '<div class="container question_set" id="question_set' + question_number + '" data-question-type = "introduction">';
 
         str += '<span><div class="btn btn-sm btn-warning move_toggle">Minimize</div>Information field: <span class="question_number">' + question_number + '</span></span><div class="content">';
+
+        //add should be randomized field
+        str += '<div class="form-group row"><input class="" style="margin-top: 5px" type="checkbox" id="randomize' + question_number + '" '+((shouldRandomize)?("checked"):(""))+'/><label class="col-sm-6 col-form-label">Should be randomized: </label></div>';
+
         // add text area
         str += '<div class="form-group w_100 row"><label class="col-sm-1 col-form-label">Info:</label>'
                + '<div class="col-sm-9"><textarea class="form-control htmleditor" id="question'+question_number+'" placeholder="Introduction goes here">'+question+'</textarea></div>'
@@ -56,8 +60,7 @@ class InformationFieldEdit {
                     ['color', ['color']],
                     ['insert', ['picture','link','video','table','codeview']]
                 ],
-                codeviewIframeWhitelistSrc: ['drive.google.com']
-                ,
+                codeviewIframeWhitelistSrc: ['drive.google.com'],
                 callbacks: {
                     onImageUpload: function(files) {
 
@@ -91,6 +94,7 @@ class InformationFieldEdit {
 
         question_set["question"] = $("#question"+this.questionNumber).val();
         question_set["type"] = $('#question_set' + this.questionNumber).attr('data-question-type');
+        question_set["shouldRandomize"] = $("#randomize"+this.questionNumber).is(':checked')
         if($("#video_url"+this.questionNumber).val() != undefined){ // if question contains video_url add it
             question_set["video_url"] = $("#video_url"+this.questionNumber).val();
         }

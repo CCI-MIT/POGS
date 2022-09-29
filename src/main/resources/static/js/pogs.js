@@ -96,6 +96,9 @@ class Pogs {
         this.doneUrlParameter = config.doneUrlParameter;
         this.videoChatShouldRecord = (config.videoChatShouldRecord)?(config.videoChatShouldRecord):(false);
         this.taskIsSolo = config.taskIsSolo;
+        this.triggerTaskForVideoChat = (config.triggerTaskForVideoChat
+                                        && config.triggerTaskForVideoChat != "")?
+                                       (config.triggerTaskForVideoChat):("/task/");
         this.setupSubjectColors();
 
         this.hasCollaborationVotingWidget = config.hasCollaborationVotingWidget;
@@ -407,7 +410,8 @@ class Pogs {
        console.log("this.isGlobalChatPage: " + this.isGlobalChatPage)
         if(this.isGlobalChatPage){
 
-            if(message.content.currentUrl.indexOf("/task/")!=-1){
+
+            if(message.content.currentUrl.indexOf(this.triggerTaskForVideoChat)!=-1) {
                 if(!this.isGlobalChatInitialized){
                     this.isGlobalChatInitialized = true;
                     $("#communication_to_show").show();

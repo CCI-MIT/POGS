@@ -8,6 +8,7 @@ class SelectField extends Field {
     setupHTML(){
         let str = "";
         str += '<div class="form-group" id="surveyField_'+this.index+'" style="min-width: 300px;">'
+
         str += '<label for="answer'+this.index+'" id="question'+this.index+'" class="text-left text-dark row">'+this.jsonInfo.question+'</label>'
 
         if(this.jsonInfo.video_url){
@@ -54,13 +55,17 @@ class SelectFieldEdit {
 
     //addSelectQuestion
     //this.fieldList.push(new SelectFieldEdit(
-    constructor(question_number, question, withVideo, video_url, choices, answer) {
+    constructor(question_number, question, withVideo, video_url, choices, answer, shouldRandomize) {
         let str = "";
         this.questionNumber = question_number;
         str +=
             '<div class="container question_set" id="question_set' + question_number
             + '" data-question-type = "select" >'
         str += '<span><div class="btn btn-sm btn-warning move_toggle">Minimize</div>Select field: <span class="question_number">' + question_number + '</span></span><div class="content">';
+
+        //add should be randomized field
+        str += '<div class="form-group row"><input class="" style="margin-top: 5px" type="checkbox" id="randomize' + question_number + '" '+((shouldRandomize)?("checked"):(""))+'/><label class="col-sm-6 col-form-label">Should be randomized: </label></div>';
+
         //add question field
         str +=
             '<div class="form-group row"><label class="col-sm-2 col-form-label">Question: </label><input class=" form-control col-sm-8" type="text" id="question'
@@ -175,6 +180,8 @@ class SelectFieldEdit {
 
         question_set["question"] = $("#question"+this.questionNumber).val();
         question_set["type"] = $('#question_set' + this.questionNumber).attr('data-question-type');
+        question_set["shouldRandomize"] = $("#randomize"+this.questionNumber).is(':checked')
+
         if($("#video_url"+this.questionNumber).val() != undefined){ // if question contains video_url add it
             question_set["video_url"] = $("#video_url"+this.questionNumber).val();
         }

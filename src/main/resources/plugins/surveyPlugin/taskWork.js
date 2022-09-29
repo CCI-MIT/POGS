@@ -5,7 +5,9 @@ var surveyPlugin = pogs.createPlugin('surveyTaskPlugin',function(){
 
     var survey = new Survey(this);
     // get config attributes from task plugin
-    survey.setupSurvey(this.getStringAttribute("surveyBluePrint"),this.getCompletedTaskStringAttribute("customVariables"));
+    survey.setupSurvey(this.getStringAttribute("surveyBluePrint"),
+                       this.getCompletedTaskStringAttribute("customVariables"),
+                       this.getCompletedTaskStringAttribute("finalDisplayOrder"));
     this.subscribeTaskAttributeBroadcast(survey.broadcastReceived.bind(survey))
 
 });
