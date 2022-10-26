@@ -39,6 +39,19 @@
                         </th:block>
                     </tbody>
                 </table>
+            <script th:inline="text" th:if="${pogsSession.sessionWideScriptId}">
+                /*<![CDATA[*/
+                console.log("Has session wide script")
+                var sessionWideScript = pogs.createPlugin('sessionWideScript',function(){
+
+                    console.log("Session wide script RUNNING")
+                    setTimeout(function(){
+                        [(${sessionWideScript})]
+
+                    },500);
+                });
+                /*]]>*/
+            </script>
                 <script>
                 $(function (){
                     let teamIndex = parseInt('[(${subjectsTeamIndex})]') + 2;
