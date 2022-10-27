@@ -384,6 +384,30 @@ class Pogs {
         this.firstLoad = true;
 
     }
+    getOverrideURLIfSet(newUrlToBeSet){
+        let overrideUrl = this.getSubjectAttribute("SESSION_DONE_REDIRECT_URL");
+        if(overrideUrl){
+            return overrideUrl;
+        }
+        return newUrlToBeSet;
+    }
+    getSubjectAttribute(attributeName){
+        let subject = null;
+        for(var i=0; i < this.teammates.length; i++) {
+            if(this.teammates[i].externalId == this.subjectId){
+                subject = this.teammates[i];
+                break;
+            }
+        }
+        if(subject == null) return null;
+        for(var j=0 ; j < subject.attributes.length; j ++){
+            if(subject.attributes[j].attributeName == attributeName) {
+                //print("Attribute found" + attributeName);
+                return subject.attributes[j].stringValue;
+            }
+        }
+        return null;
+    }
     validateFinalUrl(newUrlToBeSet) {
         //check if there is HTTPS or HTTP in the URL.
         if ((newUrlToBeSet.indexOf("http") == -1)&&(newUrlToBeSet.indexOf("https")==-1)) {
@@ -391,6 +415,8 @@ class Pogs {
         } else {
             if((newUrlToBeSet.indexOf("/sessions/")!=-1) && this.doneUrlParameter){
                 return newUrlToBeSet + '?externalId=' + this.subjectId;
+            } else {
+                newUrlToBeSet = this.getOverrideURLIfSet(newUrlToBeSet);
             }
             return newUrlToBeSet;
         }
@@ -503,4 +529,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.9.3");
+console.log("Version 1.10.1");

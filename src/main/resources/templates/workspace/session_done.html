@@ -39,19 +39,6 @@
                         </th:block>
                     </tbody>
                 </table>
-            <script th:inline="text" th:if="${pogsSession.sessionWideScriptId}">
-                /*<![CDATA[*/
-                console.log("Has session wide script")
-                var sessionWideScript = pogs.createPlugin('sessionWideScript',function(){
-
-                    console.log("Session wide script RUNNING")
-                    setTimeout(function(){
-                        [(${sessionWideScript})]
-
-                    },500);
-                });
-                /*]]>*/
-            </script>
                 <script>
                 $(function (){
                     let teamIndex = parseInt('[(${subjectsTeamIndex})]') + 2;
@@ -81,6 +68,7 @@
                                currentUrl: window.location,
                                sessionId: '[(${pogsSession.id})]',
                                subjectId: '[(${subject.subjectExternalId})]',
+                               teammates: [(${teammates})],
                                secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
                                doneUrlParameter : '[(${pogsSession.doneUrlParameter})]',
                                nextUrl : '[(${nextUrl})]',
