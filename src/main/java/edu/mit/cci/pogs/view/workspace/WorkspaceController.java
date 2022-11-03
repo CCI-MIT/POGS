@@ -476,6 +476,9 @@ public class WorkspaceController {
             sr.getSession().getSecondsRemainingForCurrentUrl());
         model.addAttribute("nextUrl", sr.getSession().getNextUrl());
 
+        if(sessionWrapper.getGlobalChatCompletedTaskId()== null){
+
+        }
         CompletedTask completedTask = completedTaskDao.get(sessionWrapper.getGlobalChatCompletedTaskId());
         model.addAttribute("completedTask", completedTask);
 
@@ -1096,6 +1099,11 @@ public class WorkspaceController {
         if (sr != null) {
             model.addAttribute("showScore", false);
         }
+
+
+        model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(
+                sr.getSession().getTaskList().get(0), su,
+                sr.getSession().getSessionRounds().get(0))));
         return checkExternalIdAndSessionRunningAndForward(su, model,
                 "workspace/session_done");
     }
@@ -1124,6 +1132,9 @@ public class WorkspaceController {
                 }
 
 
+                model.addAttribute("teammates", teamService.getTeamatesJSONObject(teamService.getTeamMates(
+                        sr.getSession().getTaskList().get(0), su,
+                        sr.getSession().getSessionRounds().get(0))));
                 model.addAttribute("subjectsTeamIndex", subjectsTeam);
                 model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
                 model.addAttribute("showScore", true);

@@ -778,6 +778,11 @@ class VideoChatManager {
     }
     setupHTML() {
         console.log("SETTING UP THE PAGE FOR CALL")
+        var os = document.getElementById("communication_to_show");
+        os.append("<div style='width:350px;height:100%;background-color: red'></div>")
+    }
+    setupHTML_() {
+        console.log("SETTING UP THE PAGE FOR CALL")
         $("#communication_to_show").empty();
         var script = document.createElement('script');
         //add jitsi iframe lib
