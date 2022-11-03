@@ -212,9 +212,11 @@ class Pogs {
             let isExternalFinalPage =
                 ((url.indexOf("http") != -1||url.indexOf("https")!=-1))
                 && (url.indexOf("/sessions/")==-1) ;
-
+            console.log("isGlobalChat ("+this.isGlobalChatPage + ") inside the onUnload call is external page: " + isExternalFinalPage);
             if(!this.isGlobalChatPage){
 
+                console.log("isGlobalChat ("+this.isGlobalChatPage + ") inside the onUnload call parent location: " + window.parent.location);
+                console.log("isGlobalChat ("+this.isGlobalChatPage + ") inside the onUnload call parent location: "+ window.location)
                 if ( window.location !== window.parent.location ) {
 
                     if(!isExternalFinalPage){
@@ -228,6 +230,9 @@ class Pogs {
                 this.countDown = null;
 
                 if(isExternalFinalPage){
+                    window.location = this.nextUrl;
+                }
+                if(url.indexOf("/scoring/")!=-1){
                     window.location = this.nextUrl;
                 }
             }
@@ -529,4 +534,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.10.2");
+console.log("Version 1.10.3");
