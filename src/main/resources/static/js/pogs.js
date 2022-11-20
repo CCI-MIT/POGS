@@ -389,9 +389,45 @@ class Pogs {
         this.firstLoad = true;
 
     }
+    getURLRedirectAttributes(){
+        let url = "";
+        let workerId = this.getSubjectAttribute("workerId");
+        if(workerId){
+            url = url + "&workerId="+workerId;
+        }
+        let assignmentId = this.getSubjectAttribute("assignmentId");
+        if(assignmentId){
+            url = url + "&assignmentId="+assignmentId;
+        }
+        let hitId = this.getSubjectAttribute("hitId");
+        if(hitId){
+            url = url + "&hitId="+hitId;
+        }
+        let PROLIFIC_PID = this.getSubjectAttribute("PROLIFIC_PID");
+        if(PROLIFIC_PID){
+            url = url + "&PROLIFIC_PID="+PROLIFIC_PID;
+        }
+        let STUDY_ID = this.getSubjectAttribute("STUDY_ID");
+        if(STUDY_ID){
+            url = url + "&STUDY_ID="+STUDY_ID;
+        }
+        let SESSION_ID = this.getSubjectAttribute("SESSION_ID");
+        if(SESSION_ID){
+            url = url + "&SESSION_ID="+SESSION_ID;
+        }
+        return url;
+    }
     getOverrideURLIfSet(newUrlToBeSet){
         let overrideUrl = this.getSubjectAttribute("SESSION_DONE_REDIRECT_URL");
+        let urlParameter = this.getURLRedirectAttributes();
         if(overrideUrl){
+            if(urlParameter){
+                if(overrideUrl.indexOf("?")!==-1){
+                    overrideUrl = overrideUrl + "?" + urlParameter.substring(1,urlParameter.length);
+                } else {
+                    overrideUrl = overrideUrl + urlParameter;
+                }
+            }
             return overrideUrl;
         }
         return newUrlToBeSet;
@@ -534,4 +570,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.11.1");
+console.log("Version 1.11.2");
