@@ -924,22 +924,22 @@ class VideoChatManager {
                 this.communicationPluginReference.sendMessage("cameraError", "-", CHAT_TYPE.STATUS, null);
             });
             this.api.addEventListener("audioAvailabilityChanged", (e) => {
-                this.communicationPluginReference.sendMessage("audioAvailabilityChanged", "-" + e.available, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("audioAvailabilityChanged_available:"+e.available, "-" + e.available, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("videoAvailabilityChanged", (e) => {
-                this.communicationPluginReference.sendMessage("videoAvailabilityChanged", "-" + e.available, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("videoAvailabilityChanged_available:"+e.available, "-" + e.available, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("videoMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("videoMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
             this.api.addEventListener("videoMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("videoMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("audioMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("audioMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("audioMuteStatusChanged_muted:e.muted", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("faceLandmarkDetected", (e) => {
