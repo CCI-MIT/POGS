@@ -920,6 +920,36 @@ class VideoChatManager {
                 $("#communicationContainer").empty();
             });
 
+            this.api.addEventListener("cameraError", () => {
+                this.communicationPluginReference.sendMessage("cameraError", "-", CHAT_TYPE.STATUS, null);
+            });
+            this.api.addEventListener("audioAvailabilityChanged", (e) => {
+                this.communicationPluginReference.sendMessage("audioAvailabilityChanged", "-" + e.available, CHAT_TYPE.STATUS, null);
+            });
+
+            this.api.addEventListener("videoAvailabilityChanged", (e) => {
+                this.communicationPluginReference.sendMessage("videoAvailabilityChanged", "-" + e.available, CHAT_TYPE.STATUS, null);
+            });
+
+            this.api.addEventListener("videoMuteStatusChanged", (e) => {
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+            });
+            this.api.addEventListener("videoMuteStatusChanged", (e) => {
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+            });
+
+            this.api.addEventListener("audioMuteStatusChanged", (e) => {
+                this.communicationPluginReference.sendMessage("audioMuteStatusChanged", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+            });
+
+            this.api.addEventListener("faceLandmarkDetected", (e) => {
+                this.communicationPluginReference.sendMessage("faceLandmarkDetected", "- muted:" + JSON.stringify(e), CHAT_TYPE.STATUS, null);
+            });
+
+
+
+
+
         }.bind(this);
 
 
