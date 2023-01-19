@@ -423,9 +423,9 @@ class Pogs {
         if(overrideUrl){
             if(urlParameter){
                 if(overrideUrl.indexOf("?")!==-1){
-                    overrideUrl = overrideUrl + "?" + urlParameter.substring(1,urlParameter.length);
-                } else {
                     overrideUrl = overrideUrl + urlParameter;
+                } else {
+                    overrideUrl = overrideUrl + "?" + urlParameter.substring(1,urlParameter.length);
                 }
             }
             return overrideUrl;
@@ -570,4 +570,4 @@ class Pogs {
 
 
 new Pogs();
-console.log("Version 1.11.2");
+console.log("Version 1.11.3");
