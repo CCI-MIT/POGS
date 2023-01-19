@@ -932,14 +932,14 @@ class VideoChatManager {
             });
 
             this.api.addEventListener("videoMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted:"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
             this.api.addEventListener("videoMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("videoMuteStatusChanged_muted:"+e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("audioMuteStatusChanged", (e) => {
-                this.communicationPluginReference.sendMessage("audioMuteStatusChanged_muted:e.muted", "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
+                this.communicationPluginReference.sendMessage("audioMuteStatusChanged_muted:" + e.muted, "- muted:" + e.muted, CHAT_TYPE.STATUS, null);
             });
 
             this.api.addEventListener("faceLandmarkDetected", (e) => {
