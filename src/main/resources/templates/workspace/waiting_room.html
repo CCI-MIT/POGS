@@ -19,10 +19,9 @@
             <div id="caveat">(may start sooner if all participants are present)</div>
         </div>
         <div class="form-group waiting_message" th:if="${pogsSessionPerpetual}">
-            <div class="message ">
-                        Waiting for other participants to join ...
-                        <small>Max. waiting time: <b th:text="${pogsSession.waitingRoomTime}"></b></small>
-                    </div>
+            <div class="message " th:text="${pogsSession.waitingRoomMessage}">
+                        Waiting for other participants to join ...</div>
+<!--            <small>Max. waiting time: <b th:text="${pogsSession.waitingRoomTime}"></b></small>-->
                     <div id="countdown" style="display: none"></div>
 
         </div>

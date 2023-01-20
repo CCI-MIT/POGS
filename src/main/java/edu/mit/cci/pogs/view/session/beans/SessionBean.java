@@ -81,6 +81,8 @@ public class SessionBean {
     private Boolean   recordSessionSaveEphemeralEvents;
     private String    videoChatNotificationEmail;
 
+    private String waitingRoomMessage;
+
 
 
     public SessionBean() {
@@ -148,6 +150,7 @@ public class SessionBean {
         this.videoChatNotificationEmail = value.getVideoChatNotificationEmail();
         this.videoChatRecordingEnabled = value.getVideoChatRecordingEnabled();
         this.triggerTaskForVideoChat = value.getTriggerTaskForVideoChat();
+        this.waitingRoomMessage = value.getWaitingRoomMessage();
 
     }
 
@@ -637,6 +640,14 @@ public class SessionBean {
 
     public void setTriggerTaskForVideoChat(String triggerTaskForVideoChat) {
         this.triggerTaskForVideoChat = triggerTaskForVideoChat;
+    }
+
+    public String getWaitingRoomMessage() {
+        return waitingRoomMessage;
+    }
+
+    public void setWaitingRoomMessage(String waitingRoomMessage) {
+        this.waitingRoomMessage = waitingRoomMessage;
     }
 
     public String getTriggerTaskForVideoChat() {

@@ -234,6 +234,7 @@ public class SessionService {
         session.setVideoChatNotificationEmail(sessionBean.getVideoChatNotificationEmail());
         session.setVideoChatRecordingEnabled(sessionBean.getVideoChatRecordingEnabled());
         session.setTriggerTaskForVideoChat(sessionBean.getTriggerTaskForVideoChat());
+        session.setWaitingRoomMessage(sessionBean.getWaitingRoomMessage());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -334,6 +335,7 @@ public class SessionService {
         clonedNonPerpetualSession.setVideoChatNotificationEmail(session.getVideoChatNotificationEmail());
         clonedNonPerpetualSession.setVideoChatRecordingEnabled(session.getVideoChatRecordingEnabled());
         clonedNonPerpetualSession.setTriggerTaskForVideoChat(session.getTriggerTaskForVideoChat());
+        clonedNonPerpetualSession.setWaitingRoomMessage(session.getWaitingRoomMessage());
 
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());

@@ -525,6 +525,14 @@
                 </div>
 
                 <div class="form-group row">
+                    <label class="col-sm-3 col-form-label" for="waitingRoomMessage">Waiting room message:</label>
+                    <div class="col-sm-9">
+                        <input class="form-control" type="text" id="waitingRoomMessage" th:field="*{waitingRoomMessage}"/>
+                        <div class="invalid-feedback">Please provide a waiting room message.</div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="couldNotAssignToTeamMessage">Could Not Assign To Team Message:</label>
                     <div class="col-sm-9">
                         <input class="form-control" type="text" id="couldNotAssignToTeamMessage" th:field="*{couldNotAssignToTeamMessage}"/>
@@ -853,7 +861,10 @@
                             $("#sessionSuffixError").show();
                             valid = false;
                         }
-
+                        if($("#waitingRoomMessage").val()==""){
+                            $("#waitingRoomMessage").addClass("is-invalid");
+                            valid = false;
+                        }
                         if($("#couldNotAssignToTeamMessage").val()==""){
                             $("#couldNotAssignToTeamMessage").addClass("is-invalid");
                             valid = false;
