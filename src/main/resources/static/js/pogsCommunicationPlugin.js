@@ -56,7 +56,7 @@ class CommunicationPlugin extends PogsPlugin {
             if(this.pogsRef.communicationType == COMMUNICATION_TYPE.VIDEO_CHAT) {
                 var vtm = new VideoChatManager(this, false);
             }
-            if(this.pogsRef.communicationType == COMMUNICATION_TYPE.VIDEO_CHAT) {
+            if(this.pogsRef.communicationType == COMMUNICATION_TYPE.AUDIO_CHAT) {
                 var vtm = new VideoChatManager(this, true);
             }
 
