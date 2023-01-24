@@ -1,6 +1,6 @@
 class TwoAnwserSurvey extends Survey {
 
-    setupSurvey(surveyBluePrint, customVariables){
+    setupSurvey(surveyBluePrint, customVariables) {
         this.customVariables = customVariables;
         console.info("starting survey setup...");
 

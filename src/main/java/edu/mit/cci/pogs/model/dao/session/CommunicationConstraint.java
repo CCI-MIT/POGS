@@ -6,7 +6,8 @@ public enum CommunicationConstraint {
     GROUP_CHAT('G',"Group Chat Channel - No constraint"),
     MATRIX_CHAT('M',"Matrix Chat - Constraint: matrix"),
     DYADIC_CHAT('D',"Dyadic Communication - Constraint telephone system"),
-    VIDEO_CHAT('V',"Video Group Chat Channel ");
+    VIDEO_CHAT('V',"Video Group Chat Channel "),
+    AUDIO_CHAT('A',"Audio Group Chat Channel ");
 
     private Character communicationTypeChar;
     private String communicationType;

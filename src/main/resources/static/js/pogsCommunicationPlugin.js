@@ -3,6 +3,7 @@ const COMMUNICATION_TYPE ={
     GROUP_CHAT: 'G',
     MATRIX_CHAT: 'M',
     VIDEO_CHAT : 'V',
+    AUDIO_CHAT: 'A',
     DYADIC : 'D'
 }
 
@@ -53,7 +54,10 @@ class CommunicationPlugin extends PogsPlugin {
                 mtm.changeChannelTo(CHAT_BODY.INSTRUCTIONS.htmlRef, CHAT_BODY.INSTRUCTIONS.displayString,null);
             }
             if(this.pogsRef.communicationType == COMMUNICATION_TYPE.VIDEO_CHAT) {
-                var vtm = new VideoChatManager(this);
+                var vtm = new VideoChatManager(this, false);
+            }
+            if(this.pogsRef.communicationType == COMMUNICATION_TYPE.VIDEO_CHAT) {
+                var vtm = new VideoChatManager(this, true);
             }
 
 
@@ -721,10 +725,11 @@ class DyadicChatManager extends GroupChatManager {
 
 
 class VideoChatManager {
-    constructor(communicationPluginReference) {
+    constructor(communicationPluginReference, shouldStartVideoMuted) {
         console.log("<<<<<<<<<<<New video chat>>>>> ")
         this.channelReceiver = null;
         this.memberReady=0;
+        this.shouldStartVideoMuted = shouldStartVideoMuted;
         this.communicationPluginReference = communicationPluginReference;
         this.subjectsInChannel = communicationPluginReference.getTeammates();
         this.currentSubject = communicationPluginReference.getSubjectByExternalId(communicationPluginReference.getSubjectId());
@@ -804,6 +809,7 @@ class VideoChatManager {
 
 
 
+       let shouldStartVideoMuted = this.shouldStartVideoMuted;
 
         script.onload = function() {
             var options = {};
@@ -832,6 +838,7 @@ class VideoChatManager {
                     },
 
                     configOverwrite: {
+                        startAudioOnly: shouldStartVideoMuted,
                         disableSimulcast: false,
                         disableDeepLinking: true,
                         useStunTurn: true,
@@ -863,6 +870,7 @@ class VideoChatManager {
                     },
 
                     configOverwrite: {
+                        startAudioOnly: shouldStartVideoMuted,
                         disableSimulcast: false,
                         disableDeepLinking: true,
                         useStunTurn: true,
