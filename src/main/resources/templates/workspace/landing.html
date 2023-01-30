@@ -12,7 +12,9 @@
 <!--/*@thymesVar id="externalId" type="java.lang.String"*/-->
 <div layout:fragment="content">
     <div class="d-flex align-items-center flex-column justify-content-center h-100 " style="height: 100%">
-                    <span  th:if="${not isPogsReferrer}">Click on the button below to check in into this session (even if you've already clicked on it before, you need to do it again)....</span>
+                    <span  th:if="${not isPogsReferrer}"><!--  Click on the button below to check in into this session (even if you've already clicked on it before, you need to do it again).... --->
+                        Click the button below to join the study
+                    </span>
                     <span  th:if="${ isPogsReferrer}"> Redirecting ...</span>
 
         <form id="landingPage" th:action="${action}" method="">

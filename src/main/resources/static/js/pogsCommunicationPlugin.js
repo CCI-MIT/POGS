@@ -830,7 +830,8 @@ class VideoChatManager {
                         TILE_VIEW_MAX_COLUMNS: 1,
                         enableClosePage: false,
                         toolbarButtons: [
-                            'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
+                            'microphone', 'camera',
+                            /*'desktop', 'embedmeeting', 'fullscreen',*/
                         ],
                     },
                     userInfo: {
@@ -862,7 +863,8 @@ class VideoChatManager {
                         TILE_VIEW_MAX_COLUMNS: 1,
                         enableClosePage: false,
                         toolbarButtons: [
-                            'microphone', 'camera', 'desktop', 'embedmeeting', 'fullscreen',
+                            'microphone', 'camera',
+                            /*'desktop', 'embedmeeting', 'fullscreen',*/
                         ],
                     },
                     userInfo: {

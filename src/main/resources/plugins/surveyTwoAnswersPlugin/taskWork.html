@@ -40,7 +40,7 @@ const SURVEY_FIELDS = {
 
 }
 const SECOND_FIELD_NAMING = "Confirmation"; // "Second answer"
-const CANT_ANSWER_SECOND_AUTHOR_FIRST = "Await confirmation from the other party"; //"You can't answer the second because you were author of the first answer"
+const CANT_ANSWER_SECOND_AUTHOR_FIRST = "Confirmation from the other party shows up here"; //"You can't answer the second because you were author of the first answer"
 const CANT_ANSWER_FIST_AUTHOR_SECOND = "This is what the other party selected"; // "You can't answer the first because you were author of the second answer";
 
 class Field {
@@ -128,7 +128,7 @@ class Field {
         this.firstAnswerField = firstAnswerField;
         $('#surveyField_' +this.index).hide();
         $('#surveyField_' +this.index + ' .embed-responsive').remove();
-        $('#question' +this.index).html('<small>'+SECOND_FIELD_NAMING+'</small>');
+        $('#question' +this.index).html('<small><b>↪️'+SECOND_FIELD_NAMING+': '+ this.jsonInfo.question+'</b></small>');
     }
     getPogsPlugin(){
         return this.surveyRefence.getPogsPlugin();
