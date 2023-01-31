@@ -221,6 +221,11 @@ class Survey {
                 this.totalAnswerableFields++;
             }
 
+
+
+
+
+
             //console.log(i + '----'+ JSON.stringify(e));
         }
 
