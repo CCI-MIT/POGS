@@ -13,6 +13,27 @@ class Survey {
 
         this.fields = [];
         this.globalFieldIndex = 0;
+        this.totalAnswerableFields = 0;
+        this.lastCheckedAnswers = 0;
+    }
+    showHelperTextOnTop(){
+        $("#surveyForm").css("margin-top",'20px');
+        this.updateTextOnHelperText();
+    }
+    updateTextOnHelperText(){
+
+        let answeredFields = 0;
+        for(let i=0;i<this.fields.length;i++){
+            if(this.fields[i].jsonInfo.type != "introduction" && this.fields[i].finalAnswerSubject!=null){
+                console.log('this.fields[i]: ' + i + ' - ' + this.fields[i].jsonInfo.type)
+                answeredFields++;
+            }
+        }
+        if( this.lastCheckedAnswers ==0 || (this.lastCheckedAnswers != answeredFields ) ) {
+            $("#descriptionOfFieldsAnswered")
+                .html('Answered: '+answeredFields+' out ' + this.totalAnswerableFields + ' questions');
+            this.lastCheckedAnswers = answeredFields
+        }
     }
     resolveVariablesForNetworkQuestions(surveyItem){
         var regex = new RegExp(/\${.*}/gi);
@@ -178,21 +199,26 @@ class Survey {
                 hasRandomizedFields = true;
             }
             if(e.type == "text"){ // setup text question
-                this.fields.push(new InputField(this,e));
+                new InputField(this,e);
+                this.totalAnswerableFields++;
             }
             else if(e.type == "radio"){ // setup radio question
-                this.fields.push(new RadioField(this,e));
+                new RadioField(this,e);
+                this.totalAnswerableFields++;
             }
             else if(e.type == "select") {
-                this.fields.push(new SelectField(this,e));
+                new SelectField(this,e);
+                this.totalAnswerableFields++;
             }
             else if(e.type == "checkbox") {
-                this.fields.push(new CheckboxField(this,e));
+                new CheckboxField(this,e);
+                this.totalAnswerableFields++;
             }
-            if(e.type == "introduction") {
-                this.fields.push(new InformationField(this,e));
+            else if(e.type == "introduction") {
+                new InformationField(this,e);
             }else if(e.type == "radiotable"){ // setup radio question
-                this.fields.push(new RadioTableField(this,e));
+                new RadioTableField(this,e);
+                this.totalAnswerableFields++;
             }
 
             //console.log(i + '----'+ JSON.stringify(e));
@@ -205,6 +231,7 @@ class Survey {
                     .appendTo("#surveyFormOrdered");
             }
         }
+        this.showHelperTextOnTop();
 
     }
 
@@ -222,6 +249,7 @@ class Survey {
             if(message.sender != this.pogsPlugin.subjectId) {
                 this.fields[index].broadcastReceived(message);
             }
+            this.updateTextOnHelperText();
         }
     }
 
