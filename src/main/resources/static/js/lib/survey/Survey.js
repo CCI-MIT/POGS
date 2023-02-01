@@ -236,7 +236,9 @@ class Survey {
                     .appendTo("#surveyFormOrdered");
             }
         }
-        this.showHelperTextOnTop();
+        if(this.totalAnswerableFields!=0) {
+            this.showHelperTextOnTop();
+        }
 
     }
 
@@ -254,7 +256,9 @@ class Survey {
             if(message.sender != this.pogsPlugin.subjectId) {
                 this.fields[index].broadcastReceived(message);
             }
-            this.updateTextOnHelperText();
+            if(this.totalAnswerableFields!=0) {
+                this.updateTextOnHelperText();
+            }
         }
     }
 
