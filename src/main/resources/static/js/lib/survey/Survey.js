@@ -17,7 +17,7 @@ class Survey {
         this.lastCheckedAnswers = 0;
     }
     showHelperTextOnTop(){
-        $("#surveyForm").css("margin-top",'20px');
+        $("#surveyForm").css("margin-top",'50px');
         this.updateTextOnHelperText();
     }
     updateTextOnHelperText(){
