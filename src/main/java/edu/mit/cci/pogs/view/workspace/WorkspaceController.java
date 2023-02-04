@@ -214,7 +214,12 @@ public class WorkspaceController {
             response.addCookie(co);
         }
 
-        return "workspace/landing";
+        if(session.getLandingPageOverrideEnabled()){
+            model.addAttribute("pogsSession",session);
+            return "workspace/customized_landing";
+        } else {
+            return "workspace/landing";
+        }
     }
 
     @GetMapping("/sessions/start/{sessionId}")

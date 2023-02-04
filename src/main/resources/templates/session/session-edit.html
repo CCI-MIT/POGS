@@ -531,6 +531,19 @@
                         <div class="invalid-feedback">Please provide a waiting room message.</div>
                     </div>
                 </div>
+                <div class="form-group row hiddable" >
+                    <label class="col-sm-3 col-form-label" for="landingPageOverrideEnabled">Landing Page Override Enabled:</label>
+                    <div class="col-sm-9">
+                        <input class="form-check-input" th:field="*{landingPageOverrideEnabled}" type="checkbox" id="landingPageOverrideEnabled" data-trigger="landingPage" />
+                    </div>
+                </div>
+
+                <div class="form-group row hideable" data-hide="landingPage">
+                    <label class="col-sm-3 col-form-label" for="landingText">Landing page override:</label>
+                    <div class="col-sm-9">
+                        <textarea class="form-control htmleditor" id="landingText" th:field="*{landingPageOverrideContent}" rows="3"></textarea>
+                    </div>
+                </div>
 
                 <div class="form-group row">
                     <label class="col-sm-3 col-form-label" for="couldNotAssignToTeamMessage">Could Not Assign To Team Message:</label>

@@ -82,6 +82,8 @@ public class SessionBean {
     private String    videoChatNotificationEmail;
 
     private String waitingRoomMessage;
+    private Boolean   landingPageOverrideEnabled;
+    private String    landingPageOverrideContent;
 
 
 
@@ -151,6 +153,9 @@ public class SessionBean {
         this.videoChatRecordingEnabled = value.getVideoChatRecordingEnabled();
         this.triggerTaskForVideoChat = value.getTriggerTaskForVideoChat();
         this.waitingRoomMessage = value.getWaitingRoomMessage();
+
+        this.landingPageOverrideContent = value.getLandingPageOverrideContent();
+        this.landingPageOverrideEnabled = value.getLandingPageOverrideEnabled();
 
     }
 
@@ -652,5 +657,21 @@ public class SessionBean {
 
     public String getTriggerTaskForVideoChat() {
         return this.triggerTaskForVideoChat;
+    }
+
+    public Boolean getLandingPageOverrideEnabled() {
+        return landingPageOverrideEnabled;
+    }
+
+    public void setLandingPageOverrideEnabled(Boolean landingPageOverrideEnabled) {
+        this.landingPageOverrideEnabled = landingPageOverrideEnabled;
+    }
+
+    public String getLandingPageOverrideContent() {
+        return landingPageOverrideContent;
+    }
+
+    public void setLandingPageOverrideContent(String landingPageOverrideContent) {
+        this.landingPageOverrideContent = landingPageOverrideContent;
     }
 }

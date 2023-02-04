@@ -842,6 +842,10 @@ class VideoChatManager {
                         startAudioOnly: shouldStartVideoMuted,
                         disableSimulcast: false,
                         disableDeepLinking: true,
+                        toolbarButtons: [
+                            'microphone', 'camera',
+                            /*'desktop', 'embedmeeting', 'fullscreen',*/
+                        ],
                         useStunTurn: true,
                         prejoinPageEnabled: false,
 
@@ -876,6 +880,10 @@ class VideoChatManager {
                         disableSimulcast: false,
                         disableDeepLinking: true,
                         useStunTurn: true,
+                        toolbarButtons: [
+                            'microphone', 'camera',
+                            /*'desktop', 'embedmeeting', 'fullscreen',*/
+                        ],
                         prejoinPageEnabled: false,
 
                     }

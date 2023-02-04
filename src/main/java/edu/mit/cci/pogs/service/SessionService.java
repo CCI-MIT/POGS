@@ -235,6 +235,8 @@ public class SessionService {
         session.setVideoChatRecordingEnabled(sessionBean.getVideoChatRecordingEnabled());
         session.setTriggerTaskForVideoChat(sessionBean.getTriggerTaskForVideoChat());
         session.setWaitingRoomMessage(sessionBean.getWaitingRoomMessage());
+        session.setLandingPageOverrideContent(sessionBean.getLandingPageOverrideContent());
+        session.setLandingPageOverrideEnabled(sessionBean.getLandingPageOverrideEnabled());
 
         Study study = studyDao.get(sessionBean.getStudyId());
         session.setFullSessionName(study.getStudySessionPrefix() + sessionBean.getSessionSuffix());
@@ -336,6 +338,8 @@ public class SessionService {
         clonedNonPerpetualSession.setVideoChatRecordingEnabled(session.getVideoChatRecordingEnabled());
         clonedNonPerpetualSession.setTriggerTaskForVideoChat(session.getTriggerTaskForVideoChat());
         clonedNonPerpetualSession.setWaitingRoomMessage(session.getWaitingRoomMessage());
+        clonedNonPerpetualSession.setLandingPageOverrideEnabled(session.getLandingPageOverrideEnabled());
+        clonedNonPerpetualSession.setLandingPageOverrideContent(session.getLandingPageOverrideContent());
 
         clonedNonPerpetualSession = sessionDao.create(clonedNonPerpetualSession);
         List<SessionHasTaskGroup> taskGroup = sessionHasTaskGroupDao.listSessionHasTaskGroupBySessionId(session.getId());
