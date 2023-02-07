@@ -49,7 +49,8 @@
           var jitsiProviderURL ="meet.jit.si/";
           var url = "";
 
-          var roomName = "pogs_session_video_chat_confenrence_76856758976898532342_"+ makeid(35)
+          var randomZ = makeid(35);
+          var roomName = "pogs_session_video_chat_confenrence_76856758976898532342_"+ randomZ
 
 
           url = jitsiProviderURL + roomName;
@@ -75,11 +76,11 @@
                       ],
                   },
                   userInfo: {
-                      displayName: this.currentSubject.displayName
+                      displayName: "User" + randomZ
                   },
 
                   configOverwrite: {
-                      startAudioOnly: shouldStartVideoMuted,
+                      startAudioOnly: false,
                       disableSimulcast: false,
                       disableDeepLinking: true,
                       useStunTurn: true,
