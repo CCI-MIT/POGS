@@ -13,6 +13,7 @@
 <div layout:fragment="content">
     <div class="d-flex align-items-center flex-column justify-content-center h-100 " style="height: 100%">
         <div class="" th:remove="tag" th:utext="${pogsSession.landingPageOverrideContent}" ></div>
+        <div id="jitsiVideoCallTestPage"></div>
         <form id="landingPage" th:action="${action}" method="">
             <input type="hidden" name="externalId" th:value="${externalId}">
             <input type="hidden" name="workerId" th:value="${workerId}">
@@ -30,6 +31,74 @@
               $("#landingPage").submit();
               }
           });
+
+          //START OF JITSI TEST
+          var script = document.createElement('script');
+          function makeid(length) {
+              let result = '';
+              const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+              const charactersLength = characters.length;
+              let counter = 0;
+              while (counter < length) {
+                  result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                  counter += 1;
+              }
+              return result;
+          }
+
+          var jitsiProviderURL ="meet.jit.si/";
+          var url = "";
+
+          var roomName = "pogs_session_video_chat_confenrence_76856758976898532342_"+ makeid(35)
+
+
+          url = jitsiProviderURL + roomName;
+          script.onload = function() {
+              var options = {};
+              options = {
+                  width: 350,
+
+                  roomName: roomName,
+                  parentNode: document.getElementById("communication_to_show"),
+                  interfaceConfigOverwrite: {
+                      filmStripOnly: false,
+                      MOBILE_APP_PROMO: false,
+                      HIDE_INVITE_MORE_HEADER: true,
+                      SHOW_CHROME_EXTENSION_BANNER: false,
+                      DISPLAY_WELCOME_PAGE_CONTENT: false,
+                      DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
+                      TILE_VIEW_MAX_COLUMNS: 1,
+                      enableClosePage: false,
+                      toolbarButtons: [
+                          'microphone', 'camera',
+                          /*'desktop', 'embedmeeting', 'fullscreen',*/
+                      ],
+                  },
+                  userInfo: {
+                      displayName: this.currentSubject.displayName
+                  },
+
+                  configOverwrite: {
+                      startAudioOnly: shouldStartVideoMuted,
+                      disableSimulcast: false,
+                      disableDeepLinking: true,
+                      useStunTurn: true,
+                      toolbarButtons: [
+                          'microphone', 'camera',
+                          /*'desktop', 'embedmeeting', 'fullscreen',*/
+                      ],
+                      prejoinPageEnabled: false,
+
+                  }
+              }
+              new window.JitsiMeetExternalAPI(url, options);
+
+          }
+
+          script.src = ("https://meet.jit.si/external_api.js")
+
+          document.getElementsByTagName('head')[0].appendChild(script);
+
         </script>
     </div>
 </div>

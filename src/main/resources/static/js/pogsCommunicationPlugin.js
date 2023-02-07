@@ -831,7 +831,7 @@ class VideoChatManager {
                         enableClosePage: false,
                         toolbarButtons: [
                             'microphone', 'camera',
-                            /*'desktop', 'embedmeeting', 'fullscreen',*/
+                            'desktop', 'embedmeeting', 'fullscreen'
                         ],
                     },
                     userInfo: {
@@ -839,12 +839,12 @@ class VideoChatManager {
                     },
 
                     configOverwrite: {
-                        startAudioOnly: shouldStartVideoMuted,
+                        //startAudioOnly: shouldStartVideoMuted,
                         disableSimulcast: false,
                         disableDeepLinking: true,
                         toolbarButtons: [
                             'microphone', 'camera',
-                            /*'desktop', 'embedmeeting', 'fullscreen',*/
+                            'desktop', 'embedmeeting', 'fullscreen'
                         ],
                         useStunTurn: true,
                         prejoinPageEnabled: false,
@@ -890,12 +890,13 @@ class VideoChatManager {
                 }
             }
             this.api = new window.JitsiMeetExternalAPI(url, options);
-            this.api.addEventListener('tileViewChanged', (event) => {
+            /*this.api.addEventListener('tileViewChanged', (event) => {
                 //to enforce tile view only
                 if(event && !event.enabled){
                     this.api.executeCommand('toggleTileView');
                 }
-            });
+            });*/
+
             this.api.addEventListener('videoConferenceJoined', () => {
                 this.memberReady++;
 

@@ -13,10 +13,11 @@
 
         <div class="form-group waiting_message" th:if="${not pogsSessionPerpetual}">
             <div class="message ">
-                Your session is scheduled to start in
+<!--                Your session is scheduled to start in-->
+                You are now connected and the session will start shortly
             </div>
             <div id="countdown"></div>
-            <div id="caveat">(may start sooner if all participants are present)</div>
+<!--            <div id="caveat">(may start sooner if all participants are present)</div>-->
         </div>
         <div class="form-group waiting_message" th:if="${pogsSessionPerpetual}">
             <div class="message ">
