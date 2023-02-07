@@ -866,10 +866,10 @@ class VideoChatManager {
                         DISPLAY_WELCOME_PAGE_TOOLBAR_ADDITIONAL_CONTENT: false,
                         TILE_VIEW_MAX_COLUMNS: 1,
                         enableClosePage: false,
-                        toolbarButtons: [
+                        /*toolbarButtons: [
                             'microphone', 'camera',
-                            /*'desktop', 'embedmeeting', 'fullscreen',*/
-                        ],
+                            /*'desktop', 'embedmeeting', 'fullscreen',
+                        ],*/
                     },
                     userInfo: {
                         displayName: this.currentSubject.displayName
@@ -880,10 +880,10 @@ class VideoChatManager {
                         disableSimulcast: false,
                         disableDeepLinking: true,
                         useStunTurn: true,
-                        toolbarButtons: [
+                        /*toolbarButtons: [
                             'microphone', 'camera',
-                            /*'desktop', 'embedmeeting', 'fullscreen',*/
-                        ],
+                            /*'desktop', 'embedmeeting', 'fullscreen',
+                        ],*/
                         prejoinPageEnabled: false,
 
                     }
