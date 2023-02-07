@@ -890,12 +890,12 @@ class VideoChatManager {
                 }
             }
             this.api = new window.JitsiMeetExternalAPI(url, options);
-            /*this.api.addEventListener('tileViewChanged', (event) => {
+            this.api.addEventListener('tileViewChanged', (event) => {
                 //to enforce tile view only
                 if(event && !event.enabled){
                     this.api.executeCommand('toggleTileView');
                 }
-            });*/
+            });
 
             this.api.addEventListener('videoConferenceJoined', () => {
                 this.memberReady++;
