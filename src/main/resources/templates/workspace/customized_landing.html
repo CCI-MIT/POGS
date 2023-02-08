@@ -10,10 +10,11 @@
 <!--/*@thymesVar id="errorMessage" type="java.lang.String"*/-->
 <!--/*@thymesVar id="action" type="java.lang.String"*/-->
 <!--/*@thymesVar id="externalId" type="java.lang.String"*/-->
+
 <div layout:fragment="content">
     <div class="d-flex align-items-center flex-column justify-content-center h-100 " style="height: 100%">
         <div class="" th:remove="tag" th:utext="${pogsSession.landingPageOverrideContent}" ></div>
-        <div id="jitsiVideoCallTestPage" style="min-height:100px;max-height: 500px"></div>
+        <div id="jitsiVideoCallTestPage" style="min-height:250px;margin-bottom: 2px"></div>
         <form id="landingPage" th:action="${action}" method="">
             <input type="hidden" name="externalId" th:value="${externalId}">
             <input type="hidden" name="workerId" th:value="${workerId}">
