@@ -265,7 +265,7 @@ public class ExportDaoImpl implements ExportDao {
         query.addConditions(s.ID.in(sessionIds));
         query.addConditions(el.COMPLETED_TASK_ID.isNotNull());
         query.addConditions(el.EVENT_TYPE.eq(CommunicationMessage.CommunicationType.CHECK_IN.name()));
-        query.addGroupBy(el.SESSION_ID, el.COMPLETED_TASK_ID, el.SENDER_SUBJECT_ID);
+        query.addGroupBy(el.SESSION_ID, el.COMPLETED_TASK_ID, el.SENDER_SUBJECT_ID, el.TIMESTAMP);
 
         List<EventLogCheckingSummary> withCompletedTaskIds = query.fetchInto(EventLogCheckingSummary.class);
 
