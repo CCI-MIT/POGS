@@ -899,34 +899,46 @@ class VideoChatManager {
 
             this.api.addEventListener('videoConferenceJoined', () => {
                 this.memberReady++;
+                try {
+                    console.log("videoConferenceJoined");
 
-                console.log("videoConferenceJoined");
-                this.api.executeCommand('displayName',this.currentSubject.displayName);
+                    this.api.executeCommand('displayName', this.currentSubject.displayName);
 
-                this.api.executeCommand('toggleTileView');
-                let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
-                console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: " + (shouldStartRecording)?("TRUE"):("FALSE"))
-                if(shouldStartRecording) {
-                    this.api.executeCommand('setFollowMe');
-                    console.log(" this.communicationPluginReference.pogsRef.videoChatShouldRecord: " +
-                                (this.communicationPluginReference.pogsRef.videoChatShouldRecord)?
-                                ("TRUE"):("FALSE"))
+                    this.api.executeCommand('toggleTileView');
+                    let shouldStartRecording = this.communicationPluginReference.getCurrentSubjectShouldStartRecording();
+                    console.log("THIS USER IS THE HOST AND SHOULD START RECORDING: "
+                                + (shouldStartRecording) ? ("TRUE") : ("FALSE"))
+                    if (shouldStartRecording) {
+                        this.api.executeCommand('setFollowMe');
+                        console.log(
+                            " this.communicationPluginReference.pogsRef.videoChatShouldRecord: " +
+                            (this.communicationPluginReference.pogsRef.videoChatShouldRecord) ?
+                            ("TRUE") : ("FALSE"))
 
-                    if(this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
-                        console.log("Will send start recording")
-                        this.api.executeCommand('startRecording', {
-                            mode: 'file', //recording mode, either `file` or `stream`.
-                            shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
-                            //rtmpStreamKey: string, //the RTMP stream key.
-                            //rtmpBroadcastID: string, //the RTMP broadcast ID.
-                            //youtubeStreamKey: string, //the youtube stream key.
-                            //youtubeBroadcastID: string //the youtube broacast ID.
-                        });
+                        if (this.communicationPluginReference.pogsRef.videoChatShouldRecord) {
+                            console.log("Will send start recording")
+                            this.api.executeCommand('startRecording', {
+                                mode: 'file', //recording mode, either `file` or `stream`.
+                                shouldShare: false, //whether the recording should be shared with the participants or not. Only applies to certain jitsi meet deploys.
+                                //rtmpStreamKey: string, //the RTMP stream key.
+                                //rtmpBroadcastID: string, //the RTMP broadcast ID.
+                                //youtubeStreamKey: string, //the youtube stream key.
+                                //youtubeBroadcastID: string //the youtube broacast ID.
+                            });
+                            this.communicationPluginReference.sendMessage(
+                                "videoConferenceRECORDINGSTARTED", "-", CHAT_TYPE.STATUS, null)
+                        }
+
                     }
 
+                    this.communicationPluginReference.sendMessage("videoConferenceJoined", "-",
+                                                                  CHAT_TYPE.JOINED, null)
+                }catch (e) {
+                    $.getJSON('/log/' +this.communicationPluginReference.getSessionId() + "?externalId="+ this.currentSubject.displayName+"&errorMessage="+ JSON.stringify(e) + "&url"+window.location.href);
                 }
-
-                this.communicationPluginReference.sendMessage("videoConferenceJoined", "-", CHAT_TYPE.JOINED, null)
+            });
+            this.api.addEventListener("recordingStatusChanged", (e)=>{
+                this.communicationPluginReference.sendMessage("recordingStatusChanged", JSON.stringify(e), CHAT_TYPE.STATUS, null);
             });
             this.api.addEventListener("participantLeft", () => {
                 console.log("participantLeft")
@@ -938,11 +950,12 @@ class VideoChatManager {
 
                 if(shouldStartRecording) {
                     this.api.executeCommand('stopRecording', {mode: 'file'});
+                    this.communicationPluginReference.sendMessage("stopRecording", "-", CHAT_TYPE.STATUS, null);
                 }
 
                 console.log("videoConferenceLeft");
                 this.communicationPluginReference.sendMessage("videoConferenceLeft", "-", CHAT_TYPE.STATUS, null);
-                $("#communicationContainer").empty();
+                //$("#communicationContainer").empty();
             });
 
             this.api.addEventListener("cameraError", () => {
