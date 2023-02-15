@@ -665,10 +665,10 @@ public class SessionRunner implements Runnable {
                         subjectList.get(i).getSubjectDisplayName(),
                         appId, apiToken, privateKeyPath,!chooseFirstSubjectToStartRecording);
                 addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_TOKEN", jitsiToken);
-                if(!chooseFirstSubjectToStartRecording){
+                //if(!chooseFirstSubjectToStartRecording){
                     addSubjectAttributeJWT(subjectList.get(i),"JITSI_JWT_START_REC", "true");
-                    chooseFirstSubjectToStartRecording = true;
-                }
+                   // chooseFirstSubjectToStartRecording = true;
+                //}
             }
         }
     }

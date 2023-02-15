@@ -299,10 +299,13 @@ public class JaasUtils {
                         .withUserId(userId)
                         .withRoomName("*")
                         //.withUserEmail("My email here") // Set the user email
-                        .withModerator(false) // Enable user as moderator
 
-                        .withOutboundEnabled(false) // Enable outbound calls
-                        .withTranscriptionEnabled(true) // Enable transcription
+                        .withModerator(true) // Enable user as moderator
+                        .withTranscriptionEnabled(true) // ADD BOOLEAN IN SESSION BECAUSE TRANSCRIPT IS PAID EXTRA
+                        .withRecordingEnabled(true)
+
+//                        .withOutboundEnabled(false) // Enable outbound calls
+//                        .withTranscriptionEnabled(true) // Enable transcription
                         .withAppID(appId) // Set the AppID
                         //.withUserAvatar("https://avatarurl.com/avatar/url") // Set the user avatar
                         .signWith(rsaPrivateKey); /** Finally the JWT is signed with the private key */
