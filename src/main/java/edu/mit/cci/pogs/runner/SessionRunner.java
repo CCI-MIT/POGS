@@ -84,7 +84,7 @@ import edu.mit.cci.pogs.utils.StringUtils;
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class SessionRunner implements Runnable {
 
-    private static final boolean SHOULD_SAVE_LOG = true;
+    private static final boolean SHOULD_SAVE_LOG = false;
 
     private boolean sessionHasStarted = false;
 

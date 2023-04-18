@@ -6,6 +6,8 @@ import org.jooq.SelectQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import edu.mit.cci.pogs.model.dao.api.AbstractDao;
 import edu.mit.cci.pogs.model.dao.individualsubjectscore.IndividualSubjectScoreDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.IndividualSubjectScore;
@@ -39,6 +41,19 @@ public class IndividualSubjectScoreDaoImpl extends AbstractDao<IndividualSubject
             return null;
         }else{
             return record.into(IndividualSubjectScore.class);
+        }
+
+    }
+    @Override
+    public List<IndividualSubjectScore> findByGiven(Long completedTaskId) {
+        final SelectQuery<Record> query = dslContext.select()
+                .from(INDIVIDUAL_SUBJECT_SCORE).getQuery();
+        query.addConditions(INDIVIDUAL_SUBJECT_SCORE.COMPLETED_TASK_ID.eq(completedTaskId));
+        List<IndividualSubjectScore> record =  query.fetchInto(IndividualSubjectScore.class);
+        if(record == null) {
+            return null;
+        }else{
+            return record;
         }
 
     }

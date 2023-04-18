@@ -49,6 +49,7 @@ import edu.mit.cci.pogs.model.dao.task.TaskDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.IndividualSubjectScore;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Round;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
@@ -66,6 +67,7 @@ import edu.mit.cci.pogs.runner.wrappers.TeamWrapper;
 import edu.mit.cci.pogs.service.CompletedTaskAttributeService;
 import edu.mit.cci.pogs.service.DictionaryService;
 import edu.mit.cci.pogs.service.EventLogService;
+import edu.mit.cci.pogs.service.IndividualSubjectScoreService;
 import edu.mit.cci.pogs.service.SessionService;
 import edu.mit.cci.pogs.service.SubjectHasSessionCheckInService;
 import edu.mit.cci.pogs.service.SubjectService;
@@ -103,6 +105,9 @@ public class WorkspaceController {
 
     @Autowired
     private TaskScoreService taskScoreService;
+
+    @Autowired
+    private IndividualSubjectScoreService individualSubjectScoreService;
 
     @Autowired
     private EventLogService eventLogService;
@@ -1094,6 +1099,50 @@ public class WorkspaceController {
         }
 
         return "workspace/task_work";
+    }
+
+    @GetMapping("/round/{roundId}/task/{taskId}/s/{subjectExternalId}")
+    public String taskScoreWork(@PathVariable("roundId") Long roundId,
+                           @PathVariable("taskId") Long taskId,
+                           @PathVariable("subjectExternalId") String subjectExternalId,
+                           HttpServletRequest request,
+                           HttpServletResponse response,
+                           Model model) {
+
+        Task task = taskDao.get(taskId);
+        Subject su = workspaceService.getSubject(subjectExternalId);
+        Round round = roundDao.get(roundId);
+        SessionRunner sr = SessionRunnerManager.getSessionRunner(su.getSessionId());
+        Team team = teamService.getTeamCascadeConfig(su.getId(), sr.getSession().getId(), round.getId(), taskId);
+        CompletedTask completedTask = completedTaskDao.getByRoundIdTaskIdTeamId(
+                round.getId(),
+                team.getId(),
+                task.getId());
+        if (completedTask == null) {
+            completedTask = completedTaskDao.getBySubjectIdTaskId(su.getId(), taskId);
+        }
+
+        List<Subject> teammates = teamService.getTeamMates(task,su,round);
+
+        SessionWrapper sessionWrapper = sr.getSession();
+        model.addAttribute("pogsSession", sessionWrapper);
+        model.addAttribute("teammates", teammates);
+
+        model.addAttribute("subject", su);
+        model.addAttribute("completedTask", completedTask);
+
+        model.addAttribute("showSubjectName", sr.getSession().getScoreboardUseDisplayNames());
+        model.addAttribute("showScore", true);
+        model.addAttribute("secondsRemainingCurrentUrl", sr.getSession().getSecondsRemainingForCurrentUrl());
+
+
+        if(sr.getSession().getCommunicationType().equals(CommunicationConstraint.NO_CHAT.getId().toString())){
+            model.addAttribute("template", "layouts/workspace-layout.html");
+        } else {
+            model.addAttribute("template", "layouts/workspace-iframe-layout.html");
+        }
+
+        return "workspace/task_scoring";
     }
 
     @GetMapping("/scoring/{externalId}")

@@ -94,6 +94,8 @@ public class TaskService {
         tk.setChatScriptId(value.getChatScriptId());
         tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
         tk.setShouldScore(value.getShouldScore());
+        tk.setScorePageEnabled(value.getScorePageEnabled());
+
         if (tk.getShouldScore() == null) {
             tk.setShouldScore(false);
         }

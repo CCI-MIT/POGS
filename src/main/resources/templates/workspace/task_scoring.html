@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="${template}">
+<head>
+    <meta charset="UTF-8">
+    <title>POGS</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="d-flex align-items-center flex-column justify-content-center h-100  text-white" style="height: 100%">
+        <div class="waiting_message" id="pogsWaitTaskScoreBoard"> Please wait while we calculate the scores...</div>
+
+        <div class="waiting_message" th:if="${showScore}" id="pogsTaskScoreBoard" style="display: none">
+            <div class="" style="margin-bottom: 10px">Scoreboard </div>
+            <table class="table table-striped" >
+                <thead>
+                <tr>
+                    <th></th>
+                    <th>Score</th>
+                </tr>
+                </thead>
+                <tbody>
+                <th:block th:each="subj : ${teammates}">
+                    <tr th:id="${subj.id + '_subject_row'}">
+                        <td th:if="${showSubjectName}">
+                            <span th:text="${subj.subjectDisplayName}" th:class="${subj.subjectExternalId + '_color badge'}"></span>
+                        </td>
+                        <td th:if="${ not showSubjectName}" th:id="${subj.id + '_subject_name'}"></td>
+                        <td th:id="${subj.id + '_subject_score'}"></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </table>
+            <script>
+                $(function (){
+
+                    function getScoreIfNotFound(){
+                        console.log("Getting score now. ");
+                        $.getJSON("/individualScoreValues/"+pogs.completedTaskId,null,function(data) {
+                            if(data.length == 0 ){
+                                setTimeoutRef = setTimeout(getScoreIfNotFound,3000);
+                            } else {
+                                console.log(data);
+                                clearTimeout(setTimeoutRef);
+                                let indScores = data;
+                                for (let i = 0; i < indScores.length;i++)
+                                {
+                                    $('#' + indScores[i].subjectId + '_subject_score')
+                                        .html(indScores[i].individualScore);
+                                }
+
+                                $("#" + pogs.subjectId + '_subject_row').css("background-color","gray");
+                                let ref = $("#" + pogs.subjectId + '_subject_row');
+                                ref.popover({
+                                                content: "This is your score!",
+                                                html: true,
+                                                placement: "bottom",
+                                                animation: true,
+                                                trigger: "hover",  container: 'body'
+                                            });
+                                ref.popover('show');
+                                $("#pogsTaskScoreBoard").show();
+                                $("#pogsWaitTaskScoreBoard").hide();
+                            }
+                        });
+                    }
+                    let setTimeoutRef = setTimeout(getScoreIfNotFound,3000);
+                   // let teamIndex = parseInt('[(${subjectsTeamIndex})]') + 2;
+                   // $("td:nth-child("+teamIndex+")").css("background-color","gray");
+
+                   // let leng = $("td:nth-child("+teamIndex+")").length -1;
+                   // let ref = $($("td:nth-child("+teamIndex+")")[leng]);
+/*
+                    ref.popover({
+                                    content: "This is your team!",
+                                    html: true,
+                                    placement: "bottom",
+                                    animation: true,
+                                    trigger: "hover",  container: 'body'
+                                });
+                    ref.popover('show');
+
+ */
+                });
+            </script>
+        </div>
+        <script>
+
+            $(function () {
+
+
+
+                pogs.setup({
+                               currentUrl: window.location,
+                               sessionId: '[(${pogsSession.id})]',
+                               subjectId: '[(${subject.subjectExternalId})]',
+                               secondsRemainingCurrentUrl: [(${secondsRemainingCurrentUrl})],
+                               doneUrlParameter : '[(${pogsSession.doneUrlParameter})]',
+                               nextUrl : '[(${nextUrl})]',
+                               completedTaskId:'[(${completedTask.id})]',
+                               hasCollaboration:false,
+                               hasChat: false
+                           });
+
+
+
+
+
+            });
+
+
+        </script>
+    </div>
+</div>
+<div layout:fragment="footer">
+    &copy; Copyright Center for Collective Intelligence 2018. All rights reserved.
+</div>
+</body>
+</html>

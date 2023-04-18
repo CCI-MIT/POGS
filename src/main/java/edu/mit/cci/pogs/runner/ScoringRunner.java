@@ -50,7 +50,7 @@ public class ScoringRunner extends TaskRelatedScriptRunner implements Runnable {
             bufferForAfterWork = 10*1000l;
         }
 
-        Long timeBeforeStarts = taskWrapper.getTaskEndTimestamp() + bufferForAfterWork - DateUtils.now();
+        Long timeBeforeStarts = taskWrapper.getTaskEndTimestampWithoutScoringPage() + bufferForAfterWork - DateUtils.now();
         taskPlugin =  TaskPlugin.getTaskPlugin(taskWrapper.getTaskPluginType());
 
         try {

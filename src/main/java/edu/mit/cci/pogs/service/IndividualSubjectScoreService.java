@@ -5,6 +5,8 @@ import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import edu.mit.cci.pogs.model.dao.individualsubjectscore.IndividualSubjectScoreDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.IndividualSubjectScore;
@@ -64,6 +66,14 @@ public class IndividualSubjectScoreService {
 
             }
         }
+    }
+    public IndividualSubjectScore getIndividualScore(Long subjectId, Long completedTaskId){
+        return individualSubjectScoreDao
+                .getByGiven(subjectId, completedTaskId);
+    }
+
+    public List<IndividualSubjectScore> getIndividualScores(Long completedTaskId){
+        return individualSubjectScoreDao.findByGiven(completedTaskId);
     }
 
     public void createIndividualSubjectScoreFromScript(String individualTaskScoreJSONObject,

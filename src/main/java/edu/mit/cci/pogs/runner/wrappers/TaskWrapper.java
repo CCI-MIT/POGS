@@ -10,6 +10,8 @@ import edu.mit.cci.pogs.utils.DateUtils;
 
 public class TaskWrapper extends Task {
 
+    public static final int SCORING_BUFFER_TIME = 60;
+    public static final int SCORING_PAGE_TIME = 60;
     private Long taskStartTimestamp;
 
     private List<CompletedTask> completedTasks;
@@ -59,9 +61,24 @@ public class TaskWrapper extends Task {
             total += DateUtils.toMilliseconds(this.getPrimerTime());
         }
         total += DateUtils.toMilliseconds(this.getInteractionTime());
+        if (this.getScorePageEnabled()) {
+            total += DateUtils.toMilliseconds(SCORING_BUFFER_TIME);
+            total += DateUtils.toMilliseconds(SCORING_PAGE_TIME);
+        }
         return total;
     }
 
+    public Long getTaskWorkEndTime(){
+        Long total =  getTaskStartTimestamp() + getTotalTaskTime();
+        if (this.getScorePageEnabled()) {
+            total =  total - DateUtils.toMilliseconds(SCORING_BUFFER_TIME);
+            total = total - DateUtils.toMilliseconds(SCORING_PAGE_TIME);
+        }
+        return total;
+    }
+    public Long getTaskEndTimestampWithoutScoringPage() {
+        return getTaskWorkEndTime();
+    }
     public Long getTaskEndTimestamp() {
         return getTaskStartTimestamp() + getTotalTaskTime();
     }
@@ -85,6 +102,9 @@ public class TaskWrapper extends Task {
         }
         if (getPrimerPageEnabled() && primerSecondsRemaining() > 0) {
             return "/task" + getId() + "/w/";
+        }
+        if (getScorePageEnabled()) {
+            return "/task" + getId() + "/s/";
         }
         return null;
 
@@ -127,6 +147,10 @@ public class TaskWrapper extends Task {
     public Long getInteractionEndTime() {
         return getPrimerEndTime() + DateUtils.toMilliseconds(getInteractionTime());
     }
+    public Long getTaskScoreEndTime(){
+
+        return getTaskWorkEndTime() + DateUtils.toMilliseconds(SCORING_BUFFER_TIME) + DateUtils.toMilliseconds(SCORING_PAGE_TIME);
+    }
 
     public ArrayList<SessionSchedule> getSessionSchedules(String roundUrl) {
         ArrayList<SessionSchedule> schedules = new ArrayList<>();
@@ -142,9 +166,15 @@ public class TaskWrapper extends Task {
                     roundUrl+getTaskPrimerUrl()));
 
         }
+
         schedules.add(new SessionSchedule(getPrimerEndTime(),
-                getTaskEndTimestamp(),this,null,null,
+                getTaskWorkEndTime(),this,null,null,
                 roundUrl+getTaskWorkUrl()));
+        if(getScorePageEnabled()){
+            schedules.add(new SessionSchedule(getTaskWorkEndTime(),
+                    getTaskScoreEndTime(),this,null,null,
+                    roundUrl+getTaskScoreUrl()));
+        }
 
         return schedules;
     }
@@ -156,5 +186,8 @@ public class TaskWrapper extends Task {
     }
     public String getTaskWorkUrl(){
         return "/task/" + getId() + "/w";
+    }
+    public String getTaskScoreUrl(){
+        return "/task/" + getId() + "/s";
     }
 }

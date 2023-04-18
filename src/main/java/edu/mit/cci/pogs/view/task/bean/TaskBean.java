@@ -29,6 +29,7 @@ public class TaskBean {
 
     private Long taskConfigurationId;
     private Boolean shouldScore;
+    private Boolean scorePageEnabled;
 
 
 
@@ -60,6 +61,7 @@ public class TaskBean {
         this.chatScriptId = value.getChatScriptId();
         this.primerVideoAutoplayMute = value.getPrimerVideoAutoplayMute();
         this.shouldScore = value.getShouldScore();
+        this.scorePageEnabled = value.getScorePageEnabled();
 
     }
 
@@ -253,5 +255,13 @@ public class TaskBean {
 
     public void setShouldScore(Boolean shouldScore) {
         this.shouldScore = shouldScore;
+    }
+
+    public Boolean getScorePageEnabled() {
+        return scorePageEnabled;
+    }
+
+    public void setScorePageEnabled(Boolean scorePageEnabled) {
+        this.scorePageEnabled = scorePageEnabled;
     }
 }
