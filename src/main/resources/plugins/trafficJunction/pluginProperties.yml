@@ -1,0 +1,5 @@
+name: trafficJuntion
+description: A traffic junction game plugin
+
+scoring:
+  scoringType : script
