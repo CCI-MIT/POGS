@@ -20,7 +20,7 @@ class TrafficJunctionTask {
             }
         }
 
-        this.extraData = "/" + completedTask + "/" + subject;//"?workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId;
+        this.extraData = "/" + completedTask + "/" + subject.externalId;//"?workerId=" +workerId + "&assignmentId=" + assignmentId + "&hitId=" + hitId;
 
     }
     setupGrid(gridBluePrintz){
