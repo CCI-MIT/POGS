@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
+from http.server import BaseHTTPRequestHandler,HTTPServer
 import cgi
 import json
 from typingTask import score_typing_task
@@ -22,8 +22,8 @@ class myHandler(BaseHTTPRequestHandler):
 
 	def do_POST(self):
 		if DEBUG:
-			print 'Got POST in path'
-			print self.path
+			print('Got POST in path')
+			print(self.path)
 		ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
 
 		if ctype == 'multipart/form-data':
@@ -38,7 +38,7 @@ class myHandler(BaseHTTPRequestHandler):
 
 		if DEBUG:
 			for param in params :
-				print 'paramName: ' + str(param) +' - paramValue:' #+ str(params[param][0])
+				print ('paramName: ' + str(param) +' - paramValue:') #+ str(params[param][0]))
 
 
 		if self.path != None:
@@ -59,13 +59,13 @@ def main():
 		#Create a web server and define the handler to manage the
 		#incoming request
 		server = HTTPServer(('', PORT_NUMBER), myHandler)
-		print 'Started httpserver on port ' , PORT_NUMBER
+		print ('Started httpserver on port ' , PORT_NUMBER)
 		
 		#Wait forever for incoming htto requests
 		server.serve_forever()
 
 	except KeyboardInterrupt:
-		print '^C received, shutting down the web server'
+		print ('^C received, shutting down the web server')
 		server.socket.close()
 
 if __name__ == '__main__':
