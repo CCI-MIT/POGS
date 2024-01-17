@@ -30,6 +30,8 @@ public class TaskBean {
     private Long taskConfigurationId;
     private Boolean shouldScore;
     private Boolean scorePageEnabled;
+    private Long replayFromSessionId;
+    private Boolean replayFromSessionEnabled;
 
 
 
@@ -62,6 +64,8 @@ public class TaskBean {
         this.primerVideoAutoplayMute = value.getPrimerVideoAutoplayMute();
         this.shouldScore = value.getShouldScore();
         this.scorePageEnabled = value.getScorePageEnabled();
+        this.replayFromSessionId = value.getReplayFromSessionId();
+        this.replayFromSessionEnabled = value.getReplayFromSessionEnabled();
 
     }
 
@@ -263,5 +267,21 @@ public class TaskBean {
 
     public void setScorePageEnabled(Boolean scorePageEnabled) {
         this.scorePageEnabled = scorePageEnabled;
+    }
+
+    public Long getReplayFromSessionId() {
+        return replayFromSessionId;
+    }
+
+    public void setReplayFromSessionId(Long replayFromSessionId) {
+        this.replayFromSessionId = replayFromSessionId;
+    }
+
+    public Boolean getReplayFromSessionEnabled() {
+        return replayFromSessionEnabled;
+    }
+
+    public void setReplayFromSessionEnabled(Boolean replayFromSessionEnabled) {
+        this.replayFromSessionEnabled = replayFromSessionEnabled;
     }
 }

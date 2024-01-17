@@ -95,6 +95,8 @@ public class TaskService {
         tk.setPrimerVideoAutoplayMute(value.getPrimerVideoAutoplayMute());
         tk.setShouldScore(value.getShouldScore());
         tk.setScorePageEnabled(value.getScorePageEnabled());
+        tk.setReplayFromSessionEnabled(value.getReplayFromSessionEnabled());
+        tk.setReplayFromSessionId(value.getReplayFromSessionId());
 
         if (tk.getShouldScore() == null) {
             tk.setShouldScore(false);
@@ -122,6 +124,9 @@ public class TaskService {
         }
         return value;
     }
+    public void update(Task task){
+        taskDao.update(task);
+    }
 
     private void createOrUpdateTaskHasTaskConfiguration(TaskBean value) {
         TaskHasTaskConfiguration currentConfig = taskHasTaskConfigurationDao.getByTaskId(value.getId());
@@ -139,6 +144,9 @@ public class TaskService {
 
     }
 
+    public Task get(Long taskId){
+        return taskDao.get(taskId);
+    }
     private void createOrUpdateUserGroups(TaskBean taskBean) {
         if (taskBean.getResearchGroupRelationshipBean() == null && taskBean.getResearchGroupRelationshipBean().getSelectedValues() == null) {
             return;

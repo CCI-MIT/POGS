@@ -1,0 +1,180 @@
+.whack_grid { margin:1em auto; border-collapse:collapse }
+.whack_grid td {
+    /*cursor:pointer;*/
+    border:1px solid #ccc;
+    text-align:center;
+    font-family:sans-serif;
+}
+.RED {
+    color: red;
+}
+.GREEN{
+    color: darkgreen;
+}
+.BLUE{
+    color: darkblue;
+}
+.BROWN{
+    color: sandybrown;
+}
+
+/* Create two columns that floats next to each other */
+
+.gameColumn {
+    color: black;
+    float: left;
+    width: 80%;
+    padding: 10px;
+    align-items: center;
+    border: solid;
+}
+
+#informationColumn {
+    color: black;
+    float: left;
+    width: 20%;
+    padding: 10px;
+    border: solid;
+}
+
+/* Clear floats after the columns */
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/*Monster color*/
+.monster{
+    color: black;
+}
+
+/* The Modal*/
+.after_modal_appended
+{
+    position:relative;
+
+}
+
+.modal-backdrop {
+    position: absolute;
+}
+
+.modal{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: -webkit-fit-content;
+    height: -moz-fit-content;
+}
+
+.container {
+    position: relative;
+}
+
+@media (max-width: 260px) {
+
+    #wackamoleTitle{
+        font-size: 23px;
+    }
+
+    #readyView{
+        font-size: 13px;
+    }
+
+    #readyBtn{
+        font-size:10px
+    }
+
+    .whack_grid td {
+        width:15px; height:15px;
+        font-size: 5px;
+    }
+
+    #gameAndInfoRow{
+        min-width: 231px;
+    }
+
+    #informationColumn {
+        font-size: 8px;
+    }
+
+    .modal{
+        font-size: 11px;
+    }
+
+}
+@media (min-width: 261px) and (max-width: 420px) {
+
+    #wackamoleTitle{
+        font-size: 26px;
+    }
+
+    #readyView{
+        font-size: 15px;
+    }
+
+    #readyBtn{
+        font-size:10px
+    }
+
+    .whack_grid td {
+        width:16px; height:16px;
+        font-size: 7px;
+    }
+
+    #gameAndInfoRow{
+        min-width: 245px;
+    }
+
+    #informationColumn {
+        font-size: 8px;
+    }
+
+    .modal{
+        font-size: 12px;
+    }
+
+}
+@media (min-width: 421px) and (max-width: 615px) {
+
+    .whack_grid td {
+        width:25px; height:25px;
+        font-size: 11px;
+    }
+
+    #gameAndInfoRow{
+        min-width: 392px;
+    }
+
+    #informationColumn {
+        font-size: 13px;
+    }
+
+    .modal{
+        font-size: 16px;
+    }
+
+}
+@media (min-width: 615px) {
+
+    .whack_grid td {
+        width:30px; height:30px;
+        font-size: 13px
+    }
+
+
+    #gameAndInfoRow{
+        min-width: 555px;
+    }
+
+    #informationColumn {
+        font-size: 18px;
+    }
+
+    .modal{
+        font-size: 20px;
+    }
+
+}

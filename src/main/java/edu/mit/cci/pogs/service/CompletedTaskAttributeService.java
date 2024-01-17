@@ -56,10 +56,11 @@ public class CompletedTaskAttributeService {
                 completedTaskAttributeDao.update(cta);
             }
         }
-
-
     }
 
+    public List<CompletedTaskAttribute> listCompletedTaskAttributes(Long completedTaskId){
+        return completedTaskAttributeDao.listByCompletedTaskId(completedTaskId);
+    }
     public JSONArray listCompletedTaskAttributesForCompletedTask(Long completedTaskId){
         List<CompletedTaskAttribute> list = completedTaskAttributeDao.listByCompletedTaskId(completedTaskId);
         return attributesToJsonArray(list);

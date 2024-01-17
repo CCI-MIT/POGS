@@ -29,6 +29,7 @@ public class SessionReplayScriptProcessor {
 
     private Long sessionScriptToReplayFrom;
 
+
     @Autowired
     private EventLogService eventLogService;
 

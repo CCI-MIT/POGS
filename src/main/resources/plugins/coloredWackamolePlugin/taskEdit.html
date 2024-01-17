@@ -1,0 +1,71 @@
+<div>
+    <div class="container player" id="player'+ this.numOfPlayer +'">
+        <div class="form-group row">
+            <bold class="col-sm-2 col-form-label">Configuration</bold>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="numberOfColors">Number of colors: </label>
+            <input type="number" min="1" name="numberOfColors" step="1" class="form-control col-sm-8" id="numberOfColors" placeholder="Enter the number of colors" value="">
+            <small  class="form-text text-muted">The number of colors ("RED","GREEN","BLUE","BROWN"). They will be used in this order.</small>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="colorFrequency">Color frequency: </label>
+            <input type="text" name="colorFrequency"  class="form-control col-sm-8" id="colorFrequency" placeholder="Set the colors frequencies" value="">
+            <small  class="form-text text-muted">The color frequency, should be set separated by commas and must have the values for all colors. Ex: 3 colors : 30,20,50 </small>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="colorWeights">Color weights: </label>
+            <input type="text"  name="colorFrequency"  class="form-control col-sm-8" id="colorWeights" placeholder="Set the colors weights" value="">
+            <small  class="form-text text-muted">The color weights used in scoring, should be set separated by commas and must have the values for all colors. Ex: 3 colors : 1,2,3 </small>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="totalRoundTime">Total round time: </label>
+            <input type="number"  name="roundTotalTime"  class="form-control col-sm-8" id="totalRoundTime" placeholder="Enter the total round time in milliseconds" value="">
+            <small class="form-text text-muted">The total round time in milliseconds.</small>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="moleDuration">Mole duration: </label>
+            <input type="number"  name="moleDuration" class="form-control col-sm-8" id="moleDuration" placeholder="Enter the mole duration in milliseconds" value="">
+            <small class="form-text text-muted">Mole duration in milliseconds defaults to 1000.</small>
+        </div>
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label" for="gridSize">Grid size: </label>
+            <input type="number"  name="gridSize" class="form-control col-sm-8" id="gridSize" placeholder="Enter the grid size" value="">
+            <small class="form-text text-muted">Enter the grid size in total cells ex.: 10x10 = 100 .</small>
+        </div>
+        <div class="form-group row" >
+            <label class="col-sm-3 col-form-label" for="randomMolePlacement">Allow more than one mole at the same time:</label>
+            <div class="col-sm-9">
+                <input class="form-check-input"  type="checkbox" id="randomMolePlacement" />
+            </div>
+            <small class="form-text text-muted">If true a random time multiplier will be applied to the mole duration time</small>
+        </div>
+        <div class="form-group row" >
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-primary" id="generateScript">Generate script</button>
+                <small class="form-text text-muted" style="color: red" id="errorMsgGeneration"></small>
+            </div>
+        </div>
+    </div>
+    <div class="container player" id="script">
+        <div class="form-group row">
+            <bold class="col-sm-2 col-form-label">Current script</bold>
+        </div>
+        <div class="form-group row" >
+            <div class="col-sm-12">
+                <textarea id="blueprint" rows="8" cols="33" ></textarea>
+            </div>
+            <small class="form-text text-muted">Either input the script manually or use the generator above.</small>
+        </div>
+    </div>
+
+<!--
+    <div class="form-group row">
+        <label class="col-sm-6 col-form-label" for="addPlayer">Add a new player config:</label>
+
+        <div class="col-sm-3">
+            <button type="button" class="btn btn-primary" id="addPlayer">Add Player</button>
+        </div>
+    </div>
+-->
+</div>

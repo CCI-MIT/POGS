@@ -3,12 +3,18 @@ package edu.mit.cci.pogs.runner;
 import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import javax.script.ScriptContext;
 
 import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.dao.subject.SubjectDao;
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
+import edu.mit.cci.pogs.model.jooq.tables.TaskExecutionAttribute;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTaskAttribute;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.SessionExecutionAttribute;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.Subject;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Task;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.runner.wrappers.SessionWrapper;
 import edu.mit.cci.pogs.runner.wrappers.TaskWrapper;
@@ -112,6 +118,17 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
 
     }
 
+    private void updateTaskReferencesBasedOnCompletedTaskAttributes(){
+        List<CompletedTaskAttribute> list = completedTaskAttributeService.listCompletedTaskAttributes(getCompletedTask().getId());
+        for(CompletedTaskAttribute sea: list){
+            if(sea.getAttributeName().equals("REPLAY_SESSION_ID")){
+                Task taskToUpdate = taskService.get(getCompletedTask().getTaskId());
+                taskToUpdate.setReplayFromSessionId(Long.parseLong(sea.getStringValue()));
+                taskService.update(taskToUpdate);
+            }
+        }
+    }
+
     protected void retreiveSubjectAttributesToAdd() {
         String subjectAttributesToAddJson = (String) this.getEngine()
                 .getBindings(ScriptContext.ENGINE_SCOPE).get("subjectAttributesToAdd");
@@ -123,6 +140,7 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
                 ScriptContext.ENGINE_SCOPE).get("completedTaskAttributesToAdd");
         completedTaskAttributeService.createCompletedTaskAttributesFromJsonString(
                 attributesToAddJson,this.getCompletedTask().getId());
+        updateTaskReferencesBasedOnCompletedTaskAttributes();
     }
     protected void retrieveEventLogsToAdd() {
         String attributesToAddJson = (String) this.getEngine().getBindings(

@@ -28,12 +28,14 @@ import edu.mit.cci.pogs.model.dao.taskhastaskconfiguration.TaskHasTaskConfigurat
 import edu.mit.cci.pogs.model.dao.taskplugin.TaskPlugin;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ChatScript;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ResearchGroup;
+import edu.mit.cci.pogs.model.jooq.tables.pojos.Session;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskConfiguration;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.TaskHasTaskConfiguration;
 import edu.mit.cci.pogs.service.TaskService;
 import edu.mit.cci.pogs.utils.MessageUtils;
 import edu.mit.cci.pogs.utils.SqlTimestampPropertyEditor;
 import edu.mit.cci.pogs.view.researchgroup.beans.ResearchGroupRelationshipBean;
+import edu.mit.cci.pogs.view.session.beans.SessionBean;
 import edu.mit.cci.pogs.view.task.bean.TaskBean;
 
 @Controller
@@ -130,7 +132,6 @@ public class TaskController {
 
         TaskHasTaskConfiguration thtc = taskHasTaskConfigurationDao.getByTaskId(tb.getId());
         tb.setTaskConfigurationId(thtc.getTaskConfigurationId());
-
         model.addAttribute("task", tb);
         return "task/task-edit";
     }

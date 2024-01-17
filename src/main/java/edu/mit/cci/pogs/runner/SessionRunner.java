@@ -345,6 +345,17 @@ public class SessionRunner implements Runnable {
 
             }
         }
+        for (TaskWrapper task : session.getTaskList()) {
+            if(task.getReplayFromSessionEnabled()!=null && task.getReplayFromSessionEnabled()) {
+                TaskReplayScriptProcessor trsp = (TaskReplayScriptProcessor) context.getBean("taskReplayScriptProcessor");
+                trsp.setSessionToReplayFrom(task.getReplayFromSessionId());
+                trsp.setSession(session);
+                trsp.setTaskWrapper(task);
+                Thread thread = new Thread(trsp);
+                thread.start();
+            }
+        }
+
     }
 
     private void scheduleTaskRelatedThreads(SessionWrapper session) {
@@ -765,8 +776,17 @@ public class SessionRunner implements Runnable {
             team.setTaskId(task.getId());
         }
         team = teamDao.create(team);
-        if (session.getRobotSessionEventSourceId() != null) {
-            List<Subject> robotsList = subjectDao.listBySessionId(session.getRobotSessionEventSourceId());
+        Long sessionIdToCopyUsersFrom = null;
+        if(session.getRobotSessionEventSourceId() != null){
+            sessionIdToCopyUsersFrom = session.getRobotSessionEventSourceId();
+        }
+        for (TaskWrapper taskz : session.getTaskList()) {
+            if (taskz.getReplayFromSessionEnabled() != null && taskz.getReplayFromSessionEnabled()) {
+                sessionIdToCopyUsersFrom = taskz.getReplayFromSessionId();
+            }
+        }
+        if (sessionIdToCopyUsersFrom != null) {
+            List<Subject> robotsList = subjectDao.listBySessionId(sessionIdToCopyUsersFrom);
             for (Subject su : robotsList) {
                 Subject robotClone = new Subject();
                 robotClone.setSubjectDisplayName(su.getSubjectDisplayName());
@@ -1153,6 +1173,9 @@ public class SessionRunner implements Runnable {
     public void setShouldRun(boolean shouldRun) {
         this.shouldRun = shouldRun;
 
+    }
+    public void addThreadFromScript(Thread e){
+        this.chatAndScriptRunners.add(e);
     }
 
     public JSONArray getPerpetualSubjectsMigratedToSpawnedSessions() {
