@@ -12,10 +12,6 @@ RUN ["sh","/app/setupRightLocalhostChange.sh"]
 
 
 #[LOCAL START] If running local copy enable this line and disable SERVER.
-# RUN chmod +x ./mvnw &&  \
-#    ./mvnw clean compile package install
-# cp target/pogs-0.0.1-SNAPSHOT.jar .docker/pogsserver/
-COPY .docker/pogsserver/pogs-0.0.1-SNAPSHOT.jar /app/pogs.jar
 #COPY ./target/pogs-0.0.1-SNAPSHOT.jar /app/pogs.jar
 #[LOCAL END]
 
@@ -23,9 +19,9 @@ COPY .docker/pogsserver/pogs-0.0.1-SNAPSHOT.jar /app/pogs.jar
 #[SERVER START]
 #RUN apk update && apk add --no-cache curl
 
-#COPY .docker/pogsserver/downloadLatestBinaryFromGithubReleases.sh /app/downloadLatestBinaryFromGithubReleases.sh
-#RUN ["chmod", "+x", "/app/downloadLatestBinaryFromGithubReleases.sh"]
-#RUN ["sh","/app/downloadLatestBinaryFromGithubReleases.sh"]
+COPY .docker/pogsserver/downloadLatestBinaryFromGithubReleases.sh /app/downloadLatestBinaryFromGithubReleases.sh
+RUN ["chmod", "+x", "/app/downloadLatestBinaryFromGithubReleases.sh"]
+RUN ["sh","/app/downloadLatestBinaryFromGithubReleases.sh"]
 #[SERVER END]
 
 #[TMZ start]
