@@ -3,6 +3,7 @@ package edu.mit.cci.pogs.runner;
 import edu.mit.cci.pogs.model.dao.session.CommunicationConstraint;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -925,7 +926,8 @@ public class SessionRunner implements Runnable {
 
     private String[] shouldSessionStartByConditionScript(Long scriptId, List<Subject> subjects) {
         ScriptEngineManager manager = new ScriptEngineManager();
-        ScriptEngine engine = manager.getEngineByName("JavaScript");
+        NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
+        ScriptEngine engine = factory.getScriptEngine();
         String[] subjectsToJoinSession = null;
         ExecutableScript es = executableScriptDao.get(scriptId);
         if (es != null) {

@@ -3,7 +3,7 @@ database:
   schema: pogs
   url: jdbc:mysql://${database.host}/${database.schema}?allowPublicKeyRetrieval=true&useSSL=false
   username: root
-  password: ${POGS_PASSWORD}
+  password: 1234
 videoprovider:
   providerurl: ${VIDEO_PROVIDER_URL}
   privatekey : ${VIDEO_PROVIDER_PRIVATE_KEY_PATH}

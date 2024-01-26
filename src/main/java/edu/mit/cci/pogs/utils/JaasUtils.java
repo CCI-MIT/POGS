@@ -9,7 +9,9 @@ import java.util.HashMap;
 import java.util.Map;
 import com.auth0.jwt.*;
 import com.auth0.jwt.algorithms.Algorithm;
-import sun.misc.BASE64Decoder;
+import io.netty.handler.codec.base64.Base64Decoder;
+
+import java.util.Base64;
 
 import java.security.interfaces.*;
 import java.util.UUID;
@@ -256,8 +258,8 @@ public class JaasUtils {
     public static RSAPrivateKey getPemPrivateKey(String filename) throws Exception {
         String pem = new String(Files.readAllBytes(Paths.get(filename)));
         String privKey = pem.replace(BEGIN_PRIVATE_KEY, EMPTY).replace(END_PRIVATE_KEY, EMPTY);
-        BASE64Decoder b64=new BASE64Decoder();
-        byte[] decoded = b64.decodeBuffer(privKey);
+        Base64.Decoder b64= Base64.getDecoder();
+        byte[] decoded = b64.decode(privKey);
 
         PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
         KeyFactory kf = KeyFactory.getInstance(RSA);

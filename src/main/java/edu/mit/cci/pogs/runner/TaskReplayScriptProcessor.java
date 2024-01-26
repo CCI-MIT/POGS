@@ -6,6 +6,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.openjdk.nashorn.api.scripting.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
     public void run(){
 
-        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp() - SECONDS_BEFORE_TASK_STARTS) - DateUtils.now();
+        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - DateUtils.now();
        try {
            if (timeBeforeStarts > 0) {
                System.out.println(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks());
@@ -77,11 +78,10 @@ public class TaskReplayScriptProcessor implements Runnable {
                }
            }
 
-
-           ScriptEngineManager manager = new ScriptEngineManager();
+           NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
            ScriptEngine engine;
 
-           engine = manager.getEngineByName("JavaScript");
+           engine = factory.getScriptEngine();
 
            try {
                Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(code.getBytes()));

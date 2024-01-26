@@ -2,6 +2,7 @@ package edu.mit.cci.pogs.runner;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -11,11 +12,9 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 
 import edu.mit.cci.pogs.model.dao.executablescript.ExecutableScriptDao;
 import edu.mit.cci.pogs.model.jooq.tables.pojos.ExecutableScript;
@@ -47,11 +46,15 @@ public class SessionReplayScriptProcessor {
                 code = ex.getScriptContent();
             }
         }
-
+        List< ScriptEngineFactory> list = new ScriptEngineManager().getEngineFactories();
+        for(ScriptEngineFactory sef: list){
+            System.out.println(sef.getEngineName() + " - " + sef.getEngineVersion());
+        }
         ScriptEngineManager manager = new ScriptEngineManager();
+        NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
         ScriptEngine engine;
 
-        engine = manager.getEngineByName("JavaScript");
+        engine = factory.getScriptEngine();
 
         try {
             Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(code.getBytes()));
