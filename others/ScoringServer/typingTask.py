@@ -10,8 +10,8 @@ def score_typing_task(request_parameters):
 	if request_parameters['dictionaryHasGroundTruth'] != None and request_parameters['dictionaryHasGroundTruth'][0] == "true":
 		has_groud_truth = True
 
-	print ' Has Ground Truth: '
-	print str(has_groud_truth)
+	print(' Has Ground Truth: ')
+	print(str(has_groud_truth))
 	if has_groud_truth:
 		return calculate_text_has_ground_truth(request_parameters)
 	else:
@@ -78,7 +78,7 @@ def extract_individual_typed_text_from_completed_task_attributes(request_paramet
 	entries = []
 	for attribute in completed_task_attributes:
 		if 'fullTextAuthor_' in attribute['attributeName'] :
-			print attribute['attributeName']
+			print(attribute['attributeName'])
 			entries.append({ 'subject_external_id' : attribute['attributeName'].replace('fullTextAuthor_',''), 'typed_text':attribute['stringValue'], 'score': 0.0, 'max_score': 0.0 })
 	return entries
 
@@ -117,7 +117,7 @@ def calculate_text_does_not_have_ground_truth(request_parameters):
 							##print "Found correct category  "
 							right_categories_found[dict_entries['entryCategory']] = 1
 						else:
-							print "Found wrong category  "
+							print("Found wrong category  ")
 						break
 				if found:
 					break

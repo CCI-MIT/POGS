@@ -92,7 +92,7 @@ def get_text_sections_by_color_in_order(request_parameters):
 	counter = 0
 	finalDict = []
 	h = HTMLParser()
-	print " ((()()()()()()"
+	print(" ((()()()()()()")
 	for se in colorOrder :
 		#print se
 		colors[se]['author'] = get_string_value_completed_task_attribute(request_parameters, str('subjectAssignedToColor_'+str(counter)))
