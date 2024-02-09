@@ -1,6 +1,7 @@
 package edu.mit.cci.pogs.model.dao.completedtaskscore.impl;
 
 import org.jooq.*;
+import org.jooq.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

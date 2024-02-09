@@ -10,6 +10,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import edu.mit.cci.pogs.model.jooq.tables.pojos.CompletedTask;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 public abstract class AbstractJavascriptRunner {
 
@@ -21,8 +22,9 @@ public abstract class AbstractJavascriptRunner {
 
         this.completedTask = completedTask;
 
+        NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
         ScriptEngineManager manager = new ScriptEngineManager();
-        engine = manager.getEngineByName("JavaScript");
+        engine = factory.getScriptEngine();
 
         setupVariableBindings();
 
