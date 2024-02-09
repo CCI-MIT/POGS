@@ -61,7 +61,7 @@ def scoreStudy(settings):
             else:
                 curTaskScores /= float(curSubTask['Std'])
             
-            print newScores.shape
+            print(newScores.shape)
             newScores += curTaskScores / len(combineParameters[curCombination])
 
         taskNames.append(curCombination)
