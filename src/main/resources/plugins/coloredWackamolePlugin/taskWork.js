@@ -140,7 +140,7 @@ class Wackamole {
                 //if (self.pogsPlugin.getTeammates().length == self.memberReady) {
                     // 5 seconds Count down, then display gameGrid
                     // and mole start popping up randomly
-                    var countDownDate = new Date().getTime() + 5000;
+                    /*var countDownDate = new Date().getTime() + 5000;
                     this.countDownTo(countDownDate, "loadingCountDown",
                     function() {
                         setTimeout(function () {
@@ -150,7 +150,7 @@ class Wackamole {
                             this.molePopUp();
                         }.bind(this), 5000);
                     }.bind(this));
-
+                     */
                 //}
             }
 
@@ -174,6 +174,7 @@ class Wackamole {
             }
             else if (attrName == 'targetHit') {
                 self.totalHitOnTarget++;
+                var cell = message.content.attributeIntegerValue;
                 $("#teamScore").text(self.totalHitOnTarget);
                 //TODO:
                 $("#whack_cell" + cell)
