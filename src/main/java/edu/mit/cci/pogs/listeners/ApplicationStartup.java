@@ -44,7 +44,11 @@ public class ApplicationStartup {
         }
         String pathToPlugins = env.getProperty("spring.datasource.url");
         System.out.println("JDBC URL: " + pathToPlugins);
-
+        System.out.println("   ==================================================================    ");
+        System.out.println("   ==================================================================    ");
+        System.out.println("   ===                       Version 1.12.6                       ===    ");
+        System.out.println("   ==================================================================    ");
+        System.out.println("   ==================================================================    ");
 
     }
 
