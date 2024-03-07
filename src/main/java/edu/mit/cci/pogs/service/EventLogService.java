@@ -1,5 +1,6 @@
 package edu.mit.cci.pogs.service;
 
+import edu.mit.cci.pogs.utils.DateUtils;
 import org.jooq.tools.json.JSONArray;
 import org.jooq.tools.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,7 +94,9 @@ public class EventLogService {
     }
 
     public String getScriptForLogs(Long sessionId) {
+        Long total = DateUtils.now();
         List<EventLog> eventLogs = eventLogDao.listLogsBySessionIdExludingCheckIn(sessionId);
+        System.out.println("TIME FROM DATABASE: " + (DateUtils.now() - total) + " - ");
         String scriptData = "// Script for session id: " + sessionId + "\n";
         scriptData += "// Events ordered by timestamp \n";
         scriptData += "var sessionEventArray={};\n";
