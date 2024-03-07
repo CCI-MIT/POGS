@@ -47,7 +47,7 @@ public class TaskEventReplayRunner implements Runnable {
     private WorkspaceCollaborationWSController collaborationWSController;
 
 
-    private static final Logger _log = LoggerFactory.getLogger(ChatScriptRunner.class);
+    private static final Logger _log = LoggerFactory.getLogger(TaskEventReplayRunner.class);
 
 
     @Autowired
@@ -62,8 +62,8 @@ public class TaskEventReplayRunner implements Runnable {
             if (timeBeforeStarts > 0) {
                 _log.debug("Sleeping before sending, for: " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
-                _log.debug("Sending replay entries for: " + timeBeforeStarts);
             }
+            _log.debug("Sending replay entries for: " + timeBeforeStarts);
             Long lastTimeDiff = 0l;
 
             JSONArray taskEvents = this.sessionEvents.getJSONArray(this.taskWrapper.getId().toString());

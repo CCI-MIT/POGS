@@ -1,6 +1,8 @@
 package edu.mit.cci.pogs.runner;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -51,6 +53,8 @@ public class TaskReplayScriptProcessor implements Runnable {
     @Autowired
     private ExecutableScriptDao executableScriptDao;
 
+    private static final Logger _log = LoggerFactory.getLogger(TaskReplayScriptProcessor.class);
+
     private int SECONDS_BEFORE_TASK_STARTS = 10 * 1000;
 
     public void run(){
@@ -58,11 +62,11 @@ public class TaskReplayScriptProcessor implements Runnable {
         Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - DateUtils.now();
        try {
            if (timeBeforeStarts > 0) {
-               System.out.println(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks());
+               _log.info(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks().size());
                Thread.sleep(timeBeforeStarts);
            }
 
-           System.out.println(" Task Replay Script Processor is starting for Task id: " + taskWrapper.getId());
+           _log.info(" Task Replay Script Processor is starting for Task id: " + taskWrapper.getId());
 
            //setup the variables/script from event log
            String code = null;
@@ -97,7 +101,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
            String sessionEvents = (String) engine
                    .getBindings(ScriptContext.ENGINE_SCOPE).get("sessionEvents");
-           System.out.println(sessionEvents);
+           //System.out.println(sessionEvents);
            JSONObject sessEv = new JSONObject(sessionEvents);
            TaskEventReplayRunner csr = (TaskEventReplayRunner) context.getBean("taskEventReplayRunner");
            csr.setSession(session);
