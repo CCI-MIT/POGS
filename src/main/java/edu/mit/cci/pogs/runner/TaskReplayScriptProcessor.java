@@ -76,7 +76,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
 
            if (sessionScriptToReplayFrom == null) {
-               code = eventLogService.getScriptForLogs(sessionToReplayFrom);
+               code = eventLogService.getScriptForLogs(sessionToReplayFrom);//replace by eventJSON
            } else {
                ExecutableScript ex = executableScriptDao.get(sessionScriptToReplayFrom);
                if (ex != null) {

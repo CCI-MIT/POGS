@@ -93,7 +93,7 @@ public class EventLogService {
     }
 
     public String getScriptForLogs(Long sessionId) {
-        List<EventLog> eventLogs = eventLogDao.listLogsBySessionId(sessionId);
+        List<EventLog> eventLogs = eventLogDao.listLogsBySessionIdExludingCheckIn(sessionId);
         String scriptData = "// Script for session id: " + sessionId + "\n";
         scriptData += "// Events ordered by timestamp \n";
         scriptData += "var sessionEventArray={};\n";
