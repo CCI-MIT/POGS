@@ -257,7 +257,7 @@ class Wackamole {
                     // and mole might disappear when cell click broadcast is received
                     self.pogsPlugin.saveCompletedTaskAttribute('targetHit',
                         "", 0.0,
-                        0, true, '', 'Subject hit mole in cell: ' + cell);
+                        cell, true, '', 'Subject hit mole in cell: ' + cell);
                     //TODO: add animation
                     $("#whack_cell" + cell)
                         .addClass("hit_color")

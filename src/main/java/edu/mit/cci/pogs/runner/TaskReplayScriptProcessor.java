@@ -55,11 +55,11 @@ public class TaskReplayScriptProcessor implements Runnable {
 
     private static final Logger _log = LoggerFactory.getLogger(TaskReplayScriptProcessor.class);
 
-    private int SECONDS_BEFORE_TASK_STARTS = 10 * 1000;
+    private int SECONDS_BEFORE_TASK_STARTS = 7 * 1000;
 
     public void run(){
 
-        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - DateUtils.now();
+        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - (DateUtils.now() + SECONDS_BEFORE_TASK_STARTS);
        try {
            if (timeBeforeStarts > 0) {
                _log.info(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks().size());
@@ -101,7 +101,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
            String sessionEvents = (String) engine
                    .getBindings(ScriptContext.ENGINE_SCOPE).get("sessionEvents");
-           //System.out.println(sessionEvents);
+           _log.debug(sessionEvents);
            JSONObject sessEv = new JSONObject(sessionEvents);
            TaskEventReplayRunner csr = (TaskEventReplayRunner) context.getBean("taskEventReplayRunner");
            csr.setSession(session);
