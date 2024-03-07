@@ -62,6 +62,7 @@ public class TaskEventReplayRunner implements Runnable {
             if (timeBeforeStarts > 0) {
                 _log.debug("Sleeping before sending, for: " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
+                _log.debug("Sending replay entries for: " + timeBeforeStarts);
             }
             Long lastTimeDiff = 0l;
 
