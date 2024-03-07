@@ -42,11 +42,10 @@ public class ApplicationStartup {
             TaskPlugin.addTaskPlugin(tp.getTaskPluginName(), tp);
 
         }
-        String pathToPlugins = env.getProperty("spring.datasource.url");
-        System.out.println("JDBC URL: " + pathToPlugins);
+
         System.out.println("   ==================================================================    ");
         System.out.println("   ==================================================================    ");
-        System.out.println("   ===                       Version 1.12.8                       ===    ");
+        System.out.println("   ===                  POGS Version 1.12.9                       ===    ");
         System.out.println("   ==================================================================    ");
         System.out.println("   ==================================================================    ");
 

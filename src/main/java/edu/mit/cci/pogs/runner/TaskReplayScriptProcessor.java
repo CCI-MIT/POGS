@@ -59,7 +59,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
     public void run(){
 
-        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - (DateUtils.now() + SECONDS_BEFORE_TASK_STARTS);
+        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - (DateUtils.now());
        try {
            if (timeBeforeStarts > 0) {
                _log.info(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks().size());
@@ -72,6 +72,8 @@ public class TaskReplayScriptProcessor implements Runnable {
            String code = null;
            Task updatedTaskFromDB = taskService.get(taskWrapper.getId());
            sessionToReplayFrom = updatedTaskFromDB.getReplayFromSessionId();
+           Long timeForLoadingFromDB = DateUtils.now();
+
 
            if (sessionScriptToReplayFrom == null) {
                code = eventLogService.getScriptForLogs(sessionToReplayFrom);
@@ -81,7 +83,9 @@ public class TaskReplayScriptProcessor implements Runnable {
                    code = ex.getScriptContent();
                }
            }
+           _log.debug("Time to load events from database: " + (DateUtils.now() - timeForLoadingFromDB) + " milliseconds");
 
+           Long timeForJSScript = DateUtils.now();
            NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
            ScriptEngine engine;
 
@@ -98,6 +102,7 @@ public class TaskReplayScriptProcessor implements Runnable {
                System.out.println(se);
                se.printStackTrace();
            }
+           _log.debug("Time to load events in script: " + (DateUtils.now() - timeForJSScript) + " milliseconds");
 
            String sessionEvents = (String) engine
                    .getBindings(ScriptContext.ENGINE_SCOPE).get("sessionEvents");
