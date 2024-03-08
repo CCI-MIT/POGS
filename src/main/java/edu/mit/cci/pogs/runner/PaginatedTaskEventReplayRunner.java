@@ -77,6 +77,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             Integer totalPages = (totalEvents/EVENTS_PER_PAGE);
             CompletedTask currentCompletedTask = taskWrapper.getCompletedTasks().get(0);
             long startTime = currentCompletedTask.getStartTime().getTime();
+            long sendTime = 0l;
             for(int page =0 ; page < totalPages; page++){
                 List<EventLog> events = eventLogService.getEventsBySessionIdCompletedTaskIdTotal(sourceSessionId, ct.getId(),
                         page*EVENTS_PER_PAGE, EVENTS_PER_PAGE);
@@ -85,9 +86,11 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
                     Long eventTime = e.getTimestamp().getTime() - ct.getStartTime().getTime();
                     System.out.println(" > Event: " + eventTime + " - " +((eventTime + startTime) - DateUtils.now()));
                     if( ((eventTime + startTime) - DateUtils.now()) >0 ) {
-                        Thread.sleep((eventTime + startTime)- DateUtils.now());
+                        Thread.sleep((eventTime + startTime)- DateUtils.now() - sendTime);
                     }
+                    sendTime = DateUtils.now();
                     createAndSendMessage(e);
+                    sendTime = sendTime - DateUtils.now();
                 }
             }
 
@@ -109,7 +112,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             if(content.has("attributeIntegerValue"))
                 tamc.setAttributeIntegerValue(content.getLong("attributeIntegerValue"));
             if(content.has("loggableAttribute"))
-                tamc.setLoggableAttribute(content.getBoolean("loggableAttribute"));
+                tamc.setLoggableAttribute(false);//should not save mouse movements on LIVE playing
             if(content.has("summaryDescription"))
 
                 tamc.setSummaryDescription((content.isNull("summaryDescription"))?
