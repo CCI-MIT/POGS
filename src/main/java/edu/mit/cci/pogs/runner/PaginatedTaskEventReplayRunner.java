@@ -75,16 +75,17 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
 
             Integer totalEvents = eventLogService.countEventsBySessionIdCompletedTaskIdTotal(sourceSessionId,ct.getId());
             Integer totalPages = (totalEvents/EVENTS_PER_PAGE);
-            long lastTimeDiff = 0l;
+            CompletedTask currentCompletedTask = taskWrapper.getCompletedTasks().get(0);
+            long startTime = currentCompletedTask.getStartTime().getTime();
             for(int page =0 ; page < totalPages; page++){
-                Long tim = DateUtils.now();
                 List<EventLog> events = eventLogService.getEventsBySessionIdCompletedTaskIdTotal(sourceSessionId, ct.getId(),
                         page*EVENTS_PER_PAGE, EVENTS_PER_PAGE);
-                _log.debug("Elapsed time from database: " + (DateUtils.now() - tim));
+
                 for(EventLog e: events) {
                     Long eventTime = e.getTimestamp().getTime() - ct.getStartTime().getTime();
-                    Thread.sleep((eventTime - lastTimeDiff));
-                    lastTimeDiff = eventTime;
+                    if( ((eventTime + startTime) - DateUtils.now()) >0 ) {
+                        Thread.sleep((eventTime + startTime)- DateUtils.now());
+                    }
                     createAndSendMessage(e);
                 }
             }
