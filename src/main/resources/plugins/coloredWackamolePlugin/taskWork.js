@@ -18,6 +18,9 @@ class Wackamole {
         this.countdowns = {};
         this.blueprint = "";
         //console.log(pogsPlugin);
+        this.taskStartRefereceTimestamp = new Date().getTime();
+        this.mouseBuffer = [];
+        this.lastMouseClearedBuffer = 0;
     }
 
     setupGrid(title, teammates, whackBluePrint, configuration) {
@@ -155,8 +158,11 @@ class Wackamole {
             }
 
             else if (attrName == 'mouseMove') {
-                var position = message.content.attributeStringValue.split(":");
-                this.teammates[message.sender].updatePosition(position[0], position[1]);
+                let infos = message.content.attributeStringValue.split(";");
+                for(let i=0;i < infos.length; i++) {
+                    let position = infos[i].split(":");
+                    this.teammates[message.sender].updatePosition(position[1], position[2]);
+                }
             }
             else if (attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
                 var cell = message.content.attributeIntegerValue;
@@ -298,15 +304,24 @@ class Wackamole {
             "", 0.0,
             cell, false);
     }
-
+    appendMouseMovement(t,x,y){
+        this.mouseBuffer.push(t + ":" + x + ":" + y);
+        if(new Date().getTime() - this.lastMouseClearedBuffer > 500) {
+            let mousBuff = this.mouseBuffer.reduce( (ac,cv) => ac +";" +cv , []);
+            this.mouseBuffer = [];
+            this.lastMouseClearedBuffer = new Date().getTime();
+            this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
+                mousBuff, 0.0,
+                0, true);
+        }
+    }
     handleMouseMove(event) {
         var offset = $('#wackamoleContainer').offset();
         var x = event.pageX - offset.left;
         var y = event.pageY - offset.top;
         // broadcast mouse move
-        this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
-            x + ":" + y, 0.0,
-            0, true);
+        this.appendMouseMovement((new Date().getTime() - this.taskStartRefereceTimestamp),x,y);
+
     }
 
     countDownTo(countDownDate, elementId, callback) {
