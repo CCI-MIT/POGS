@@ -55,7 +55,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
 
     private static final Logger _log = LoggerFactory.getLogger(PaginatedTaskEventReplayRunner.class);
 
-    private static final Integer EVENTS_PER_PAGE = 1000;
+    private static final Integer EVENTS_PER_PAGE = 3000;
     @Override
     public void run() {
 
@@ -83,6 +83,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
 
                 for(EventLog e: events) {
                     Long eventTime = e.getTimestamp().getTime() - ct.getStartTime().getTime();
+                    System.out.println(" > Event: " + eventTime + " - " +((eventTime + startTime) - DateUtils.now()));
                     if( ((eventTime + startTime) - DateUtils.now()) >0 ) {
                         Thread.sleep((eventTime + startTime)- DateUtils.now());
                     }
