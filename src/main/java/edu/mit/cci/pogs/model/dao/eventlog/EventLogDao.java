@@ -16,7 +16,10 @@ public interface EventLogDao extends Dao<EventLog, Long> {
 
     List<EventLog> listLogsBySessionId(Long sessionId);
 
-    List<EventLog> listLogsBySessionIdExludingCheckIn(Long sessionId);
+    List<EventLog> listLogsBySessionIdExcludingCheckIn(Long sessionId);
+    List<EventLog> listLogsBySessionIdCompletedTaskIdExcludingCheckIn(Long sessionId, Long completedTaskId,
+                                                                      int page, int limit);
+    Integer countLogsBySessionIdCompletedTaskIdExcludingCheckIn(Long sessionId, Long completedTaskId);
 
     Integer getCountOfSubjectContribution(Long subjectId, Long completedTaskId, String eventType);
 

@@ -93,9 +93,15 @@ public class EventLogService {
         }
     }
 
+    public Integer countEventsBySessionIdCompletedTaskIdTotal(Long sessionId, Long completedTaskId){
+        return eventLogDao.countLogsBySessionIdCompletedTaskIdExcludingCheckIn(sessionId,completedTaskId);
+    }
+    public List<EventLog> getEventsBySessionIdCompletedTaskIdTotal(Long sessionId, Long completedTaskId, int page, int limit){
+        return eventLogDao.listLogsBySessionIdCompletedTaskIdExcludingCheckIn(sessionId,completedTaskId, page, limit);
+    }
     public String getScriptForLogs(Long sessionId) {
         Long total = DateUtils.now();
-        List<EventLog> eventLogs = eventLogDao.listLogsBySessionIdExludingCheckIn(sessionId);
+        List<EventLog> eventLogs = eventLogDao.listLogsBySessionIdExcludingCheckIn(sessionId);
         System.out.println("TIME FROM DATABASE: " + (DateUtils.now() - total) + " - ");
         String scriptData = "// Script for session id: " + sessionId + "\n";
         scriptData += "// Events ordered by timestamp \n";

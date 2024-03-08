@@ -17,6 +17,7 @@ public interface CompletedTaskDao extends Dao<CompletedTask, Long> {
 
     CompletedTask getBySubjectIdTaskId(Long subjectId, Long taskId);
 
+
     void deleteByRoundId(Long roundId);
 
     List<CompletedTask> listByCompletedTaskIds(List<Long> completedTaskIds);

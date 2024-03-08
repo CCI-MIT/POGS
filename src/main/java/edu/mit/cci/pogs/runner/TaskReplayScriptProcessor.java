@@ -68,53 +68,14 @@ public class TaskReplayScriptProcessor implements Runnable {
 
            _log.info(" Task Replay Script Processor is starting for Task id: " + taskWrapper.getId());
 
-           //setup the variables/script from event log
-           String code = null;
-           Task updatedTaskFromDB = taskService.get(taskWrapper.getId());
-           sessionToReplayFrom = updatedTaskFromDB.getReplayFromSessionId();
-           Long timeForLoadingFromDB = DateUtils.now();
+           PaginatedTaskEventReplayRunner ptrr = (PaginatedTaskEventReplayRunner) context.getBean("paginatedTaskEventReplayRunner");
+           ptrr.setSourceSessionId(sessionToReplayFrom);
+           ptrr.setTaskWrapper(this.taskWrapper);
+           ptrr.setSession(this.session);
 
-
-           if (sessionScriptToReplayFrom == null) {
-               code = eventLogService.getScriptForLogs(sessionToReplayFrom);//replace by eventJSON
-           } else {
-               ExecutableScript ex = executableScriptDao.get(sessionScriptToReplayFrom);
-               if (ex != null) {
-                   code = ex.getScriptContent();
-               }
-           }
-           _log.debug("Time to load events from database: " + (DateUtils.now() - timeForLoadingFromDB) + " milliseconds");
-
-           Long timeForJSScript = DateUtils.now();
-           NashornScriptEngineFactory factory = new NashornScriptEngineFactory();
-           ScriptEngine engine;
-
-           engine = factory.getScriptEngine();
-
-           try {
-               Reader scriptReader = new InputStreamReader(new ByteArrayInputStream(code.getBytes()));
-
-               engine.eval(scriptReader);
-               scriptReader.close();
-
-           } catch (ScriptException | IOException se) {
-               //plugin script failed.
-               System.out.println(se);
-               se.printStackTrace();
-           }
-           _log.debug("Time to load events in script: " + (DateUtils.now() - timeForJSScript) + " milliseconds");
-
-           String sessionEvents = (String) engine
-                   .getBindings(ScriptContext.ENGINE_SCOPE).get("sessionEvents");
-           _log.debug(sessionEvents);
-           JSONObject sessEv = new JSONObject(sessionEvents);
-           TaskEventReplayRunner csr = (TaskEventReplayRunner) context.getBean("taskEventReplayRunner");
-           csr.setSession(session);
-           csr.setTaskWrapper(taskWrapper);
-           csr.setSessionEvents(sessEv);
            SessionRunner sr = SessionRunnerManager.getSessionRunner(session.getId());
 
-           Thread thread = new Thread(csr);
+           Thread thread = new Thread(ptrr);
            thread.start();
            sr.addThreadFromScript(thread);
        }catch (InterruptedException ie) {
@@ -123,17 +84,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
     }
 
-    public Long getSessionScriptToReplayFrom() {
-        return sessionScriptToReplayFrom;
-    }
 
-    public void setSessionScriptToReplayFrom(Long sessionScriptToReplayFrom) {
-        this.sessionScriptToReplayFrom = sessionScriptToReplayFrom;
-    }
-
-    public Long getSessionToReplayFrom() {
-        return sessionToReplayFrom;
-    }
 
     public void setSessionToReplayFrom(Long sessionToReplayFrom) {
         this.sessionToReplayFrom = sessionToReplayFrom;
@@ -155,13 +106,6 @@ public class TaskReplayScriptProcessor implements Runnable {
         this.session = session;
     }
 
-    public EventLogService getEventLogService() {
-        return eventLogService;
-    }
-
-    public void setEventLogService(EventLogService eventLogService) {
-        this.eventLogService = eventLogService;
-    }
 
     public ApplicationContext getContext() {
         return context;
