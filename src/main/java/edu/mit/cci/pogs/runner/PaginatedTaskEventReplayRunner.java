@@ -74,7 +74,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             _log.debug("Sending replay entries for: " + timeBeforeStarts);
 
             Integer totalEvents = eventLogService.countEventsBySessionIdCompletedTaskIdTotal(sourceSessionId,ct.getId());
-            Integer totalPages = (totalEvents/EVENTS_PER_PAGE);
+            Integer totalPages =   Double.valueOf(Math.ceil(totalEvents/EVENTS_PER_PAGE)).intValue();
             CompletedTask currentCompletedTask = taskWrapper.getCompletedTasks().get(0);
             long startTime = currentCompletedTask.getStartTime().getTime();
             long sendTime = 0l;
