@@ -163,7 +163,7 @@ class Wackamole {
                     let position = infos[i].split(":");
                     setTimeout(function(){
                         this.teammates[message.sender].updatePosition(position[1], position[2]);
-                    },(new Date().getTime() - this.taskStartRefereceTimestamp + parseInt(position[0])));
+                    }.bind(this),(this.taskStartRefereceTimestamp + parseInt(position[0]) - new Date().getTime()));
 
                 }
             }

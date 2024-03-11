@@ -59,7 +59,7 @@ public class TaskReplayScriptProcessor implements Runnable {
 
     public void run(){
 
-        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - (DateUtils.now());
+        Long timeBeforeStarts = (taskWrapper.getTaskStartTimestamp()) - (3*1000) - (DateUtils.now());
        try {
            if (timeBeforeStarts > 0) {
                _log.info(" Time until Task Replay Script Processor: " + taskWrapper.getId() + " starts : " + timeBeforeStarts + " - # OF CTS: " + taskWrapper.getCompletedTasks().size());
