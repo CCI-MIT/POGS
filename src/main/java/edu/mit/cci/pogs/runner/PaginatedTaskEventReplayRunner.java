@@ -58,7 +58,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
     @Override
     public void run() {
 
-        Long timeBeforeStarts = taskWrapper.getPrimerEndTime() - new Date().getTime();
+        Long timeBeforeStarts = taskWrapper.getTaskStartTimestamp() - new Date().getTime();
         List<Round> roundId = roundDao.listBySessionId(sourceSessionId);
         CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(roundId.get(0).getId(), null, taskWrapper.getId());
         if(ct == null) {
@@ -87,18 +87,19 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
                         list = new ArrayList<>();
                     }
                     list.add(e);
-                    eventLogMap.put(e.getTimestamp().getTime(), list);
+                    Long eventTime = e.getTimestamp().getTime() - ct.getStartTime().getTime();
+                    eventLogMap.put(eventTime, list);
                 }
+                _log.debug("Added " + eventLogMap.keySet().size() + " different timestamps to be sent");
 
                 Iterator<Long> iterator = eventLogMap.keySet().iterator();
                 while (iterator.hasNext()) {
-                    Long timestamp = iterator.next();
-                    Long eventTime = timestamp - ct.getStartTime().getTime();
+                    Long eventTime = iterator.next();
                     System.out.println(" > Event: " + eventTime + " - " + ((eventTime + startTime) - DateUtils.now()));
                     if (((eventTime + startTime) - DateUtils.now()) > 0) {
                         Thread.sleep((eventTime + startTime) - DateUtils.now() - sendTime);
                     }
-                    for (EventLog e : eventLogMap.get(timestamp)) {
+                    for (EventLog e : eventLogMap.get(eventTime)) {
                         sendTime = DateUtils.now();
                         createAndSendMessage(e);
                         sendTime = sendTime - DateUtils.now();
