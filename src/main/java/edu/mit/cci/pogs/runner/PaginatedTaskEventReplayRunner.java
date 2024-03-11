@@ -22,8 +22,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -78,20 +77,34 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             CompletedTask currentCompletedTask = taskWrapper.getCompletedTasks().get(0);
             long startTime = currentCompletedTask.getStartTime().getTime();
             long sendTime = 0l;
-            for(int page =0 ; page < totalPages; page++){
+            for(int page =0 ; page < totalPages; page++) {
                 List<EventLog> events = eventLogService.getEventsBySessionIdCompletedTaskIdTotal(sourceSessionId, ct.getId(),
-                        page*EVENTS_PER_PAGE, EVENTS_PER_PAGE);
-
-                for(EventLog e: events) {
-                    Long eventTime = e.getTimestamp().getTime() - ct.getStartTime().getTime();
-                    System.out.println(" > Event: " + eventTime + " - " +((eventTime + startTime) - DateUtils.now()));
-                    if( ((eventTime + startTime) - DateUtils.now()) >0 ) {
-                        Thread.sleep((eventTime + startTime)- DateUtils.now() - sendTime);
+                        page * EVENTS_PER_PAGE, EVENTS_PER_PAGE);
+                Map<Long, List<EventLog>> eventLogMap = new HashMap<>();
+                for (EventLog e : events) {
+                    List<EventLog> list = eventLogMap.get(e.getTimestamp().getTime());
+                    if (list == null) {
+                        list = new ArrayList<>();
                     }
-                    sendTime = DateUtils.now();
-                    createAndSendMessage(e);
-                    sendTime = sendTime - DateUtils.now();
+                    list.add(e);
+                    eventLogMap.put(e.getTimestamp().getTime(), list);
                 }
+
+                Iterator<Long> iterator = eventLogMap.keySet().iterator();
+                while (iterator.hasNext()) {
+                    Long timestamp = iterator.next();
+                    Long eventTime = timestamp - ct.getStartTime().getTime();
+                    System.out.println(" > Event: " + eventTime + " - " + ((eventTime + startTime) - DateUtils.now()));
+                    if (((eventTime + startTime) - DateUtils.now()) > 0) {
+                        Thread.sleep((eventTime + startTime) - DateUtils.now() - sendTime);
+                    }
+                    for (EventLog e : eventLogMap.get(timestamp)) {
+                        sendTime = DateUtils.now();
+                        createAndSendMessage(e);
+                        sendTime = sendTime - DateUtils.now();
+                    }
+                }
+
             }
 
         }catch (InterruptedException ie) {
@@ -112,7 +125,11 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             if(content.has("attributeIntegerValue"))
                 tamc.setAttributeIntegerValue(content.getLong("attributeIntegerValue"));
             if(content.has("loggableAttribute"))
-                tamc.setLoggableAttribute(false);//should not save mouse movements on LIVE playing
+                if(tamc.getAttributeName().contains("mouseMove")) {
+                    tamc.setLoggableAttribute(false);//should not save mouse movements on LIVE playing
+                } else {
+                    tamc.setLoggableAttribute(true);
+                }
             if(content.has("summaryDescription"))
 
                 tamc.setSummaryDescription((content.isNull("summaryDescription"))?

@@ -161,7 +161,10 @@ class Wackamole {
                 let infos = message.content.attributeStringValue.split(";");
                 for(let i=0;i < infos.length; i++) {
                     let position = infos[i].split(":");
-                    this.teammates[message.sender].updatePosition(position[1], position[2]);
+                    setTimeout(function(){
+                        this.teammates[message.sender].updatePosition(position[1], position[2]);
+                    },(new Date().getTime() - this.taskStartRefereceTimestamp + parseInt(position[0])));
+
                 }
             }
             else if (attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
