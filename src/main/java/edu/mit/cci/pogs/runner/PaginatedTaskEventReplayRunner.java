@@ -80,7 +80,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
             for(int page =0 ; page < totalPages; page++) {
                 List<EventLog> events = eventLogService.getEventsBySessionIdCompletedTaskIdTotal(sourceSessionId, ct.getId(),
                         page * EVENTS_PER_PAGE, EVENTS_PER_PAGE);
-                Map<Long, ArrayList<EventLog>> eventLogMap = new HashMap<>();
+                Map<Long, ArrayList<EventLog>> eventLogMap = new LinkedHashMap<>();
                 for (EventLog e : events) {
                     Long eventTime = (e.getTimestamp().getTime() - ct.getStartTime().getTime());
                     ArrayList<EventLog> list = eventLogMap.get(eventTime);
@@ -91,6 +91,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
                     eventLogMap.put(eventTime, list);
                 }
                 _log.debug("Added " + eventLogMap.keySet().size() + " different timestamps to be sent");
+                _log.debug("[ " + eventLogMap.keySet().toArray().toString() + " ] ");
 
                 for (Long eventTime : eventLogMap.keySet()) {
                     _log.debug(" > Event: " + eventTime + " - " + ((eventTime + startTime) - DateUtils.now()));
