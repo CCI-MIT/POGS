@@ -58,7 +58,7 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
     @Override
     public void run() {
 
-        Long timeBeforeStarts = taskWrapper.getTaskStartTimestamp() - new Date().getTime();
+        Long timeBeforeStarts = taskWrapper.getTaskStartTimestamp() + 500 - new Date().getTime();
         List<Round> roundId = roundDao.listBySessionId(sourceSessionId);
         CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(roundId.get(0).getId(), null, taskWrapper.getId());
         if(ct == null) {
