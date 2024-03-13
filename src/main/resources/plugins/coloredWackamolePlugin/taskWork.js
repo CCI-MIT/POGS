@@ -158,6 +158,7 @@ class Wackamole {
             }
 
             else if (attrName == 'mouseMove') {
+                /*
                 let infos = message.content.attributeStringValue.split(";");
                 for(let i=0;i < infos.length; i++) {
                     let position = infos[i].split(":");
@@ -165,7 +166,9 @@ class Wackamole {
                         this.teammates[message.sender].updatePosition(position[1], position[2]);
                     }.bind(this),(this.taskStartRefereceTimestamp + parseInt(position[0]) - new Date().getTime()));
 
-                }
+                }*/
+                let position = message.content.attributeStringValue.split(":");
+                this.teammates[message.sender].updatePosition(position[0], position[1]);
             }
             else if (attrName == 'clickInCell') {  // TODO: Same code is repeated; should this be a common function?
                 var cell = message.content.attributeIntegerValue;
@@ -323,7 +326,10 @@ class Wackamole {
         var x = event.pageX - offset.left;
         var y = event.pageY - offset.top;
         // broadcast mouse move
-        this.appendMouseMovement((new Date().getTime() - this.taskStartRefereceTimestamp),x,y);
+        //this.appendMouseMovement((new Date().getTime() - this.taskStartRefereceTimestamp),x,y);
+        this.pogsPlugin.saveCompletedTaskAttribute('mouseMove',
+            x+':'+y, 0.0,
+            0, true);
 
     }
 
