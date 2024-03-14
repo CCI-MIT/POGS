@@ -69,6 +69,7 @@ class Wackamole {
 
         // mouse move event
         $("#wackamoleContainer").on('mousemove', self.handleMouseMove.bind(self));
+        $("#blackOut").on('click',this.handleSendBlackOut.bind(this));
 
         self.pogsPlugin.saveCompletedTaskAttribute('totalOfRounds',
                                                    "", 0.0,
@@ -92,7 +93,12 @@ class Wackamole {
             if (callNow) func.apply(context, args);
         };
     }
+    handleSendBlackOut(){
 
+        this.pogsPlugin.saveCompletedTaskAttribute('blackoutSent',
+            "", 0.0,
+            cell, true, '', 'Subject sent blackout to other team: ');
+    }
     initPlayers(teammates, myId) {
         var self = this;
         self.subjectId = myId; // this is my id
@@ -195,6 +201,22 @@ class Wackamole {
                     $(this).removeClass("hit_color");
                     next();
                 });
+            } else if (attrName == 'blackoutReceived') {
+                $("#countDownModal").modal("show");
+                $("#loadingCountDown").html("You received a blackout from the other team...");
+
+                var countDownDate = new Date().getTime() + 10000;
+                self.countDownTo(countDownDate, "loadingCountDown",
+                    function () {
+                        setTimeout(function () {
+                            $("#countDownModal").modal("hide");
+                            $("#gameColumn").remove('.modal-backdrop');
+                            $("#gameColumn").removeClass("after_modal_appended");
+
+                        }.bind(this), 1)
+                    }.bind(this)
+                );
+
             }
         }
     }
