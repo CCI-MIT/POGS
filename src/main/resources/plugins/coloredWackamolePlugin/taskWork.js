@@ -219,7 +219,7 @@ class Wackamole {
         $("#countDownModal").modal("show");
 
         var countDownDate = new Date().getTime() + 10000;
-        self.countDownTo(countDownDate, "loadingCountDown",
+        this.countDownTo(countDownDate, "loadingCountDown",
             function () {
                 setTimeout(function () {
                     $("#countDownModal").modal("hide");
