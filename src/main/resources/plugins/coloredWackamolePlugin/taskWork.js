@@ -94,14 +94,14 @@ class Wackamole {
         };
     }
     handleSendBlackOut(){
-        $("#blackOut").disable();
+        $("#blackOut").prop("disabled",true);
         $("#blackOut").text("Blackout sent")
         this.pogsPlugin.saveCompletedTaskAttribute('blackoutSent',
             "", 0.0,
             0, true, '', 'Subject sent blackout to other team: ');
         setTimeout(function(){
             $("#blackOut").text("Send a blackout")
-            $("#blackOut").enable();
+            $("#blackOut").prop("disabled",false);
         },1000*60*1)
     }
     initPlayers(teammates, myId) {
