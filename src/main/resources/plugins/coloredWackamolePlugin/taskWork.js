@@ -414,43 +414,47 @@ class Wackamole {
         let cellTime = null;
         for(let i =0 ; i < lines.length; i++ ) {
             line = lines[i].split(";");
-            if(line[1] === "BLACK"){
-                this.handleBlackoutReceived();
-                continue;
-            }
             cellIndex = line[2];
             cellKind = line[1];
             cellTime = line[0];
+            if(cellKind === "BLACK"){
+                setTimeout(
+                function(){this.handleBlackoutReceived()}.bind(this),
+                cellTime)
 
-            setTimeout(function (cellIndex, cellKind, cellTime) {
-                console.log("[ #whack_cell" +cellIndex + "] " + cellTime);
+            } else {
 
-                $("#whack_cell" + cellIndex).addClass("hasMole");
-                $("#whack_cell" + cellIndex).addClass(cellKind);
-                $("#whack_cell" + cellIndex).append('<i class="fa fa-optin-monster" data-cell-reference-index="' + cellIndex + '"></i>');
 
-                // trigger mole added event
-                //$("#whack_cell" + randomCell).trigger("addMole");
-                self.totalTarget++;
-                self.currentMoleNumber++;
+                setTimeout(function (cellIndex, cellKind, cellTime) {
+                    //console.log("[ #whack_cell" + cellIndex + "] " + cellTime);
 
-                // remove mole after moleAppearTime
-                setTimeout(function (cellIndex,  cellKind, cellTime) {
-                    $("#whack_cell" + cellIndex).removeClass("hasMole");
-                    $("#whack_cell" + cellIndex).removeClass("RED");
-                    $("#whack_cell" + cellIndex).removeClass("GREEN");
-                    $("#whack_cell" + cellIndex).removeClass("BLUE");
-                    $("#whack_cell" + cellIndex).removeClass("BROWN");
-                    $("#whack_cell" + cellIndex).find('.fa-optin-monster').remove();
+                    $("#whack_cell" + cellIndex).addClass("hasMole");
+                    $("#whack_cell" + cellIndex).addClass(cellKind);
+                    $("#whack_cell" + cellIndex).append('<i class="fa fa-optin-monster" data-cell-reference-index="' + cellIndex + '"></i>');
 
-                    // trigger mole remove event
-                    //$("#whack_cell" + randomCell).trigger("removeMole");
+                    // trigger mole added event
+                    //$("#whack_cell" + randomCell).trigger("addMole");
+                    self.totalTarget++;
+                    self.currentMoleNumber++;
 
-                    self.currentMoleNumber--;
+                    // remove mole after moleAppearTime
+                    setTimeout(function (cellIndex, cellKind, cellTime) {
+                        $("#whack_cell" + cellIndex).removeClass("hasMole");
+                        $("#whack_cell" + cellIndex).removeClass("RED");
+                        $("#whack_cell" + cellIndex).removeClass("GREEN");
+                        $("#whack_cell" + cellIndex).removeClass("BLUE");
+                        $("#whack_cell" + cellIndex).removeClass("BROWN");
+                        $("#whack_cell" + cellIndex).find('.fa-optin-monster').remove();
 
-                }, self.moleAppearTime, cellIndex,  cellKind, cellTime);
+                        // trigger mole remove event
+                        //$("#whack_cell" + randomCell).trigger("removeMole");
 
-            },cellTime,  cellIndex,  cellKind, cellTime);
+                        self.currentMoleNumber--;
+
+                    }, self.moleAppearTime, cellIndex, cellKind, cellTime);
+
+                }, cellTime, cellIndex, cellKind, cellTime);
+            }
         }
     }
 
