@@ -255,7 +255,7 @@ class Wackamole {
         //if (this.pogsPlugin.getTeammates().length == self.memberReady) {
             // 5 seconds Count down, then display gameGrid
             // and mole start popping up randomly
-            var countDownDate = new Date().getTime() + 5000;
+            var countDownDate = new Date().getTime() + 60*1000;
             self.countDownTo(countDownDate, "loadingCountDown",
             function () {
                 setTimeout(function () {
@@ -265,7 +265,7 @@ class Wackamole {
 
                     this.molePopUp();
 
-                }.bind(this), 5000)
+                }.bind(this), 60*1000)
             }.bind(this)
             );
         //}

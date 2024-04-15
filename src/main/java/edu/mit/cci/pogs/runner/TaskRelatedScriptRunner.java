@@ -122,6 +122,7 @@ public abstract class TaskRelatedScriptRunner extends AbstractJavascriptRunner {
         List<CompletedTaskAttribute> list = completedTaskAttributeService.listCompletedTaskAttributes(getCompletedTask().getId());
         for(CompletedTaskAttribute sea: list){
             if(sea.getAttributeName().equals("REPLAY_SESSION_ID")){
+                System.out.println("Found replay session override in TASK ID.");
                 Task taskToUpdate = taskService.get(getCompletedTask().getTaskId());
                 taskToUpdate.setReplayFromSessionId(Long.parseLong(sea.getStringValue()));
                 taskService.update(taskToUpdate);

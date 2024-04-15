@@ -59,18 +59,19 @@ public class PaginatedTaskEventReplayRunner implements Runnable {
     public void run() {
 
         Long timeBeforeStarts = taskWrapper.getTaskStartTimestamp() + 500 - new Date().getTime();
-        List<Round> roundId = roundDao.listBySessionId(sourceSessionId);
-        CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(roundId.get(0).getId(), null, taskWrapper.getId());
-        if(ct == null) {
-            return;
-        }
+
         _log.info("Starting taskEventReplay for task: " + taskWrapper.getId());
         try {
             if (timeBeforeStarts > 0) {
                 _log.debug("Sleeping before sending, for: " + timeBeforeStarts);
                 Thread.sleep(timeBeforeStarts);
             }
-            _log.debug("Sending replay entries for: " + timeBeforeStarts);
+            _log.debug("Sending replay entries for: " + timeBeforeStarts + " for source session ID: " + sourceSessionId);
+            List<Round> roundId = roundDao.listBySessionId(sourceSessionId);
+            CompletedTask ct = completedTaskDao.getByRoundIdTaskIdTeamId(roundId.get(0).getId(), null, taskWrapper.getId());
+            if(ct == null) {
+                return;
+            }
 
             Integer totalEvents = eventLogService.countEventsBySessionIdCompletedTaskIdTotal(sourceSessionId,ct.getId());
             Integer totalPages =   Double.valueOf(Math.ceil((double) totalEvents/EVENTS_PER_PAGE)).intValue();
