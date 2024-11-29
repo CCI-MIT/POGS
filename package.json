@@ -30,7 +30,7 @@
     "fast-diff": "^1.1.2",
     "font-awesome": "^4.7.0",
     "html5sortable": "^0.9.2",
-    "jquery": "1.12.4",
+    "jquery": "3.5.1",
     "jquery-datetimepicker": "^2.5.20",
     "jsonlint": "^1.6.3",
     "loglevel": "^1.6.1",
